@@ -1,3 +1,4 @@
 build
-*.pro*
-src/twitter-secrets.h
+*.pro.*
+src/lib/twitter-secrets.h
+report

@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/harbour-twablet.qml</file>
+        <file>qml/pages/AccountsPage.qml</file>
+        <file>qml/pages/AddColumnPage.qml</file>
+        <file>qml/pages/AuthentificationPage.qml</file>
+        <file>qml/pages/ColumnLayout.qml</file>
+        <file>qml/pages/MainPage.qml</file>
+        <file>qml/cover/CoverPage.qml</file>
+    </qresource>
+</RCC>
