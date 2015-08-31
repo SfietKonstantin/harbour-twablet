@@ -95,33 +95,16 @@
         <source>There is no column defined. Pull down to add a column.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>TwitterAuthentification</name>
     <message>
-        <source>An error happened when connecting to Twitter. Please check your internet connection.</source>
+        <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>An error happened when authentification to Twitter please retry.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>TwitterModel</name>
-    <message>
-        <source>Error while sending query to Twitter, check your internet connection.</source>
+        <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error while reading data from Twitter.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>TwitterTimelineQuery</name>
-    <message>
-        <source>Timeline</source>
+        <source>New tweet</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

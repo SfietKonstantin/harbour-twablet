@@ -26,3 +26,6 @@ OTHER_FILES += \
     pages/AddColumnPage.qml \
     cover/CoverPage.qml
 
+CONFIG += sailfishapp_i18n
+
+TRANSLATIONS += translations/harbour-twablet-de.ts

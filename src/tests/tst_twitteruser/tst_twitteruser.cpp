@@ -65,7 +65,7 @@ private Q_SLOTS:
     void testModel()
     {
         TwitterDataRepositoryObject repositoryObject {};
-        TwitterUserRepository &repository {repositoryObject.users()};
+        TwitterUserRepository &repository (repositoryObject.users());
 
         for (int i = 0; i < 3; ++i) {
             repository.add(TwitterUser(QString::number(i + 1), QString(), QString(),
