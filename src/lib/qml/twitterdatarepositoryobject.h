@@ -38,6 +38,12 @@
 #include "layoutrepository.h"
 #include "twittertweetcentralrepository.h"
 
+class LayoutComparator
+{
+public:
+    bool operator()(const Layout &first, const Layout &second) const;
+};
+
 class TwitterDataRepositoryObject : public QObject
 {
     Q_OBJECT
@@ -45,7 +51,7 @@ public:
     explicit TwitterDataRepositoryObject(QObject *parent = 0);
     TwitterUserRepository & users();
     LayoutRepository & layouts();
-    TwitterTweetRepository & tweets(int layoutIndex);
+    TwitterTweetRepository & tweets(const Layout &layout);
 public slots:
     void addUser(const QString &name, const QString &userId, const QString &screenName,
                  const QString &token, const QString &tokenSecret);
@@ -57,7 +63,7 @@ private:
     TwitterUserRepository m_users {};
     LayoutRepository m_layouts {};
     TwitterTweetCentralRepository m_tweetsCentralRepository {};
-    std::vector<TwitterTweetRepository> m_tweetRepositories {};
+    std::map<Layout, TwitterTweetRepository, LayoutComparator> m_tweetRepositories {};
 };
 
 #endif // TWITTERDATAREPOSITORYOBJECT_H

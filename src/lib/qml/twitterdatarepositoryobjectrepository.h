@@ -67,7 +67,8 @@ template<> class TwitterDataRepositoryObjectRepository<TwitterTweet>
 public:
     static TwitterTweetRepository & get(TwitterDataRepositoryObject &repository, int layoutIndex)
     {
-        return repository.tweets(layoutIndex);
+        const Layout &layout {*(repository.layouts().begin() + layoutIndex)};
+        return repository.tweets(layout);
     }
 };
 

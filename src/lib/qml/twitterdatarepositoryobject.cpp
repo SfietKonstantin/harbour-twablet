@@ -33,14 +33,36 @@
 #include "twitterquery.h"
 #include <QtCore/QVariantMap>
 
+bool LayoutComparator::operator()(const Layout &first, const Layout &second) const
+{
+    if (first.userId() < second.userId()) {
+        return true;
+    }
+    if (first.userId() > second.userId()) {
+        return false;
+    }
+
+    const TwitterQuery &firstQuery {first.query()};
+    const TwitterQuery &secondQuery {first.query()};
+
+    if (firstQuery.type() < secondQuery.type()) {
+        return true;
+    }
+
+    if (firstQuery.type() > secondQuery.type()) {
+        return false;
+    }
+
+    return firstQuery.arguments() < secondQuery.arguments();
+}
+
 TwitterDataRepositoryObject::TwitterDataRepositoryObject(QObject *parent)
     : QObject(parent)
 {
     m_loadSaveManager.load(m_users);
     m_loadSaveManager.load(m_layouts);
     for (const Layout &layout : m_layouts) {
-        Q_UNUSED(layout)
-        m_tweetRepositories.emplace_back();
+        m_tweetRepositories.emplace(layout, std::move(TwitterTweetRepository()));
     }
 }
 
@@ -54,9 +76,9 @@ LayoutRepository & TwitterDataRepositoryObject::layouts()
     return m_layouts;
 }
 
-TwitterTweetRepository & TwitterDataRepositoryObject::tweets(int layoutIndex)
+TwitterTweetRepository & TwitterDataRepositoryObject::tweets(const Layout &layout)
 {
-    return m_tweetRepositories[layoutIndex];
+    return m_tweetRepositories[layout];
 }
 
 void TwitterDataRepositoryObject::addUser(const QString &name, const QString &userId,
@@ -97,19 +119,18 @@ void TwitterDataRepositoryObject::addLayout(const QString &name, int userIndex, 
 
     m_layouts.add(Layout(name, user.userId(), TwitterQuery(static_cast<TwitterQuery::Type>(queryType),
                                                            std::move(queryArguments))));
-    m_tweetRepositories.emplace_back();
+    m_tweetRepositories.emplace(*(std::end(m_layouts) - 1), TwitterTweetRepository());
     m_loadSaveManager.save(m_layouts);
     refresh();
 }
 
 void TwitterDataRepositoryObject::refresh()
 {
-
-    for (int i = 0; i < m_layouts.count(); ++i) {
-        const Layout &layout {*(m_layouts.begin() + i)};
+    for (auto it = std::begin(m_tweetRepositories); it != std::end(m_tweetRepositories); ++it) {
+        const Layout &layout {it->first};
         const TwitterUser &user {m_users.find(layout.userId())};
         if (!user.isNull()) {
-            m_tweetsCentralRepository.query(layout.name(), user, layout.query(), m_tweetRepositories[i]);
+            m_tweetsCentralRepository.query(user, layout.query(), it->second);
         }
     }
 }

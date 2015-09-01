@@ -51,7 +51,7 @@ class TwitterTweetCentralRepository: public QObject
 public:
     explicit TwitterTweetCentralRepository();
     DISABLE_COPY_DEFAULT_MOVE(TwitterTweetCentralRepository);
-    void query(const QString &layoutName, const TwitterUser &user, const TwitterQuery &query,
+    void query(const TwitterUser &user, const TwitterQuery &query,
                TwitterTweetRepository &repository);
 private:
     static ITwitterQueryHandler * createQueryHandler(const TwitterQuery &query);
