@@ -48,7 +48,7 @@ private Q_SLOTS:
     {
         TwitterUserRepository repository {};
         for (int i = 0; i < 4; ++i) {
-            repository.add(TwitterUser(QString::number(i + 1), QString(), QString(),
+            repository.append(TwitterUser(QString::number(i + 1), QString(), QString(),
                                        QByteArray(), QByteArray()));
         }
         QCOMPARE((std::begin(repository) + 0)->name(), QString::number(1));
@@ -68,7 +68,7 @@ private Q_SLOTS:
         TwitterUserRepository &repository (repositoryObject.users());
 
         for (int i = 0; i < 3; ++i) {
-            repository.add(TwitterUser(QString::number(i + 1), QString(), QString(),
+            repository.append(TwitterUser(QString::number(i + 1), QString(), QString(),
                                        QByteArray(), QByteArray()));
         }
 
@@ -82,7 +82,7 @@ private Q_SLOTS:
         QCOMPARE(getObject(model, 1)->name(), QString::number(2));
         QCOMPARE(getObject(model, 2)->name(), QString::number(3));
 
-        repository.add(TwitterUser(QString::number(4), QString(), QString(),
+        repository.append(TwitterUser(QString::number(4), QString(), QString(),
                                    QByteArray(), QByteArray()));
 
         QCOMPARE(model.count(), 4);

@@ -41,8 +41,10 @@ public:
     explicit TwitterTimelineQueryHandler();
     DISABLE_COPY_DISABLE_MOVE(TwitterTimelineQueryHandler);
 private:
-    void createRequest(QString &path, std::map<QString, QString> &parameters) const;
-    bool treatReply(const QByteArray &data, std::vector<TwitterTweet> &items, QString &errorMessage) const;
+    void createRequest(QString &path, std::map<QString, QString> &parameters) const override;
+    bool treatReply(const QByteArray &data, std::vector<TwitterTweet> &items,
+                    QString &errorMessage, Placement &placement) override;
+    QString m_sinceId {};
 };
 
 #endif // TWITTERTIMELINEQUERYHANDLER_H

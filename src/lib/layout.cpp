@@ -55,3 +55,13 @@ TwitterQuery Layout::query() const
 {
     return m_query;
 }
+
+int Layout::unread() const
+{
+    return m_unread;
+}
+
+void Layout::setUnread(int unread)
+{
+    m_unread = unread;
+}

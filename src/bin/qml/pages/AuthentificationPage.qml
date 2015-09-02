@@ -35,17 +35,13 @@ import harbour.twablet 1.0
 
 Dialog {
     id: container
-    canAccept: nameField.text.length > 0
+    canAccept: false
     allowedOrientations: app.defaultAllowedOrientations
     Component.onCompleted: state = "initial"
     onStatusChanged: {
         if (status === PageStatus.Active) {
             authentification.startRequest()
         }
-    }
-    onAccepted: {
-        Repository.addUser(nameField.text, authentification.userId, authentification.screenName,
-                               authentification.token, authentification.tokenSecret)
     }
 
     TwitterAuthentification {
@@ -60,8 +56,13 @@ Dialog {
             error.text = errorMessage
         }
         onDone: {
-            container.state = "done"
-            nameField.text = screenName
+            pageStack.replace(Qt.resolvedUrl("AccountPage.qml"),
+                              {
+                                  userId: authentification.userId,
+                                  screenName: authentification.screenName,
+                                  token: authentification.token,
+                                  tokenSecret: authentification.tokenSecret
+                              })
         }
     }
 
@@ -128,42 +129,7 @@ Dialog {
                     }
                 }
             }
-
-            Column {
-                id: editor
-                anchors.left: parent.left; anchors.right: parent.right
-                DialogHeader {
-                    acceptText: qsTr("Add account")
-                }
-                Item {
-                    anchors.left: parent.left; anchors.leftMargin: Theme.horizontalPageMargin
-                    anchors.right: parent.right; anchors.rightMargin: Theme.horizontalPageMargin
-                    height: Theme.itemSizeLarge
-
-                    Image {
-                        id: icon
-                        width: Theme.itemSizeMedium
-                        height: Theme.itemSizeMedium
-                        source: "image://theme/icon-m-service-twitter"
-                    }
-
-                    Label {
-                        anchors.left: icon.right; anchors.leftMargin: Theme.paddingMedium
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: authentification.screenName
-                        font.pixelSize: Theme.fontSizeLarge
-                        color: Theme.highlightColor
-                    }
-                }
-                TextField {
-                    id: nameField
-                    anchors.left: parent.left; anchors.right: parent.right
-                    placeholderText: qsTr("Name of the account")
-                }
-            }
         }
-
         ViewPlaceholder {
             id: error
         }
@@ -186,31 +152,21 @@ Dialog {
             PropertyChanges { target: indicator; running: true }
             PropertyChanges { target: drawer; visible: false }
             PropertyChanges { target: error; enabled: false }
-            PropertyChanges { target: editor; visible: false }
         },State {
             name: "error"
             PropertyChanges { target: indicator; running: false }
             PropertyChanges { target: drawer; visible: false }
             PropertyChanges { target: error; enabled: true }
-            PropertyChanges { target: editor; visible: false }
         }, State {
             name: "startRequestDone"
             PropertyChanges { target: indicator; running: false }
             PropertyChanges { target: drawer; visible: true }
             PropertyChanges { target: error; enabled: false }
-            PropertyChanges { target: editor; visible: false }
         }, State {
             name: "continueRequest"
             PropertyChanges { target: indicator; running: true }
             PropertyChanges { target: drawer; visible: false }
             PropertyChanges { target: error; enabled: false }
-            PropertyChanges { target: editor; visible: false }
-        }, State {
-            name: "done"
-            PropertyChanges { target: indicator; running: false }
-            PropertyChanges { target: drawer; visible: false }
-            PropertyChanges { target: error; enabled: false }
-            PropertyChanges { target: editor; visible: true }
         }
     ]
 }

@@ -32,7 +32,7 @@
 #ifndef REPOSITORY_H
 #define REPOSITORY_H
 
-#include <vector>
+#include <deque>
 #include <set>
 #include <QtCore/QString>
 #include "globals.h"
@@ -42,7 +42,7 @@ template<class T>
 class Repository
 {
 public:
-    using List = std::vector<T>;
+    using List = std::deque<T>;
     explicit Repository() {}
     DISABLE_COPY_DEFAULT_MOVE(Repository);
     typename List::const_iterator begin() const
@@ -53,22 +53,32 @@ public:
     {
         return std::end(m_data);
     }
-    void add(T &&data)
+    void append(T &&data)
     {
         m_data.emplace_back(data);
         for (IListener<T> *listener : m_listeners) {
-            listener->doAdd(*(std::end(m_data) - 1));
+            listener->doAppend(*(std::end(m_data) - 1));
         }
     }
-    void add(const std::vector<T> &data)
+    void append(const std::vector<T> &data)
     {
         for (const T &entry : data) {
             m_data.emplace_back(entry);
         }
         for (IListener<T> *listener : m_listeners) {
-            listener->doAdd(data);
+            listener->doAppend(data);
         }
     }
+    void prepend(const std::vector<T> &data)
+    {
+        for (auto it = data.rbegin(); it != data.rend(); ++it) {
+            m_data.emplace_front(*it);
+        }
+        for (IListener<T> *listener : m_listeners) {
+            listener->doPrepend(data);
+        }
+    }
+
     void update(int index, T &&data)
     {
         if (index < 0 || static_cast<typename List::size_type>(index) >= m_data.size()) {
@@ -115,7 +125,7 @@ public:
     {
         m_listeners.erase(&listener);
     }
-    std::vector<T> m_data {};
+    std::deque<T> m_data {};
 private:
     std::set<IListener<T> *> m_listeners {};
     QString m_errorString {};

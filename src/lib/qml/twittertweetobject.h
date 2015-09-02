@@ -34,6 +34,7 @@
 
 #include <QtCore/QObject>
 #include "twittertweet.h"
+#include "model.h"
 
 class TwitterTweetObject : public QObject
 {
@@ -47,7 +48,9 @@ public:
     QString text() const;
 private:
     explicit TwitterTweetObject(const TwitterTweet &twitterTweet, QObject *parent = 0);
+    void update(const TwitterTweet &other);
     TwitterTweet m_twitterTweet {};
+    friend class Model<TwitterTweet, TwitterTweetObject>;
 };
 
 #endif // TWITTERTWEETOBJECT_H

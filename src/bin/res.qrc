@@ -2,6 +2,7 @@
     <qresource prefix="/">
         <file>qml/harbour-twablet.qml</file>
         <file>qml/pages/AccountsPage.qml</file>
+        <file>qml/pages/AccountPage.qml</file>
         <file>qml/pages/AddColumnPage.qml</file>
         <file>qml/pages/AuthentificationPage.qml</file>
         <file>qml/pages/ColumnLayout.qml</file>

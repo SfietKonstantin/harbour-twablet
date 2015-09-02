@@ -46,6 +46,11 @@ template<class T> class TwitterDataRepositoryObjectRepository;
 template<> class TwitterDataRepositoryObjectRepository<TwitterUser>
 {
 public:
+    static bool isValid(TwitterDataRepositoryObject *repository, int layoutIndex)
+    {
+        Q_UNUSED(layoutIndex)
+        return repository != nullptr;
+    }
     static TwitterUserRepository & get(TwitterDataRepositoryObject &repository, int layoutIndex)
     {
         Q_UNUSED(layoutIndex)
@@ -55,6 +60,11 @@ public:
 template<> class TwitterDataRepositoryObjectRepository<Layout>
 {
 public:
+    static bool isValid(TwitterDataRepositoryObject *repository, int layoutIndex)
+    {
+        Q_UNUSED(layoutIndex)
+        return repository != nullptr;
+    }
     static LayoutRepository & get(TwitterDataRepositoryObject &repository, int layoutIndex)
     {
         Q_UNUSED(layoutIndex)
@@ -65,9 +75,17 @@ public:
 template<> class TwitterDataRepositoryObjectRepository<TwitterTweet>
 {
 public:
+    static bool isValid(TwitterDataRepositoryObject *repository, int layoutIndex)
+    {
+        Q_UNUSED(layoutIndex)
+        if (repository == nullptr) {
+            return false;
+        }
+        return (layoutIndex >= 0 && layoutIndex < std::end(repository->layouts()) - std::begin(repository->layouts()));
+    }
     static TwitterTweetRepository & get(TwitterDataRepositoryObject &repository, int layoutIndex)
     {
-        const Layout &layout {*(repository.layouts().begin() + layoutIndex)};
+        const Layout &layout {*(std::begin(repository.layouts()) + layoutIndex)};
         return repository.tweets(layout);
     }
 };

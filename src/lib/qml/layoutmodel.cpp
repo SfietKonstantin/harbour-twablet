@@ -51,6 +51,9 @@ QVariant LayoutModel::data(const QModelIndex &index, int role) const
     case LayoutRole:
         return QVariant::fromValue(layout.get());
         break;
+    case UnreadRole:
+        return layout->unread();
+        break;
     default:
         return QVariant();
         break;
@@ -59,5 +62,5 @@ QVariant LayoutModel::data(const QModelIndex &index, int role) const
 
 QHash<int, QByteArray> LayoutModel::roleNames() const
 {
-    return {{NameRole, "name"}, {LayoutRole, "layout"}};
+    return {{NameRole, "name"}, {LayoutRole, "layout"}, {UnreadRole, "unread"}};
 }

@@ -41,8 +41,15 @@ class ITwitterQueryHandler
 public:
     virtual ~ITwitterQueryHandler() {}
 protected:
+    enum Placement
+    {
+        Discard,
+        Append,
+        Prepend,
+    };
     virtual void createRequest(QString &path, std::map<QString, QString> &parameters) const = 0;
-    virtual bool treatReply(const QByteArray &data, std::vector<TwitterTweet> &items, QString &errorMessage) const = 0;
+    virtual bool treatReply(const QByteArray &data, std::vector<TwitterTweet> &items,
+                            QString &errorMessage, Placement &placement) = 0;
     friend class TwitterTweetCentralRepository;
 };
 

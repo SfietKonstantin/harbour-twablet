@@ -45,10 +45,13 @@ public:
     void setName(const QString &name);
     QString userId() const;
     TwitterQuery query() const;
+    int unread() const;
+    void setUnread(int unread);
 private:
     QString m_name {};
     QString m_userId {};
     TwitterQuery m_query {};
+    int m_unread {0};
 };
 
 #endif // LAYOUT_H

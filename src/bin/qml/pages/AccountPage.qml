@@ -33,73 +33,62 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.twablet 1.0
 
-Page {
+Dialog {
     id: container
+    canAccept: nameField.text.length > 0
     allowedOrientations: app.defaultAllowedOrientations
-
-    SilicaListView {
-        id: view
-        anchors.fill: parent
-        model: TwitterUserModel {
-            repository: Repository
+    property int index: -1
+    property string userId
+    property string screenName
+    property string token
+    property string tokenSecret
+    property string initialName
+    onAccepted: {
+        if (container.index == -1) {
+            Repository.addUser(nameField.text, container.userId, container.screenName,
+                               container.token, container.tokenSecret)
+        } else {
+            Repository.updateUserName(container.index, nameField.text)
         }
-        header: PageHeader { title: qsTr("Accounts") }
-        delegate: ListItem {
-            id: item
-            function remove() {
-                remorseAction(qsTr("Removing account"), function() {
-                    Repository.removeUser(index)
-                })
-            }
-            menu: contextMenu
-            contentHeight: Theme.itemSizeMedium
-            ListView.onRemove: animateRemoval(item)
-            onClicked: pageStack.push(Qt.resolvedUrl("AccountPage.qml"),
-                                      {
-                                          index: model.index,
-                                          screenName: model.screenName,
-                                          initialName: model.name
-                                      })
+    }
 
-            Column {
-                spacing: Theme.paddingSmall
-                anchors.verticalCenter: parent.verticalCenter
+    SilicaFlickable {
+        id: flickable
+        anchors.fill: parent
+
+        Column {
+            anchors.left: parent.left; anchors.right: parent.right
+            DialogHeader {
+                id: header
+                acceptText: qsTr("Add account")
+            }
+
+            Item {
                 anchors.left: parent.left; anchors.leftMargin: Theme.horizontalPageMargin
                 anchors.right: parent.right; anchors.rightMargin: Theme.horizontalPageMargin
+                height: Theme.itemSizeLarge
+
+                Image {
+                    id: icon
+                    width: Theme.itemSizeMedium
+                    height: Theme.itemSizeMedium
+                    source: "image://theme/icon-m-service-twitter"
+                }
 
                 Label {
-                    anchors.left: parent.left; anchors.right: parent.right
-                    text: model.name
-                    color: item.pressed ? Theme.highlightColor : Theme.primaryColor
-                }
-                Label {
-                    color: item.pressed ? Theme.secondaryHighlightColor : Theme.secondaryColor
-                    text: model.screenName
-                    font.pixelSize: Theme.fontSizeSmall
+                    anchors.left: icon.right; anchors.leftMargin: Theme.paddingMedium
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: container.screenName
+                    font.pixelSize: Theme.fontSizeLarge
+                    color: Theme.highlightColor
                 }
             }
-
-            Component {
-                id: contextMenu
-                ContextMenu {
-                    MenuItem {
-                        text: qsTr("Remove")
-                        onClicked: remove()
-                    }
-                }
-            }
-        }
-
-
-        ViewPlaceholder {
-            enabled: view.count === 0
-            text: qsTr("There is no account defined. Pull down to add one account")
-        }
-
-        PullDownMenu {
-            MenuItem {
-                text: qsTr("Add account")
-                onClicked: pageStack.push(Qt.resolvedUrl("AuthentificationPage.qml"))
+            TextField {
+                id: nameField
+                anchors.left: parent.left; anchors.right: parent.right
+                placeholderText: qsTr("Name of the account")
+                text: container.initialName
             }
         }
     }

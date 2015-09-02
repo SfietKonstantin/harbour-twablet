@@ -55,8 +55,11 @@ public:
 public slots:
     void addUser(const QString &name, const QString &userId, const QString &screenName,
                  const QString &token, const QString &tokenSecret);
+    void updateUserName(int index, const QString &name);
     void removeUser(int index);
     void addLayout(const QString &name, int userIndex, int queryType, const QVariantMap &arguments);
+    void updateLayoutName(int index, const QString &name);
+    void removeLayout(int index);
     void refresh();
 private:
     LoadSaveManager m_loadSaveManager {};

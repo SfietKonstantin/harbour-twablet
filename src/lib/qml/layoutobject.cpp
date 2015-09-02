@@ -46,10 +46,20 @@ QString LayoutObject::name() const
     return m_layout.name();
 }
 
-void LayoutObject::setName(const QString &name)
+int LayoutObject::unread() const
 {
-    if (m_layout.name() != name) {
-        m_layout.setName(name);
+    return m_layout.unread();
+}
+
+void LayoutObject::update(const Layout &other)
+{
+    if (m_layout.name() != other.name()) {
+        m_layout.setName(other.name());
         emit nameChanged();
+    }
+
+    if (m_layout.unread() != other.unread()) {
+        m_layout.setUnread(other.unread());
+        emit unreadChanged();
     }
 }

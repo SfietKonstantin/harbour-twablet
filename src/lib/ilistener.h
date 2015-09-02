@@ -41,8 +41,9 @@ class IListener
 public:
     virtual ~IListener() {}
 private:
-    virtual void doAdd(const T &data) = 0;
-    virtual void doAdd(const std::vector<T> &data) = 0;
+    virtual void doAppend(const T &data) = 0;
+    virtual void doAppend(const std::vector<T> &data) = 0;
+    virtual void doPrepend(const std::vector<T> &data) = 0;
     virtual void doUpdate(int index, const T &data) = 0;
     virtual void doRemove(int index) = 0;
     virtual void doStart() = 0;

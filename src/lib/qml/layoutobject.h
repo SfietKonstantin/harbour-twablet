@@ -34,6 +34,7 @@
 
 #include <QtCore/QObject>
 #include "layout.h"
+#include "model.h"
 
 class LayoutObject : public QObject
 {
@@ -43,12 +44,15 @@ public:
     DISABLE_COPY_DISABLE_MOVE(LayoutObject);
     static LayoutObject * create(const Layout &layout, QObject *parent = 0);
     QString name() const;
+    int unread() const;
 signals:
     void nameChanged();
+    void unreadChanged();
 private:
     explicit LayoutObject(const Layout &layout, QObject *parent = 0);
-    void setName(const QString &name);
+    void update(const Layout &other);
     Layout m_layout {};
+    friend class Model<Layout, LayoutObject>;
 };
 
 #endif // LAYOUTOBJECT_H

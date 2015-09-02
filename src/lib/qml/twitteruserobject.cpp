@@ -66,10 +66,10 @@ QByteArray TwitterUserObject::tokenSecret() const
     return m_twitterUser.tokenSecret();
 }
 
-void TwitterUserObject::setName(const QString &name)
+void TwitterUserObject::update(const TwitterUser &other)
 {
-    if (m_twitterUser.name() != name) {
-        m_twitterUser.setName(name);
+    if (m_twitterUser.name() != other.name()) {
+        m_twitterUser.setName(other.name());
         emit nameChanged();
     }
 }

@@ -73,9 +73,17 @@ SilicaListView {
                 anchors.left: avatar.right; anchors.leftMargin: Theme.paddingSmall
                 anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
                 text: model.item.text
+                font.pixelSize: Theme.fontSizeSmall
                 wrapMode: Text.WordWrap
+                color: Theme.highlightColor
             }
         }
+    }
+
+    BusyIndicator {
+        anchors.centerIn: parent
+        enabled: twitterModel.count === 0 && twitterModel.status === Model.Loading
+        size: BusyIndicatorSize.Large
     }
 
     VerticalScrollDecorator {}

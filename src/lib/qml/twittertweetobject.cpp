@@ -50,3 +50,8 @@ QString TwitterTweetObject::text() const
 {
     return m_twitterTweet.text();
 }
+
+void TwitterTweetObject::update(const TwitterTweet &other)
+{
+    Q_UNUSED(other)
+}

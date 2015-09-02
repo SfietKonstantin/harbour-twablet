@@ -19,12 +19,12 @@ SOURCES += main.cpp
 
 OTHER_FILES += \
     qml/harbour-twablet.qml \
-    pages/MainPage.qml \
-    pages/AccountsPage.qml \
-    pages/AuthentificationPage.qml \
-    pages/ColumnLayout.qml \
-    pages/AddColumnPage.qml \
-    cover/CoverPage.qml
+    qml/pages/MainPage.qml \
+    qml/pages/AccountsPage.qml \
+    qml/pages/AuthentificationPage.qml \
+    qml/pages/ColumnLayout.qml \
+    qml/pages/AddColumnPage.qml \
+    qml/cover/CoverPage.qml
 
 CONFIG += sailfishapp_i18n
 

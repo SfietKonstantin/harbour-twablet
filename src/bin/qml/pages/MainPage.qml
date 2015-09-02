@@ -57,12 +57,6 @@ Page {
             }
 
             MenuItem {
-                text: qsTr("Add column")
-                enabled: userModel.count > 0
-                onClicked: pageStack.push(Qt.resolvedUrl("AddColumnPage.qml"), {userModel: userModel})
-            }
-
-            MenuItem {
                 text: qsTr("Accounts")
                 onClicked: pageStack.push(Qt.resolvedUrl("AccountsPage.qml"))
             }
@@ -78,12 +72,6 @@ Page {
             MenuItem {
                 text: qsTr("New tweet")
                 enabled: false
-            }
-
-            MenuItem {
-                text: qsTr("Add column")
-                enabled: userModel.count > 0
-                onClicked: pageStack.push(Qt.resolvedUrl("AddColumnPage.qml"), {userModel: userModel})
             }
 
             MenuItem {
@@ -128,15 +116,30 @@ Page {
                     layoutIndex: index
                     title: name
                 }
+                footer: Item {
+                    visible: layoutModel.count > 0
+                    width: view.columnWidth
+                    height: view.height
+
+                    Button {
+                        anchors.centerIn: parent
+                        text: qsTr("Add column")
+                        onClicked: pageStack.push(Qt.resolvedUrl("AddColumnPage.qml"), {userModel: userModel})
+                    }
+                }
 
                 HorizontalScrollDecorator {}
 
             }
-            Item {
+            Rectangle {
                 id: toolbar
                 anchors.left: parent.left; anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 height: layoutModel.count > 0 ? Theme.itemSizeSmall : 0
+                gradient: Gradient {
+                    GradientStop { position: 0; color: Theme.rgba(Theme.secondaryHighlightColor, 0.2) }
+                    GradientStop { position: 1; color: "transparent" }
+                }
             }
         }
     }

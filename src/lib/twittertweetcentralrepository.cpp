@@ -71,7 +71,8 @@ void TwitterTweetCentralRepository::query(const TwitterUser &user, const Twitter
 
         std::vector<TwitterTweet> items {};
         QString errorMessage {};
-        if (!handlerPtr->treatReply(reply->readAll(), items, errorMessage)) {
+        ITwitterQueryHandler::Placement placement {ITwitterQueryHandler::Discard};
+        if (!handlerPtr->treatReply(reply->readAll(), items, errorMessage, placement)) {
             qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Error happened during request for layout" << user.userId() << query.type();
             qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Parsing error: " << errorMessage;
             repository.error(tr("Internal error"));
@@ -81,7 +82,16 @@ void TwitterTweetCentralRepository::query(const TwitterUser &user, const Twitter
                 m_data.emplace(tweet.id(), tweet);
             }
             qDebug(QLoggingCategory("twitter-tweet-central-repository")) << "New data available for layout" << user.userId() << query.type() << ". Count:" << items.size();
-            repository.add(items);
+            switch (placement) {
+            case ITwitterQueryHandler::Append:
+                repository.append(items);
+                break;
+            case ITwitterQueryHandler::Prepend:
+                repository.prepend(items);
+                break;
+            case ITwitterQueryHandler::Discard:
+                break;
+            }
             repository.finish();
         }
     });

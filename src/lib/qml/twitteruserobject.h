@@ -34,6 +34,7 @@
 
 #include <QtCore/QObject>
 #include "twitteruser.h"
+#include "model.h"
 
 class TwitterUserObject : public QObject
 {
@@ -53,8 +54,9 @@ signals:
     void nameChanged();
 private:
     explicit TwitterUserObject(const TwitterUser &twitterUser, QObject *parent = 0);
-    void setName(const QString &name);
+    void update(const TwitterUser &other);
     TwitterUser m_twitterUser {};
+    friend class Model<TwitterUser, TwitterUserObject>;
 };
 
 #endif // TWITTERUSEROBJECT_H

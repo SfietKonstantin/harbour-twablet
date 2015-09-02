@@ -41,6 +41,12 @@ template<class T, class O>
 class Model: public IModel, public IListener<T>
 {
 public:
+    ~Model()
+    {
+        if (TwitterDataRepositoryObjectRepository<T>::isValid(m_repository, m_layoutIndex)) {
+            TwitterDataRepositoryObjectRepository<T>::get(*m_repository, m_layoutIndex).removeListener(*this);
+        }
+    }
     void classBegin() override
     {
     }
@@ -72,11 +78,11 @@ public:
     void setLayoutIndex(int modelIndex) override
     {
         if (m_layoutIndex != modelIndex) {
-            if (m_repository != nullptr) {
+            if (TwitterDataRepositoryObjectRepository<T>::isValid(m_repository, m_layoutIndex)) {
                 TwitterDataRepositoryObjectRepository<T>::get(*m_repository, m_layoutIndex).removeListener(*this);
             }
             m_layoutIndex = modelIndex;
-            if (m_repository != nullptr) {
+            if (TwitterDataRepositoryObjectRepository<T>::isValid(m_repository, m_layoutIndex)) {
                 TwitterDataRepositoryObjectRepository<T>::get(*m_repository, m_layoutIndex).addListener(*this);
             }
             refreshData();
@@ -90,11 +96,11 @@ public:
     void setRepository(TwitterDataRepositoryObject *repository) override
     {
         if (m_repository != repository) {
-            if (m_repository != nullptr) {
+            if (TwitterDataRepositoryObjectRepository<T>::isValid(m_repository, m_layoutIndex)) {
                 TwitterDataRepositoryObjectRepository<T>::get(*m_repository, m_layoutIndex).removeListener(*this);
             }
             m_repository = repository;
-            if (m_repository != nullptr) {
+            if (TwitterDataRepositoryObjectRepository<T>::isValid(m_repository, m_layoutIndex)) {
                 TwitterDataRepositoryObjectRepository<T>::get(*m_repository, m_layoutIndex).addListener(*this);
             }
             refreshData();
@@ -106,20 +112,29 @@ protected:
         : IModel(parent) , IListener<T>()
     {
     }
-    std::vector<QObjectPtr<O>> m_data {};
+    std::deque<QObjectPtr<O>> m_data {};
 private:
-    void doAdd(const T &data) override
+    void doAppend(const T &data) override
     {
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
         m_data.emplace_back(O::create(data, this));
         emit countChanged();
         endInsertRows();
     }
-    void doAdd(const std::vector<T> &data) override
+    void doAppend(const std::vector<T> &data) override
     {
         beginInsertRows(QModelIndex(), rowCount(), rowCount() + data.size() - 1);
-        for (const T & entry : data) {
+        for (const T &entry : data) {
             m_data.emplace_back(O::create(entry, this));
+        }
+        emit countChanged();
+        endInsertRows();
+    }
+    void doPrepend(const std::vector<T> &data) override
+    {
+        beginInsertRows(QModelIndex(), 0, data.size() - 1);
+        for (auto it = data.rbegin(); it != data.rend(); ++it) {
+            m_data.emplace_front(O::create(*it, this));
         }
         emit countChanged();
         endInsertRows();
@@ -129,7 +144,7 @@ private:
         if (index < 0 || index >= rowCount()) {
             return;
         }
-        m_data[index].reset(O::create(data));
+        m_data[index]->update(data);
         emit dataChanged(this->index(index), this->index(index));
     }
 
@@ -161,8 +176,8 @@ private:
 
     void refreshData()
     {
-        std::vector<QObjectPtr<O>> newData;
-        if (m_repository != nullptr) {
+        std::deque<QObjectPtr<O>> newData;
+        if (TwitterDataRepositoryObjectRepository<T>::isValid(m_repository, m_layoutIndex)) {
             for (const T &data : TwitterDataRepositoryObjectRepository<T>::get(*m_repository, m_layoutIndex)) {
                 newData.emplace_back(O::create(data, this));
             }
