@@ -45,11 +45,63 @@ SilicaListView {
         repository: Repository
     }
 
-    header: PageHeader {
-        title: container.title
+    QtObject {
+        id: internal
+        property int unread: 0
+        property double refreshDelta
+        property bool isInit
+        onUnreadChanged: {
+            Repository.updateLayoutUnread(container.layoutIndex, unread)
+        }
     }
 
-    delegate: Item {
+    Connections {
+        // Workaround to prepend tweets
+        // Not showing the first delegate will
+        // make the ListView not to scroll
+        // After inserting elements we reposition
+        // the view
+        target: twitterModel
+        onPrependPre: {
+            internal.isInit = (twitterModel.count === 0)
+            if (!internal.isInit) {
+                var previousY = container.contentY
+                container.positionViewAtIndex(1, ListView.Beginning)
+                internal.refreshDelta = container.contentY - previousY
+            }
+        }
+        onPrependPost: {
+            if (!internal.isInit) {
+                container.positionViewAtIndex(1 + insertedCount, ListView.Beginning)
+                container.contentY -= internal.refreshDelta
+            }
+            // Search for the index of the first item in the view and update the unread info
+            var x = container.width / 2
+            for (var y = 0; y < container.height; ++y) {
+                var index = container.indexAt(x, y)
+                if (index !== -1) {
+                    internal.unread = index
+                    break
+                }
+            }
+        }
+    }
+
+    onContentYChanged: {
+        var index = container.indexAt(container.width / 2, 0)
+        if (index !== -1) {
+            internal.unread = Math.min(internal.unread, index)
+        }
+    }
+
+    header: PageHeader {
+        id: pageHeader
+        title: container.title
+        height: Theme.itemSizeLarge
+    }
+
+    delegate: MouseArea {
+        id: delegate
         width: container.width
         height: background.height
 
@@ -74,7 +126,7 @@ SilicaListView {
                 anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
                 text: model.item.text
                 font.pixelSize: Theme.fontSizeSmall
-                wrapMode: Text.WordWrap
+                wrapMode: Text.Wrap
                 color: Theme.highlightColor
             }
         }

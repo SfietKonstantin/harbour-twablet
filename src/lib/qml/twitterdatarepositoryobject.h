@@ -47,12 +47,15 @@ public:
     LayoutRepository & layouts();
     TwitterTweetRepository & tweets(const Layout &layout);
 public slots:
+    // Users
     void addUser(const QString &name, const QString &userId, const QString &screenName,
                  const QString &token, const QString &tokenSecret);
     void updateUserName(int index, const QString &name);
     void removeUser(int index);
+    // Layouts
     void addLayout(const QString &name, int userIndex, int queryType, const QVariantMap &arguments);
     void updateLayoutName(int index, const QString &name);
+    void updateLayoutUnread(int index, int unread);
     void removeLayout(int index);
     void refresh();
 private:

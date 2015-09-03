@@ -60,6 +60,7 @@ bool TwitterTimelineQueryHandler::treatReply(const QByteArray &data, std::vector
     }
 
     QJsonArray tweets (document.array());
+    items.reserve(tweets.size());
     for (const QJsonValue &tweet : tweets) {
         if (tweet.isObject()) {
             items.emplace_back(tweet.toObject());

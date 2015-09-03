@@ -34,6 +34,7 @@
 
 #include <QtCore/QString>
 #include <map>
+#include <vector>
 #include "twittertweet.h"
 
 class ITwitterQueryHandler

@@ -141,6 +141,16 @@ void TwitterDataRepositoryObject::updateLayoutName(int index, const QString &nam
     m_loadSaveManager.save(m_layouts);
 }
 
+void TwitterDataRepositoryObject::updateLayoutUnread(int index, int unread)
+{
+    if (index < 0 || index >= std::end(m_layouts) - std::begin(m_layouts)) {
+        return;
+    }
+    Layout layout {*(std::begin(m_layouts) + index)};
+    layout.setUnread(unread);
+    m_layouts.update(index, std::move(layout));
+}
+
 void TwitterDataRepositoryObject::removeLayout(int index)
 {
     if (index < 0 || index >= std::end(m_layouts) - std::begin(m_layouts)) {

@@ -47,6 +47,7 @@ class IModel : public QAbstractListModel, public QQmlParserStatus
     Q_PROPERTY(int layoutIndex READ layoutIndex WRITE setLayoutIndex NOTIFY layoutIndexChanged)
     Q_PROPERTY(TwitterDataRepositoryObject * repository READ repository WRITE setRepository
                NOTIFY repositoryChanged)
+    Q_ENUMS(Status)
 public:
     enum Status
     {
@@ -64,6 +65,8 @@ public:
     virtual void setRepository(TwitterDataRepositoryObject *repository) = 0;
 signals:
     void countChanged();
+    void prependPre();
+    void prependPost(int insertedCount);
     void statusChanged();
     void errorMessageChanged();
     void layoutIndexChanged();

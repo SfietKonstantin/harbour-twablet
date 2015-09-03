@@ -132,12 +132,14 @@ private:
     }
     void doPrepend(const std::vector<T> &data) override
     {
+        emit prependPre();
         beginInsertRows(QModelIndex(), 0, data.size() - 1);
         for (auto it = data.rbegin(); it != data.rend(); ++it) {
             m_data.emplace_front(O::create(*it, this));
         }
         emit countChanged();
         endInsertRows();
+        emit prependPost(data.size());
     }
     void doUpdate(int index, const T &data) override
     {
