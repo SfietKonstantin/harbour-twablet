@@ -24,6 +24,7 @@ OTHER_FILES += \
     qml/pages/AuthentificationPage.qml \
     qml/pages/ColumnLayout.qml \
     qml/pages/AddColumnPage.qml \
+    qml/pages/Toolbar.qml
     qml/cover/CoverPage.qml
 
 CONFIG += sailfishapp_i18n

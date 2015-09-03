@@ -8,5 +8,10 @@
         <file>qml/pages/ColumnLayout.qml</file>
         <file>qml/pages/MainPage.qml</file>
         <file>qml/cover/CoverPage.qml</file>
+        <file>data/home.svg</file>
+        <file>data/inbox.svg</file>
+        <file>data/mail.svg</file>
+        <file>data/search.svg</file>
+        <file>qml/pages/Toolbar.qml</file>
     </qresource>
 </RCC>

@@ -101,9 +101,23 @@ Page {
 
             SilicaListView {
                 id: view
-                property real columnWidth: container.isLandscape ? (Screen.sizeCategory === Screen.Large ? view.width / 3 : view.width / 2) : view.width
+                function animateToIndex(index) {
+                    animation.stop()
+                    var currentX = view.contentX
+                    view.positionViewAtIndex(index, ListView.Beginning)
+                    var destX = view.contentX
+                    animation.from = currentX
+                    animation.to = destX
+                    animation.start()
+                }
+
+                property int columnCount: container.isLandscape ? (Screen.sizeCategory === Screen.Large ? 3 : 2) : 1
+                property real columnWidth: view.width / columnCount
                 anchors.left: parent.left; anchors.right: parent.right
                 anchors.top: parent.top; anchors.bottom: toolbar.top
+                onContentXChanged: {
+                    toolbar.currentIndex = indexAt(view.contentX, view.height / 2)
+                }
 
                 clip: true
                 cacheBuffer: columnWidth * layoutModel.count
@@ -128,18 +142,19 @@ Page {
                     }
                 }
 
-                HorizontalScrollDecorator {}
-
-            }
-            Rectangle {
-                id: toolbar
-                anchors.left: parent.left; anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                height: layoutModel.count > 0 ? Theme.itemSizeSmall : 0
-                gradient: Gradient {
-                    GradientStop { position: 0; color: Theme.rgba(Theme.secondaryHighlightColor, 0.2) }
-                    GradientStop { position: 1; color: "transparent" }
+                NumberAnimation {
+                    id: animation
+                    target: view
+                    property: "contentX"
+                    duration: 200
+                    easing.type: Easing.OutQuad
                 }
+            }
+            Toolbar {
+                id: toolbar
+                columnCount: view.columnCount
+                mainView: view
+                onGoToIndex: view.animateToIndex(index)
             }
         }
     }
