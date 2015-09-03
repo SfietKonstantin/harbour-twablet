@@ -42,9 +42,9 @@
 #include "twitterquery.h"
 #include "repository.h"
 #include "twittertweetrepository.h"
+#include "itwitterqueryhandler.h"
 
 class QNetworkReply;
-class ITwitterQueryHandler;
 class TwitterTweetCentralRepository: public QObject
 {
     Q_OBJECT
@@ -54,9 +54,15 @@ public:
     void query(const TwitterUser &user, const TwitterQuery &query,
                TwitterTweetRepository &repository);
 private:
-    static ITwitterQueryHandler * createQueryHandler(const TwitterQuery &query);
+    class TwitterQueryComparator
+    {
+    public:
+        bool operator()(const TwitterQuery &first, const TwitterQuery &second) const;
+    };
+    ITwitterQueryHandler * getQueryHandler(const TwitterQuery &query);
     std::map<QString, TwitterTweet> m_data {};
     QObjectPtr<QNetworkAccessManager> m_network {nullptr};
+    std::map<TwitterQuery, std::unique_ptr<ITwitterQueryHandler>, TwitterQueryComparator> m_queries {};
 };
 
 #endif // TWITTERTWEETCENTRALREPOSITORY_H

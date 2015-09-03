@@ -33,29 +33,6 @@
 #include "twitterquery.h"
 #include <QtCore/QVariantMap>
 
-bool LayoutComparator::operator()(const Layout &first, const Layout &second) const
-{
-    if (first.userId() < second.userId()) {
-        return true;
-    }
-    if (first.userId() > second.userId()) {
-        return false;
-    }
-
-    const TwitterQuery &firstQuery {first.query()};
-    const TwitterQuery &secondQuery {first.query()};
-
-    if (firstQuery.type() < secondQuery.type()) {
-        return true;
-    }
-
-    if (firstQuery.type() > secondQuery.type()) {
-        return false;
-    }
-
-    return firstQuery.arguments() < secondQuery.arguments();
-}
-
 TwitterDataRepositoryObject::TwitterDataRepositoryObject(QObject *parent)
     : QObject(parent)
 {
@@ -183,4 +160,28 @@ void TwitterDataRepositoryObject::refresh()
             m_tweetsCentralRepository.query(user, layout.query(), it->second);
         }
     }
+}
+
+bool TwitterDataRepositoryObject::LayoutComparator::operator()(const Layout &first,
+                                                               const Layout &second) const
+{
+    if (first.userId() < second.userId()) {
+        return true;
+    }
+    if (first.userId() > second.userId()) {
+        return false;
+    }
+
+    const TwitterQuery &firstQuery {first.query()};
+    const TwitterQuery &secondQuery {first.query()};
+
+    if (firstQuery.type() < secondQuery.type()) {
+        return true;
+    }
+
+    if (firstQuery.type() > secondQuery.type()) {
+        return false;
+    }
+
+    return firstQuery.arguments() < secondQuery.arguments();
 }

@@ -44,7 +44,7 @@ void TwitterTimelineQueryHandler::createRequest(QString &path, std::map<QString,
     path = QLatin1String("statuses/home_timeline.json");
     parameters.insert({QLatin1String("count"), QString::number(200)});
     if (!m_sinceId.isEmpty()) {
-        parameters.insert({QLatin1String("since_id "), m_sinceId});
+        parameters.insert({QLatin1String("since_id"), m_sinceId});
     }
 }
 

@@ -38,12 +38,6 @@
 #include "layoutrepository.h"
 #include "twittertweetcentralrepository.h"
 
-class LayoutComparator
-{
-public:
-    bool operator()(const Layout &first, const Layout &second) const;
-};
-
 class TwitterDataRepositoryObject : public QObject
 {
     Q_OBJECT
@@ -62,6 +56,11 @@ public slots:
     void removeLayout(int index);
     void refresh();
 private:
+    class LayoutComparator
+    {
+    public:
+        bool operator()(const Layout &first, const Layout &second) const;
+    };
     LoadSaveManager m_loadSaveManager {};
     TwitterUserRepository m_users {};
     LayoutRepository m_layouts {};

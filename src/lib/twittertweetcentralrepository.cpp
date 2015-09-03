@@ -45,7 +45,7 @@ void TwitterTweetCentralRepository::query(const TwitterUser &user, const Twitter
                                           TwitterTweetRepository &repository)
 {
     // Create the request
-    ITwitterQueryHandler * handler = createQueryHandler(query);
+    ITwitterQueryHandler * handler = getQueryHandler(query);
     if (handler == nullptr) {
         return;
     }
@@ -58,7 +58,6 @@ void TwitterTweetCentralRepository::query(const TwitterUser &user, const Twitter
 
     connect(reply, &QNetworkReply::finished, this, [this, user, query, handler, reply, &repository]() {
         QObjectPtr<QNetworkReply> replyPtr {reply};
-        std::unique_ptr<ITwitterQueryHandler> handlerPtr {handler};
 
         if (replyPtr->error() != QNetworkReply::NoError) {
             qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Error happened during request for layout" << user.userId() << query.type();
@@ -72,7 +71,7 @@ void TwitterTweetCentralRepository::query(const TwitterUser &user, const Twitter
         std::vector<TwitterTweet> items {};
         QString errorMessage {};
         ITwitterQueryHandler::Placement placement {ITwitterQueryHandler::Discard};
-        if (!handlerPtr->treatReply(reply->readAll(), items, errorMessage, placement)) {
+        if (!handler->treatReply(reply->readAll(), items, errorMessage, placement)) {
             qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Error happened during request for layout" << user.userId() << query.type();
             qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Parsing error: " << errorMessage;
             repository.error(tr("Internal error"));
@@ -97,14 +96,35 @@ void TwitterTweetCentralRepository::query(const TwitterUser &user, const Twitter
     });
 }
 
-ITwitterQueryHandler * TwitterTweetCentralRepository::createQueryHandler(const TwitterQuery &query)
+ITwitterQueryHandler * TwitterTweetCentralRepository::getQueryHandler(const TwitterQuery &query)
 {
+    auto it = m_queries.find(query);
+    if (it != std::end(m_queries)) {
+        return it->second.get();
+    }
+
     switch (query.type()) {
     case TwitterQuery::Timeline:
-        return new TwitterTimelineQueryHandler();
+    {
+        std::unique_ptr<ITwitterQueryHandler> handler {new TwitterTimelineQueryHandler()};
+        return m_queries.emplace(query, std::move(handler)).first->second.get();
         break;
+    }
     default:
         return nullptr;
         break;
     }
+}
+
+
+bool TwitterTweetCentralRepository::TwitterQueryComparator::operator()(const TwitterQuery &first,
+                                                                       const TwitterQuery &second) const
+{
+    if (first.type() < second.type()) {
+        return true;
+    }
+    if (first.type() > second.type()) {
+        return false;
+    }
+    return first.arguments() < second.arguments();
 }
