@@ -44,6 +44,7 @@
 #include "qml/twitteraccountobject.h"
 #include "qml/twitteraccountmodel.h"
 #include "qml/layoutmodel.h"
+#include "qml/twitterqueryobject.h"
 #include "qml/twitterquerylistmodel.h"
 #include "qml/twittertweetmodel.h"
 
@@ -53,6 +54,7 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<IModel>("harbour.twablet", 1, 0, "Model", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<TwitterAccountObject>("harbour.twablet", 1, 0, "TwitterAccount", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<LayoutObject>("harbour.twablet", 1, 0, "Layout", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<TwitterQueryObject>("harbour.twablet", 1, 0, "TwitterQuery", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<TwitterTweetObject>("harbour.twablet", 1, 0, "TwitterTweet", QLatin1String("Uncreatable"));
     qmlRegisterType<TwitterAuthentification>("harbour.twablet", 1, 0, "TwitterAuthentification");
     qmlRegisterType<TwitterAccountModel>("harbour.twablet", 1, 0, "TwitterAccountModel");

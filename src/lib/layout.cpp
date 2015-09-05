@@ -56,6 +56,11 @@ TwitterQuery Layout::query() const
     return m_query;
 }
 
+void Layout::setQuery(TwitterQuery &&query)
+{
+    m_query = std::move(query);
+}
+
 int Layout::unread() const
 {
     return m_unread;

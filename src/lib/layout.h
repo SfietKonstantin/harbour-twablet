@@ -45,6 +45,7 @@ public:
     void setName(const QString &name);
     QString userId() const;
     TwitterQuery query() const;
+    void setQuery(TwitterQuery &&query);
     int unread() const;
     void setUnread(int unread);
 private:

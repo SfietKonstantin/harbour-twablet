@@ -29,50 +29,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "layoutobject.h"
+#ifndef TWITTERHOMETIMELINEQUERYHANDLER_H
+#define TWITTERHOMETIMELINEQUERYHANDLER_H
 
-LayoutObject::LayoutObject(const Layout &layout, QObject *parent)
-    : QObject(parent), m_layout{layout}
+#include "itwitterqueryhandler.h"
+#include "globals.h"
+
+class TwitterHomeTimelineQueryHandler: public ITwitterQueryHandler
 {
-}
+public:
+    explicit TwitterHomeTimelineQueryHandler();
+    DISABLE_COPY_DISABLE_MOVE(TwitterHomeTimelineQueryHandler);
+private:
+    void createRequest(QString &path, std::map<QString, QString> &parameters) const override;
+    bool treatReply(const QByteArray &data, std::vector<TwitterTweet> &items,
+                    QString &errorMessage, Placement &placement) override;
+    QString m_sinceId {};
+};
 
-LayoutObject * LayoutObject::create(const Layout &layout, QObject *parent)
-{
-    return new LayoutObject(layout, parent);
-}
-
-QString LayoutObject::name() const
-{
-    return m_layout.name();
-}
-
-int LayoutObject::unread() const
-{
-    return m_layout.unread();
-}
-
-TwitterQueryObject::Type LayoutObject::queryType() const
-{
-    return static_cast<TwitterQueryObject::Type>(m_layout.query().type());
-}
-
-void LayoutObject::update(const Layout &other)
-{
-    if (m_layout.name() != other.name()) {
-        m_layout.setName(other.name());
-        emit nameChanged();
-    }
-
-    if (m_layout.query() != other.query()) {
-        TwitterQuery::Type oldType = m_layout.query().type();
-        m_layout.setQuery(other.query());
-        if (m_layout.query().type() != oldType) {
-            emit typeChanged();
-        }
-    }
-
-    if (m_layout.unread() != other.unread()) {
-        m_layout.setUnread(other.unread());
-        emit unreadChanged();
-    }
-}
+#endif // TWITTERHOMETIMELINEQUERYHANDLER_H

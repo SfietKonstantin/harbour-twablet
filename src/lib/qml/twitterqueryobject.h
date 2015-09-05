@@ -44,7 +44,8 @@ public:
     enum Type
     {
         Invalid = TwitterQuery::Invalid,
-        Timeline = TwitterQuery::Timeline
+        Home = TwitterQuery::Home,
+        Mentions = TwitterQuery::Mentions
     };
     DISABLE_COPY_DISABLE_MOVE(TwitterQueryObject);
     static TwitterQueryObject * create(const TwitterQuery &twitterQuery, QObject *parent = 0);

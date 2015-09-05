@@ -29,17 +29,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERTIMELINEQUERYHANDLER_H
-#define TWITTERTIMELINEQUERYHANDLER_H
+#ifndef TWITTERMENTIONSTIMELINEQUERYHANDLER_H
+#define TWITTERMENTIONSTIMELINEQUERYHANDLER_H
 
 #include "itwitterqueryhandler.h"
 #include "globals.h"
 
-class TwitterTimelineQueryHandler: public ITwitterQueryHandler
+class TwitterMentionsTimelineQueryHandler: public ITwitterQueryHandler
 {
 public:
-    explicit TwitterTimelineQueryHandler();
-    DISABLE_COPY_DISABLE_MOVE(TwitterTimelineQueryHandler);
+    explicit TwitterMentionsTimelineQueryHandler();
+    DISABLE_COPY_DISABLE_MOVE(TwitterMentionsTimelineQueryHandler);
 private:
     void createRequest(QString &path, std::map<QString, QString> &parameters) const override;
     bool treatReply(const QByteArray &data, std::vector<TwitterTweet> &items,
@@ -47,4 +47,4 @@ private:
     QString m_sinceId {};
 };
 
-#endif // TWITTERTIMELINEQUERYHANDLER_H
+#endif // TWITTERMENTIONSTIMELINEQUERYHANDLER_H

@@ -76,7 +76,16 @@ Rectangle {
             Image {
                 id: icon
                 anchors.centerIn: parent
-                source: Qt.resolvedUrl("../../data/home.svg")
+                source: {
+                    switch (model.queryType) {
+                    case TwitterQuery.Home:
+                        Qt.resolvedUrl("../../data/home.svg")
+                        break
+                    case TwitterQuery.Mentions:
+                        Qt.resolvedUrl("../../data/mail.svg")
+                        break
+                    }
+                }
                 width: Theme.iconSizeSmall * 1.4
                 height: Theme.iconSizeSmall * 1.4
             }

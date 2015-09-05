@@ -29,50 +29,49 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "layoutobject.h"
+#include "twitterhometimelinequeryhandler.h"
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
+#include "twittertweet.h"
 
-LayoutObject::LayoutObject(const Layout &layout, QObject *parent)
-    : QObject(parent), m_layout{layout}
+TwitterHomeTimelineQueryHandler::TwitterHomeTimelineQueryHandler()
 {
 }
 
-LayoutObject * LayoutObject::create(const Layout &layout, QObject *parent)
+void TwitterHomeTimelineQueryHandler::createRequest(QString &path, std::map<QString, QString> &parameters) const
 {
-    return new LayoutObject(layout, parent);
+    path = QLatin1String("statuses/home_timeline.json");
+    parameters.insert({QLatin1String("count"), QString::number(200)});
+    if (!m_sinceId.isEmpty()) {
+        parameters.insert({QLatin1String("since_id"), m_sinceId});
+    }
 }
 
-QString LayoutObject::name() const
+bool TwitterHomeTimelineQueryHandler::treatReply(const QByteArray &data, std::vector<TwitterTweet> &items,
+                                             QString &errorMessage, Placement &placement)
 {
-    return m_layout.name();
-}
-
-int LayoutObject::unread() const
-{
-    return m_layout.unread();
-}
-
-TwitterQueryObject::Type LayoutObject::queryType() const
-{
-    return static_cast<TwitterQueryObject::Type>(m_layout.query().type());
-}
-
-void LayoutObject::update(const Layout &other)
-{
-    if (m_layout.name() != other.name()) {
-        m_layout.setName(other.name());
-        emit nameChanged();
+    QJsonParseError error {-1, QJsonParseError::NoError};
+    QJsonDocument document {QJsonDocument::fromJson(data, &error)};
+    if (error.error != QJsonParseError::NoError) {
+        errorMessage = error.errorString();
+        placement = Discard;
+        return false;
     }
 
-    if (m_layout.query() != other.query()) {
-        TwitterQuery::Type oldType = m_layout.query().type();
-        m_layout.setQuery(other.query());
-        if (m_layout.query().type() != oldType) {
-            emit typeChanged();
+    QJsonArray tweets (document.array());
+    items.reserve(tweets.size());
+    for (const QJsonValue &tweet : tweets) {
+        if (tweet.isObject()) {
+            items.emplace_back(tweet.toObject());
         }
     }
 
-    if (m_layout.unread() != other.unread()) {
-        m_layout.setUnread(other.unread());
-        emit unreadChanged();
+    if (!items.empty()) {
+        m_sinceId = std::begin(items)->id();
     }
+
+    placement = Prepend;
+    return true;
 }
+

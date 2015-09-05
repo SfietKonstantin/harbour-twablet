@@ -40,8 +40,9 @@ class LayoutModel : public Model<Layout, LayoutObject>
 public:
     enum Roles {
         NameRole = Qt::UserRole + 1,
-        LayoutRole,
-        UnreadRole
+        QueryTypeRole,
+        UnreadRole,
+        LayoutRole
     };
     explicit LayoutModel(QObject *parent = 0);
     QVariant data(const QModelIndex &index, int role) const override;

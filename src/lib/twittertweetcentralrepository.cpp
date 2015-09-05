@@ -31,7 +31,8 @@
 
 #include "twittertweetcentralrepository.h"
 #include "itwitterqueryhandler.h"
-#include "twittertimelinequeryhandler.h"
+#include "twitterhometimelinequeryhandler.h"
+#include "twittermentionstimelinequeryhandler.h"
 #include "private/twitterqueryutil.h"
 #include <QtCore/QLoggingCategory>
 #include <QtNetwork/QNetworkReply>
@@ -104,9 +105,15 @@ ITwitterQueryHandler * TwitterTweetCentralRepository::getQueryHandler(const Twit
     }
 
     switch (query.type()) {
-    case TwitterQuery::Timeline:
+    case TwitterQuery::Home:
     {
-        std::unique_ptr<ITwitterQueryHandler> handler {new TwitterTimelineQueryHandler()};
+        std::unique_ptr<ITwitterQueryHandler> handler {new TwitterHomeTimelineQueryHandler()};
+        return m_queries.emplace(query, std::move(handler)).first->second.get();
+        break;
+    }
+    case TwitterQuery::Mentions:
+    {
+        std::unique_ptr<ITwitterQueryHandler> handler {new TwitterMentionsTimelineQueryHandler()};
         return m_queries.emplace(query, std::move(handler)).first->second.get();
         break;
     }

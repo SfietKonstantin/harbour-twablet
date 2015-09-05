@@ -128,7 +128,9 @@ void TwitterDataRepositoryObject::addLayout(const QString &name, int accountInde
     const TwitterAccount &account = *(std::begin(m_accounts) + accountIndex);
 
     switch (queryType) {
-    case TwitterQuery::Timeline:
+    case TwitterQuery::Home:
+        break;
+    case TwitterQuery::Mentions:
         break;
     default:
         return;
@@ -158,8 +160,13 @@ void TwitterDataRepositoryObject::addDefaultLayouts(int accountIndex, const QStr
     const TwitterAccount &account = *(std::begin(m_accounts) + accountIndex);
 
     if (enableHomeTimeline) {
-        m_layouts.append(Layout(homeName, account.userId(), TwitterQuery(TwitterQuery::Timeline,
+        m_layouts.append(Layout(homeName, account.userId(), TwitterQuery(TwitterQuery::Home,
                                                                          TwitterQuery::Arguments())));
+        m_tweetRepositories.emplace(*(std::end(m_layouts) - 1), TwitterTweetRepository());
+    }
+    if (enableMentionsTimeline) {
+        m_layouts.append(Layout(mentionsName, account.userId(), TwitterQuery(TwitterQuery::Mentions,
+                                                                             TwitterQuery::Arguments())));
         m_tweetRepositories.emplace(*(std::end(m_layouts) - 1), TwitterTweetRepository());
     }
 }
@@ -217,7 +224,7 @@ bool TwitterDataRepositoryObject::LayoutComparator::operator()(const Layout &fir
     }
 
     const TwitterQuery &firstQuery {first.query()};
-    const TwitterQuery &secondQuery {first.query()};
+    const TwitterQuery &secondQuery {second.query()};
 
     if (firstQuery.type() < secondQuery.type()) {
         return true;

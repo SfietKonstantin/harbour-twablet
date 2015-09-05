@@ -36,7 +36,8 @@
 TwitterQueryListModel::TwitterQueryListModel(QObject *parent) :
     QAbstractListModel(parent)
 {
-    m_data.emplace_back(new Data {tr("Timeline"), TwitterQueryObject::Timeline});
+    m_data.emplace_back(new Data {tr("Home"), TwitterQueryObject::Home});
+    m_data.emplace_back(new Data {tr("Mentions"), TwitterQueryObject::Mentions});
 }
 
 void TwitterQueryListModel::classBegin()

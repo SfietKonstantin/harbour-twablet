@@ -42,7 +42,8 @@ public:
     enum Type
     {
         Invalid = 0,
-        Timeline
+        Home,
+        Mentions
     };
     using Arguments = std::vector<std::pair<QString, QString>>;
     explicit TwitterQuery() = default;
@@ -50,6 +51,8 @@ public:
     DEFAULT_COPY_DEFAULT_MOVE(TwitterQuery);
     Type type() const;
     Arguments arguments() const;
+    bool operator==(const TwitterQuery &other) const;
+    bool operator!=(const TwitterQuery &other) const;
 private:
     Type m_type {Invalid};
     Arguments m_arguments {};

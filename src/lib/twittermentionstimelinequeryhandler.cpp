@@ -29,27 +29,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twittertimelinequeryhandler.h"
+#include "twittermentionstimelinequeryhandler.h"
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
 #include "twittertweet.h"
 
-TwitterTimelineQueryHandler::TwitterTimelineQueryHandler()
+TwitterMentionsTimelineQueryHandler::TwitterMentionsTimelineQueryHandler()
 {
 }
 
-void TwitterTimelineQueryHandler::createRequest(QString &path, std::map<QString, QString> &parameters) const
+void TwitterMentionsTimelineQueryHandler::createRequest(QString &path, std::map<QString, QString> &parameters) const
 {
-    path = QLatin1String("statuses/home_timeline.json");
+    path = QLatin1String("statuses/mentions_timeline.json");
     parameters.insert({QLatin1String("count"), QString::number(200)});
     if (!m_sinceId.isEmpty()) {
         parameters.insert({QLatin1String("since_id"), m_sinceId});
     }
 }
 
-bool TwitterTimelineQueryHandler::treatReply(const QByteArray &data, std::vector<TwitterTweet> &items,
-                                             QString &errorMessage, Placement &placement)
+bool TwitterMentionsTimelineQueryHandler::treatReply(const QByteArray &data, std::vector<TwitterTweet> &items,
+                                                     QString &errorMessage, Placement &placement)
 {
     QJsonParseError error {-1, QJsonParseError::NoError};
     QJsonDocument document {QJsonDocument::fromJson(data, &error)};
@@ -74,4 +74,3 @@ bool TwitterTimelineQueryHandler::treatReply(const QByteArray &data, std::vector
     placement = Prepend;
     return true;
 }
-

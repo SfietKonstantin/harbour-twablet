@@ -46,3 +46,13 @@ TwitterQuery::Arguments TwitterQuery::arguments() const
     return m_arguments;
 }
 
+bool TwitterQuery::operator==(const TwitterQuery &other) const
+{
+    return m_type == other.m_type && m_arguments == other.m_arguments;
+}
+
+bool TwitterQuery::operator!=(const TwitterQuery &other) const
+{
+    return !(*this == other);
+}
+
