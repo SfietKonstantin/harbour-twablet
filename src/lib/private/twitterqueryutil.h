@@ -34,14 +34,14 @@
 
 #include <QtNetwork/QNetworkRequest>
 #include <map>
-#include "../twitteruser.h"
+#include "../twitteraccount.h"
 
 class TwitterQueryUtil
 {
 public:
     static QNetworkRequest createGetRequest(const QString &path,
                                             const std::map<QString, QString> &parameters,
-                                            const TwitterUser &user);
+                                            const TwitterAccount &account);
 };
 
 #endif // TWITTERQUERYUTIL_H

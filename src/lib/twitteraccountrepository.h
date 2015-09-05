@@ -29,19 +29,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERUSERREPOSITORY_H
-#define TWITTERUSERREPOSITORY_H
+#ifndef TWITTERACCOUNTREPOSITORY_H
+#define TWITTERACCOUNTREPOSITORY_H
 
 #include "repository.h"
 #include "iloadsave.h"
-#include "twitteruser.h"
+#include "twitteraccount.h"
 
-class TwitterUserRepository: public Repository<TwitterUser>, public ILoadSave
+class TwitterAccountRepository: public Repository<TwitterAccount>, public ILoadSave
 {
 public:
-    TwitterUser find(const QString &userId) const;
+    TwitterAccount find(const QString &userId) const;
     void load(const QJsonObject &json) override;
     void save(QJsonObject &json) const override;
 };
 
-#endif // TWITTERUSERREPOSITORY_H
+#endif // TWITTERACCOUNTREPOSITORY_H

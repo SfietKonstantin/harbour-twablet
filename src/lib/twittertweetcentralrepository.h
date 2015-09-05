@@ -38,7 +38,7 @@
 #include "globals.h"
 #include "qobjectutils.h"
 #include "twittertweet.h"
-#include "twitteruser.h"
+#include "twitteraccount.h"
 #include "twitterquery.h"
 #include "repository.h"
 #include "twittertweetrepository.h"
@@ -51,7 +51,7 @@ class TwitterTweetCentralRepository: public QObject
 public:
     explicit TwitterTweetCentralRepository();
     DISABLE_COPY_DEFAULT_MOVE(TwitterTweetCentralRepository);
-    void query(const TwitterUser &user, const TwitterQuery &query,
+    void query(const TwitterAccount &account, const TwitterQuery &query,
                TwitterTweetRepository &repository);
 private:
     class TwitterQueryComparator

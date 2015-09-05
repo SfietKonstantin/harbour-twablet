@@ -37,11 +37,19 @@ import "pages"
 ApplicationWindow {
     id: app
 
-    Component {
-        id: mainPage
-        MainPage {}
+    TwitterAccountModel {
+        id: accountModel
+        repository: Repository
     }
-    initialPage: mainPage
+
+    Component.onCompleted: {
+        if (accountModel.count === 0) {
+            pageStack.push(Qt.resolvedUrl("pages/AccountsPage.qml"), {initial: true})
+        } else {
+            pageStack.push(Qt.resolvedUrl("pages/MainPage.qml"))
+        }
+    }
+
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
 }
 

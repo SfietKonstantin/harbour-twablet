@@ -35,15 +35,15 @@ import harbour.twablet 1.0
 
 Dialog {
     id: container
-    property TwitterUserModel userModel
+    property TwitterAccountModel accountModel
 
     canAccept: nameField.text.length > 0
     allowedOrientations: app.defaultAllowedOrientations
 
     onAccepted: {
-        var userIndex = userCombo.currentIndex
+        var accountIndex = accountCombo.currentIndex
         var queryType = queryModel.getType(queryCombo.currentIndex)
-        Repository.addLayout(nameField.text, userIndex, queryType, {})
+        Repository.addLayout(nameField.text, accountIndex, queryType, {})
     }
 
     SilicaFlickable {
@@ -64,11 +64,11 @@ Dialog {
             }
 
             ComboBox {
-                id: userCombo
-                label: qsTr("User")
+                id: accountCombo
+                label: qsTr("Account")
                 menu: ContextMenu {
                     Repeater {
-                        model: container.userModel
+                        model: container.accountModel
                         delegate: MenuItem {
                             text: model.name
                         }

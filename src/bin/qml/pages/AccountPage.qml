@@ -45,10 +45,12 @@ Dialog {
     property string initialName
     onAccepted: {
         if (container.index == -1) {
-            Repository.addUser(nameField.text, container.userId, container.screenName,
-                               container.token, container.tokenSecret)
+            var index = Repository.addAccount(nameField.text, container.userId, container.screenName,
+                                              container.token, container.tokenSecret)
+            Repository.addDefaultLayouts(index, qsTr("Home"), homeTl.checked,
+                                         qsTr("Mentions"), mentionsTl.checked)
         } else {
-            Repository.updateUserName(container.index, nameField.text)
+            Repository.updateAccountName(container.index, nameField.text)
         }
     }
 
@@ -89,6 +91,18 @@ Dialog {
                 anchors.left: parent.left; anchors.right: parent.right
                 placeholderText: qsTr("Name of the account")
                 text: container.initialName
+            }
+            TextSwitch {
+                id: homeTl
+                visible: container.index === -1
+                text: qsTr("Add home timeline")
+                checked: true
+            }
+            TextSwitch {
+                id: mentionsTl
+                visible: container.index === -1
+                text: qsTr("Add mentions timeline")
+                checked: true
             }
         }
     }

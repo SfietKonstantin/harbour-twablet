@@ -86,7 +86,7 @@ public:
         }
         m_data[index] = std::move(data);
         for (IListener<T> *listener : m_listeners) {
-            listener->doUpdate(index, *(m_data.begin() + index));
+            listener->doUpdate(index, *(std::begin(m_data) + index));
         }
     }
     void remove(int index)

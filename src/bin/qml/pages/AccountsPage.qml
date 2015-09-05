@@ -36,19 +36,30 @@ import harbour.twablet 1.0
 Page {
     id: container
     allowedOrientations: app.defaultAllowedOrientations
+    property bool initial: false
+    onStatusChanged: {
+        if (container.status === PageStatus.Active) {
+            if (container.initial && accountModel.count > 0) {
+                pageStack.replace(Qt.resolvedUrl("MainPage.qml"))
+            }
+        }
+    }
 
     SilicaListView {
         id: view
         anchors.fill: parent
-        model: TwitterUserModel {
-            repository: Repository
-        }
+        model: accountModel
         header: PageHeader { title: qsTr("Accounts") }
         delegate: ListItem {
             id: item
             function remove() {
                 remorseAction(qsTr("Removing account"), function() {
-                    Repository.removeUser(index)
+                    Repository.removeAccount(index)
+
+                    if (!container.initial && accountModel.count === 0) {
+                        pageStack.clear()
+                        pageStack.push(Qt.resolvedUrl("AccountsPage.qml"), {initial: true})
+                    }
                 })
             }
             menu: contextMenu

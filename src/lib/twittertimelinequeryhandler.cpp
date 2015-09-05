@@ -68,7 +68,7 @@ bool TwitterTimelineQueryHandler::treatReply(const QByteArray &data, std::vector
     }
 
     if (!items.empty()) {
-        m_sinceId = items.begin()->id();
+        m_sinceId = std::begin(items)->id();
     }
 
     placement = Prepend;

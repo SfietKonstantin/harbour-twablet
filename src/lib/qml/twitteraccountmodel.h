@@ -29,47 +29,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twitteruserobject.h"
+#ifndef TWITTERACCOUNTMODEL_H
+#define TWITTERACCOUNTMODEL_H
 
-TwitterUserObject::TwitterUserObject(const TwitterUser &twitterUser, QObject *parent)
-    : QObject(parent), m_twitterUser(twitterUser)
-{
-}
+#include "twitteraccountobject.h"
+#include "model.h"
 
-TwitterUserObject * TwitterUserObject::create(const TwitterUser &twitterUser, QObject *parent)
+class TwitterAccountModel : public Model<TwitterAccount, TwitterAccountObject>
 {
-    return new TwitterUserObject(twitterUser, parent);
-}
+public:
+    enum Roles {
+        NameRole = Qt::UserRole + 1,
+        ScreenNameRole,
+        AccountRole
+    };
+    explicit TwitterAccountModel(QObject *parent = 0);
+    QVariant data(const QModelIndex &index, int role) const override;
+private:
+    QHash<int, QByteArray> roleNames() const override;
+};
 
-QString TwitterUserObject::name() const
-{
-    return m_twitterUser.name();
-}
-
-QString TwitterUserObject::userId() const
-{
-    return m_twitterUser.userId();
-}
-
-QString TwitterUserObject::screenName() const
-{
-    return m_twitterUser.screenName();
-}
-
-QByteArray TwitterUserObject::token() const
-{
-    return m_twitterUser.token();
-}
-
-QByteArray TwitterUserObject::tokenSecret() const
-{
-    return m_twitterUser.tokenSecret();
-}
-
-void TwitterUserObject::update(const TwitterUser &other)
-{
-    if (m_twitterUser.name() != other.name()) {
-        m_twitterUser.setName(other.name());
-        emit nameChanged();
-    }
-}
+#endif // TWITTERACCOUNTMODEL_H

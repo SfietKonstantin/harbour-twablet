@@ -36,16 +36,21 @@
 TwitterDataRepositoryObject::TwitterDataRepositoryObject(QObject *parent)
     : QObject(parent)
 {
-    m_loadSaveManager.load(m_users);
+    m_loadSaveManager.load(m_accounts);
     m_loadSaveManager.load(m_layouts);
     for (const Layout &layout : m_layouts) {
         m_tweetRepositories.emplace(layout, std::move(TwitterTweetRepository()));
     }
 }
 
-TwitterUserRepository & TwitterDataRepositoryObject::users()
+bool TwitterDataRepositoryObject::hasAccounts() const
 {
-    return m_users;
+    return (std::begin(m_accounts) != std::end(m_accounts));
+}
+
+TwitterAccountRepository & TwitterDataRepositoryObject::accounts()
+{
+    return m_accounts;
 }
 
 LayoutRepository & TwitterDataRepositoryObject::layouts()
@@ -58,35 +63,43 @@ TwitterTweetRepository & TwitterDataRepositoryObject::tweets(const Layout &layou
     return m_tweetRepositories[layout];
 }
 
-void TwitterDataRepositoryObject::addUser(const QString &name, const QString &userId,
-                                          const QString &screenName,
-                                          const QString &token, const QString &tokenSecret)
+int TwitterDataRepositoryObject::addAccount(const QString &name, const QString &userId,
+                                            const QString &screenName,
+                                            const QString &token, const QString &tokenSecret)
 {
-    m_users.append(TwitterUser(name, userId, screenName, token.toLocal8Bit(),
+    bool oldHasAccounts = hasAccounts();
+    m_accounts.append(TwitterAccount(name, userId, screenName, token.toLocal8Bit(),
                             tokenSecret.toLocal8Bit()));
-    m_loadSaveManager.save(m_users);
-}
+    m_loadSaveManager.save(m_accounts);
 
-void TwitterDataRepositoryObject::updateUserName(int index, const QString &name)
-{
-    if (index < 0 || index >= std::end(m_users) - std::begin(m_users)) {
-        return;
-    }
-    TwitterUser user {*(std::begin(m_users) + index)};
-    user.setName(name);
-    m_users.update(index, std::move(user));
-    m_loadSaveManager.save(m_users);
-}
-
-void TwitterDataRepositoryObject::removeUser(int index)
-{
-    if (index < 0 || index >= std::end(m_users) - std::begin(m_users)) {
-        return;
+    if (hasAccounts() != oldHasAccounts) {
+        emit hasAccountsChanged();
     }
 
-    const QString userId {(std::begin(m_users) + index)->userId()};
-    m_users.remove(index);
-    m_loadSaveManager.save(m_users);
+    return std::end(m_accounts) - std::begin(m_accounts) - 1;
+}
+
+void TwitterDataRepositoryObject::updateAccountName(int index, const QString &name)
+{
+    if (index < 0 || index >= std::end(m_accounts) - std::begin(m_accounts)) {
+        return;
+    }
+    TwitterAccount account {*(std::begin(m_accounts) + index)};
+    account.setName(name);
+    m_accounts.update(index, std::move(account));
+    m_loadSaveManager.save(m_accounts);
+}
+
+void TwitterDataRepositoryObject::removeAccount(int index)
+{
+    if (index < 0 || index >= std::end(m_accounts) - std::begin(m_accounts)) {
+        return;
+    }
+
+    bool oldHasAccounts = hasAccounts();
+    const QString userId {(std::begin(m_accounts) + index)->userId()};
+    m_accounts.remove(index);
+    m_loadSaveManager.save(m_accounts);
 
     std::vector<int> removedIndexes;
     for (int i = 0; i < m_layouts.count(); ++i) {
@@ -100,15 +113,19 @@ void TwitterDataRepositoryObject::removeUser(int index)
         m_layouts.remove(i);
     }
     m_loadSaveManager.save(m_layouts);
+
+    if (hasAccounts() != oldHasAccounts) {
+        emit hasAccountsChanged();
+    }
 }
 
-void TwitterDataRepositoryObject::addLayout(const QString &name, int userIndex, int queryType,
+void TwitterDataRepositoryObject::addLayout(const QString &name, int accountIndex, int queryType,
                                             const QVariantMap &arguments)
 {
-    if (userIndex < 0 || userIndex >= std::end(m_users) - std::begin(m_users)) {
+    if (accountIndex < 0 || accountIndex >= std::end(m_accounts) - std::begin(m_accounts)) {
         return;
     }
-    const TwitterUser &user = *(std::begin(m_users) + userIndex);
+    const TwitterAccount &account = *(std::begin(m_accounts) + accountIndex);
 
     switch (queryType) {
     case TwitterQuery::Timeline:
@@ -123,11 +140,28 @@ void TwitterDataRepositoryObject::addLayout(const QString &name, int userIndex, 
         queryArguments.push_back(std::make_pair(key, arguments.value(key).toString()));
     }
 
-    m_layouts.append(Layout(name, user.userId(), TwitterQuery(static_cast<TwitterQuery::Type>(queryType),
+    m_layouts.append(Layout(name, account.userId(), TwitterQuery(static_cast<TwitterQuery::Type>(queryType),
                                                            std::move(queryArguments))));
     m_tweetRepositories.emplace(*(std::end(m_layouts) - 1), TwitterTweetRepository());
     m_loadSaveManager.save(m_layouts);
     refresh();
+}
+
+void TwitterDataRepositoryObject::addDefaultLayouts(int accountIndex, const QString &homeName,
+                                                    bool enableHomeTimeline, const QString &mentionsName,
+                                                    bool enableMentionsTimeline)
+{
+    if (accountIndex < 0 || accountIndex >= std::end(m_accounts) - std::begin(m_accounts)) {
+        return;
+    }
+
+    const TwitterAccount &account = *(std::begin(m_accounts) + accountIndex);
+
+    if (enableHomeTimeline) {
+        m_layouts.append(Layout(homeName, account.userId(), TwitterQuery(TwitterQuery::Timeline,
+                                                                         TwitterQuery::Arguments())));
+        m_tweetRepositories.emplace(*(std::end(m_layouts) - 1), TwitterTweetRepository());
+    }
 }
 
 void TwitterDataRepositoryObject::updateLayoutName(int index, const QString &name)
@@ -165,9 +199,9 @@ void TwitterDataRepositoryObject::refresh()
 {
     for (auto it = std::begin(m_tweetRepositories); it != std::end(m_tweetRepositories); ++it) {
         const Layout &layout {it->first};
-        const TwitterUser &user {m_users.find(layout.userId())};
-        if (!user.isNull()) {
-            m_tweetsCentralRepository.query(user, layout.query(), it->second);
+        const TwitterAccount &account {m_accounts.find(layout.userId())};
+        if (!account.isNull()) {
+            m_tweetsCentralRepository.query(account, layout.query(), it->second);
         }
     }
 }

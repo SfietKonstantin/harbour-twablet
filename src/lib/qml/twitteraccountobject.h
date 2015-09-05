@@ -29,22 +29,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERUSEROBJECT_H
-#define TWITTERUSEROBJECT_H
+#ifndef TWITTERACCOUNTOBJECT_H
+#define TWITTERACCOUNTOBJECT_H
 
 #include <QtCore/QObject>
-#include "twitteruser.h"
+#include "twitteraccount.h"
 #include "model.h"
 
-class TwitterUserObject : public QObject
+class TwitterAccountObject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
     Q_PROPERTY(QString userId READ userId CONSTANT)
     Q_PROPERTY(QString screenName READ screenName CONSTANT)
 public:
-    DISABLE_COPY_DISABLE_MOVE(TwitterUserObject);
-    static TwitterUserObject * create(const TwitterUser &twitterUser, QObject *parent = 0);
+    DISABLE_COPY_DISABLE_MOVE(TwitterAccountObject);
+    static TwitterAccountObject * create(const TwitterAccount &twitterAccount, QObject *parent = 0);
     QString name() const;
     QString userId() const;
     QString screenName() const;
@@ -53,10 +53,10 @@ public:
 signals:
     void nameChanged();
 private:
-    explicit TwitterUserObject(const TwitterUser &twitterUser, QObject *parent = 0);
-    void update(const TwitterUser &other);
-    TwitterUser m_twitterUser {};
-    friend class Model<TwitterUser, TwitterUserObject>;
+    explicit TwitterAccountObject(const TwitterAccount &twitterAccount, QObject *parent = 0);
+    void update(const TwitterAccount &other);
+    TwitterAccount m_twitterAccount {};
+    friend class Model<TwitterAccount, TwitterAccountObject>;
 };
 
-#endif // TWITTERUSEROBJECT_H
+#endif // TWITTERACCOUNTOBJECT_H

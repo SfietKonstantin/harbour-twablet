@@ -37,7 +37,14 @@ Page {
     id: container
     allowedOrientations: app.defaultAllowedOrientations
 
-    TwitterUserModel { id: userModel; repository: Repository }
+    onStatusChanged: {
+        if (container.status === PageStatus.Active) {
+            if (accountModel.count === 0) {
+                pageStack.replace(Qt.resolvedUrl("AccountsPage.qml"), {initial: true})
+            }
+        }
+    }
+
     LayoutModel { id: layoutModel; repository: Repository }
 
     Component.onCompleted: {
@@ -48,24 +55,12 @@ Page {
 
     SilicaFlickable {
         anchors.fill: parent
-
-        PullDownMenu {
-            visible: layoutModel.count === 0
-            MenuItem {
-                text: qsTr("About")
-                enabled: false
-            }
-
-            MenuItem {
-                text: qsTr("Accounts")
-                onClicked: pageStack.push(Qt.resolvedUrl("AccountsPage.qml"))
-            }
-        }
+        visible: accountModel.count > 0
 
         PushUpMenu {
-            visible: layoutModel.count > 0
             MenuItem {
                 text: qsTr("Refresh")
+                enabled: layoutModel.count > 0
                 onClicked: Repository.refresh()
             }
 
@@ -85,19 +80,17 @@ Page {
             }
         }
 
-        ViewPlaceholder {
-            enabled: userModel.count === 0
-            text: qsTr("There is no account defined. Pull down to configure accounts.")
-        }
-
-        ViewPlaceholder {
-            enabled: userModel.count > 0 && layoutModel.count === 0
-            text: qsTr("There is no column defined. Pull down to add a column.")
+        Button {
+            anchors.centerIn: parent
+            visible: layoutModel.count === 0
+            text: qsTr("Add column")
+            onClicked: pageStack.push(Qt.resolvedUrl("AddColumnPage.qml"), {accountModel: accountModel})
         }
 
         Item {
             width: parent.width
             height: parent.height
+            visible: layoutModel.count > 0
 
             SilicaListView {
                 id: view
@@ -138,7 +131,7 @@ Page {
                     Button {
                         anchors.centerIn: parent
                         text: qsTr("Add column")
-                        onClicked: pageStack.push(Qt.resolvedUrl("AddColumnPage.qml"), {userModel: userModel})
+                        onClicked: pageStack.push(Qt.resolvedUrl("AddColumnPage.qml"), {accountModel: accountModel})
                     }
                 }
 

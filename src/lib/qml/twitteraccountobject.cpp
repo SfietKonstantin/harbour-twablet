@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,46 +29,47 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twitteruser.h"
+#include "twitteraccountobject.h"
 
-TwitterUser::TwitterUser(const QString &name, const QString &userId, const QString &screenName,
-                         const QByteArray &token, const QByteArray &tokenSecret)
-    : m_name{name}, m_userId{userId}, m_screenName{screenName}
-    , m_token{token}, m_tokenSecret{tokenSecret}
+TwitterAccountObject::TwitterAccountObject(const TwitterAccount &twitterAccount, QObject *parent)
+    : QObject(parent), m_twitterAccount(twitterAccount)
 {
 }
 
-bool TwitterUser::isNull() const
+TwitterAccountObject * TwitterAccountObject::create(const TwitterAccount &twitterAccount, QObject *parent)
 {
-    return (m_name.isEmpty() || m_userId.isEmpty() || m_token.isEmpty() || m_tokenSecret.isEmpty());
+    return new TwitterAccountObject(twitterAccount, parent);
 }
 
-QString TwitterUser::name() const
+QString TwitterAccountObject::name() const
 {
-    return m_name;
+    return m_twitterAccount.name();
 }
 
-void TwitterUser::setName(const QString &name)
+QString TwitterAccountObject::userId() const
 {
-    m_name = name;
+    return m_twitterAccount.userId();
 }
 
-QString TwitterUser::userId() const
+QString TwitterAccountObject::screenName() const
 {
-    return m_userId;
+    return m_twitterAccount.screenName();
 }
 
-QString TwitterUser::screenName() const
+QByteArray TwitterAccountObject::token() const
 {
-    return m_screenName;
+    return m_twitterAccount.token();
 }
 
-QByteArray TwitterUser::token() const
+QByteArray TwitterAccountObject::tokenSecret() const
 {
-    return m_token;
+    return m_twitterAccount.tokenSecret();
 }
 
-QByteArray TwitterUser::tokenSecret() const
+void TwitterAccountObject::update(const TwitterAccount &other)
 {
-    return m_tokenSecret;
+    if (m_twitterAccount.name() != other.name()) {
+        m_twitterAccount.setName(other.name());
+        emit nameChanged();
+    }
 }

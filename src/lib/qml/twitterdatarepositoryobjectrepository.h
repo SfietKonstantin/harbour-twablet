@@ -36,14 +36,14 @@
 
 #include "twittertweetrepository.h"
 
-class TwitterUser;
+class TwitterAccount;
 class Layout;
 class TwitterTweet;
-class TwitterUserRepository;
+class TwitterAccountRepository;
 class LayoutRepository;
 class TwitterDataRepositoryObject;
 template<class T> class TwitterDataRepositoryObjectRepository;
-template<> class TwitterDataRepositoryObjectRepository<TwitterUser>
+template<> class TwitterDataRepositoryObjectRepository<TwitterAccount>
 {
 public:
     static bool isValid(TwitterDataRepositoryObject *repository, int layoutIndex)
@@ -51,10 +51,10 @@ public:
         Q_UNUSED(layoutIndex)
         return repository != nullptr;
     }
-    static TwitterUserRepository & get(TwitterDataRepositoryObject &repository, int layoutIndex)
+    static TwitterAccountRepository & get(TwitterDataRepositoryObject &repository, int layoutIndex)
     {
         Q_UNUSED(layoutIndex)
-        return repository.users();
+        return repository.accounts();
     }
 };
 template<> class TwitterDataRepositoryObjectRepository<Layout>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,24 +29,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERUSERMODEL_H
-#define TWITTERUSERMODEL_H
+#ifndef TWITTERACCOUNT_H
+#define TWITTERACCOUNT_H
 
-#include "twitteruserobject.h"
-#include "model.h"
+#include <QtCore/QByteArray>
+#include <QtCore/QString>
+#include "globals.h"
 
-class TwitterUserModel : public Model<TwitterUser, TwitterUserObject>
+class TwitterAccount
 {
 public:
-    enum Roles {
-        NameRole = Qt::UserRole + 1,
-        ScreenNameRole,
-        UserRole
-    };
-    explicit TwitterUserModel(QObject *parent = 0);
-    QVariant data(const QModelIndex &index, int role) const override;
+    explicit TwitterAccount() = default;
+    explicit TwitterAccount(const QString &name, const QString &userId, const QString &screenName,
+                            const QByteArray &token, const QByteArray &tokenSecret);
+    DEFAULT_COPY_DEFAULT_MOVE(TwitterAccount);
+    bool isNull() const;
+    QString name() const;
+    void setName(const QString &name);
+    QString userId() const;
+    QString screenName() const;
+    QByteArray token() const;
+    QByteArray tokenSecret() const;
 private:
-    QHash<int, QByteArray> roleNames() const override;
+    QString m_name {};
+    QString m_userId {};
+    QString m_screenName {};
+    QByteArray m_token {};
+    QByteArray m_tokenSecret {};
 };
 
-#endif // TWITTERUSERMODEL_H
+#endif // TWITTERACCOUNT_H

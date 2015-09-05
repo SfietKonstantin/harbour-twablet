@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,33 +29,38 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERUSER_H
-#define TWITTERUSER_H
+#include "twitteraccountmodel.h"
+#include "twitterdatarepositoryobject.h"
 
-#include <QtCore/QByteArray>
-#include <QtCore/QString>
-#include "globals.h"
-
-class TwitterUser
+TwitterAccountModel::TwitterAccountModel(QObject *parent) :
+    Model<TwitterAccount, TwitterAccountObject>(parent)
 {
-public:
-    explicit TwitterUser() = default;
-    explicit TwitterUser(const QString &name, const QString &userId, const QString &screenName,
-                         const QByteArray &token, const QByteArray &tokenSecret);
-    DEFAULT_COPY_DEFAULT_MOVE(TwitterUser);
-    bool isNull() const;
-    QString name() const;
-    void setName(const QString &name);
-    QString userId() const;
-    QString screenName() const;
-    QByteArray token() const;
-    QByteArray tokenSecret() const;
-private:
-    QString m_name {};
-    QString m_userId {};
-    QString m_screenName {};
-    QByteArray m_token {};
-    QByteArray m_tokenSecret {};
-};
+}
 
-#endif // TWITTERUSER_H
+QVariant TwitterAccountModel::data(const QModelIndex &index, int role) const
+{
+    int row = index.row();
+    if (row < 0 || row >= rowCount()) {
+        return QVariant();
+    }
+    const QObjectPtr<TwitterAccountObject> &account = m_data[row];
+    switch (role) {
+    case NameRole:
+        return account->name();
+        break;
+    case ScreenNameRole:
+        return account->screenName();
+        break;
+    case AccountRole:
+        return QVariant::fromValue(account.get());
+        break;
+    default:
+        return QVariant();
+        break;
+    }
+}
+
+QHash<int, QByteArray> TwitterAccountModel::roleNames() const
+{
+    return {{NameRole, "name"}, {ScreenNameRole, "screenName"}, {AccountRole, "account"}};
+}

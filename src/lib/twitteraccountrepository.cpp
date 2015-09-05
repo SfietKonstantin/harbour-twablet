@@ -29,33 +29,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twitteruserrepository.h"
+#include "twitteraccountrepository.h"
 #include <QtCore/QJsonArray>
 
-TwitterUser TwitterUserRepository::find(const QString &userId) const
+TwitterAccount TwitterAccountRepository::find(const QString &userId) const
 {
-    List::const_iterator it {std::find_if(std::begin(m_data), std::end(m_data), [userId](const TwitterUser &user) {
+    List::const_iterator it {std::find_if(std::begin(m_data), std::end(m_data), [userId](const TwitterAccount &user) {
         return (user.userId() == userId);
     })};
 
     if (it != std::end(m_data)) {
         return *it;
     }
-    return TwitterUser();
+    return TwitterAccount();
 }
 
-void TwitterUserRepository::load(const QJsonObject &json)
+void TwitterAccountRepository::load(const QJsonObject &json)
 {
-    const QJsonArray &usersArray {json.value(QLatin1String("users")).toArray()};
+    const QJsonArray &accountsArray {json.value(QLatin1String("accounts")).toArray()};
 
     List data;
-    for (const QJsonValue &userValue : usersArray) {
-        const QJsonObject &user {userValue.toObject()};
-        const QString &name {user.value(QLatin1String("name")).toString()};
-        const QString &userId {user.value(QLatin1String("userId")).toString()};
-        const QString &screenName {user.value(QLatin1String("screenName")).toString()};
-        const QByteArray &token {user.value(QLatin1String("token")).toString().toLocal8Bit()};
-        const QByteArray &tokenSecret {user.value(QLatin1String("tokenSecret")).toString().toLocal8Bit()};
+    for (const QJsonValue &accountValue : accountsArray) {
+        const QJsonObject &account {accountValue.toObject()};
+        const QString &name {account.value(QLatin1String("name")).toString()};
+        const QString &userId {account.value(QLatin1String("userId")).toString()};
+        const QString &screenName {account.value(QLatin1String("screenName")).toString()};
+        const QByteArray &token {account.value(QLatin1String("token")).toString().toLocal8Bit()};
+        const QByteArray &tokenSecret {account.value(QLatin1String("tokenSecret")).toString().toLocal8Bit()};
         if (!name.isEmpty() && !userId.isEmpty()) {
             data.emplace_back(name, userId, screenName, token, tokenSecret);
         }
@@ -63,18 +63,18 @@ void TwitterUserRepository::load(const QJsonObject &json)
     m_data = std::move(data);
 }
 
-void TwitterUserRepository::save(QJsonObject &json) const
+void TwitterAccountRepository::save(QJsonObject &json) const
 {
-    QJsonArray users {};
-    for (const TwitterUser &user : m_data) {
-        QJsonObject userObject {};
-        userObject.insert(QLatin1String("name"), user.name());
-        userObject.insert(QLatin1String("userId"), user.userId());
-        userObject.insert(QLatin1String("screenName"), user.screenName());
-        userObject.insert(QLatin1String("token"), QString::fromLocal8Bit(user.token()));
-        userObject.insert(QLatin1String("tokenSecret"), QString::fromLocal8Bit(user.tokenSecret()));
-        users.append(userObject);
+    QJsonArray accounts {};
+    for (const TwitterAccount &account : m_data) {
+        QJsonObject accountObject {};
+        accountObject.insert(QLatin1String("name"), account.name());
+        accountObject.insert(QLatin1String("userId"), account.userId());
+        accountObject.insert(QLatin1String("screenName"), account.screenName());
+        accountObject.insert(QLatin1String("token"), QString::fromLocal8Bit(account.token()));
+        accountObject.insert(QLatin1String("tokenSecret"), QString::fromLocal8Bit(account.tokenSecret()));
+        accounts.append(accountObject);
     }
-    json.insert(QLatin1String("users"), users);
+    json.insert(QLatin1String("accounts"), accounts);
 }
 

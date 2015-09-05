@@ -34,26 +34,32 @@
 
 #include <QtCore/QObject>
 #include "loadsavemanager.h"
-#include "twitteruserrepository.h"
+#include "twitteraccountrepository.h"
 #include "layoutrepository.h"
 #include "twittertweetcentralrepository.h"
 
 class TwitterDataRepositoryObject : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool hasAccounts READ hasAccounts NOTIFY hasAccountsChanged)
 public:
     explicit TwitterDataRepositoryObject(QObject *parent = 0);
-    TwitterUserRepository & users();
+    bool hasAccounts() const;
+    TwitterAccountRepository & accounts();
     LayoutRepository & layouts();
     TwitterTweetRepository & tweets(const Layout &layout);
+signals:
+    void hasAccountsChanged();
 public slots:
-    // Users
-    void addUser(const QString &name, const QString &userId, const QString &screenName,
-                 const QString &token, const QString &tokenSecret);
-    void updateUserName(int index, const QString &name);
-    void removeUser(int index);
+    // Accounts
+    int addAccount(const QString &name, const QString &userId, const QString &screenName,
+                    const QString &token, const QString &tokenSecret);
+    void updateAccountName(int index, const QString &name);
+    void removeAccount(int index);
     // Layouts
-    void addLayout(const QString &name, int userIndex, int queryType, const QVariantMap &arguments);
+    void addLayout(const QString &name, int accountIndex, int queryType, const QVariantMap &arguments);
+    void addDefaultLayouts(int accountIndex, const QString &homeName, bool enableHomeTimeline,
+                           const QString &mentionsName, bool enableMentionsTimeline);
     void updateLayoutName(int index, const QString &name);
     void updateLayoutUnread(int index, int unread);
     void removeLayout(int index);
@@ -65,7 +71,7 @@ private:
         bool operator()(const Layout &first, const Layout &second) const;
     };
     LoadSaveManager m_loadSaveManager {};
-    TwitterUserRepository m_users {};
+    TwitterAccountRepository m_accounts {};
     LayoutRepository m_layouts {};
     TwitterTweetCentralRepository m_tweetsCentralRepository {};
     std::map<Layout, TwitterTweetRepository, LayoutComparator> m_tweetRepositories {};

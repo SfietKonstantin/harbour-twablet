@@ -17,11 +17,11 @@ HEADERS += \
     ilistener.h \
     iloadsave.h \
     loadsavemanager.h \
-    twitteruser.h \
-    twitteruserrepository.h \
+    twitteraccount.h \
+    twitteraccountrepository.h \
     qml/twitterdatarepositoryobject.h \
-    qml/twitteruserobject.h \
-    qml/twitterusermodel.h \
+    qml/twitteraccountobject.h \
+    qml/twitteraccountmodel.h \
     twitterquery.h \
     qml/twitterqueryobject.h \
     layout.h \
@@ -45,11 +45,11 @@ SOURCES += \
     private/twitterqueryutil.cpp \
     qml/twitterauthentification.cpp \
     loadsavemanager.cpp \
-    twitteruser.cpp \
-    twitteruserrepository.cpp \
+    twitteraccount.cpp \
+    twitteraccountrepository.cpp \
     qml/twitterdatarepositoryobject.cpp \
-    qml/twitteruserobject.cpp \
-    qml/twitterusermodel.cpp \
+    qml/twitteraccountobject.cpp \
+    qml/twitteraccountmodel.cpp \
     twitterquery.cpp \
     qml/twitterqueryobject.cpp \
     layout.cpp \

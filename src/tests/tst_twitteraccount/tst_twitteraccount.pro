@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = tst_twitteruser
+TARGET = tst_twitteraccount
 
 QT = core qml testlib
 
@@ -8,4 +8,4 @@ include(../../config.pri)
 INCLUDEPATH += ../../lib
 LIBS += -L../../lib -lharbour-twablet
 
-SOURCES += tst_twitteruser.cpp
+SOURCES += tst_twitteraccount.cpp

@@ -41,7 +41,7 @@ TwitterTweetCentralRepository::TwitterTweetCentralRepository()
 {
 }
 
-void TwitterTweetCentralRepository::query(const TwitterUser &user, const TwitterQuery &query,
+void TwitterTweetCentralRepository::query(const TwitterAccount &account, const TwitterQuery &query,
                                           TwitterTweetRepository &repository)
 {
     // Create the request
@@ -53,14 +53,14 @@ void TwitterTweetCentralRepository::query(const TwitterUser &user, const Twitter
     QString path {};
     std::map<QString, QString> parameters {};
     handler->createRequest(path, parameters);
-    QNetworkReply *reply = m_network->get(TwitterQueryUtil::createGetRequest(path, parameters, user));
+    QNetworkReply *reply = m_network->get(TwitterQueryUtil::createGetRequest(path, parameters, account));
     repository.start();
 
-    connect(reply, &QNetworkReply::finished, this, [this, user, query, handler, reply, &repository]() {
+    connect(reply, &QNetworkReply::finished, this, [this, account, query, handler, reply, &repository]() {
         QObjectPtr<QNetworkReply> replyPtr {reply};
 
         if (replyPtr->error() != QNetworkReply::NoError) {
-            qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Error happened during request for layout" << user.userId() << query.type();
+            qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Error happened during request for layout" << account.userId() << query.type();
             qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Error code:" << reply->error();
             qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Error message (Qt):" << reply->errorString();
             qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Error message (Twitter):" << reply->readAll();
@@ -72,7 +72,7 @@ void TwitterTweetCentralRepository::query(const TwitterUser &user, const Twitter
         QString errorMessage {};
         ITwitterQueryHandler::Placement placement {ITwitterQueryHandler::Discard};
         if (!handler->treatReply(reply->readAll(), items, errorMessage, placement)) {
-            qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Error happened during request for layout" << user.userId() << query.type();
+            qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Error happened during request for layout" << account.userId() << query.type();
             qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Parsing error: " << errorMessage;
             repository.error(tr("Internal error"));
             return;
@@ -80,7 +80,7 @@ void TwitterTweetCentralRepository::query(const TwitterUser &user, const Twitter
             for (const TwitterTweet &tweet : items) {
                 m_data.emplace(tweet.id(), tweet);
             }
-            qDebug(QLoggingCategory("twitter-tweet-central-repository")) << "New data available for layout" << user.userId() << query.type() << ". Count:" << items.size();
+            qDebug(QLoggingCategory("twitter-tweet-central-repository")) << "New data available for layout" << account.userId() << query.type() << ". Count:" << items.size();
             switch (placement) {
             case ITwitterQueryHandler::Append:
                 repository.append(items);

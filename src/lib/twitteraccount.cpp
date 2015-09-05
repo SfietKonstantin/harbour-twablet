@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,38 +29,46 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twitterusermodel.h"
-#include "twitterdatarepositoryobject.h"
+#include "twitteraccount.h"
 
-TwitterUserModel::TwitterUserModel(QObject *parent) :
-    Model<TwitterUser, TwitterUserObject>(parent)
+TwitterAccount::TwitterAccount(const QString &name, const QString &userId, const QString &screenName,
+                               const QByteArray &token, const QByteArray &tokenSecret)
+    : m_name{name}, m_userId{userId}, m_screenName{screenName}
+    , m_token{token}, m_tokenSecret{tokenSecret}
 {
 }
 
-QVariant TwitterUserModel::data(const QModelIndex &index, int role) const
+bool TwitterAccount::isNull() const
 {
-    int row = index.row();
-    if (row < 0 || row >= rowCount()) {
-        return QVariant();
-    }
-    const QObjectPtr<TwitterUserObject> &user = m_data[row];
-    switch (role) {
-    case NameRole:
-        return user->name();
-        break;
-    case ScreenNameRole:
-        return user->screenName();
-        break;
-    case UserRole:
-        return QVariant::fromValue(user.get());
-        break;
-    default:
-        return QVariant();
-        break;
-    }
+    return (m_name.isEmpty() || m_userId.isEmpty() || m_token.isEmpty() || m_tokenSecret.isEmpty());
 }
 
-QHash<int, QByteArray> TwitterUserModel::roleNames() const
+QString TwitterAccount::name() const
 {
-    return {{NameRole, "name"}, {ScreenNameRole, "screenName"}, {UserRole, "user"}};
+    return m_name;
+}
+
+void TwitterAccount::setName(const QString &name)
+{
+    m_name = name;
+}
+
+QString TwitterAccount::userId() const
+{
+    return m_userId;
+}
+
+QString TwitterAccount::screenName() const
+{
+    return m_screenName;
+}
+
+QByteArray TwitterAccount::token() const
+{
+    return m_token;
+}
+
+QByteArray TwitterAccount::tokenSecret() const
+{
+    return m_tokenSecret;
 }

@@ -37,13 +37,13 @@
 
 QNetworkRequest TwitterQueryUtil::createGetRequest(const QString &path,
                                                    const std::map<QString, QString> &parameters,
-                                                   const TwitterUser &user)
+                                                   const TwitterAccount &account)
 {
     QString url {QLatin1String("https://api.twitter.com/1.1/") + path};
     std::vector<std::pair<QString, QString>> parametersVector (std::begin(parameters), std::end(parameters));
 
     QByteArray header {TwitterDataUtil::authorizationHeader(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, "GET", url.toLocal8Bit(),
-                                                            parametersVector, user.token(), user.tokenSecret())};
+                                                            parametersVector, account.token(), account.tokenSecret())};
     QUrl urlObject {url};
     QUrlQuery query {};
     QList<QPair<QString, QString>> parametersQt {};

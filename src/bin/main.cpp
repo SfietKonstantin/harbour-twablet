@@ -41,8 +41,8 @@
 #endif
 #include "qml/twitterdatarepositoryobject.h"
 #include "qml/twitterauthentification.h"
-#include "qml/twitteruserobject.h"
-#include "qml/twitterusermodel.h"
+#include "qml/twitteraccountobject.h"
+#include "qml/twitteraccountmodel.h"
 #include "qml/layoutmodel.h"
 #include "qml/twitterquerylistmodel.h"
 #include "qml/twittertweetmodel.h"
@@ -51,11 +51,11 @@ int main(int argc, char *argv[])
 {
     qmlRegisterUncreatableType<TwitterDataRepositoryObject>("harbour.twablet", 1, 0, "TwitterDataRepository", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<IModel>("harbour.twablet", 1, 0, "Model", QLatin1String("Uncreatable"));
-    qmlRegisterUncreatableType<TwitterUserObject>("harbour.twablet", 1, 0, "TwitterUser", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<TwitterAccountObject>("harbour.twablet", 1, 0, "TwitterAccount", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<LayoutObject>("harbour.twablet", 1, 0, "Layout", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<TwitterTweetObject>("harbour.twablet", 1, 0, "TwitterTweet", QLatin1String("Uncreatable"));
     qmlRegisterType<TwitterAuthentification>("harbour.twablet", 1, 0, "TwitterAuthentification");
-    qmlRegisterType<TwitterUserModel>("harbour.twablet", 1, 0, "TwitterUserModel");
+    qmlRegisterType<TwitterAccountModel>("harbour.twablet", 1, 0, "TwitterAccountModel");
     qmlRegisterType<LayoutModel>("harbour.twablet", 1, 0, "LayoutModel");
     qmlRegisterType<TwitterTweetModel>("harbour.twablet", 1, 0, "TwitterTweetModel");
     qmlRegisterType<TwitterQueryListModel>("harbour.twablet", 1, 0, "TwitterQueryListModel");
