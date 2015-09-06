@@ -39,7 +39,7 @@ SilicaListView {
     property int layoutIndex
     spacing: Theme.paddingMedium
 
-    model: TwitterTweetModel {
+    model: TweetModel {
         id: twitterModel
         layoutIndex: container.layoutIndex
         repository: Repository

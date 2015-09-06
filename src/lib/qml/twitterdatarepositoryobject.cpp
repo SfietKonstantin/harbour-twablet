@@ -39,7 +39,7 @@ TwitterDataRepositoryObject::TwitterDataRepositoryObject(QObject *parent)
     m_loadSaveManager.load(m_accounts);
     m_loadSaveManager.load(m_layouts);
     for (const Layout &layout : m_layouts) {
-        m_tweetRepositories.emplace(layout, std::move(TwitterTweetRepository()));
+        m_tweetRepositories.emplace(layout, std::move(TweetRepository()));
     }
 }
 
@@ -58,7 +58,7 @@ LayoutRepository & TwitterDataRepositoryObject::layouts()
     return m_layouts;
 }
 
-TwitterTweetRepository & TwitterDataRepositoryObject::tweets(const Layout &layout)
+TweetRepository & TwitterDataRepositoryObject::tweets(const Layout &layout)
 {
     return m_tweetRepositories[layout];
 }
@@ -144,7 +144,7 @@ void TwitterDataRepositoryObject::addLayout(const QString &name, int accountInde
 
     m_layouts.append(Layout(name, account.userId(), Query(static_cast<Query::Type>(queryType),
                                                            std::move(queryArguments))));
-    m_tweetRepositories.emplace(*(std::end(m_layouts) - 1), TwitterTweetRepository());
+    m_tweetRepositories.emplace(*(std::end(m_layouts) - 1), TweetRepository());
     m_loadSaveManager.save(m_layouts);
     refresh();
 }
@@ -162,12 +162,12 @@ void TwitterDataRepositoryObject::addDefaultLayouts(int accountIndex, const QStr
     if (enableHomeTimeline) {
         m_layouts.append(Layout(homeName, account.userId(), Query(Query::Home,
                                                                          Query::Arguments())));
-        m_tweetRepositories.emplace(*(std::end(m_layouts) - 1), TwitterTweetRepository());
+        m_tweetRepositories.emplace(*(std::end(m_layouts) - 1), TweetRepository());
     }
     if (enableMentionsTimeline) {
         m_layouts.append(Layout(mentionsName, account.userId(), Query(Query::Mentions,
                                                                              Query::Arguments())));
-        m_tweetRepositories.emplace(*(std::end(m_layouts) - 1), TwitterTweetRepository());
+        m_tweetRepositories.emplace(*(std::end(m_layouts) - 1), TweetRepository());
     }
 }
 

@@ -34,11 +34,11 @@
 
 #include <QtCore/QtGlobal>
 
-#include "twittertweetrepository.h"
+#include "tweetrepository.h"
 
 class Account;
 class Layout;
-class TwitterTweet;
+class Tweet;
 class AccountRepository;
 class LayoutRepository;
 class TwitterDataRepositoryObject;
@@ -72,7 +72,7 @@ public:
     }
 };
 
-template<> class TwitterDataRepositoryObjectRepository<TwitterTweet>
+template<> class TwitterDataRepositoryObjectRepository<Tweet>
 {
 public:
     static bool isValid(TwitterDataRepositoryObject *repository, int layoutIndex)
@@ -83,7 +83,7 @@ public:
         }
         return (layoutIndex >= 0 && layoutIndex < std::end(repository->layouts()) - std::begin(repository->layouts()));
     }
-    static TwitterTweetRepository & get(TwitterDataRepositoryObject &repository, int layoutIndex)
+    static TweetRepository & get(TwitterDataRepositoryObject &repository, int layoutIndex)
     {
         const Layout &layout {*(std::begin(repository.layouts()) + layoutIndex)};
         return repository.tweets(layout);

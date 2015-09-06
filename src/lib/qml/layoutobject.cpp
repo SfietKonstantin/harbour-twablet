@@ -31,48 +31,48 @@
 
 #include "layoutobject.h"
 
-LayoutObject::LayoutObject(const Layout &layout, QObject *parent)
-    : QObject(parent), m_layout{layout}
+LayoutObject::LayoutObject(const Layout &data, QObject *parent)
+    : QObject(parent), m_data{data}
 {
 }
 
-LayoutObject * LayoutObject::create(const Layout &layout, QObject *parent)
+LayoutObject * LayoutObject::create(const Layout &data, QObject *parent)
 {
-    return new LayoutObject(layout, parent);
+    return new LayoutObject(data, parent);
 }
 
 QString LayoutObject::name() const
 {
-    return m_layout.name();
+    return m_data.name();
 }
 
 int LayoutObject::unread() const
 {
-    return m_layout.unread();
+    return m_data.unread();
 }
 
 QueryObject::Type LayoutObject::queryType() const
 {
-    return static_cast<QueryObject::Type>(m_layout.query().type());
+    return static_cast<QueryObject::Type>(m_data.query().type());
 }
 
 void LayoutObject::update(const Layout &other)
 {
-    if (m_layout.name() != other.name()) {
-        m_layout.setName(other.name());
+    if (m_data.name() != other.name()) {
+        m_data.setName(other.name());
         emit nameChanged();
     }
 
-    if (m_layout.query() != other.query()) {
-        Query::Type oldType = m_layout.query().type();
-        m_layout.setQuery(other.query());
-        if (m_layout.query().type() != oldType) {
+    if (m_data.query() != other.query()) {
+        Query::Type oldType = m_data.query().type();
+        m_data.setQuery(other.query());
+        if (m_data.query().type() != oldType) {
             emit typeChanged();
         }
     }
 
-    if (m_layout.unread() != other.unread()) {
-        m_layout.setUnread(other.unread());
+    if (m_data.unread() != other.unread()) {
+        m_data.setUnread(other.unread());
         emit unreadChanged();
     }
 }

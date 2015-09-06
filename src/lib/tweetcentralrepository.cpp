@@ -29,20 +29,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twittertweetcentralrepository.h"
-#include "twitterhometimelinequeryhandler.h"
-#include "twittermentionstimelinequeryhandler.h"
+#include "tweetcentralrepository.h"
+#include "hometimelinequeryhandler.h"
+#include "mentionstimelinequeryhandler.h"
 #include "private/twitterqueryutil.h"
 #include <QtCore/QLoggingCategory>
 #include <QtNetwork/QNetworkReply>
 
-TwitterTweetCentralRepository::TwitterTweetCentralRepository()
+TweetCentralRepository::TweetCentralRepository()
     : m_network{new QNetworkAccessManager()}
 {
 }
 
-void TwitterTweetCentralRepository::query(const Account &account, const Query &query,
-                                          TwitterTweetRepository &repository)
+void TweetCentralRepository::query(const Account &account, const Query &query,
+                                          TweetRepository &repository)
 {
     // Create the request
     IQueryHandler * handler = getQueryHandler(query);
@@ -68,7 +68,7 @@ void TwitterTweetCentralRepository::query(const Account &account, const Query &q
             return;
         }
 
-        std::vector<TwitterTweet> items {};
+        std::vector<Tweet> items {};
         QString errorMessage {};
         IQueryHandler::Placement placement {IQueryHandler::Discard};
         if (!handler->treatReply(reply->readAll(), items, errorMessage, placement)) {
@@ -77,7 +77,7 @@ void TwitterTweetCentralRepository::query(const Account &account, const Query &q
             repository.error(tr("Internal error"));
             return;
         } else {
-            for (const TwitterTweet &tweet : items) {
+            for (const Tweet &tweet : items) {
                 m_data.emplace(tweet.id(), tweet);
             }
             qDebug(QLoggingCategory("twitter-tweet-central-repository")) << "New data available for layout" << account.userId() << query.type() << ". Count:" << items.size();
@@ -96,7 +96,7 @@ void TwitterTweetCentralRepository::query(const Account &account, const Query &q
     });
 }
 
-IQueryHandler * TwitterTweetCentralRepository::getQueryHandler(const Query &query)
+IQueryHandler * TweetCentralRepository::getQueryHandler(const Query &query)
 {
     auto it = m_queries.find(query);
     if (it != std::end(m_queries)) {
@@ -106,13 +106,13 @@ IQueryHandler * TwitterTweetCentralRepository::getQueryHandler(const Query &quer
     switch (query.type()) {
     case Query::Home:
     {
-        std::unique_ptr<IQueryHandler> handler {new TwitterHomeTimelineQueryHandler()};
+        std::unique_ptr<IQueryHandler> handler {new HomeTimelineQueryHandler()};
         return m_queries.emplace(query, std::move(handler)).first->second.get();
         break;
     }
     case Query::Mentions:
     {
-        std::unique_ptr<IQueryHandler> handler {new TwitterMentionsTimelineQueryHandler()};
+        std::unique_ptr<IQueryHandler> handler {new MentionsTimelineQueryHandler()};
         return m_queries.emplace(query, std::move(handler)).first->second.get();
         break;
     }
@@ -123,7 +123,7 @@ IQueryHandler * TwitterTweetCentralRepository::getQueryHandler(const Query &quer
 }
 
 
-bool TwitterTweetCentralRepository::QueryComparator::operator()(const Query &first,
+bool TweetCentralRepository::QueryComparator::operator()(const Query &first,
                                                                        const Query &second) const
 {
     if (first.type() < second.type()) {

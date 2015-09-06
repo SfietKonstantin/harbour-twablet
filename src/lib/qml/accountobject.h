@@ -44,7 +44,7 @@ class AccountObject : public QObject
     Q_PROPERTY(QString screenName READ screenName CONSTANT)
 public:
     DISABLE_COPY_DISABLE_MOVE(AccountObject);
-    static AccountObject * create(const Account &twitterAccount, QObject *parent = 0);
+    static AccountObject * create(const Account &data, QObject *parent = 0);
     QString name() const;
     QString userId() const;
     QString screenName() const;
@@ -53,9 +53,9 @@ public:
 signals:
     void nameChanged();
 private:
-    explicit AccountObject(const Account &twitterAccount, QObject *parent = 0);
+    explicit AccountObject(const Account &data, QObject *parent = 0);
     void update(const Account &other);
-    Account m_twitterAccount {};
+    Account m_data {};
     friend class Model<Account, AccountObject>;
 };
 

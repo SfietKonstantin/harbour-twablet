@@ -29,28 +29,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERTWEETOBJECT_H
-#define TWITTERTWEETOBJECT_H
+#ifndef MENTIONSTIMELINEQUERYHANDLER_H
+#define MENTIONSTIMELINEQUERYHANDLER_H
 
-#include <QtCore/QObject>
-#include "twittertweet.h"
-#include "model.h"
+#include "iqueryhandler.h"
+#include "globals.h"
 
-class TwitterTweetObject : public QObject
+class MentionsTimelineQueryHandler: public IQueryHandler
 {
-    Q_OBJECT
-    Q_PROPERTY(QString id READ id CONSTANT)
-    Q_PROPERTY(QString text READ text CONSTANT)
 public:
-    DISABLE_COPY_DISABLE_MOVE(TwitterTweetObject);
-    static TwitterTweetObject * create(const TwitterTweet &twitterTweet, QObject *parent = 0);
-    QString id() const;
-    QString text() const;
+    explicit MentionsTimelineQueryHandler();
+    DISABLE_COPY_DISABLE_MOVE(MentionsTimelineQueryHandler);
 private:
-    explicit TwitterTweetObject(const TwitterTweet &twitterTweet, QObject *parent = 0);
-    void update(const TwitterTweet &other);
-    TwitterTweet m_twitterTweet {};
-    friend class Model<TwitterTweet, TwitterTweetObject>;
+    void createRequest(QString &path, std::map<QString, QString> &parameters) const override;
+    bool treatReply(const QByteArray &data, std::vector<Tweet> &items,
+                    QString &errorMessage, Placement &placement) override;
+    QString m_sinceId {};
 };
 
-#endif // TWITTERTWEETOBJECT_H
+#endif // MENTIONSTIMELINEQUERYHANDLER_H

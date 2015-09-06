@@ -31,45 +31,45 @@
 
 #include "accountobject.h"
 
-AccountObject::AccountObject(const Account &twitterAccount, QObject *parent)
-    : QObject(parent), m_twitterAccount(twitterAccount)
+AccountObject::AccountObject(const Account &data, QObject *parent)
+    : QObject(parent), m_data(data)
 {
 }
 
-AccountObject * AccountObject::create(const Account &twitterAccount, QObject *parent)
+AccountObject * AccountObject::create(const Account &data, QObject *parent)
 {
-    return new AccountObject(twitterAccount, parent);
+    return new AccountObject(data, parent);
 }
 
 QString AccountObject::name() const
 {
-    return m_twitterAccount.name();
+    return m_data.name();
 }
 
 QString AccountObject::userId() const
 {
-    return m_twitterAccount.userId();
+    return m_data.userId();
 }
 
 QString AccountObject::screenName() const
 {
-    return m_twitterAccount.screenName();
+    return m_data.screenName();
 }
 
 QByteArray AccountObject::token() const
 {
-    return m_twitterAccount.token();
+    return m_data.token();
 }
 
 QByteArray AccountObject::tokenSecret() const
 {
-    return m_twitterAccount.tokenSecret();
+    return m_data.tokenSecret();
 }
 
 void AccountObject::update(const Account &other)
 {
-    if (m_twitterAccount.name() != other.name()) {
-        m_twitterAccount.setName(other.name());
+    if (m_data.name() != other.name()) {
+        m_data.setName(other.name());
         emit nameChanged();
     }
 }

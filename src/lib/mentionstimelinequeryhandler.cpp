@@ -29,12 +29,48 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERTWEETREPOSITORY_H
-#define TWITTERTWEETREPOSITORY_H
+#include "mentionstimelinequeryhandler.h"
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
+#include "tweet.h"
 
-#include "repository.h"
+MentionsTimelineQueryHandler::MentionsTimelineQueryHandler()
+{
+}
 
-using TwitterTweetRepository = Repository<TwitterTweet>;
+void MentionsTimelineQueryHandler::createRequest(QString &path, std::map<QString, QString> &parameters) const
+{
+    path = QLatin1String("statuses/mentions_timeline.json");
+    parameters.insert({QLatin1String("count"), QString::number(200)});
+    if (!m_sinceId.isEmpty()) {
+        parameters.insert({QLatin1String("since_id"), m_sinceId});
+    }
+}
 
-#endif // TWITTERTWEETREPOSITORY_H
+bool MentionsTimelineQueryHandler::treatReply(const QByteArray &data, std::vector<Tweet> &items,
+                                                     QString &errorMessage, Placement &placement)
+{
+    QJsonParseError error {-1, QJsonParseError::NoError};
+    QJsonDocument document {QJsonDocument::fromJson(data, &error)};
+    if (error.error != QJsonParseError::NoError) {
+        errorMessage = error.errorString();
+        placement = Discard;
+        return false;
+    }
 
+    QJsonArray tweets (document.array());
+    items.reserve(tweets.size());
+    for (const QJsonValue &tweet : tweets) {
+        if (tweet.isObject()) {
+            items.emplace_back(tweet.toObject());
+        }
+    }
+
+    if (!items.empty()) {
+        m_sinceId = std::begin(items)->id();
+    }
+
+    placement = Prepend;
+    return true;
+}

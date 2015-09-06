@@ -29,40 +29,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERTWEETCENTRALREPOSITORY_H
-#define TWITTERTWEETCENTRALREPOSITORY_H
+#include "tweetmodel.h"
 
-#include <map>
-#include <QtCore/QObject>
-#include <QtNetwork/QNetworkAccessManager>
-#include "globals.h"
-#include "qobjectutils.h"
-#include "twittertweet.h"
-#include "account.h"
-#include "query.h"
-#include "repository.h"
-#include "twittertweetrepository.h"
-#include "iqueryhandler.h"
-
-class QNetworkReply;
-class TwitterTweetCentralRepository: public QObject
+TweetModel::TweetModel(QObject *parent) :
+    Model<Tweet, TweetObject>(parent)
 {
-    Q_OBJECT
-public:
-    explicit TwitterTweetCentralRepository();
-    DISABLE_COPY_DEFAULT_MOVE(TwitterTweetCentralRepository);
-    void query(const Account &account, const Query &query,
-               TwitterTweetRepository &repository);
-private:
-    class QueryComparator
-    {
-    public:
-        bool operator()(const Query &first, const Query &second) const;
-    };
-    IQueryHandler * getQueryHandler(const Query &query);
-    std::map<QString, TwitterTweet> m_data {};
-    QObjectPtr<QNetworkAccessManager> m_network {nullptr};
-    std::map<Query, std::unique_ptr<IQueryHandler>, QueryComparator> m_queries {};
-};
+}
 
-#endif // TWITTERTWEETCENTRALREPOSITORY_H
+QVariant TweetModel::data(const QModelIndex &index, int role) const
+{
+    int row = index.row();
+    if (row < 0 || row >= rowCount()) {
+        return QVariant();
+    }
+    const QObjectPtr<TweetObject> &tweet = m_data[row];
+    switch (role) {
+    case IdRole:
+        return tweet->id();
+        break;
+    case ItemRole:
+        return QVariant::fromValue(tweet.get());
+        break;
+    default:
+        return QVariant();
+        break;
+    }
+}
+
+QHash<int, QByteArray> TweetModel::roleNames() const
+{
+    return {{IdRole, "id"}, {ItemRole, "item"}};
+}

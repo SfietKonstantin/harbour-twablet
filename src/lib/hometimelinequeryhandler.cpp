@@ -29,22 +29,49 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twittertweet.h"
-#include <QtCore/QDebug>
+#include "hometimelinequeryhandler.h"
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
+#include "tweet.h"
 
-TwitterTweet::TwitterTweet(const QJsonObject &json)
+HomeTimelineQueryHandler::HomeTimelineQueryHandler()
 {
-    m_id = json.value(QLatin1String("id_str")).toString();
-    m_text = json.value(QLatin1String("text")).toString();
 }
 
-QString TwitterTweet::id() const
+void HomeTimelineQueryHandler::createRequest(QString &path, std::map<QString, QString> &parameters) const
 {
-    return m_id;
+    path = QLatin1String("statuses/home_timeline.json");
+    parameters.insert({QLatin1String("count"), QString::number(200)});
+    if (!m_sinceId.isEmpty()) {
+        parameters.insert({QLatin1String("since_id"), m_sinceId});
+    }
 }
 
-QString TwitterTweet::text() const
+bool HomeTimelineQueryHandler::treatReply(const QByteArray &data, std::vector<Tweet> &items,
+                                             QString &errorMessage, Placement &placement)
 {
-    return m_text;
+    QJsonParseError error {-1, QJsonParseError::NoError};
+    QJsonDocument document {QJsonDocument::fromJson(data, &error)};
+    if (error.error != QJsonParseError::NoError) {
+        errorMessage = error.errorString();
+        placement = Discard;
+        return false;
+    }
+
+    QJsonArray tweets (document.array());
+    items.reserve(tweets.size());
+    for (const QJsonValue &tweet : tweets) {
+        if (tweet.isObject()) {
+            items.emplace_back(tweet.toObject());
+        }
+    }
+
+    if (!items.empty()) {
+        m_sinceId = std::begin(items)->id();
+    }
+
+    placement = Prepend;
+    return true;
 }
 

@@ -29,34 +29,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twittertweetmodel.h"
+#ifndef HOMETIMELINEQUERYHANDLER_H
+#define HOMETIMELINEQUERYHANDLER_H
 
-TwitterTweetModel::TwitterTweetModel(QObject *parent) :
-    Model<TwitterTweet, TwitterTweetObject>(parent)
-{
-}
+#include "iqueryhandler.h"
+#include "globals.h"
 
-QVariant TwitterTweetModel::data(const QModelIndex &index, int role) const
+class HomeTimelineQueryHandler: public IQueryHandler
 {
-    int row = index.row();
-    if (row < 0 || row >= rowCount()) {
-        return QVariant();
-    }
-    const QObjectPtr<TwitterTweetObject> &tweet = m_data[row];
-    switch (role) {
-    case IdRole:
-        return tweet->id();
-        break;
-    case ItemRole:
-        return QVariant::fromValue(tweet.get());
-        break;
-    default:
-        return QVariant();
-        break;
-    }
-}
+public:
+    explicit HomeTimelineQueryHandler();
+    DISABLE_COPY_DISABLE_MOVE(HomeTimelineQueryHandler);
+private:
+    void createRequest(QString &path, std::map<QString, QString> &parameters) const override;
+    bool treatReply(const QByteArray &data, std::vector<Tweet> &items,
+                    QString &errorMessage, Placement &placement) override;
+    QString m_sinceId {};
+};
 
-QHash<int, QByteArray> TwitterTweetModel::roleNames() const
-{
-    return {{IdRole, "id"}, {ItemRole, "item"}};
-}
+#endif // HOMETIMELINEQUERYHANDLER_H

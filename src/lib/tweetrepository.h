@@ -29,49 +29,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twitterhometimelinequeryhandler.h"
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
-#include "twittertweet.h"
+#ifndef TWEETREPOSITORY_H
+#define TWEETREPOSITORY_H
 
-TwitterHomeTimelineQueryHandler::TwitterHomeTimelineQueryHandler()
-{
-}
+#include "repository.h"
+#include "tweet.h"
 
-void TwitterHomeTimelineQueryHandler::createRequest(QString &path, std::map<QString, QString> &parameters) const
-{
-    path = QLatin1String("statuses/home_timeline.json");
-    parameters.insert({QLatin1String("count"), QString::number(200)});
-    if (!m_sinceId.isEmpty()) {
-        parameters.insert({QLatin1String("since_id"), m_sinceId});
-    }
-}
+using TweetRepository = Repository<Tweet>;
 
-bool TwitterHomeTimelineQueryHandler::treatReply(const QByteArray &data, std::vector<TwitterTweet> &items,
-                                             QString &errorMessage, Placement &placement)
-{
-    QJsonParseError error {-1, QJsonParseError::NoError};
-    QJsonDocument document {QJsonDocument::fromJson(data, &error)};
-    if (error.error != QJsonParseError::NoError) {
-        errorMessage = error.errorString();
-        placement = Discard;
-        return false;
-    }
-
-    QJsonArray tweets (document.array());
-    items.reserve(tweets.size());
-    for (const QJsonValue &tweet : tweets) {
-        if (tweet.isObject()) {
-            items.emplace_back(tweet.toObject());
-        }
-    }
-
-    if (!items.empty()) {
-        m_sinceId = std::begin(items)->id();
-    }
-
-    placement = Prepend;
-    return true;
-}
+#endif // TWEETREPOSITORY_H
 

@@ -35,7 +35,7 @@
 #include <QtCore/QString>
 #include <map>
 #include <vector>
-#include "twittertweet.h"
+#include "tweet.h"
 
 class IQueryHandler
 {
@@ -49,10 +49,10 @@ protected:
         Prepend,
     };
     virtual void createRequest(QString &path, std::map<QString, QString> &parameters) const = 0;
-    virtual bool treatReply(const QByteArray &data, std::vector<TwitterTweet> &items,
+    virtual bool treatReply(const QByteArray &data, std::vector<Tweet> &items,
                             QString &errorMessage, Placement &placement) = 0;
-    friend class TwitterTweetCentralRepository;
+    friend class TweetCentralRepository;
 };
 
-#endif // ITWITTERQUERYHANDLER_H
+#endif // IQUERYHANDLER_H
 

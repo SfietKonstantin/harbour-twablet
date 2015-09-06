@@ -44,7 +44,7 @@ class LayoutObject : public QObject
     Q_PROPERTY(QueryObject::Type queryType READ queryType NOTIFY typeChanged)
 public:
     DISABLE_COPY_DISABLE_MOVE(LayoutObject);
-    static LayoutObject * create(const Layout &layout, QObject *parent = 0);
+    static LayoutObject * create(const Layout &data, QObject *parent = 0);
     QString name() const;
     int unread() const;
     QueryObject::Type queryType() const;
@@ -53,9 +53,9 @@ signals:
     void typeChanged();
     void unreadChanged();
 private:
-    explicit LayoutObject(const Layout &layout, QObject *parent = 0);
+    explicit LayoutObject(const Layout &data, QObject *parent = 0);
     void update(const Layout &other);
-    Layout m_layout {};
+    Layout m_data {};
     friend class Model<Layout, LayoutObject>;
 };
 

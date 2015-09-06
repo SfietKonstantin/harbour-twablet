@@ -48,11 +48,11 @@ public:
         Mentions = Query::Mentions
     };
     DISABLE_COPY_DISABLE_MOVE(QueryObject);
-    static QueryObject * create(const Query &query, QObject *parent = 0);
+    static QueryObject * create(const Query &data, QObject *parent = 0);
     Type type() const;
 private:
-    explicit QueryObject(const Query &query, QObject *parent = 0);
-    Query m_query {};
+    explicit QueryObject(const Query &data, QObject *parent = 0);
+    Query m_data {};
 };
 
 #endif // QUERYOBJECT_H

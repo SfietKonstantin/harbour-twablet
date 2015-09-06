@@ -29,23 +29,40 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERTWEETMODEL_H
-#define TWITTERTWEETMODEL_H
+#ifndef TWEETCENTRALREPOSITORY_H
+#define TWEETCENTRALREPOSITORY_H
 
-#include "twittertweetobject.h"
-#include "model.h"
+#include <map>
+#include <QtCore/QObject>
+#include <QtNetwork/QNetworkAccessManager>
+#include "globals.h"
+#include "qobjectutils.h"
+#include "tweet.h"
+#include "account.h"
+#include "query.h"
+#include "repository.h"
+#include "tweetrepository.h"
+#include "iqueryhandler.h"
 
-class TwitterTweetModel : public Model<TwitterTweet, TwitterTweetObject>
+class QNetworkReply;
+class TweetCentralRepository: public QObject
 {
+    Q_OBJECT
 public:
-    enum Roles {
-        IdRole = Qt::UserRole + 1,
-        ItemRole
-    };
-    explicit TwitterTweetModel(QObject *parent = 0);
-    QVariant data(const QModelIndex &index, int role) const override;
+    explicit TweetCentralRepository();
+    DISABLE_COPY_DEFAULT_MOVE(TweetCentralRepository);
+    void query(const Account &account, const Query &query,
+               TweetRepository &repository);
 private:
-    QHash<int, QByteArray> roleNames() const override;
+    class QueryComparator
+    {
+    public:
+        bool operator()(const Query &first, const Query &second) const;
+    };
+    IQueryHandler * getQueryHandler(const Query &query);
+    std::map<QString, Tweet> m_data {};
+    QObjectPtr<QNetworkAccessManager> m_network {nullptr};
+    std::map<Query, std::unique_ptr<IQueryHandler>, QueryComparator> m_queries {};
 };
 
-#endif // TWITTERTWEETMODEL_H
+#endif // TWEETCENTRALREPOSITORY_H

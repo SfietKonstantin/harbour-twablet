@@ -31,17 +31,17 @@
 
 #include "queryobject.h"
 
-QueryObject::QueryObject(const Query &query, QObject *parent)
-    : QObject(parent), m_query{query}
+QueryObject::QueryObject(const Query &data, QObject *parent)
+    : QObject(parent), m_data{data}
 {
 }
 
-QueryObject * QueryObject::create(const Query &query, QObject *parent)
+QueryObject * QueryObject::create(const Query &data, QObject *parent)
 {
-    return new QueryObject(query, parent);
+    return new QueryObject(data, parent);
 }
 
 QueryObject::Type QueryObject::type() const
 {
-    return static_cast<Type>(m_query.type());
+    return static_cast<Type>(m_data.type());
 }

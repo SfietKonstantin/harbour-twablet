@@ -36,7 +36,7 @@
 #include "loadsavemanager.h"
 #include "accountrepository.h"
 #include "layoutrepository.h"
-#include "twittertweetcentralrepository.h"
+#include "tweetcentralrepository.h"
 
 class TwitterDataRepositoryObject : public QObject
 {
@@ -47,7 +47,7 @@ public:
     bool hasAccounts() const;
     AccountRepository & accounts();
     LayoutRepository & layouts();
-    TwitterTweetRepository & tweets(const Layout &layout);
+    TweetRepository & tweets(const Layout &layout);
 signals:
     void hasAccountsChanged();
 public slots:
@@ -73,8 +73,8 @@ private:
     LoadSaveManager m_loadSaveManager {};
     AccountRepository m_accounts {};
     LayoutRepository m_layouts {};
-    TwitterTweetCentralRepository m_tweetsCentralRepository {};
-    std::map<Layout, TwitterTweetRepository, LayoutComparator> m_tweetRepositories {};
+    TweetCentralRepository m_tweetsCentralRepository {};
+    std::map<Layout, TweetRepository, LayoutComparator> m_tweetRepositories {};
 };
 
 #endif // TWITTERDATAREPOSITORYOBJECT_H

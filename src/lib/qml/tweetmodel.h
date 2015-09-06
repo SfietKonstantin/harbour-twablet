@@ -29,48 +29,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twittermentionstimelinequeryhandler.h"
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
-#include "twittertweet.h"
+#ifndef TWEETMODEL_H
+#define TWEETMODEL_H
 
-TwitterMentionsTimelineQueryHandler::TwitterMentionsTimelineQueryHandler()
+#include "tweetobject.h"
+#include "model.h"
+
+class TweetModel : public Model<Tweet, TweetObject>
 {
-}
+public:
+    enum Roles {
+        IdRole = Qt::UserRole + 1,
+        ItemRole
+    };
+    explicit TweetModel(QObject *parent = 0);
+    QVariant data(const QModelIndex &index, int role) const override;
+private:
+    QHash<int, QByteArray> roleNames() const override;
+};
 
-void TwitterMentionsTimelineQueryHandler::createRequest(QString &path, std::map<QString, QString> &parameters) const
-{
-    path = QLatin1String("statuses/mentions_timeline.json");
-    parameters.insert({QLatin1String("count"), QString::number(200)});
-    if (!m_sinceId.isEmpty()) {
-        parameters.insert({QLatin1String("since_id"), m_sinceId});
-    }
-}
-
-bool TwitterMentionsTimelineQueryHandler::treatReply(const QByteArray &data, std::vector<TwitterTweet> &items,
-                                                     QString &errorMessage, Placement &placement)
-{
-    QJsonParseError error {-1, QJsonParseError::NoError};
-    QJsonDocument document {QJsonDocument::fromJson(data, &error)};
-    if (error.error != QJsonParseError::NoError) {
-        errorMessage = error.errorString();
-        placement = Discard;
-        return false;
-    }
-
-    QJsonArray tweets (document.array());
-    items.reserve(tweets.size());
-    for (const QJsonValue &tweet : tweets) {
-        if (tweet.isObject()) {
-            items.emplace_back(tweet.toObject());
-        }
-    }
-
-    if (!items.empty()) {
-        m_sinceId = std::begin(items)->id();
-    }
-
-    placement = Prepend;
-    return true;
-}
+#endif // TWEETMODEL_H

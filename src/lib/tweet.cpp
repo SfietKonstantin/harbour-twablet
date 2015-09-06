@@ -29,22 +29,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERMENTIONSTIMELINEQUERYHANDLER_H
-#define TWITTERMENTIONSTIMELINEQUERYHANDLER_H
+#include "tweet.h"
+#include <QtCore/QDebug>
 
-#include "iqueryhandler.h"
-#include "globals.h"
-
-class TwitterMentionsTimelineQueryHandler: public IQueryHandler
+Tweet::Tweet(const QJsonObject &json)
 {
-public:
-    explicit TwitterMentionsTimelineQueryHandler();
-    DISABLE_COPY_DISABLE_MOVE(TwitterMentionsTimelineQueryHandler);
-private:
-    void createRequest(QString &path, std::map<QString, QString> &parameters) const override;
-    bool treatReply(const QByteArray &data, std::vector<TwitterTweet> &items,
-                    QString &errorMessage, Placement &placement) override;
-    QString m_sinceId {};
-};
+    m_id = json.value(QLatin1String("id_str")).toString();
+    m_text = json.value(QLatin1String("text")).toString();
+}
 
-#endif // TWITTERMENTIONSTIMELINEQUERYHANDLER_H
+QString Tweet::id() const
+{
+    return m_id;
+}
+
+QString Tweet::text() const
+{
+    return m_text;
+}
+

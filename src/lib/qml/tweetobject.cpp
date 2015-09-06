@@ -29,24 +29,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERTWEET_H
-#define TWITTERTWEET_H
+#include "tweetobject.h"
 
-#include <QtCore/QString>
-#include <QtCore/QJsonObject>
-#include "globals.h"
-
-class TwitterTweet
+TweetObject::TweetObject(const Tweet &data, QObject *parent)
+    : QObject(parent), m_data(data)
 {
-public:
-    explicit TwitterTweet() = default;
-    explicit TwitterTweet(const QJsonObject &json);
-    DEFAULT_COPY_DEFAULT_MOVE(TwitterTweet);
-    QString id() const;
-    QString text() const;
-private:
-    QString m_id {};
-    QString m_text {};
-};
+}
 
-#endif // TWITTERTWEET_H
+TweetObject * TweetObject::create(const Tweet &data, QObject *parent)
+{
+    return new TweetObject(data, parent);
+}
+
+QString TweetObject::id() const
+{
+    return m_data.id();
+}
+
+QString TweetObject::text() const
+{
+    return m_data.text();
+}
+
+void TweetObject::update(const Tweet &other)
+{
+    Q_UNUSED(other)
+}

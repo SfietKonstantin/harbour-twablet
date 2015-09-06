@@ -30,16 +30,16 @@ HEADERS += \
     layoutrepository.h \
     qml/layoutobject.h \
     qml/layoutmodel.h \
-    twittertweet.h \
-    twittertweetcentralrepository.h \
-    twittertweetrepository.h \
-    qml/twittertweetobject.h \
-    qml/twittertweetmodel.h \
+    tweet.h \
+    tweetcentralrepository.h \
+    tweetrepository.h \
+    qml/tweetobject.h \
+    qml/tweetmodel.h \
     qml/twitterdatarepositoryobject.h \
     qml/twitterdatarepositoryobjectrepository.h \
     iqueryhandler.h \
-    twitterhometimelinequeryhandler.h \
-    twittermentionstimelinequeryhandler.h
+    hometimelinequeryhandler.h \
+    mentionstimelinequeryhandler.h
 
 SOURCES += \
     private/twitterdatautil.cpp \
@@ -57,10 +57,10 @@ SOURCES += \
     layoutrepository.cpp \
     qml/layoutobject.cpp \
     qml/layoutmodel.cpp \
-    twittertweet.cpp \
-    qml/twittertweetobject.cpp \
-    qml/twittertweetmodel.cpp \
-    twittertweetcentralrepository.cpp \
+    tweet.cpp \
+    qml/tweetobject.cpp \
+    qml/tweetmodel.cpp \
+    tweetcentralrepository.cpp \
     qml/twitterdatarepositoryobject.cpp \
-    twitterhometimelinequeryhandler.cpp \
-    twittermentionstimelinequeryhandler.cpp
+    hometimelinequeryhandler.cpp \
+    mentionstimelinequeryhandler.cpp
