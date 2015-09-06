@@ -29,14 +29,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERQUERY_H
-#define TWITTERQUERY_H
+#ifndef QUERY_H
+#define QUERY_H
 
 #include <QtCore/QObject>
 #include <QtCore/QVariantMap>
 #include "globals.h"
 
-class TwitterQuery
+class Query
 {
 public:
     enum Type
@@ -46,16 +46,16 @@ public:
         Mentions
     };
     using Arguments = std::vector<std::pair<QString, QString>>;
-    explicit TwitterQuery() = default;
-    explicit TwitterQuery(Type type, Arguments &&arguments);
-    DEFAULT_COPY_DEFAULT_MOVE(TwitterQuery);
+    explicit Query() = default;
+    explicit Query(Type type, Arguments &&arguments);
+    DEFAULT_COPY_DEFAULT_MOVE(Query);
     Type type() const;
     Arguments arguments() const;
-    bool operator==(const TwitterQuery &other) const;
-    bool operator!=(const TwitterQuery &other) const;
+    bool operator==(const Query &other) const;
+    bool operator!=(const Query &other) const;
 private:
     Type m_type {Invalid};
     Arguments m_arguments {};
 };
 
-#endif // TWITTERQUERY_H
+#endif // QUERY_H

@@ -51,9 +51,9 @@ int LayoutObject::unread() const
     return m_layout.unread();
 }
 
-TwitterQueryObject::Type LayoutObject::queryType() const
+QueryObject::Type LayoutObject::queryType() const
 {
-    return static_cast<TwitterQueryObject::Type>(m_layout.query().type());
+    return static_cast<QueryObject::Type>(m_layout.query().type());
 }
 
 void LayoutObject::update(const Layout &other)
@@ -64,7 +64,7 @@ void LayoutObject::update(const Layout &other)
     }
 
     if (m_layout.query() != other.query()) {
-        TwitterQuery::Type oldType = m_layout.query().type();
+        Query::Type oldType = m_layout.query().type();
         m_layout.setQuery(other.query());
         if (m_layout.query().type() != oldType) {
             emit typeChanged();

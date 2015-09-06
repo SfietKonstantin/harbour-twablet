@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,44 +29,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twitterquerylistmodel.h"
-#include "twitterqueryobject.h"
+#include "accountmodel.h"
+#include "twitterdatarepositoryobject.h"
 
-
-TwitterQueryListModel::TwitterQueryListModel(QObject *parent) :
-    QAbstractListModel(parent)
-{
-    m_data.emplace_back(new Data {tr("Home"), TwitterQueryObject::Home});
-    m_data.emplace_back(new Data {tr("Mentions"), TwitterQueryObject::Mentions});
-}
-
-void TwitterQueryListModel::classBegin()
+AccountModel::AccountModel(QObject *parent) :
+    Model<Account, AccountObject>(parent)
 {
 }
 
-void TwitterQueryListModel::componentComplete()
-{
-}
-
-int TwitterQueryListModel::rowCount(const QModelIndex &index) const
-{
-    Q_UNUSED(index)
-    return m_data.size();
-}
-
-QVariant TwitterQueryListModel::data(const QModelIndex &index, int role) const
+QVariant AccountModel::data(const QModelIndex &index, int role) const
 {
     int row = index.row();
     if (row < 0 || row >= rowCount()) {
         return QVariant();
     }
-    const std::unique_ptr<Data> &data = m_data[row];
+    const QObjectPtr<AccountObject> &account = m_data[row];
     switch (role) {
     case NameRole:
-        return data->name;
+        return account->name();
         break;
-    case QueryTypeRole:
-        return data->type;
+    case ScreenNameRole:
+        return account->screenName();
+        break;
+    case AccountRole:
+        return QVariant::fromValue(account.get());
         break;
     default:
         return QVariant();
@@ -74,20 +60,7 @@ QVariant TwitterQueryListModel::data(const QModelIndex &index, int role) const
     }
 }
 
-int TwitterQueryListModel::count() const
+QHash<int, QByteArray> AccountModel::roleNames() const
 {
-    return rowCount();
-}
-
-int TwitterQueryListModel::getType(int index)
-{
-    if (index < 0 || index >= rowCount()) {
-        return TwitterQuery::Invalid;
-    }
-    return m_data[index]->type;
-}
-
-QHash<int, QByteArray> TwitterQueryListModel::roleNames() const
-{
-    return {{NameRole, "name"}, {QueryTypeRole, "type"}};
+    return {{NameRole, "name"}, {ScreenNameRole, "screenName"}, {AccountRole, "account"}};
 }

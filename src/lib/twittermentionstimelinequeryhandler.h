@@ -32,10 +32,10 @@
 #ifndef TWITTERMENTIONSTIMELINEQUERYHANDLER_H
 #define TWITTERMENTIONSTIMELINEQUERYHANDLER_H
 
-#include "itwitterqueryhandler.h"
+#include "iqueryhandler.h"
 #include "globals.h"
 
-class TwitterMentionsTimelineQueryHandler: public ITwitterQueryHandler
+class TwitterMentionsTimelineQueryHandler: public IQueryHandler
 {
 public:
     explicit TwitterMentionsTimelineQueryHandler();

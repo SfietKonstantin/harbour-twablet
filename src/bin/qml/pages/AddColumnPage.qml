@@ -35,14 +35,14 @@ import harbour.twablet 1.0
 
 Dialog {
     id: container
-    property TwitterAccountModel accountModel
+    property AccountModel accountModel
 
     canAccept: nameField.text.length > 0
     allowedOrientations: app.defaultAllowedOrientations
 
     onAccepted: {
         var accountIndex = accountCombo.currentIndex
-        var queryType = queryModel.getType(queryCombo.currentIndex)
+        var queryType = queryListModel.getType(queryCombo.currentIndex)
         Repository.addLayout(nameField.text, accountIndex, queryType, {})
     }
 
@@ -81,7 +81,7 @@ Dialog {
                 label: qsTr("Column type")
                 menu: ContextMenu {
                     Repeater {
-                        model: TwitterQueryListModel {id: queryModel}
+                        model: QueryListModel {id: queryListModel}
                         delegate: MenuItem {
                             text: model.name
                         }

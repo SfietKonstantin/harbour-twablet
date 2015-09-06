@@ -29,22 +29,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twitteraccountrepository.h"
+#include "accountrepository.h"
 #include <QtCore/QJsonArray>
 
-TwitterAccount TwitterAccountRepository::find(const QString &userId) const
+Account AccountRepository::find(const QString &userId) const
 {
-    List::const_iterator it {std::find_if(std::begin(m_data), std::end(m_data), [userId](const TwitterAccount &user) {
+    List::const_iterator it {std::find_if(std::begin(m_data), std::end(m_data), [userId](const Account &user) {
         return (user.userId() == userId);
     })};
 
     if (it != std::end(m_data)) {
         return *it;
     }
-    return TwitterAccount();
+    return Account();
 }
 
-void TwitterAccountRepository::load(const QJsonObject &json)
+void AccountRepository::load(const QJsonObject &json)
 {
     const QJsonArray &accountsArray {json.value(QLatin1String("accounts")).toArray()};
 
@@ -63,10 +63,10 @@ void TwitterAccountRepository::load(const QJsonObject &json)
     m_data = std::move(data);
 }
 
-void TwitterAccountRepository::save(QJsonObject &json) const
+void AccountRepository::save(QJsonObject &json) const
 {
     QJsonArray accounts {};
-    for (const TwitterAccount &account : m_data) {
+    for (const Account &account : m_data) {
         QJsonObject accountObject {};
         accountObject.insert(QLatin1String("name"), account.name());
         accountObject.insert(QLatin1String("userId"), account.userId());

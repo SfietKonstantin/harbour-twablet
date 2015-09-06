@@ -37,7 +37,7 @@
 
 QNetworkRequest TwitterQueryUtil::createGetRequest(const QString &path,
                                                    const std::map<QString, QString> &parameters,
-                                                   const TwitterAccount &account)
+                                                   const Account &account)
 {
     QString url {QLatin1String("https://api.twitter.com/1.1/") + path};
     std::vector<std::pair<QString, QString>> parametersVector (std::begin(parameters), std::end(parameters));

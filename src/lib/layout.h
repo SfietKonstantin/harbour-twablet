@@ -33,25 +33,25 @@
 #define LAYOUT_H
 
 #include <QtCore/QString>
-#include "twitterquery.h"
+#include "query.h"
 
 class Layout
 {
 public:
     explicit Layout() = default;
-    explicit Layout(const QString &name, const QString &userId, TwitterQuery &&query);
+    explicit Layout(const QString &name, const QString &userId, Query &&query);
     DEFAULT_COPY_DEFAULT_MOVE(Layout);
     QString name() const;
     void setName(const QString &name);
     QString userId() const;
-    TwitterQuery query() const;
-    void setQuery(TwitterQuery &&query);
+    Query query() const;
+    void setQuery(Query &&query);
     int unread() const;
     void setUnread(int unread);
 private:
     QString m_name {};
     QString m_userId {};
-    TwitterQuery m_query {};
+    Query m_query {};
     int m_unread {0};
 };
 

@@ -78,10 +78,10 @@ Rectangle {
                 anchors.centerIn: parent
                 source: {
                     switch (model.queryType) {
-                    case TwitterQuery.Home:
+                    case Query.Home:
                         Qt.resolvedUrl("../../data/home.svg")
                         break
-                    case TwitterQuery.Mentions:
+                    case Query.Mentions:
                         Qt.resolvedUrl("../../data/mail.svg")
                         break
                     }

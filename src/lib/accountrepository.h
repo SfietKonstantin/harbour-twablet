@@ -29,30 +29,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERQUERYOBJECT_H
-#define TWITTERQUERYOBJECT_H
+#ifndef ACCOUNTREPOSITORY_H
+#define ACCOUNTREPOSITORY_H
 
-#include <QtCore/QObject>
-#include "twitterquery.h"
+#include "repository.h"
+#include "iloadsave.h"
+#include "account.h"
 
-class TwitterQueryObject : public QObject
+class AccountRepository: public Repository<Account>, public ILoadSave
 {
-    Q_OBJECT
-    Q_ENUMS(Type)
-    Q_PROPERTY(Type type READ type CONSTANT)
 public:
-    enum Type
-    {
-        Invalid = TwitterQuery::Invalid,
-        Home = TwitterQuery::Home,
-        Mentions = TwitterQuery::Mentions
-    };
-    DISABLE_COPY_DISABLE_MOVE(TwitterQueryObject);
-    static TwitterQueryObject * create(const TwitterQuery &twitterQuery, QObject *parent = 0);
-    Type type() const;
-private:
-    explicit TwitterQueryObject(const TwitterQuery &twitterQuery, QObject *parent = 0);
-    TwitterQuery m_twitterQuery {};
+    Account find(const QString &userId) const;
+    void load(const QJsonObject &json) override;
+    void save(QJsonObject &json) const override;
 };
 
-#endif // TWITTERQUERYOBJECT_H
+#endif // ACCOUNTREPOSITORY_H

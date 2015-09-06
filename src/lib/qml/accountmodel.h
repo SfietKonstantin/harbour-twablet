@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,30 +29,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef ITWITTERQUERYHANDLER_H
-#define ITWITTERQUERYHANDLER_H
+#ifndef ACCOUNTMODEL_H
+#define ACCOUNTMODEL_H
 
-#include <QtCore/QString>
-#include <map>
-#include <vector>
-#include "twittertweet.h"
+#include "accountobject.h"
+#include "model.h"
 
-class ITwitterQueryHandler
+class AccountModel : public Model<Account, AccountObject>
 {
 public:
-    virtual ~ITwitterQueryHandler() {}
-protected:
-    enum Placement
-    {
-        Discard,
-        Append,
-        Prepend,
+    enum Roles {
+        NameRole = Qt::UserRole + 1,
+        ScreenNameRole,
+        AccountRole
     };
-    virtual void createRequest(QString &path, std::map<QString, QString> &parameters) const = 0;
-    virtual bool treatReply(const QByteArray &data, std::vector<TwitterTweet> &items,
-                            QString &errorMessage, Placement &placement) = 0;
-    friend class TwitterTweetCentralRepository;
+    explicit AccountModel(QObject *parent = 0);
+    QVariant data(const QModelIndex &index, int role) const override;
+private:
+    QHash<int, QByteArray> roleNames() const override;
 };
 
-#endif // ITWITTERQUERYHANDLER_H
-
+#endif // ACCOUNTMODEL_H

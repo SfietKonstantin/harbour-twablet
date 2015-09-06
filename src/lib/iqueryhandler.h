@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,24 +29,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERACCOUNTMODEL_H
-#define TWITTERACCOUNTMODEL_H
+#ifndef IQUERYHANDLER_H
+#define IQUERYHANDLER_H
 
-#include "twitteraccountobject.h"
-#include "model.h"
+#include <QtCore/QString>
+#include <map>
+#include <vector>
+#include "twittertweet.h"
 
-class TwitterAccountModel : public Model<TwitterAccount, TwitterAccountObject>
+class IQueryHandler
 {
 public:
-    enum Roles {
-        NameRole = Qt::UserRole + 1,
-        ScreenNameRole,
-        AccountRole
+    virtual ~IQueryHandler() {}
+protected:
+    enum Placement
+    {
+        Discard,
+        Append,
+        Prepend,
     };
-    explicit TwitterAccountModel(QObject *parent = 0);
-    QVariant data(const QModelIndex &index, int role) const override;
-private:
-    QHash<int, QByteArray> roleNames() const override;
+    virtual void createRequest(QString &path, std::map<QString, QString> &parameters) const = 0;
+    virtual bool treatReply(const QByteArray &data, std::vector<TwitterTweet> &items,
+                            QString &errorMessage, Placement &placement) = 0;
+    friend class TwitterTweetCentralRepository;
 };
 
-#endif // TWITTERACCOUNTMODEL_H
+#endif // ITWITTERQUERYHANDLER_H
+

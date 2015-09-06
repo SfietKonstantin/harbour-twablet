@@ -19,13 +19,13 @@ HEADERS += \
     loadsavemanager.h \
     qml/imodel.h \
     qml/model.h \
-    twitteraccount.h \
-    twitteraccountrepository.h \
-    qml/twitteraccountobject.h \
-    qml/twitteraccountmodel.h \
-    twitterquery.h \
-    qml/twitterqueryobject.h \
-    qml/twitterquerylistmodel.h \
+    account.h \
+    accountrepository.h \
+    qml/accountobject.h \
+    qml/accountmodel.h \
+    query.h \
+    qml/queryobject.h \
+    qml/querylistmodel.h \
     layout.h \
     layoutrepository.h \
     qml/layoutobject.h \
@@ -37,7 +37,7 @@ HEADERS += \
     qml/twittertweetmodel.h \
     qml/twitterdatarepositoryobject.h \
     qml/twitterdatarepositoryobjectrepository.h \
-    itwitterqueryhandler.h \
+    iqueryhandler.h \
     twitterhometimelinequeryhandler.h \
     twittermentionstimelinequeryhandler.h
 
@@ -46,13 +46,13 @@ SOURCES += \
     private/twitterqueryutil.cpp \
     qml/twitterauthentification.cpp \
     loadsavemanager.cpp \
-    twitteraccount.cpp \
-    twitteraccountrepository.cpp \
-    qml/twitteraccountobject.cpp \
-    qml/twitteraccountmodel.cpp \
-    twitterquery.cpp \
-    qml/twitterqueryobject.cpp \
-    qml/twitterquerylistmodel.cpp \
+    account.cpp \
+    accountrepository.cpp \
+    qml/accountobject.cpp \
+    qml/accountmodel.cpp \
+    query.cpp \
+    qml/queryobject.cpp \
+    qml/querylistmodel.cpp \
     layout.cpp \
     layoutrepository.cpp \
     qml/layoutobject.cpp \

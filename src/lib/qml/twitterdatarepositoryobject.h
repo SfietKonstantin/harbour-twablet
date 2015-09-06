@@ -34,7 +34,7 @@
 
 #include <QtCore/QObject>
 #include "loadsavemanager.h"
-#include "twitteraccountrepository.h"
+#include "accountrepository.h"
 #include "layoutrepository.h"
 #include "twittertweetcentralrepository.h"
 
@@ -45,7 +45,7 @@ class TwitterDataRepositoryObject : public QObject
 public:
     explicit TwitterDataRepositoryObject(QObject *parent = 0);
     bool hasAccounts() const;
-    TwitterAccountRepository & accounts();
+    AccountRepository & accounts();
     LayoutRepository & layouts();
     TwitterTweetRepository & tweets(const Layout &layout);
 signals:
@@ -71,7 +71,7 @@ private:
         bool operator()(const Layout &first, const Layout &second) const;
     };
     LoadSaveManager m_loadSaveManager {};
-    TwitterAccountRepository m_accounts {};
+    AccountRepository m_accounts {};
     LayoutRepository m_layouts {};
     TwitterTweetCentralRepository m_tweetsCentralRepository {};
     std::map<Layout, TwitterTweetRepository, LayoutComparator> m_tweetRepositories {};

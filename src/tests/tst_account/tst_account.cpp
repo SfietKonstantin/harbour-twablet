@@ -33,9 +33,9 @@
 #include <QtTest/QSignalSpy>
 #include <loadsavemanager.h>
 #include <qml/twitterdatarepositoryobject.h>
-#include <qml/twitteraccountmodel.h>
+#include <qml/accountmodel.h>
 
-class TstTwitterAccount: public QObject
+class TstAccount: public QObject
 {
     Q_OBJECT
 private Q_SLOTS:
@@ -46,9 +46,9 @@ private Q_SLOTS:
 
     void testRepo()
     {
-        TwitterAccountRepository repository {};
+        AccountRepository repository {};
         for (int i = 0; i < 4; ++i) {
-            repository.append(TwitterAccount(QString::number(i + 1), QString(), QString(),
+            repository.append(Account(QString::number(i + 1), QString(), QString(),
                                              QByteArray(), QByteArray()));
         }
         QCOMPARE((std::begin(repository) + 0)->name(), QString::number(1));
@@ -65,14 +65,14 @@ private Q_SLOTS:
     void testModel()
     {
         TwitterDataRepositoryObject repositoryObject {};
-        TwitterAccountRepository &repository (repositoryObject.accounts());
+        AccountRepository &repository (repositoryObject.accounts());
 
         for (int i = 0; i < 3; ++i) {
-            repository.append(TwitterAccount(QString::number(i + 1), QString(), QString(),
+            repository.append(Account(QString::number(i + 1), QString(), QString(),
                                              QByteArray(), QByteArray()));
         }
 
-        TwitterAccountModel model {};
+        AccountModel model {};
         model.classBegin();
         model.setRepository(&repositoryObject);
         model.componentComplete();
@@ -82,7 +82,7 @@ private Q_SLOTS:
         QCOMPARE(getObject(model, 1)->name(), QString::number(2));
         QCOMPARE(getObject(model, 2)->name(), QString::number(3));
 
-        repository.append(TwitterAccount(QString::number(4), QString(), QString(),
+        repository.append(Account(QString::number(4), QString(), QString(),
                                          QByteArray(), QByteArray()));
 
         QCOMPARE(model.count(), 4);
@@ -98,14 +98,14 @@ private Q_SLOTS:
         QCOMPARE(getObject(model, 2)->name(), QString::number(4));
     }
 private:
-    static TwitterAccountObject * getObject(TwitterAccountModel &model, int index)
+    static AccountObject * getObject(AccountModel &model, int index)
     {
-        return model.data(model.index(index), TwitterAccountModel::AccountRole).value<TwitterAccountObject *>();
+        return model.data(model.index(index), AccountModel::AccountRole).value<AccountObject *>();
     }
 };
 
 
-QTEST_MAIN(TstTwitterAccount)
+QTEST_MAIN(TstAccount)
 
-#include "tst_twitteraccount.moc"
+#include "tst_account.moc"
 

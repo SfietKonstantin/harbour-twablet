@@ -35,19 +35,19 @@
 #include <QtCore/QObject>
 #include "layout.h"
 #include "model.h"
-#include "twitterqueryobject.h"
+#include "queryobject.h"
 
 class LayoutObject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
-    Q_PROPERTY(TwitterQueryObject::Type queryType READ queryType NOTIFY typeChanged)
+    Q_PROPERTY(QueryObject::Type queryType READ queryType NOTIFY typeChanged)
 public:
     DISABLE_COPY_DISABLE_MOVE(LayoutObject);
     static LayoutObject * create(const Layout &layout, QObject *parent = 0);
     QString name() const;
     int unread() const;
-    TwitterQueryObject::Type queryType() const;
+    QueryObject::Type queryType() const;
 signals:
     void nameChanged();
     void typeChanged();

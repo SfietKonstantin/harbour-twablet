@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,34 +29,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERACCOUNTOBJECT_H
-#define TWITTERACCOUNTOBJECT_H
+#ifndef ACCOUNT_H
+#define ACCOUNT_H
 
-#include <QtCore/QObject>
-#include "twitteraccount.h"
-#include "model.h"
+#include <QtCore/QByteArray>
+#include <QtCore/QString>
+#include "globals.h"
 
-class TwitterAccountObject : public QObject
+class Account
 {
-    Q_OBJECT
-    Q_PROPERTY(QString name READ name NOTIFY nameChanged)
-    Q_PROPERTY(QString userId READ userId CONSTANT)
-    Q_PROPERTY(QString screenName READ screenName CONSTANT)
 public:
-    DISABLE_COPY_DISABLE_MOVE(TwitterAccountObject);
-    static TwitterAccountObject * create(const TwitterAccount &twitterAccount, QObject *parent = 0);
+    explicit Account() = default;
+    explicit Account(const QString &name, const QString &userId, const QString &screenName,
+                            const QByteArray &token, const QByteArray &tokenSecret);
+    DEFAULT_COPY_DEFAULT_MOVE(Account);
+    bool isNull() const;
     QString name() const;
+    void setName(const QString &name);
     QString userId() const;
     QString screenName() const;
     QByteArray token() const;
     QByteArray tokenSecret() const;
-signals:
-    void nameChanged();
 private:
-    explicit TwitterAccountObject(const TwitterAccount &twitterAccount, QObject *parent = 0);
-    void update(const TwitterAccount &other);
-    TwitterAccount m_twitterAccount {};
-    friend class Model<TwitterAccount, TwitterAccountObject>;
+    QString m_name {};
+    QString m_userId {};
+    QString m_screenName {};
+    QByteArray m_token {};
+    QByteArray m_tokenSecret {};
 };
 
-#endif // TWITTERACCOUNTOBJECT_H
+#endif // ACCOUNT_H

@@ -37,7 +37,7 @@ import "pages"
 ApplicationWindow {
     id: app
 
-    TwitterAccountModel {
+    AccountModel {
         id: accountModel
         repository: Repository
     }

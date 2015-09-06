@@ -29,19 +29,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twitterqueryobject.h"
+#include "query.h"
 
-TwitterQueryObject::TwitterQueryObject(const TwitterQuery &twitterQuery, QObject *parent)
-    : QObject(parent), m_twitterQuery{twitterQuery}
+Query::Query(Type type, Arguments &&arguments)
+    : m_type{type}, m_arguments{std::move(arguments)}
 {
 }
 
-TwitterQueryObject * TwitterQueryObject::create(const TwitterQuery &twitterQuery, QObject *parent)
+Query::Type Query::type() const
 {
-    return new TwitterQueryObject(twitterQuery, parent);
+    return m_type;
 }
 
-TwitterQueryObject::Type TwitterQueryObject::type() const
+Query::Arguments Query::arguments() const
 {
-    return static_cast<Type>(m_twitterQuery.type());
+    return m_arguments;
 }
+
+bool Query::operator==(const Query &other) const
+{
+    return m_type == other.m_type && m_arguments == other.m_arguments;
+}
+
+bool Query::operator!=(const Query &other) const
+{
+    return !(*this == other);
+}
+

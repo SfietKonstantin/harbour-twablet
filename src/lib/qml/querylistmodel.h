@@ -29,15 +29,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERQUERYLISTMODEL_H
-#define TWITTERQUERYLISTMODEL_H
+#ifndef QUERYLISTMODEL_H
+#define QUERYLISTMODEL_H
 
 #include <memory>
 #include <QtCore/QAbstractListModel>
 #include <QtQml/QQmlParserStatus>
-#include "twitterqueryobject.h"
+#include "queryobject.h"
 
-class TwitterQueryListModel : public QAbstractListModel, public QQmlParserStatus
+class QueryListModel : public QAbstractListModel, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
@@ -47,7 +47,7 @@ public:
         NameRole = Qt::UserRole + 1,
         QueryTypeRole
     };
-    explicit TwitterQueryListModel(QObject *parent = 0);
+    explicit QueryListModel(QObject *parent = 0);
     void classBegin() override;
     void componentComplete() override;
     int rowCount(const QModelIndex &index = QModelIndex()) const override;
@@ -63,9 +63,9 @@ private:
     struct Data
     {
         QString name;
-        TwitterQueryObject::Type type;
+        QueryObject::Type type;
     };
     std::vector<std::unique_ptr<Data>> m_data {};
 };
 
-#endif // TWITTERQUERYLISTMODEL_H
+#endif // QUERYLISTMODEL_H

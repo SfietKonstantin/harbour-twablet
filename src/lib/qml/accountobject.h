@@ -29,47 +29,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twitteraccountobject.h"
+#ifndef ACCOUNTOBJECT_H
+#define ACCOUNTOBJECT_H
 
-TwitterAccountObject::TwitterAccountObject(const TwitterAccount &twitterAccount, QObject *parent)
-    : QObject(parent), m_twitterAccount(twitterAccount)
-{
-}
+#include <QtCore/QObject>
+#include "account.h"
+#include "model.h"
 
-TwitterAccountObject * TwitterAccountObject::create(const TwitterAccount &twitterAccount, QObject *parent)
+class AccountObject : public QObject
 {
-    return new TwitterAccountObject(twitterAccount, parent);
-}
+    Q_OBJECT
+    Q_PROPERTY(QString name READ name NOTIFY nameChanged)
+    Q_PROPERTY(QString userId READ userId CONSTANT)
+    Q_PROPERTY(QString screenName READ screenName CONSTANT)
+public:
+    DISABLE_COPY_DISABLE_MOVE(AccountObject);
+    static AccountObject * create(const Account &twitterAccount, QObject *parent = 0);
+    QString name() const;
+    QString userId() const;
+    QString screenName() const;
+    QByteArray token() const;
+    QByteArray tokenSecret() const;
+signals:
+    void nameChanged();
+private:
+    explicit AccountObject(const Account &twitterAccount, QObject *parent = 0);
+    void update(const Account &other);
+    Account m_twitterAccount {};
+    friend class Model<Account, AccountObject>;
+};
 
-QString TwitterAccountObject::name() const
-{
-    return m_twitterAccount.name();
-}
-
-QString TwitterAccountObject::userId() const
-{
-    return m_twitterAccount.userId();
-}
-
-QString TwitterAccountObject::screenName() const
-{
-    return m_twitterAccount.screenName();
-}
-
-QByteArray TwitterAccountObject::token() const
-{
-    return m_twitterAccount.token();
-}
-
-QByteArray TwitterAccountObject::tokenSecret() const
-{
-    return m_twitterAccount.tokenSecret();
-}
-
-void TwitterAccountObject::update(const TwitterAccount &other)
-{
-    if (m_twitterAccount.name() != other.name()) {
-        m_twitterAccount.setName(other.name());
-        emit nameChanged();
-    }
-}
+#endif // ACCOUNTOBJECT_H

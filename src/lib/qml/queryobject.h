@@ -29,30 +29,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twitterquery.h"
+#ifndef QUERYOBJECT_H
+#define QUERYOBJECT_H
 
-TwitterQuery::TwitterQuery(Type type, Arguments &&arguments)
-    : m_type{type}, m_arguments{std::move(arguments)}
+#include <QtCore/QObject>
+#include "query.h"
+
+class QueryObject : public QObject
 {
-}
+    Q_OBJECT
+    Q_ENUMS(Type)
+    Q_PROPERTY(Type type READ type CONSTANT)
+public:
+    enum Type
+    {
+        Invalid = Query::Invalid,
+        Home = Query::Home,
+        Mentions = Query::Mentions
+    };
+    DISABLE_COPY_DISABLE_MOVE(QueryObject);
+    static QueryObject * create(const Query &query, QObject *parent = 0);
+    Type type() const;
+private:
+    explicit QueryObject(const Query &query, QObject *parent = 0);
+    Query m_query {};
+};
 
-TwitterQuery::Type TwitterQuery::type() const
-{
-    return m_type;
-}
-
-TwitterQuery::Arguments TwitterQuery::arguments() const
-{
-    return m_arguments;
-}
-
-bool TwitterQuery::operator==(const TwitterQuery &other) const
-{
-    return m_type == other.m_type && m_arguments == other.m_arguments;
-}
-
-bool TwitterQuery::operator!=(const TwitterQuery &other) const
-{
-    return !(*this == other);
-}
-
+#endif // QUERYOBJECT_H

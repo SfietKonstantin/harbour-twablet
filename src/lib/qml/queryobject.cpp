@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,38 +29,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twitteraccountmodel.h"
-#include "twitterdatarepositoryobject.h"
+#include "queryobject.h"
 
-TwitterAccountModel::TwitterAccountModel(QObject *parent) :
-    Model<TwitterAccount, TwitterAccountObject>(parent)
+QueryObject::QueryObject(const Query &query, QObject *parent)
+    : QObject(parent), m_query{query}
 {
 }
 
-QVariant TwitterAccountModel::data(const QModelIndex &index, int role) const
+QueryObject * QueryObject::create(const Query &query, QObject *parent)
 {
-    int row = index.row();
-    if (row < 0 || row >= rowCount()) {
-        return QVariant();
-    }
-    const QObjectPtr<TwitterAccountObject> &account = m_data[row];
-    switch (role) {
-    case NameRole:
-        return account->name();
-        break;
-    case ScreenNameRole:
-        return account->screenName();
-        break;
-    case AccountRole:
-        return QVariant::fromValue(account.get());
-        break;
-    default:
-        return QVariant();
-        break;
-    }
+    return new QueryObject(query, parent);
 }
 
-QHash<int, QByteArray> TwitterAccountModel::roleNames() const
+QueryObject::Type QueryObject::type() const
 {
-    return {{NameRole, "name"}, {ScreenNameRole, "screenName"}, {AccountRole, "account"}};
+    return static_cast<Type>(m_query.type());
 }

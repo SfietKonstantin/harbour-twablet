@@ -29,33 +29,65 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERACCOUNT_H
-#define TWITTERACCOUNT_H
+#include "querylistmodel.h"
+#include "queryobject.h"
 
-#include <QtCore/QByteArray>
-#include <QtCore/QString>
-#include "globals.h"
 
-class TwitterAccount
+QueryListModel::QueryListModel(QObject *parent) :
+    QAbstractListModel(parent)
 {
-public:
-    explicit TwitterAccount() = default;
-    explicit TwitterAccount(const QString &name, const QString &userId, const QString &screenName,
-                            const QByteArray &token, const QByteArray &tokenSecret);
-    DEFAULT_COPY_DEFAULT_MOVE(TwitterAccount);
-    bool isNull() const;
-    QString name() const;
-    void setName(const QString &name);
-    QString userId() const;
-    QString screenName() const;
-    QByteArray token() const;
-    QByteArray tokenSecret() const;
-private:
-    QString m_name {};
-    QString m_userId {};
-    QString m_screenName {};
-    QByteArray m_token {};
-    QByteArray m_tokenSecret {};
-};
+    m_data.emplace_back(new Data {tr("Home"), QueryObject::Home});
+    m_data.emplace_back(new Data {tr("Mentions"), QueryObject::Mentions});
+}
 
-#endif // TWITTERACCOUNT_H
+void QueryListModel::classBegin()
+{
+}
+
+void QueryListModel::componentComplete()
+{
+}
+
+int QueryListModel::rowCount(const QModelIndex &index) const
+{
+    Q_UNUSED(index)
+    return m_data.size();
+}
+
+QVariant QueryListModel::data(const QModelIndex &index, int role) const
+{
+    int row = index.row();
+    if (row < 0 || row >= rowCount()) {
+        return QVariant();
+    }
+    const std::unique_ptr<Data> &data = m_data[row];
+    switch (role) {
+    case NameRole:
+        return data->name;
+        break;
+    case QueryTypeRole:
+        return data->type;
+        break;
+    default:
+        return QVariant();
+        break;
+    }
+}
+
+int QueryListModel::count() const
+{
+    return rowCount();
+}
+
+int QueryListModel::getType(int index)
+{
+    if (index < 0 || index >= rowCount()) {
+        return Query::Invalid;
+    }
+    return m_data[index]->type;
+}
+
+QHash<int, QByteArray> QueryListModel::roleNames() const
+{
+    return {{NameRole, "name"}, {QueryTypeRole, "type"}};
+}

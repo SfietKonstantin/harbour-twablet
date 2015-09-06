@@ -29,19 +29,46 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERACCOUNTREPOSITORY_H
-#define TWITTERACCOUNTREPOSITORY_H
+#include "account.h"
 
-#include "repository.h"
-#include "iloadsave.h"
-#include "twitteraccount.h"
-
-class TwitterAccountRepository: public Repository<TwitterAccount>, public ILoadSave
+Account::Account(const QString &name, const QString &userId, const QString &screenName,
+                 const QByteArray &token, const QByteArray &tokenSecret)
+    : m_name{name}, m_userId{userId}, m_screenName{screenName}
+    , m_token{token}, m_tokenSecret{tokenSecret}
 {
-public:
-    TwitterAccount find(const QString &userId) const;
-    void load(const QJsonObject &json) override;
-    void save(QJsonObject &json) const override;
-};
+}
 
-#endif // TWITTERACCOUNTREPOSITORY_H
+bool Account::isNull() const
+{
+    return (m_name.isEmpty() || m_userId.isEmpty() || m_token.isEmpty() || m_tokenSecret.isEmpty());
+}
+
+QString Account::name() const
+{
+    return m_name;
+}
+
+void Account::setName(const QString &name)
+{
+    m_name = name;
+}
+
+QString Account::userId() const
+{
+    return m_userId;
+}
+
+QString Account::screenName() const
+{
+    return m_screenName;
+}
+
+QByteArray Account::token() const
+{
+    return m_token;
+}
+
+QByteArray Account::tokenSecret() const
+{
+    return m_tokenSecret;
+}

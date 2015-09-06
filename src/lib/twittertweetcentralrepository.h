@@ -38,11 +38,11 @@
 #include "globals.h"
 #include "qobjectutils.h"
 #include "twittertweet.h"
-#include "twitteraccount.h"
-#include "twitterquery.h"
+#include "account.h"
+#include "query.h"
 #include "repository.h"
 #include "twittertweetrepository.h"
-#include "itwitterqueryhandler.h"
+#include "iqueryhandler.h"
 
 class QNetworkReply;
 class TwitterTweetCentralRepository: public QObject
@@ -51,18 +51,18 @@ class TwitterTweetCentralRepository: public QObject
 public:
     explicit TwitterTweetCentralRepository();
     DISABLE_COPY_DEFAULT_MOVE(TwitterTweetCentralRepository);
-    void query(const TwitterAccount &account, const TwitterQuery &query,
+    void query(const Account &account, const Query &query,
                TwitterTweetRepository &repository);
 private:
-    class TwitterQueryComparator
+    class QueryComparator
     {
     public:
-        bool operator()(const TwitterQuery &first, const TwitterQuery &second) const;
+        bool operator()(const Query &first, const Query &second) const;
     };
-    ITwitterQueryHandler * getQueryHandler(const TwitterQuery &query);
+    IQueryHandler * getQueryHandler(const Query &query);
     std::map<QString, TwitterTweet> m_data {};
     QObjectPtr<QNetworkAccessManager> m_network {nullptr};
-    std::map<TwitterQuery, std::unique_ptr<ITwitterQueryHandler>, TwitterQueryComparator> m_queries {};
+    std::map<Query, std::unique_ptr<IQueryHandler>, QueryComparator> m_queries {};
 };
 
 #endif // TWITTERTWEETCENTRALREPOSITORY_H

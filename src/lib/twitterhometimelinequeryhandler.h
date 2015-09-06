@@ -32,10 +32,10 @@
 #ifndef TWITTERHOMETIMELINEQUERYHANDLER_H
 #define TWITTERHOMETIMELINEQUERYHANDLER_H
 
-#include "itwitterqueryhandler.h"
+#include "iqueryhandler.h"
 #include "globals.h"
 
-class TwitterHomeTimelineQueryHandler: public ITwitterQueryHandler
+class TwitterHomeTimelineQueryHandler: public IQueryHandler
 {
 public:
     explicit TwitterHomeTimelineQueryHandler();

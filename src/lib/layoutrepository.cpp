@@ -48,7 +48,7 @@ void LayoutRepository::load(const QJsonObject &json)
         const QString &userId {layout.value(QLatin1String("userId")).toString()};
         int queryType {layout.value(QLatin1String("queryType")).toInt()};
 
-        TwitterQuery::Arguments arguments {};
+        Query::Arguments arguments {};
         const QJsonArray &queryArguments {layout.value(QLatin1String("queryArguments")).toArray()};
         for (const QJsonValue &argumentValue : queryArguments) {
             const QJsonObject &argumentObject {argumentValue.toObject()};
@@ -57,8 +57,8 @@ void LayoutRepository::load(const QJsonObject &json)
             arguments.emplace_back(key, value);
         }
 
-        if (!userId.isEmpty() && queryType != TwitterQuery::Invalid) {
-            TwitterQuery query {static_cast<TwitterQuery::Type>(queryType), std::move(arguments)};
+        if (!userId.isEmpty() && queryType != Query::Invalid) {
+            Query query {static_cast<Query::Type>(queryType), std::move(arguments)};
             data.emplace_back(name, userId, std::move(query));
         }
     }
