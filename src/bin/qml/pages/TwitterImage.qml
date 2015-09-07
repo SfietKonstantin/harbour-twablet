@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,46 +29,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEET_H
-#define TWEET_H
+import QtQuick 2.0
+import Sailfish.Silica 1.0
 
-#include <QtCore/QString>
-#include <QtCore/QDateTime>
-#include <QtCore/QJsonObject>
-#include "globals.h"
-#include "user.h"
+Rectangle {
+    id: container
+    property alias source: image.source
+    color: Theme.secondaryHighlightColor
 
-class Tweet
-{
-public:
-    explicit Tweet() = default;
-    explicit Tweet(const QJsonObject &json);
-    DEFAULT_COPY_DEFAULT_MOVE(Tweet);
-    bool isValid() const;
-    QString id() const;
-    QString text() const;
-    User user() const;
-    User retweetingUser() const;
-    QDateTime timestamp() const;
-    int favoriteCount() const;
-    bool isFavorited() const;
-    int retweetCount() const;
-    bool isRetweeted() const;
-    QString inReplyTo() const;
-    QString source() const;
-    // Entities
-private:
-    QString m_id {};
-    QString m_text {};
-    User m_user {};
-    User m_retweetingUser {};
-    QDateTime m_timestamp {};
-    int m_favoriteCount {};
-    bool m_favorited {};
-    int m_retweetCount {};
-    bool m_retweeted {};
-    QString m_inReplyTo {};
-    QString m_source {};
-};
+    Image {
+        id: image
+        anchors.fill: parent
+        smooth: true
+        asynchronous: true
+        fillMode: Image.PreserveAspectCrop
+        clip: true
+        opacity: 0
 
-#endif // TWEET_H
+        states: State {
+            name: "visible"; when: image.status === Image.Ready
+            PropertyChanges {
+                target: image
+                opacity: 1
+            }
+        }
+
+        Behavior on opacity {
+            FadeAnimation {}
+        }
+    }
+}
+

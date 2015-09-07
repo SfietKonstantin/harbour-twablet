@@ -13,5 +13,7 @@
         <file>data/mail.svg</file>
         <file>data/search.svg</file>
         <file>qml/pages/Toolbar.qml</file>
+        <file>qml/pages/TweetDelegate.qml</file>
+        <file>qml/pages/TwitterImage.qml</file>
     </qresource>
 </RCC>

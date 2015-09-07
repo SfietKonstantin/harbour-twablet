@@ -29,52 +29,53 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEETOBJECT_H
-#define TWEETOBJECT_H
+#ifndef USEROBJECT_H
+#define USEROBJECT_H
 
 #include <QtCore/QObject>
-#include "tweet.h"
-#include "userobject.h"
-#include "model.h"
+#include "user.h"
 
-class TweetObject : public QObject
+class UserObject : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool valid READ isValid CONSTANT)
     Q_PROPERTY(QString id READ id CONSTANT)
-    Q_PROPERTY(QString text READ text CONSTANT)
-    Q_PROPERTY(UserObject * user READ user CONSTANT)
-    Q_PROPERTY(UserObject * retweetingUser READ retweetingUser CONSTANT)
-    Q_PROPERTY(QDateTime timestamp READ timestamp CONSTANT)
-    Q_PROPERTY(int favoriteCount READ favoriteCount CONSTANT)
-    Q_PROPERTY(bool favorited READ isFavorited CONSTANT)
-    Q_PROPERTY(int retweetCount READ retweetCount CONSTANT)
-    Q_PROPERTY(bool retweeted READ isRetweeted CONSTANT)
-    Q_PROPERTY(QString inReplyTo READ inReplyTo CONSTANT)
-    Q_PROPERTY(QString source READ source CONSTANT)
-    Q_PROPERTY(QString sourceName READ sourceName CONSTANT)
+    Q_PROPERTY(QString name READ name CONSTANT)
+    Q_PROPERTY(QString screenName READ screenName CONSTANT)
+    Q_PROPERTY(QString description READ description CONSTANT)
+    Q_PROPERTY(QString location READ location CONSTANT)
+    Q_PROPERTY(QString url READ url CONSTANT)
+    Q_PROPERTY(bool protected READ isProtected CONSTANT)
+    Q_PROPERTY(bool following READ isFollowing CONSTANT)
+    Q_PROPERTY(int statusesCount READ statusesCount CONSTANT)
+    Q_PROPERTY(int followersCount READ followersCount CONSTANT)
+    Q_PROPERTY(int friendsCount READ friendsCount CONSTANT)
+    Q_PROPERTY(int listedCount READ listedCount CONSTANT)
+    Q_PROPERTY(int favouritesCount READ favouritesCount CONSTANT)
+    Q_PROPERTY(QString imageUrl READ imageUrl CONSTANT)
+    Q_PROPERTY(QString bannerUrl READ bannerUrl CONSTANT)
 public:
-    DISABLE_COPY_DISABLE_MOVE(TweetObject);
-    static TweetObject * create(const Tweet &data, QObject *parent = 0);
+    DISABLE_COPY_DISABLE_MOVE(UserObject);
+    static UserObject * create(const User &data, QObject *parent = 0);
+    bool isValid() const;
     QString id() const;
-    QString text() const;
-    UserObject * user() const;
-    UserObject * retweetingUser() const;
-    QDateTime timestamp() const;
-    int favoriteCount() const;
-    bool isFavorited() const;
-    int retweetCount() const;
-    bool isRetweeted() const;
-    QString inReplyTo() const;
-    QString source() const;
-    QString sourceName() const;
+    QString name() const;
+    QString screenName() const;
+    QString description() const;
+    QString location() const;
+    QString url() const;
+    bool isProtected() const;
+    bool isFollowing() const;
+    int statusesCount() const;
+    int followersCount() const;
+    int friendsCount() const;
+    int listedCount() const;
+    int favouritesCount() const;
+    QString imageUrl() const;
+    QString bannerUrl() const;
 private:
-    explicit TweetObject(const Tweet &data, QObject *parent = 0);
-    void update(const Tweet &other);
-    Tweet m_data {};
-    UserObject *m_user {nullptr};
-    UserObject *m_retweetingUser {nullptr};
-    QString m_sourceName {};
-    friend class Model<Tweet, TweetObject>;
+    explicit UserObject(const User &data, QObject *parent = 0);
+    User m_data {};
 };
 
-#endif // TWEETOBJECT_H
+#endif // USEROBJECT_H

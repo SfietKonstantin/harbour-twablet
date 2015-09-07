@@ -34,8 +34,34 @@
 
 Tweet::Tweet(const QJsonObject &json)
 {
-    m_id = json.value(QLatin1String("id_str")).toString();
-    m_text = json.value(QLatin1String("text")).toString();
+    // Use the retweeted status when possible
+    QJsonObject tweet {json};
+    QJsonObject retweetedTweet {json.value(QLatin1String("retweeted_status")).toObject()};
+    if (!retweetedTweet.isEmpty()) {
+        tweet = retweetedTweet;
+
+        // Adding the retweeting user when retweeting
+        m_retweetingUser = std::move(User(json.value(QLatin1String("user")).toObject()));
+    }
+
+    m_id = tweet.value(QLatin1String("id_str")).toString();
+    m_text = tweet.value(QLatin1String("text")).toString();
+    m_favoriteCount = tweet.value(QLatin1String("favorite_count")).toInt();
+    m_favorited = tweet.value(QLatin1String("favorited")).toBool();
+    m_retweetCount = tweet.value(QLatin1String("retweet_count")).toInt();
+    m_retweeted = tweet.value(QLatin1String("retweeted")).toBool();
+    m_inReplyTo = tweet.value(QLatin1String("in_reply_to_status_id")).toString();
+    m_source = tweet.value(QLatin1String("source")).toString();
+
+    QString createdAtString = tweet.value(QLatin1String("created_at")).toString();
+    QLocale locale (QLocale::English, QLocale::UnitedStates);
+    m_timestamp = locale.toDateTime(createdAtString, QLatin1String("ddd MMM dd HH:mm:ss +0000 yyyy"));
+    m_user = std::move(User(tweet.value(QLatin1String("user")).toObject()));
+}
+
+bool Tweet::isValid() const
+{
+    return !m_id.isEmpty();
 }
 
 QString Tweet::id() const
@@ -46,5 +72,50 @@ QString Tweet::id() const
 QString Tweet::text() const
 {
     return m_text;
+}
+
+User Tweet::user() const
+{
+    return m_user;
+}
+
+User Tweet::retweetingUser() const
+{
+    return m_retweetingUser;
+}
+
+QDateTime Tweet::timestamp() const
+{
+    return m_timestamp;
+}
+
+int Tweet::favoriteCount() const
+{
+    return m_favoriteCount;
+}
+
+bool Tweet::isFavorited() const
+{
+    return m_favorited;
+}
+
+int Tweet::retweetCount() const
+{
+    return m_retweetCount;
+}
+
+bool Tweet::isRetweeted() const
+{
+    return m_retweeted;
+}
+
+QString Tweet::inReplyTo() const
+{
+    return m_inReplyTo;
+}
+
+QString Tweet::source() const
+{
+    return m_source;
 }
 

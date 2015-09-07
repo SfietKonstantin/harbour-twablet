@@ -29,52 +29,94 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEETOBJECT_H
-#define TWEETOBJECT_H
-
-#include <QtCore/QObject>
-#include "tweet.h"
 #include "userobject.h"
-#include "model.h"
 
-class TweetObject : public QObject
+UserObject::UserObject(const User &data, QObject *parent)
+    : QObject(parent), m_data{data}
 {
-    Q_OBJECT
-    Q_PROPERTY(QString id READ id CONSTANT)
-    Q_PROPERTY(QString text READ text CONSTANT)
-    Q_PROPERTY(UserObject * user READ user CONSTANT)
-    Q_PROPERTY(UserObject * retweetingUser READ retweetingUser CONSTANT)
-    Q_PROPERTY(QDateTime timestamp READ timestamp CONSTANT)
-    Q_PROPERTY(int favoriteCount READ favoriteCount CONSTANT)
-    Q_PROPERTY(bool favorited READ isFavorited CONSTANT)
-    Q_PROPERTY(int retweetCount READ retweetCount CONSTANT)
-    Q_PROPERTY(bool retweeted READ isRetweeted CONSTANT)
-    Q_PROPERTY(QString inReplyTo READ inReplyTo CONSTANT)
-    Q_PROPERTY(QString source READ source CONSTANT)
-    Q_PROPERTY(QString sourceName READ sourceName CONSTANT)
-public:
-    DISABLE_COPY_DISABLE_MOVE(TweetObject);
-    static TweetObject * create(const Tweet &data, QObject *parent = 0);
-    QString id() const;
-    QString text() const;
-    UserObject * user() const;
-    UserObject * retweetingUser() const;
-    QDateTime timestamp() const;
-    int favoriteCount() const;
-    bool isFavorited() const;
-    int retweetCount() const;
-    bool isRetweeted() const;
-    QString inReplyTo() const;
-    QString source() const;
-    QString sourceName() const;
-private:
-    explicit TweetObject(const Tweet &data, QObject *parent = 0);
-    void update(const Tweet &other);
-    Tweet m_data {};
-    UserObject *m_user {nullptr};
-    UserObject *m_retweetingUser {nullptr};
-    QString m_sourceName {};
-    friend class Model<Tweet, TweetObject>;
-};
+}
 
-#endif // TWEETOBJECT_H
+UserObject * UserObject::create(const User &data, QObject *parent)
+{
+    return new UserObject(data, parent);
+}
+
+bool UserObject::isValid() const
+{
+    return m_data.isValid();
+}
+
+QString UserObject::id() const
+{
+    return m_data.id();
+}
+
+QString UserObject::name() const
+{
+    return m_data.name();
+}
+
+QString UserObject::screenName() const
+{
+    return m_data.screenName();
+}
+
+QString UserObject::description() const
+{
+    return m_data.description();
+}
+
+QString UserObject::location() const
+{
+    return m_data.location();
+}
+
+QString UserObject::url() const
+{
+    return m_data.url();
+}
+
+bool UserObject::isProtected() const
+{
+    return m_data.isProtected();
+}
+
+bool UserObject::isFollowing() const
+{
+    return m_data.isFollowing();
+}
+
+int UserObject::statusesCount() const
+{
+    return m_data.statusesCount();
+}
+
+int UserObject::followersCount() const
+{
+    return m_data.followersCount();
+}
+
+int UserObject::friendsCount() const
+{
+    return m_data.friendsCount();
+}
+
+int UserObject::listedCount() const
+{
+    return m_data.listedCount();
+}
+
+int UserObject::favouritesCount() const
+{
+    return m_data.favouritesCount();
+}
+
+QString UserObject::imageUrl() const
+{
+    return m_data.imageUrl();
+}
+
+QString UserObject::bannerUrl() const
+{
+    return m_data.bannerUrl();
+}

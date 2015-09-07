@@ -24,9 +24,13 @@ OTHER_FILES += \
     qml/pages/AuthentificationPage.qml \
     qml/pages/ColumnLayout.qml \
     qml/pages/AddColumnPage.qml \
-    qml/pages/Toolbar.qml
+    qml/pages/Toolbar.qml \
+    qml/pages/TweetDelegate.qml \
     qml/cover/CoverPage.qml
 
 CONFIG += sailfishapp_i18n
 
 TRANSLATIONS += translations/harbour-twablet-de.ts
+
+DISTFILES += \
+    qml/pages/TwitterImage.qml

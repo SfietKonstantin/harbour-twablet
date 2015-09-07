@@ -100,36 +100,10 @@ SilicaListView {
         height: Theme.itemSizeLarge
     }
 
-    delegate: MouseArea {
+    delegate: TweetDelegate {
         id: delegate
         width: container.width
-        height: background.height
-
-        Rectangle {
-            id: background
-            anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
-            anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
-            color: Theme.secondaryHighlightColor
-            height: Math.max(avatar.height, text.height + Theme.paddingMedium)
-
-            Rectangle {
-                id: avatar
-                anchors.top: parent.top; anchors.left: parent.left
-                width: Theme.itemSizeSmall
-                height: Theme.itemSizeSmall
-            }
-
-            Label {
-                id: text
-                anchors.top: parent.top; anchors.topMargin: Theme.paddingSmall
-                anchors.left: avatar.right; anchors.leftMargin: Theme.paddingSmall
-                anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
-                text: model.item.text
-                font.pixelSize: Theme.fontSizeSmall
-                wrapMode: Text.Wrap
-                color: Theme.highlightColor
-            }
-        }
+        tweet: model.item
     }
 
     BusyIndicator {

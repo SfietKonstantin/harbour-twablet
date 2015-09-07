@@ -30,10 +30,18 @@
  */
 
 #include "tweetobject.h"
+#include <QtCore/QRegularExpression>
 
 TweetObject::TweetObject(const Tweet &data, QObject *parent)
-    : QObject(parent), m_data(data)
+    : QObject(parent), m_data{data}, m_user{nullptr}
 {
+    m_user = UserObject::create(m_data.user(), this);
+    if (m_data.retweetingUser().isValid()) {
+        m_retweetingUser = UserObject::create(m_data.retweetingUser(), this);
+    }
+    QRegularExpression urlParser {QLatin1String("<a[^>]*>([^<]*)</a>")};
+    QRegularExpressionMatch match {urlParser.match(m_data.source())};
+    m_sourceName = match.captured(1);
 }
 
 TweetObject * TweetObject::create(const Tweet &data, QObject *parent)
@@ -49,6 +57,56 @@ QString TweetObject::id() const
 QString TweetObject::text() const
 {
     return m_data.text();
+}
+
+UserObject * TweetObject::user() const
+{
+    return m_user;
+}
+
+UserObject * TweetObject::retweetingUser() const
+{
+    return m_retweetingUser;
+}
+
+QDateTime TweetObject::timestamp() const
+{
+    return m_data.timestamp();
+}
+
+int TweetObject::favoriteCount() const
+{
+    return m_data.favoriteCount();
+}
+
+bool TweetObject::isFavorited() const
+{
+    return m_data.isFavorited();
+}
+
+int TweetObject::retweetCount() const
+{
+    return m_data.retweetCount();
+}
+
+bool TweetObject::isRetweeted() const
+{
+    return m_data.isRetweeted();
+}
+
+QString TweetObject::inReplyTo() const
+{
+    return m_data.inReplyTo();
+}
+
+QString TweetObject::source() const
+{
+    return m_data.source();
+}
+
+QString TweetObject::sourceName() const
+{
+    return m_sourceName;
 }
 
 void TweetObject::update(const Tweet &other)

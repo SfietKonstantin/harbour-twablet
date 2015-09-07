@@ -39,7 +39,9 @@ HEADERS += \
     qml/twitterdatarepositoryobjectrepository.h \
     iqueryhandler.h \
     hometimelinequeryhandler.h \
-    mentionstimelinequeryhandler.h
+    mentionstimelinequeryhandler.h \
+    user.h \
+    qml/userobject.h
 
 SOURCES += \
     private/twitterdatautil.cpp \
@@ -63,4 +65,6 @@ SOURCES += \
     tweetcentralrepository.cpp \
     qml/twitterdatarepositoryobject.cpp \
     hometimelinequeryhandler.cpp \
-    mentionstimelinequeryhandler.cpp
+    mentionstimelinequeryhandler.cpp \
+    user.cpp \
+    qml/userobject.cpp
