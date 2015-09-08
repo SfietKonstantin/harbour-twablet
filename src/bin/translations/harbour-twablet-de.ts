@@ -2,6 +2,33 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
+    <name>AccountPage</name>
+    <message>
+        <source>Home</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mentions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name of the account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add home timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add mentions timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AccountsPage</name>
     <message>
         <source>Accounts</source>
@@ -31,10 +58,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>User</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Name of the column</source>
         <translation type="unfinished"></translation>
     </message>
@@ -42,15 +65,15 @@
         <source>Column type</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Account</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AuthentificationPage</name>
     <message>
         <source>Retry</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Name of the account</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -88,14 +111,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>There is no account defined. Pull down to configure accounts.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There is no column defined. Pull down to add a column.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>About</source>
         <translation type="unfinished"></translation>
     </message>
@@ -105,6 +120,13 @@
     </message>
     <message>
         <source>New tweet</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TweetDelegate</name>
+    <message>
+        <source>Retweeted by %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

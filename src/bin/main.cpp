@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<LayoutObject>("harbour.twablet", 1, 0, "Layout", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<QueryObject>("harbour.twablet", 1, 0, "Query", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<TweetObject>("harbour.twablet", 1, 0, "Tweet", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<UserObject>("harbour.twablet", 1, 0, "User", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<MediaObject>("harbour.twablet", 1, 0, "Media", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<MediaModel>("harbour.twablet", 1, 0, "MediaModel", QLatin1String("Uncreatable"));
     qmlRegisterType<TwitterAuthentification>("harbour.twablet", 1, 0, "TwitterAuthentification");

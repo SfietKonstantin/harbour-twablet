@@ -62,7 +62,6 @@ MouseArea {
                 Image {
                     id: retweetIcon
                     anchors.left: parent.left
-                    visible: retweet.isRetweet
                     anchors.verticalCenter: retweetLabel.verticalCenter
                     source: "image://theme/icon-s-retweet"
                 }
@@ -74,7 +73,7 @@ MouseArea {
                     anchors.bottom: parent.bottom
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.secondaryColor
-                    text: qsTr("Retweeted by %1").arg(tweet.retweetingUser.name)
+                    text: retweet.isRetweet ? qsTr("Retweeted by %1").arg(tweet.retweetingUser.name) : ""
                     visible: retweet.isRetweet
                     wrapMode: Text.Wrap
                 }

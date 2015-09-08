@@ -54,8 +54,11 @@ Page {
     }
 
     SilicaFlickable {
+        id: main
         anchors.fill: parent
         visible: accountModel.count > 0
+        contentWidth: width
+        contentHeight: height
 
         PushUpMenu {
             MenuItem {
@@ -88,8 +91,8 @@ Page {
         }
 
         Item {
-            width: parent.width
-            height: parent.height
+            width: main.width
+            height: main.height
             visible: layoutModel.count > 0
 
             SilicaListView {

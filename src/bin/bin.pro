@@ -26,11 +26,20 @@ OTHER_FILES += \
     qml/pages/AddColumnPage.qml \
     qml/pages/Toolbar.qml \
     qml/pages/TweetDelegate.qml \
-    qml/cover/CoverPage.qml
+    qml/cover/CoverPage.qml \
+    qml/pages/TwitterImage.qml \
+
+
+DATA += \
+    data/home.svg \
+    data/mail.svg \
+    data/inbox.svg \
+    data/search.svg
+
+data.files = $${DATA}
+data.path = /usr/share/harbour-twablet/data
+INSTALLS += data
 
 CONFIG += sailfishapp_i18n
 
 TRANSLATIONS += translations/harbour-twablet-de.ts
-
-DISTFILES += \
-    qml/pages/TwitterImage.qml
