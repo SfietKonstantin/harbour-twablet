@@ -29,50 +29,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "mentionstimelinequeryhandler.h"
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
-#include "tweet.h"
+#ifndef MEDIAOBJECT_H
+#define MEDIAOBJECT_H
 
-MentionsTimelineQueryHandler::MentionsTimelineQueryHandler()
+#include <QtCore/QObject>
+#include <QtCore/QSize>
+#include "media.h"
+
+class MediaObject : public QObject
 {
-}
+    Q_OBJECT
+    Q_PROPERTY(QString id READ id CONSTANT)
+    Q_PROPERTY(QString url READ url CONSTANT)
+    Q_PROPERTY(Type type READ type CONSTANT)
+    Q_PROPERTY(int duration READ duration CONSTANT)
+    Q_PROPERTY(QSize size READ size CONSTANT)
+    Q_ENUMS(Type)
+public:
+    enum Type
+    {
+        Invalid = Media::Invalid,
+        Photo = Media::Photo,
+        Video = Media::Video,
+        Gif = Media::Gif
+    };
+    DISABLE_COPY_DISABLE_MOVE(MediaObject);
+    static MediaObject * create(const Media &data, QObject *parent = 0);
+    QString id() const;
+    QString url() const;
+    Type type() const;
+    QSize size() const;
+    int duration() const;
+private:
+    explicit MediaObject(const Media &data, QObject *parent = 0);
+    Media m_data {};
+    QSize m_size {};
+};
 
-void MentionsTimelineQueryHandler::createRequest(QString &path, std::map<QString, QString> &parameters) const
-{
-    path = QLatin1String("statuses/mentions_timeline.json");
-    parameters.insert({QLatin1String("count"), QString::number(200)});
-    parameters.insert({QLatin1String("trim_user"), QLatin1String("false")});
-    parameters.insert({QLatin1String("include_entities"), QLatin1String("true")});
-    if (!m_sinceId.isEmpty()) {
-        parameters.insert({QLatin1String("since_id"), m_sinceId});
-    }
-}
-
-bool MentionsTimelineQueryHandler::treatReply(const QByteArray &data, std::vector<Tweet> &items,
-                                                     QString &errorMessage, Placement &placement)
-{
-    QJsonParseError error {-1, QJsonParseError::NoError};
-    QJsonDocument document {QJsonDocument::fromJson(data, &error)};
-    if (error.error != QJsonParseError::NoError) {
-        errorMessage = error.errorString();
-        placement = Discard;
-        return false;
-    }
-
-    QJsonArray tweets (document.array());
-    items.reserve(tweets.size());
-    for (const QJsonValue &tweet : tweets) {
-        if (tweet.isObject()) {
-            items.emplace_back(tweet.toObject());
-        }
-    }
-
-    if (!items.empty()) {
-        m_sinceId = std::begin(items)->id();
-    }
-
-    placement = Prepend;
-    return true;
-}
+#endif // MEDIAOBJECT_H

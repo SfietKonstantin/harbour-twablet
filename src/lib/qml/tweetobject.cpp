@@ -42,6 +42,7 @@ TweetObject::TweetObject(const Tweet &data, QObject *parent)
     QRegularExpression urlParser {QLatin1String("<a[^>]*>([^<]*)</a>")};
     QRegularExpressionMatch match {urlParser.match(m_data.source())};
     m_sourceName = match.captured(1);
+    m_media.reset(MediaModel::create(m_data.media(), this));
 }
 
 TweetObject * TweetObject::create(const Tweet &data, QObject *parent)
@@ -107,6 +108,11 @@ QString TweetObject::source() const
 QString TweetObject::sourceName() const
 {
     return m_sourceName;
+}
+
+MediaModel * TweetObject::media() const
+{
+    return m_media.get();
 }
 
 void TweetObject::update(const Tweet &other)

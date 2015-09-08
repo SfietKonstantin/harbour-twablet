@@ -41,7 +41,10 @@ HEADERS += \
     hometimelinequeryhandler.h \
     mentionstimelinequeryhandler.h \
     user.h \
-    qml/userobject.h
+    qml/userobject.h \
+    media.h \
+    qml/mediaobject.h \
+    qml/mediamodel.h
 
 SOURCES += \
     private/twitterdatautil.cpp \
@@ -67,4 +70,7 @@ SOURCES += \
     hometimelinequeryhandler.cpp \
     mentionstimelinequeryhandler.cpp \
     user.cpp \
-    qml/userobject.cpp
+    qml/userobject.cpp \
+    media.cpp \
+    qml/mediaobject.cpp \
+    qml/mediamodel.cpp

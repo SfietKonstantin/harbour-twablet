@@ -29,50 +29,60 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "mentionstimelinequeryhandler.h"
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
-#include "tweet.h"
+#include "media.h"
+#include <QtCore/QLoggingCategory>
 
-MentionsTimelineQueryHandler::MentionsTimelineQueryHandler()
+Media::Media(const QJsonObject &json)
 {
+    m_id = json.value(QLatin1String("id_str")).toString();
+    m_url = json.value(QLatin1String("media_url_https")).toString();
+    QString type {json.value(QLatin1String("type")).toString()};
+    if (type == QLatin1String("photo")) {
+        m_type = Photo;
+    } else if (type == QLatin1String("video")) {
+        m_type = Video;
+    } else {
+        qCDebug(QLoggingCategory("media")) << "Unknown type" << type;
+    }
+
+    // Use "large" for size
+    QJsonObject sizes {json.value(QLatin1String("sizes")).toObject()};
+    QJsonObject sizeLarge {sizes.value(QLatin1String("large")).toObject()};
+    m_width = sizeLarge.value(QLatin1String("w")).toInt();
+    m_height = sizeLarge.value(QLatin1String("h")).toInt();
+
+    if (json.contains(QLatin1String("duration_millis"))) {
+        m_duration = json.value(QLatin1String("duration_millis")).toInt();
+    }
 }
 
-void MentionsTimelineQueryHandler::createRequest(QString &path, std::map<QString, QString> &parameters) const
+QString Media::id() const
 {
-    path = QLatin1String("statuses/mentions_timeline.json");
-    parameters.insert({QLatin1String("count"), QString::number(200)});
-    parameters.insert({QLatin1String("trim_user"), QLatin1String("false")});
-    parameters.insert({QLatin1String("include_entities"), QLatin1String("true")});
-    if (!m_sinceId.isEmpty()) {
-        parameters.insert({QLatin1String("since_id"), m_sinceId});
-    }
+    return m_id;
 }
 
-bool MentionsTimelineQueryHandler::treatReply(const QByteArray &data, std::vector<Tweet> &items,
-                                                     QString &errorMessage, Placement &placement)
+QString Media::url() const
 {
-    QJsonParseError error {-1, QJsonParseError::NoError};
-    QJsonDocument document {QJsonDocument::fromJson(data, &error)};
-    if (error.error != QJsonParseError::NoError) {
-        errorMessage = error.errorString();
-        placement = Discard;
-        return false;
-    }
-
-    QJsonArray tweets (document.array());
-    items.reserve(tweets.size());
-    for (const QJsonValue &tweet : tweets) {
-        if (tweet.isObject()) {
-            items.emplace_back(tweet.toObject());
-        }
-    }
-
-    if (!items.empty()) {
-        m_sinceId = std::begin(items)->id();
-    }
-
-    placement = Prepend;
-    return true;
+    return m_url;
 }
+
+Media::Type Media::type() const
+{
+    return m_type;
+}
+
+int Media::width() const
+{
+    return m_width;
+}
+
+int Media::height() const
+{
+    return m_height;
+}
+
+int Media::duration() const
+{
+    return m_duration;
+}
+

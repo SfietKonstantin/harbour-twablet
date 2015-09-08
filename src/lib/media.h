@@ -29,50 +29,39 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "mentionstimelinequeryhandler.h"
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonArray>
+#ifndef MEDIA_H
+#define MEDIA_H
+
+#include <QtCore/QString>
 #include <QtCore/QJsonObject>
-#include "tweet.h"
+#include "globals.h"
 
-MentionsTimelineQueryHandler::MentionsTimelineQueryHandler()
+class Media
 {
-}
+public:
+    enum Type
+    {
+        Invalid,
+        Photo,
+        Video,
+        Gif
+    };
+    explicit Media() = default;
+    explicit Media(const QJsonObject &json);
+    DEFAULT_COPY_DEFAULT_MOVE(Media);
+    QString id() const;
+    QString url() const;
+    Type type() const;
+    int width() const;
+    int height() const;
+    int duration() const;
+private:
+    QString m_id {};
+    QString m_url {};
+    Type m_type {Invalid};
+    int m_width {-1};
+    int m_height {-1};
+    int m_duration {-1};
+};
 
-void MentionsTimelineQueryHandler::createRequest(QString &path, std::map<QString, QString> &parameters) const
-{
-    path = QLatin1String("statuses/mentions_timeline.json");
-    parameters.insert({QLatin1String("count"), QString::number(200)});
-    parameters.insert({QLatin1String("trim_user"), QLatin1String("false")});
-    parameters.insert({QLatin1String("include_entities"), QLatin1String("true")});
-    if (!m_sinceId.isEmpty()) {
-        parameters.insert({QLatin1String("since_id"), m_sinceId});
-    }
-}
-
-bool MentionsTimelineQueryHandler::treatReply(const QByteArray &data, std::vector<Tweet> &items,
-                                                     QString &errorMessage, Placement &placement)
-{
-    QJsonParseError error {-1, QJsonParseError::NoError};
-    QJsonDocument document {QJsonDocument::fromJson(data, &error)};
-    if (error.error != QJsonParseError::NoError) {
-        errorMessage = error.errorString();
-        placement = Discard;
-        return false;
-    }
-
-    QJsonArray tweets (document.array());
-    items.reserve(tweets.size());
-    for (const QJsonValue &tweet : tweets) {
-        if (tweet.isObject()) {
-            items.emplace_back(tweet.toObject());
-        }
-    }
-
-    if (!items.empty()) {
-        m_sinceId = std::begin(items)->id();
-    }
-
-    placement = Prepend;
-    return true;
-}
+#endif // MEDIA_H

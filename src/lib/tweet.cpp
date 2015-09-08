@@ -30,7 +30,9 @@
  */
 
 #include "tweet.h"
-#include <QtCore/QDebug>
+#include <set>
+#include <QtCore/QLocale>
+#include <QtCore/QJsonArray>
 
 Tweet::Tweet(const QJsonObject &json)
 {
@@ -57,6 +59,17 @@ Tweet::Tweet(const QJsonObject &json)
     QLocale locale (QLocale::English, QLocale::UnitedStates);
     m_timestamp = locale.toDateTime(createdAtString, QLatin1String("ddd MMM dd HH:mm:ss +0000 yyyy"));
     m_user = std::move(User(tweet.value(QLatin1String("user")).toObject()));
+
+    QJsonObject entities {tweet.value(QLatin1String("entities")).toObject()};
+
+    QJsonArray media (entities.value(QLatin1String("media")).toArray());
+    for (const QJsonValue &medium : media) {
+        m_media.emplace_back(medium.toObject());
+    }
+    QJsonArray extendedEntities (entities.value(QLatin1String("extended_entities")).toArray());
+    for (const QJsonValue &medium : extendedEntities) {
+        m_media.emplace_back(medium.toObject());
+    }
 }
 
 bool Tweet::isValid() const
@@ -117,5 +130,10 @@ QString Tweet::inReplyTo() const
 QString Tweet::source() const
 {
     return m_source;
+}
+
+std::vector<Media> Tweet::media() const
+{
+    return m_media;
 }
 

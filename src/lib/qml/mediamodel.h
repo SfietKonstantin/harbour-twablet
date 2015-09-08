@@ -29,50 +29,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "mentionstimelinequeryhandler.h"
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
-#include "tweet.h"
+#ifndef MEDIAMODEL_H
+#define MEDIAMODEL_H
 
-MentionsTimelineQueryHandler::MentionsTimelineQueryHandler()
+#include <QtCore/QAbstractListModel>
+#include "qobjectutils.h"
+#include "mediaobject.h"
+
+class MediaModel : public QAbstractListModel
 {
-}
+    Q_OBJECT
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
+public:
+    enum Roles
+    {
+        MediaRole = Qt::UserRole + 1
+    };
+    static MediaModel * create(const std::vector<Media> &media, QObject *parent = 0);
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role) const;
+    int count() const;
+signals:
+    void countChanged();
+private:
+    explicit MediaModel(const std::vector<Media> &media, QObject *parent = 0);
+    QHash<int, QByteArray> roleNames() const override;
+    std::vector<QObjectPtr<MediaObject>> m_data {};
+};
 
-void MentionsTimelineQueryHandler::createRequest(QString &path, std::map<QString, QString> &parameters) const
-{
-    path = QLatin1String("statuses/mentions_timeline.json");
-    parameters.insert({QLatin1String("count"), QString::number(200)});
-    parameters.insert({QLatin1String("trim_user"), QLatin1String("false")});
-    parameters.insert({QLatin1String("include_entities"), QLatin1String("true")});
-    if (!m_sinceId.isEmpty()) {
-        parameters.insert({QLatin1String("since_id"), m_sinceId});
-    }
-}
-
-bool MentionsTimelineQueryHandler::treatReply(const QByteArray &data, std::vector<Tweet> &items,
-                                                     QString &errorMessage, Placement &placement)
-{
-    QJsonParseError error {-1, QJsonParseError::NoError};
-    QJsonDocument document {QJsonDocument::fromJson(data, &error)};
-    if (error.error != QJsonParseError::NoError) {
-        errorMessage = error.errorString();
-        placement = Discard;
-        return false;
-    }
-
-    QJsonArray tweets (document.array());
-    items.reserve(tweets.size());
-    for (const QJsonValue &tweet : tweets) {
-        if (tweet.isObject()) {
-            items.emplace_back(tweet.toObject());
-        }
-    }
-
-    if (!items.empty()) {
-        m_sinceId = std::begin(items)->id();
-    }
-
-    placement = Prepend;
-    return true;
-}
+#endif // MEDIAMODEL_H

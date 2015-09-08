@@ -35,6 +35,7 @@
 #include <QtCore/QObject>
 #include "tweet.h"
 #include "userobject.h"
+#include "mediamodel.h"
 #include "model.h"
 
 class TweetObject : public QObject
@@ -52,6 +53,7 @@ class TweetObject : public QObject
     Q_PROPERTY(QString inReplyTo READ inReplyTo CONSTANT)
     Q_PROPERTY(QString source READ source CONSTANT)
     Q_PROPERTY(QString sourceName READ sourceName CONSTANT)
+    Q_PROPERTY(MediaModel * media READ media CONSTANT)
 public:
     DISABLE_COPY_DISABLE_MOVE(TweetObject);
     static TweetObject * create(const Tweet &data, QObject *parent = 0);
@@ -67,6 +69,7 @@ public:
     QString inReplyTo() const;
     QString source() const;
     QString sourceName() const;
+    MediaModel * media() const;
 private:
     explicit TweetObject(const Tweet &data, QObject *parent = 0);
     void update(const Tweet &other);
@@ -74,6 +77,7 @@ private:
     UserObject *m_user {nullptr};
     UserObject *m_retweetingUser {nullptr};
     QString m_sourceName {};
+    QObjectPtr<MediaModel> m_media {nullptr};
     friend class Model<Tweet, TweetObject>;
 };
 

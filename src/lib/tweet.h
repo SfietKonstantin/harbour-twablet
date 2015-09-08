@@ -37,6 +37,7 @@
 #include <QtCore/QJsonObject>
 #include "globals.h"
 #include "user.h"
+#include "media.h"
 
 class Tweet
 {
@@ -56,7 +57,7 @@ public:
     bool isRetweeted() const;
     QString inReplyTo() const;
     QString source() const;
-    // Entities
+    std::vector<Media> media() const;
 private:
     QString m_id {};
     QString m_text {};
@@ -69,6 +70,7 @@ private:
     bool m_retweeted {};
     QString m_inReplyTo {};
     QString m_source {};
+    std::vector<Media> m_media {};
 };
 
 #endif // TWEET_H
