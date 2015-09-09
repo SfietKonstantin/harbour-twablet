@@ -5,6 +5,10 @@ CONFIG += static
 
 include(../config.pri)
 
+CONFIG(use_mock_server):{
+DEFINES += USE_MOCK_SERVER
+}
+
 QT = core network
 
 HEADERS += \

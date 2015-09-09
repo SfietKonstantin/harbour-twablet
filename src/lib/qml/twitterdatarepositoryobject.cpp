@@ -169,6 +169,7 @@ void TwitterDataRepositoryObject::addDefaultLayouts(int accountIndex, const QStr
                                                                              Query::Arguments())));
         m_tweetRepositories.emplace(*(std::end(m_layouts) - 1), TweetRepository());
     }
+    m_loadSaveManager.save(m_layouts);
 }
 
 void TwitterDataRepositoryObject::updateLayoutName(int index, const QString &name)

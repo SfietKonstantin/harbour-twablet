@@ -35,11 +35,17 @@
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 
+#ifndef USE_MOCK_SERVER
+static const char *TWITTER_API_URL = "https://api.twitter.com/1.1/";
+#else
+static const char *TWITTER_API_URL = "http://localhost:8000/";
+#endif
+
 QNetworkRequest TwitterQueryUtil::createGetRequest(const QString &path,
                                                    const std::map<QString, QString> &parameters,
                                                    const Account &account)
 {
-    QString url {QLatin1String("https://api.twitter.com/1.1/") + path};
+    QString url {QLatin1String(TWITTER_API_URL) + path};
     std::vector<std::pair<QString, QString>> parametersVector (std::begin(parameters), std::end(parameters));
 
     QByteArray header {TwitterDataUtil::authorizationHeader(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, "GET", url.toLocal8Bit(),

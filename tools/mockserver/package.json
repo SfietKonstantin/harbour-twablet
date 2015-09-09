@@ -1,0 +1,11 @@
+{
+    "name": "mockserver",
+    "version": "0.0.0",
+    "description": "A mock server to help rendering timelines",
+    "author": "Lucien Xu",
+    "private": true,
+    "main": "app.js", 
+    "dependencies": {
+        "express": "~4.9.0"
+    }
+}  
