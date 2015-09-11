@@ -36,6 +36,7 @@
 #include "ilistener.h"
 #include "qobjectutils.h"
 #include "twitterdatarepositoryobjectrepository.h"
+#include <QtCore/QLoggingCategory>
 
 template<class T, class O>
 class Model: public IModel, public IListener<T>
@@ -89,7 +90,7 @@ public:
             emit layoutIndexChanged();
         }
     }
-    TwitterDataRepositoryObject *repository() const override
+    TwitterDataRepositoryObject * repository() const override
     {
         return m_repository;
     }
@@ -207,6 +208,7 @@ private:
     }
     void setStatusAndErrorMessage(Status status, const QString &errorMessage)
     {
+        qCDebug(QLoggingCategory("Model")) << "Current status" << status << errorMessage;
         if (m_status != status) {
             m_status = status;
             emit statusChanged();

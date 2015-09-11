@@ -50,10 +50,25 @@ SilicaListView {
         property int unread: 0
         property double refreshDelta
         property bool isInit
+        function setUnread(index) {
+            if (internal.unread > index && index !== -1) {
+                internal.unread = index
+            }
+        }
         onUnreadChanged: {
             Repository.updateLayoutUnread(container.layoutIndex, unread)
         }
     }
+
+    // Thanks tweetian :)
+    Timer {
+        id: refreshUnreadCountTimer
+        interval: 250
+        repeat: false
+        onTriggered: internal.setUnread(container.indexAt(0, container.contentY + 5))
+    }
+
+    onContentYChanged: refreshUnreadCountTimer.running = true
 
     Connections {
         // Workaround to prepend tweets
@@ -75,22 +90,7 @@ SilicaListView {
                 container.positionViewAtIndex(1 + insertedCount, ListView.Beginning)
                 container.contentY -= internal.refreshDelta
             }
-            // Search for the index of the first item in the view and update the unread info
-            var x = container.width / 2
-            for (var y = 0; y < container.height; ++y) {
-                var index = container.indexAt(x, y)
-                if (index !== -1) {
-                    internal.unread = index
-                    break
-                }
-            }
-        }
-    }
-
-    onContentYChanged: {
-        var index = container.indexAt(container.width / 2, 0)
-        if (index !== -1) {
-            internal.unread = Math.min(internal.unread, index)
+            internal.unread += insertedCount
         }
     }
 
@@ -104,11 +104,15 @@ SilicaListView {
         id: delegate
         width: container.width
         tweet: model.item
+
+        Component.onCompleted: {
+            internal.setUnread(model.index)
+        }
     }
 
     BusyIndicator {
         anchors.centerIn: parent
-        enabled: twitterModel.count === 0 && twitterModel.status === Model.Loading
+        running: twitterModel.count === 0 && twitterModel.status === Model.Loading
         size: BusyIndicatorSize.Large
     }
 
