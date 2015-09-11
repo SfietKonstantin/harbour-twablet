@@ -28,6 +28,8 @@ OTHER_FILES += \
     qml/pages/TweetDelegate.qml \
     qml/cover/CoverPage.qml \
     qml/pages/TwitterImage.qml \
+    qml/pages/StatusPlaceholder.qml \
+    qml/pages/StatusHeader.qml
 
 
 DATA += \

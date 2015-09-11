@@ -94,10 +94,26 @@ SilicaListView {
         }
     }
 
-    header: PageHeader {
-        id: pageHeader
-        title: container.title
-        height: Theme.itemSizeLarge
+    header: Column {
+        width: container.width
+        spacing: Theme.paddingMedium
+
+        PageHeader {
+            id: pageHeader
+            title: container.title
+            height: Theme.itemSizeLarge
+
+            BusyIndicator {
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
+                running: model.status === Model.Loading
+                size: BusyIndicatorSize.Small
+            }
+        }
+
+        StatusHeader {
+            model: twitterModel
+        }
     }
 
     delegate: TweetDelegate {
@@ -110,10 +126,8 @@ SilicaListView {
         }
     }
 
-    BusyIndicator {
-        anchors.centerIn: parent
-        running: twitterModel.count === 0 && twitterModel.status === Model.Loading
-        size: BusyIndicatorSize.Large
+    StatusPlaceholder {
+        model: twitterModel
     }
 
     VerticalScrollDecorator {}

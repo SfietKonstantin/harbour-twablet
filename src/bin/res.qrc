@@ -15,5 +15,7 @@
         <file>qml/pages/Toolbar.qml</file>
         <file>qml/pages/TweetDelegate.qml</file>
         <file>qml/pages/TwitterImage.qml</file>
+        <file>qml/pages/StatusPlaceholder.qml</file>
+        <file>qml/pages/StatusHeader.qml</file>
     </qresource>
 </RCC>
