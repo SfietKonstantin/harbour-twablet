@@ -112,6 +112,7 @@ Page {
                 anchors.left: parent.left; anchors.right: parent.right
                 anchors.top: parent.top; anchors.bottom: toolbar.top
                 onContentXChanged: {
+                    toolbar.lastTappedIndex = -1
                     toolbar.currentIndex = indexAt(view.contentX, view.height / 2)
                 }
 
@@ -121,10 +122,20 @@ Page {
                 model: layoutModel
                 snapMode: container.isLandscape ? ListView.NoSnap : ListView.SnapOneItem
                 delegate: ColumnLayout {
+                    id: delegate
                     width: view.columnWidth
                     height: view.height
                     layoutIndex: index
                     title: name
+
+                    Connections {
+                        target: toolbar
+                        onGoToTop: {
+                            if (delegate.layoutIndex == index) {
+                                delegate.scrollToTop()
+                            }
+                        }
+                    }
                 }
                 footer: Item {
                     visible: layoutModel.count > 0

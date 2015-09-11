@@ -36,6 +36,8 @@ import harbour.twablet 1.0
 Rectangle {
     id: container
     signal goToIndex(int index)
+    signal goToTop(int index)
+    property int lastTappedIndex: -1
     property alias currentIndex: view.currentIndex
     property int columnCount
     property ListView mainView
@@ -64,13 +66,22 @@ Rectangle {
                 if (container.columnCount >= 3) {
                     targetIndex = Math.max(model.index - 1, 0)
                 }
-                container.goToIndex(targetIndex)
+
+                if (container.lastTappedIndex == -1) {
+                    container.lastTappedIndex = model.index
+                } else {
+                    if (model.index === container.lastTappedIndex) {
+                        container.goToTop(container.lastTappedIndex)
+                    } else {
+                        container.lastTappedIndex = -1
+                    }
+                }
             }
 
             Rectangle {
                 anchors.fill: parent
                 visible: delegate.pressed
-                color: Theme.highlightColor
+                color: Theme.secondaryHighlightColor
             }
 
             Image {

@@ -39,6 +39,7 @@
 #include <QtGui/QGuiApplication>
 #include <QtQuick/QQuickView>
 #endif
+#include <QtQml/qqml.h>
 #include <QtQml/QQmlEngine>
 #include "qml/twitterdatarepositoryobject.h"
 #include "qml/twitterauthentification.h"
