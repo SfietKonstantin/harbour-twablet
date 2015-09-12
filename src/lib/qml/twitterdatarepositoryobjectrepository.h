@@ -81,7 +81,7 @@ public:
         if (repository == nullptr) {
             return false;
         }
-        return (layoutIndex >= 0 && layoutIndex < std::end(repository->layouts()) - std::begin(repository->layouts()));
+        return (layoutIndex >= 0 && layoutIndex < repository->layouts().size());
     }
     static TweetRepository & get(TwitterDataRepositoryObject &repository, int layoutIndex)
     {

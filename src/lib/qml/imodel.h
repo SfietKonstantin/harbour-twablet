@@ -56,6 +56,7 @@ public:
         Error
     };
     DISABLE_COPY_DISABLE_MOVE(IModel);
+    virtual ~IModel() {}
     virtual int count() const = 0;
     virtual Status status() const = 0;
     virtual QString errorMessage() const = 0;

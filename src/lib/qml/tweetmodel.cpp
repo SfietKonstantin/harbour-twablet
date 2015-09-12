@@ -36,6 +36,10 @@ TweetModel::TweetModel(QObject *parent) :
 {
 }
 
+TweetModel::~TweetModel()
+{
+}
+
 QVariant TweetModel::data(const QModelIndex &index, int role) const
 {
     int row = index.row();

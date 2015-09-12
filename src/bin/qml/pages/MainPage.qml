@@ -149,6 +149,9 @@ Page {
                     }
                 }
 
+                add: Transition { AddAnimation {} }
+                remove: Transition { RemoveAnimation {} }
+
                 NumberAnimation {
                     id: animation
                     target: view

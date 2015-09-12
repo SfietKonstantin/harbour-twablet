@@ -65,6 +65,9 @@ public slots:
     void removeLayout(int index);
     void refresh();
 private:
+    void insertRepository(const Layout &layout);
+    void insertRepository();
+    void removeLayoutFromRepositories(int index);
     class LayoutComparator
     {
     public:
@@ -74,7 +77,12 @@ private:
     AccountRepository m_accounts {};
     LayoutRepository m_layouts {};
     TweetCentralRepository m_tweetsCentralRepository {};
-    std::map<Layout, TweetRepository, LayoutComparator> m_tweetRepositories {};
+    struct RefCountedTweetRepository
+    {
+        TweetRepository repository {};
+        std::set<const Layout *> references {};
+    };
+    std::map<Layout, RefCountedTweetRepository, LayoutComparator> m_tweetRepositories {};
 };
 
 #endif // TWITTERDATAREPOSITORYOBJECT_H

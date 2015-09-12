@@ -53,6 +53,14 @@ public:
     {
         return std::end(m_data);
     }
+    bool empty() const
+    {
+        return m_data.empty();
+    }
+    int size() const
+    {
+        return m_data.size();
+    }
     void append(T &&data)
     {
         m_data.emplace_back(data);
@@ -128,7 +136,6 @@ public:
     std::deque<T> m_data {};
 private:
     std::set<IListener<T> *> m_listeners {};
-    QString m_errorString {};
 };
 
 #endif // REPOSITORY_H

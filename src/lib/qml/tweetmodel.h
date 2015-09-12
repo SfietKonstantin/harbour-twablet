@@ -43,6 +43,7 @@ public:
         ItemRole
     };
     explicit TweetModel(QObject *parent = 0);
+    ~TweetModel();
     QVariant data(const QModelIndex &index, int role) const override;
 private:
     QHash<int, QByteArray> roleNames() const override;

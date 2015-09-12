@@ -44,8 +44,8 @@ class Model: public IModel, public IListener<T>
 public:
     ~Model()
     {
-        if (TwitterDataRepositoryObjectRepository<T>::isValid(m_repository, m_layoutIndex)) {
-            TwitterDataRepositoryObjectRepository<T>::get(*m_repository, m_layoutIndex).removeListener(*this);
+        if (m_internalRepository != nullptr) {
+            m_internalRepository->removeListener(*this);
         }
     }
     void classBegin() override
@@ -79,12 +79,15 @@ public:
     void setLayoutIndex(int modelIndex) override
     {
         if (m_layoutIndex != modelIndex) {
-            if (TwitterDataRepositoryObjectRepository<T>::isValid(m_repository, m_layoutIndex)) {
-                TwitterDataRepositoryObjectRepository<T>::get(*m_repository, m_layoutIndex).removeListener(*this);
+            if (m_internalRepository != nullptr) {
+                m_internalRepository->removeListener(*this);
             }
             m_layoutIndex = modelIndex;
             if (TwitterDataRepositoryObjectRepository<T>::isValid(m_repository, m_layoutIndex)) {
-                TwitterDataRepositoryObjectRepository<T>::get(*m_repository, m_layoutIndex).addListener(*this);
+                m_internalRepository = &TwitterDataRepositoryObjectRepository<T>::get(*m_repository, m_layoutIndex);
+                m_internalRepository->addListener(*this);
+            } else {
+                m_internalRepository = nullptr;
             }
             refreshData();
             emit layoutIndexChanged();
@@ -97,12 +100,15 @@ public:
     void setRepository(TwitterDataRepositoryObject *repository) override
     {
         if (m_repository != repository) {
-            if (TwitterDataRepositoryObjectRepository<T>::isValid(m_repository, m_layoutIndex)) {
-                TwitterDataRepositoryObjectRepository<T>::get(*m_repository, m_layoutIndex).removeListener(*this);
+            if (m_internalRepository != nullptr) {
+                m_internalRepository->removeListener(*this);
             }
             m_repository = repository;
             if (TwitterDataRepositoryObjectRepository<T>::isValid(m_repository, m_layoutIndex)) {
-                TwitterDataRepositoryObjectRepository<T>::get(*m_repository, m_layoutIndex).addListener(*this);
+                m_internalRepository = &TwitterDataRepositoryObjectRepository<T>::get(*m_repository, m_layoutIndex);
+                m_internalRepository->addListener(*this);
+            } else {
+                m_internalRepository = nullptr;
             }
             refreshData();
             emit repositoryChanged();
@@ -223,6 +229,7 @@ private:
     QString m_errorMessage {};
     int m_layoutIndex {-1};
     TwitterDataRepositoryObject *m_repository {nullptr};
+    Repository<T> *m_internalRepository {nullptr};
 };
 
 #endif // MODEL_H

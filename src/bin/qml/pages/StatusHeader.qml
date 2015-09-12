@@ -38,9 +38,10 @@ Item {
     visible: model.count > 0 && model.status === Model.Error
     property QtObject model
     anchors.left: parent.left; anchors.right: parent.right
-    height: childrenRect.height
+    height: Math.max(label.height, refreshButton.height)
 
     Label {
+        id: label
         anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
         anchors.right: refreshButton.left; anchors.rightMargin: Theme.paddingMedium
         font.pixelSize: Theme.fontSizeSmall

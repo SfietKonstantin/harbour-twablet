@@ -96,18 +96,41 @@ SilicaListView {
 
     header: Column {
         width: container.width
-        spacing: Theme.paddingMedium
 
-        PageHeader {
-            id: pageHeader
-            title: container.title
-            height: Theme.itemSizeLarge
+        Item {
+            anchors.left: parent.left; anchors.right: parent.right
+            height: header.height + Theme.paddingMedium
 
-            BusyIndicator {
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
-                running: model.status === Model.Loading
-                size: BusyIndicatorSize.Small
+            ListItem {
+                id: header
+                anchors.top: parent.top
+                anchors.left: parent.left; anchors.right: parent.right
+                contentHeight: pageHeader.height
+                onClicked: showMenu()
+                menu: ContextMenu {
+                    MenuItem {
+                        text: qsTr("Remove column")
+                        onClicked: header.remorseAction(qsTr("Removing column"), function() {
+                            Repository.removeLayout(container.layoutIndex)
+                        })
+                    }
+                }
+
+                PageHeader {
+                    id: pageHeader
+                    title: container.title
+                    height: Theme.itemSizeLarge
+                    _titleItem.color: header.pressed ? Theme.highlightColor: Theme.primaryColor
+
+                }
+
+                BusyIndicator {
+                    id: headerIndicator
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
+                    running: model.status === Model.Loading
+                    size: BusyIndicatorSize.Small
+                }
             }
         }
 
@@ -115,6 +138,8 @@ SilicaListView {
             model: twitterModel
         }
     }
+
+    add: Transition { AddAnimation {} }
 
     delegate: TweetDelegate {
         id: delegate
