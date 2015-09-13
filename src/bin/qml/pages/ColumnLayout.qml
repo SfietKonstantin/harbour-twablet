@@ -103,71 +103,66 @@ SilicaListView {
     header: Column {
         width: container.width
 
-        Item {
+        ListItem {
+            id: header
+            anchors.top: parent.top
             anchors.left: parent.left; anchors.right: parent.right
-            height: header.height + Theme.paddingMedium
+            contentHeight: pageHeader.height
+            onClicked: header.state = "visible"
 
-            ListItem {
-                id: header
-                anchors.top: parent.top
-                anchors.left: parent.left; anchors.right: parent.right
-                contentHeight: pageHeader.height
-                onClicked: header.state = "visible"
+            PageHeader {
+                id: pageHeader
+                title: container.title
+                height: Theme.itemSizeLarge
+                _titleItem.color: header.pressed ? Theme.highlightColor: Theme.primaryColor
 
-                PageHeader {
-                    id: pageHeader
-                    title: container.title
-                    height: Theme.itemSizeLarge
-                    _titleItem.color: header.pressed ? Theme.highlightColor: Theme.primaryColor
-
-                }
-
-                BusyIndicator {
-                    id: headerIndicator
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
-                    running: model.status === Model.Loading
-                    size: BusyIndicatorSize.Small
-                }
-
-                IconButton {
-                    id: headerRemove
-                    anchors.left: headerIndicator.right; anchors.leftMargin: Theme.paddingMedium
-                    anchors.verticalCenter: parent.verticalCenter
-                    icon.source: "image://theme/icon-m-remove"
-                    opacity: 0
-                    onClicked: {
-                        headerTimer.stop()
-                        header.state = ""
-                        header.remorseAction(qsTr("Removing column"), function() {
-                            Repository.removeLayout(container.layoutIndex)
-                        })
-                    }
-
-                    Behavior on opacity { NumberAnimation { duration: 200 } }
-                }
-
-                Timer {
-                    id: headerTimer
-                    interval: 5000
-                    repeat: false
-                    onTriggered: header.state = ""
-                }
-
-                states: [
-                    State {
-                        name: "visible"
-                        PropertyChanges {
-                            target: headerRemove
-                            opacity: 1
-                        }
-                        PropertyChanges {
-                            target: headerTimer
-                            running: true
-                        }
-                    }
-                ]
             }
+
+            BusyIndicator {
+                id: headerIndicator
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
+                running: model.status === Model.Loading
+                size: BusyIndicatorSize.Small
+            }
+
+            IconButton {
+                id: headerRemove
+                anchors.left: headerIndicator.right; anchors.leftMargin: Theme.paddingMedium
+                anchors.verticalCenter: parent.verticalCenter
+                icon.source: "image://theme/icon-m-remove"
+                opacity: 0
+                onClicked: {
+                    headerTimer.stop()
+                    header.state = ""
+                    header.remorseAction(qsTr("Removing column"), function() {
+                        Repository.removeLayout(container.layoutIndex)
+                    })
+                }
+
+                Behavior on opacity { NumberAnimation { duration: 200 } }
+            }
+
+            Timer {
+                id: headerTimer
+                interval: 5000
+                repeat: false
+                onTriggered: header.state = ""
+            }
+
+            states: [
+                State {
+                    name: "visible"
+                    PropertyChanges {
+                        target: headerRemove
+                        opacity: 1
+                    }
+                    PropertyChanges {
+                        target: headerTimer
+                        running: true
+                    }
+                }
+            ]
         }
 
         StatusHeader {
