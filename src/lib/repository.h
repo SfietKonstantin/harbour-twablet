@@ -45,6 +45,12 @@ public:
     using List = std::deque<T>;
     explicit Repository() {}
     DISABLE_COPY_DEFAULT_MOVE(Repository);
+    ~Repository()
+    {
+        for (IListener<T> *listener : m_listeners) {
+            removeListener(*listener);
+        }
+    }
     typename List::const_iterator begin() const
     {
         return std::begin(m_data);

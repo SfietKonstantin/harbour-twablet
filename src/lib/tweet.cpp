@@ -39,28 +39,29 @@ Tweet::Tweet(const QJsonObject &json)
     // Use the retweeted status when possible
     QJsonObject tweet {json};
     QJsonObject retweetedTweet {json.value(QLatin1String("retweeted_status")).toObject()};
+    QJsonObject displayedTweet {tweet};
     if (!retweetedTweet.isEmpty()) {
-        tweet = retweetedTweet;
+        displayedTweet = retweetedTweet;
 
         // Adding the retweeting user when retweeting
         m_retweetingUser = std::move(User(json.value(QLatin1String("user")).toObject()));
     }
 
     m_id = tweet.value(QLatin1String("id_str")).toString();
-    m_text = tweet.value(QLatin1String("text")).toString();
-    m_favoriteCount = tweet.value(QLatin1String("favorite_count")).toInt();
-    m_favorited = tweet.value(QLatin1String("favorited")).toBool();
-    m_retweetCount = tweet.value(QLatin1String("retweet_count")).toInt();
-    m_retweeted = tweet.value(QLatin1String("retweeted")).toBool();
-    m_inReplyTo = tweet.value(QLatin1String("in_reply_to_status_id")).toString();
+    m_text = displayedTweet.value(QLatin1String("text")).toString();
+    m_favoriteCount = displayedTweet.value(QLatin1String("favorite_count")).toInt();
+    m_favorited = displayedTweet.value(QLatin1String("favorited")).toBool();
+    m_retweetCount = displayedTweet.value(QLatin1String("retweet_count")).toInt();
+    m_retweeted = displayedTweet.value(QLatin1String("retweeted")).toBool();
+    m_inReplyTo = displayedTweet.value(QLatin1String("in_reply_to_status_id")).toString();
     m_source = tweet.value(QLatin1String("source")).toString();
 
-    QString createdAtString = tweet.value(QLatin1String("created_at")).toString();
+    QString createdAtString = displayedTweet.value(QLatin1String("created_at")).toString();
     QLocale locale (QLocale::English, QLocale::UnitedStates);
     m_timestamp = locale.toDateTime(createdAtString, QLatin1String("ddd MMM dd HH:mm:ss +0000 yyyy"));
-    m_user = std::move(User(tweet.value(QLatin1String("user")).toObject()));
+    m_user = std::move(User(displayedTweet.value(QLatin1String("user")).toObject()));
 
-    QJsonObject entities {tweet.value(QLatin1String("entities")).toObject()};
+    QJsonObject entities {displayedTweet.value(QLatin1String("entities")).toObject()};
 
     QJsonArray media (entities.value(QLatin1String("media")).toArray());
     for (const QJsonValue &medium : media) {

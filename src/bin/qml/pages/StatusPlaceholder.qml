@@ -45,11 +45,21 @@ Item {
         size: BusyIndicatorSize.Large
     }
 
-    ViewPlaceholder {
-        id: placeholder
-        flickable: container.parent
+    Text {
+        anchors.centerIn: parent
+        width: parent.width
         enabled: model.status === Model.Error
         text: model.errorMessage
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.Wrap
+        font {
+            pixelSize: Theme.fontSizeExtraLarge
+            family: Theme.fontFamilyHeading
+        }
+        color: Theme.highlightColor
+        opacity: enabled ? 0.6 : 0.
+
+        Behavior on opacity { FadeAnimation { duration: 300 } }
     }
 
     Button {
