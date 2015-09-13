@@ -45,10 +45,24 @@ QNetworkRequest TwitterQueryUtil::createGetRequest(const QString &path,
                                                    const std::map<QString, QString> &parameters,
                                                    const Account &account)
 {
+    return createRequest("GET", path, parameters, account);
+}
+
+QNetworkRequest TwitterQueryUtil::createPostRequest(const QString &path,
+                                                    const std::map<QString, QString> &parameters,
+                                                    const Account &account)
+{
+    return createRequest("POST", path, parameters, account);
+}
+
+QNetworkRequest TwitterQueryUtil::createRequest(const QByteArray &type, const QString &path,
+                                                const std::map<QString, QString> &parameters,
+                                                const Account &account)
+{
     QString url {QLatin1String(TWITTER_API_URL) + path};
     std::vector<std::pair<QString, QString>> parametersVector (std::begin(parameters), std::end(parameters));
 
-    QByteArray header {TwitterDataUtil::authorizationHeader(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, "GET", url.toLocal8Bit(),
+    QByteArray header {TwitterDataUtil::authorizationHeader(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, type, url.toLocal8Bit(),
                                                             parametersVector, account.token(), account.tokenSecret())};
     QUrl urlObject {url};
     QUrlQuery query {};

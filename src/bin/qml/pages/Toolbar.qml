@@ -49,6 +49,7 @@ Rectangle {
         GradientStop { position: 1; color: "transparent" }
     }
 
+
     SilicaListView {
         id: view
         property int capacity: Math.floor(view.width / Theme.itemSizeMedium)
@@ -57,7 +58,7 @@ Rectangle {
         model: LayoutModel { id: layoutModel; repository: Repository }
         orientation: Qt.Horizontal
 
-        delegate: MouseArea {
+        delegate: ToolbarButton {
             id: delegate
             width: view.cellWidth
             height: view.height
@@ -67,6 +68,7 @@ Rectangle {
                     targetIndex = Math.max(model.index - 1, 0)
                 }
 
+                container.goToIndex(targetIndex)
                 if (container.lastTappedIndex == -1) {
                     container.lastTappedIndex = model.index
                 } else {
@@ -77,28 +79,15 @@ Rectangle {
                     }
                 }
             }
-
-            Rectangle {
-                anchors.fill: parent
-                visible: delegate.pressed
-                color: Theme.secondaryHighlightColor
-            }
-
-            Image {
-                id: icon
-                anchors.centerIn: parent
-                source: {
-                    switch (model.queryType) {
-                    case Query.Home:
-                        Qt.resolvedUrl("../../data/home.svg")
-                        break
-                    case Query.Mentions:
-                        Qt.resolvedUrl("../../data/mail.svg")
-                        break
-                    }
+            source: {
+                switch (model.queryType) {
+                case Query.Home:
+                    Qt.resolvedUrl("../../data/home.svg")
+                    break
+                case Query.Mentions:
+                    Qt.resolvedUrl("../../data/mail.svg")
+                    break
                 }
-                width: Theme.iconSizeSmall * 1.4
-                height: Theme.iconSizeSmall * 1.4
             }
 
             Label {
@@ -110,17 +99,11 @@ Rectangle {
             }
         }
 
-        footer: Item {
+        footer: ToolbarButton {
             width: view.cellWidth
             height: view.height
-
-            Image {
-                anchors.centerIn: parent
-                source: "image://theme/icon-m-add"
-                width: Theme.iconSizeSmall * 1.4
-                height: Theme.iconSizeSmall * 1.4
-            }
-
+            source: "image://theme/icon-m-add"
+            onClicked: pageStack.push(Qt.resolvedUrl("AddColumnPage.qml"), {accountModel: accountModel})
         }
 
         Rectangle {

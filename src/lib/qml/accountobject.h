@@ -50,6 +50,7 @@ public:
     QString screenName() const;
     QByteArray token() const;
     QByteArray tokenSecret() const;
+    const Account & account() const;
 signals:
     void nameChanged();
 private:

@@ -34,6 +34,9 @@
 #include "mentionstimelinequeryhandler.h"
 #include "private/twitterqueryutil.h"
 #include <QtCore/QLoggingCategory>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
 #include <QtNetwork/QNetworkReply>
 
 TweetCentralRepository::TweetCentralRepository()
@@ -60,10 +63,26 @@ void TweetCentralRepository::query(const Account &account, const Query &query,
         QObjectPtr<QNetworkReply> replyPtr {reply};
 
         if (replyPtr->error() != QNetworkReply::NoError) {
-            qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Error happened during request for layout" << account.userId() << query.type();
-            qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Error code:" << reply->error();
-            qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Error message (Qt):" << reply->errorString();
-            qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Error message (Twitter):" << reply->readAll();
+            qCWarning(QLoggingCategory("tweet-central-repository")) << "Error happened during request for layout" << account.userId() << query.type();
+            qCWarning(QLoggingCategory("tweet-central-repository")) << "Error code:" << reply->error();
+            qCWarning(QLoggingCategory("tweet-central-repository")) << "Error message (Qt):" << reply->errorString();
+            const QByteArray &data {reply->readAll()};
+            qCWarning(QLoggingCategory("tweet-central-repository")) << "Error message (Twitter):" << data;
+
+            // Check if Twitter sent us an issue
+            QJsonDocument document {QJsonDocument::fromJson(data)};
+            if (document.isObject()) {
+                const QJsonObject &object {document.object()};
+                const QJsonArray &array {object.value(QLatin1String("errors")).toArray()};
+                if (array.count() == 1) {
+                    const QJsonObject &firstError {array.first().toObject()};
+                    if (firstError.value(QLatin1String("code")).toInt() == 88) {
+                        repository.error(tr("Twitter rate limit exceeded. Please try again later."));
+                        return;
+                    }
+                }
+            }
+
             repository.error(tr("Network error. Please try again later."));
             return;
         }
@@ -72,15 +91,15 @@ void TweetCentralRepository::query(const Account &account, const Query &query,
         QString errorMessage {};
         IQueryHandler::Placement placement {IQueryHandler::Discard};
         if (!handler->treatReply(reply->readAll(), items, errorMessage, placement)) {
-            qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Error happened during request for layout" << account.userId() << query.type();
-            qCWarning(QLoggingCategory("twitter-tweet-central-repository")) << "Parsing error: " << errorMessage;
+            qCWarning(QLoggingCategory("tweet-central-repository")) << "Error happened during request for layout" << account.userId() << query.type();
+            qCWarning(QLoggingCategory("tweet-central-repository")) << "Parsing error: " << errorMessage;
             repository.error(tr("Internal error"));
             return;
         } else {
             for (const Tweet &tweet : items) {
                 m_data.emplace(tweet.id(), tweet);
             }
-            qDebug(QLoggingCategory("twitter-tweet-central-repository")) << "New data available for layout" << account.userId() << query.type() << ". Count:" << items.size();
+            qDebug(QLoggingCategory("tweet-central-repository")) << "New data available for layout" << account.userId() << query.type() << ". Count:" << items.size();
             switch (placement) {
             case IQueryHandler::Append:
                 repository.append(items);

@@ -29,7 +29,8 @@ OTHER_FILES += \
     qml/cover/CoverPage.qml \
     qml/pages/TwitterImage.qml \
     qml/pages/StatusPlaceholder.qml \
-    qml/pages/StatusHeader.qml
+    qml/pages/StatusHeader.qml \
+    qml/pages/ToolbarButton.qml
 
 
 DATA += \

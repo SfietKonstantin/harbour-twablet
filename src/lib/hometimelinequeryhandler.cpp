@@ -51,7 +51,7 @@ void HomeTimelineQueryHandler::createRequest(QString &path, std::map<QString, QS
 }
 
 bool HomeTimelineQueryHandler::treatReply(const QByteArray &data, std::vector<Tweet> &items,
-                                             QString &errorMessage, Placement &placement)
+                                          QString &errorMessage, Placement &placement)
 {
     QJsonParseError error {-1, QJsonParseError::NoError};
     QJsonDocument document {QJsonDocument::fromJson(data, &error)};

@@ -66,6 +66,11 @@ QByteArray AccountObject::tokenSecret() const
     return m_data.tokenSecret();
 }
 
+const Account & AccountObject::account() const
+{
+    return m_data;
+}
+
 void AccountObject::update(const Account &other)
 {
     if (m_data.name() != other.name()) {

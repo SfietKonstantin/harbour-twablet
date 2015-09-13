@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,51 +29,56 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERAUTHENTIFICATION_H
-#define TWITTERAUTHENTIFICATION_H
+#ifndef TWITTERSTATUS_H
+#define TWITTERSTATUS_H
 
 #include <QtCore/QObject>
 #include "globals.h"
 
 class QNetworkAccessManager;
-class TwitterAuthentification : public QObject
+class AccountObject;
+class TwitterStatus : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString pin READ pin WRITE setPin NOTIFY pinChanged)
-    Q_PROPERTY(QString token READ token NOTIFY tokenChanged)
-    Q_PROPERTY(QString tokenSecret READ tokenSecret NOTIFY tokenSecretChanged)
-    Q_PROPERTY(QString userId READ userId NOTIFY userIdChanged)
-    Q_PROPERTY(QString screenName READ screenName NOTIFY nameChanged)
+    Q_PROPERTY(Status status READ status NOTIFY statusChanged)
+    Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
+    Q_PROPERTY(AccountObject * account READ account WRITE setAccount NOTIFY accountChanged)
+    Q_PROPERTY(QString statusUpdate READ statusUpdate WRITE setStatusUpdate NOTIFY statusUpdateChanged)
+    Q_PROPERTY(QString inReplyTo READ inReplyTo WRITE setInReplyTo NOTIFY inReplyToChanged)
+    Q_ENUMS(Status)
 public:
-    explicit TwitterAuthentification(QObject *parent = 0);
-    DISABLE_COPY_DISABLE_MOVE(TwitterAuthentification);
-    QString pin() const;
-    void setPin(const QString &pin);
-    QString token() const;
-    QString tokenSecret() const;
-    QString userId() const;
-    QString screenName() const;
+    enum Status
+    {
+        Idle,
+        Loading,
+        Error
+    };
+    explicit TwitterStatus(QObject *parent = 0);
+    DISABLE_COPY_DISABLE_MOVE(TwitterStatus);
+    Status status() const;
+    QString errorMessage() const;
+    AccountObject * account() const;
+    void setAccount(AccountObject *account);
+    QString statusUpdate() const;
+    void setStatusUpdate(const QString &statusUpdate);
+    QString inReplyTo() const;
+    void setInReplyTo(const QString &inReplyTo);
 public slots:
-    void startRequest();
-    void continueRequest();
+    bool post();
 signals:
-    void error(const QString &errorMessage);
-    void pinChanged();
-    void tokenChanged();
-    void tokenSecretChanged();
-    void nameChanged();
-    void userIdChanged();
-    void sendAuthorize(const QUrl &url);
-    void done();
+    void statusChanged();
+    void errorMessageChanged();
+    void accountChanged();
+    void statusUpdateChanged();
+    void inReplyToChanged();
 private:
-    void setData(QString &&token, QString &&tokenSecret, QString &&userId, QString &&screenName);
+    void setStatusAndErrorMessage(Status status, const QString &errorMessage);
     QNetworkAccessManager *m_network {nullptr};
-    QByteArray m_tempToken {};
-    QByteArray m_tempTokenSecret {};
-    QString m_pin {};
-    QString m_token {};
-    QString m_tokenSecret {};
-    QString m_userId {};
-    QString m_screenName {};
+    Status m_status {Idle};
+    QString m_errorMessage {};
+    AccountObject *m_account {nullptr};
+    QString m_statusUpdate {};
+    QString m_inReplyTo {};
 };
-#endif // TWITTERAUTHENTIFICATION_H
+
+#endif // TWITTERSTATUS_H

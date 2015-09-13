@@ -50,6 +50,8 @@ SilicaListView {
         property int unread: 0
         property double refreshDelta
         property bool isInit
+        property double opacity: isLoading ? 0. : 1
+        property bool isLoading: twitterModel.count === 0 && twitterModel.status === Model.Loading
         function setUnread(index) {
             if (internal.unread > index && index !== -1) {
                 internal.unread = index
@@ -57,6 +59,10 @@ SilicaListView {
         }
         onUnreadChanged: {
             Repository.updateLayoutUnread(container.layoutIndex, unread)
+        }
+
+        Behavior on opacity {
+            NumberAnimation { duration: 200 }
         }
     }
 
@@ -106,15 +112,7 @@ SilicaListView {
                 anchors.top: parent.top
                 anchors.left: parent.left; anchors.right: parent.right
                 contentHeight: pageHeader.height
-                onClicked: showMenu()
-                menu: ContextMenu {
-                    MenuItem {
-                        text: qsTr("Remove column")
-                        onClicked: header.remorseAction(qsTr("Removing column"), function() {
-                            Repository.removeLayout(container.layoutIndex)
-                        })
-                    }
-                }
+                onClicked: header.state = "visible"
 
                 PageHeader {
                     id: pageHeader
@@ -131,6 +129,44 @@ SilicaListView {
                     running: model.status === Model.Loading
                     size: BusyIndicatorSize.Small
                 }
+
+                IconButton {
+                    id: headerRemove
+                    anchors.left: headerIndicator.right; anchors.leftMargin: Theme.paddingMedium
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon.source: "image://theme/icon-m-remove"
+                    opacity: 0
+                    onClicked: {
+                        headerTimer.stop()
+                        header.state = ""
+                        header.remorseAction(qsTr("Removing column"), function() {
+                            Repository.removeLayout(container.layoutIndex)
+                        })
+                    }
+
+                    Behavior on opacity { NumberAnimation { duration: 200 } }
+                }
+
+                Timer {
+                    id: headerTimer
+                    interval: 5000
+                    repeat: false
+                    onTriggered: header.state = ""
+                }
+
+                states: [
+                    State {
+                        name: "visible"
+                        PropertyChanges {
+                            target: headerRemove
+                            opacity: 1
+                        }
+                        PropertyChanges {
+                            target: headerTimer
+                            running: true
+                        }
+                    }
+                ]
             }
         }
 
@@ -138,8 +174,6 @@ SilicaListView {
             model: twitterModel
         }
     }
-
-    add: Transition { AddAnimation {} }
 
     delegate: TweetDelegate {
         id: delegate
@@ -149,6 +183,8 @@ SilicaListView {
         Component.onCompleted: {
             internal.setUnread(model.index)
         }
+
+        opacity: internal.opacity
     }
 
     StatusPlaceholder {

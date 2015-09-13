@@ -33,7 +33,9 @@
 #include "twitter-secrets.h"
 #include "private/twitterdatautil.h"
 #include "qobjectutils.h"
-#include <QLoggingCategory>
+#include <QtCore/QLoggingCategory>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
 
 static const char *TWITTER_API_REQUEST_TOKEN = "https://api.twitter.com/oauth/request_token";
 static const char *TWITTER_API_REQUEST_TOKEN_PARAM_KEY = "oauth_callback";
@@ -49,7 +51,7 @@ static const char *TWITTER_API_OAUTH_USER_ID_KEY = "user_id";
 static const char *TWITTER_API_OAUTH_SCREEN_NAME_KEY = "screen_name";
 
 TwitterAuthentification::TwitterAuthentification(QObject *parent)
-    : QObject(parent), m_networkAccessManager{new QNetworkAccessManager(this)}
+    : QObject(parent), m_network{new QNetworkAccessManager(this)}
 {
 }
 
@@ -97,7 +99,7 @@ void TwitterAuthentification::startRequest()
     request.setRawHeader("Authorization", header);
     request.setHeader(QNetworkRequest::ContentTypeHeader, QByteArray("application/x-www-form-urlencoded"));
 
-    QNetworkReply *reply {m_networkAccessManager->post(request, QByteArray())};
+    QNetworkReply *reply {m_network->post(request, QByteArray())};
     connect(reply, &QNetworkReply::finished, [reply, this]() {
         QObjectPtr<QNetworkReply> replyPtr {reply};
         if (replyPtr->error() != QNetworkReply::NoError) {
@@ -146,7 +148,7 @@ void TwitterAuthentification::continueRequest()
     request.setRawHeader("Authorization", header);
     request.setHeader(QNetworkRequest::ContentTypeHeader, QByteArray("application/x-www-form-urlencoded"));
 
-    QNetworkReply *reply {m_networkAccessManager->post(request, QByteArray())};
+    QNetworkReply *reply {m_network->post(request, QByteArray())};
     connect(reply, &QNetworkReply::finished, [reply, this]() {
         QObjectPtr<QNetworkReply> replyPtr {reply};
         if (replyPtr->error() != QNetworkReply::NoError) {

@@ -29,26 +29,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERQUERYUTIL_H
-#define TWITTERQUERYUTIL_H
+import QtQuick 2.0
+import Sailfish.Silica 1.0
 
-#include <QtNetwork/QNetworkRequest>
-#include <map>
-#include "../account.h"
+MouseArea {
+    id: container
+    property alias source: icon.source
 
-class TwitterQueryUtil
-{
-public:
-    static QNetworkRequest createGetRequest(const QString &path,
-                                            const std::map<QString, QString> &parameters,
-                                            const Account &account);
-    static QNetworkRequest createPostRequest(const QString &path,
-                                             const std::map<QString, QString> &parameters,
-                                             const Account &account);
-private:
-    static QNetworkRequest createRequest(const QByteArray &type, const QString &path,
-                                         const std::map<QString, QString> &parameters,
-                                         const Account &account);
-};
+    Rectangle {
+        anchors.fill: parent
+        visible: container.pressed
+        color: Theme.secondaryHighlightColor
+    }
 
-#endif // TWITTERQUERYUTIL_H
+    Image {
+        id: icon
+        anchors.centerIn: parent
+        width: Theme.iconSizeSmall * 1.4
+        height: Theme.iconSizeSmall * 1.4
+    }
+}
+
