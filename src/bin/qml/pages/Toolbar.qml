@@ -52,7 +52,7 @@ Rectangle {
     SilicaListView {
         id: view
         property int capacity: Math.floor(view.width / Theme.itemSizeMedium)
-        property double cellWidth: view.width / capacity
+        property double cellWidth: view.width / capacity === Infinity ? 0 : view.width / capacity
         anchors.fill: parent
         model: LayoutModel { id: layoutModel; repository: Repository }
         orientation: Qt.Horizontal
@@ -110,11 +110,25 @@ Rectangle {
             }
         }
 
+        footer: Item {
+            width: view.cellWidth
+            height: view.height
+
+            Image {
+                anchors.centerIn: parent
+                source: "image://theme/icon-m-add"
+                width: Theme.iconSizeSmall * 1.4
+                height: Theme.iconSizeSmall * 1.4
+            }
+
+        }
+
         Rectangle {
             width: view.cellWidth * container.columnCount
             height: Theme.paddingMedium / 2
             x: (mainView.contentX - mainView.originX) / view.capacity * container.columnCount - (view.contentX - view.originX)
         }
     }
+
 }
 
