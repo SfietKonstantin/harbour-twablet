@@ -43,131 +43,132 @@ MouseArea {
         anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
         anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
         color: Theme.secondaryHighlightColor
-        height: childrenRect.height + Theme.paddingSmall
+        height: column.height + Theme.paddingSmall
+        opacity: 0.4
+    }
 
-        Column {
-            id: column
-            spacing: Theme.paddingMedium
+    Column {
+        id: column
+        spacing: Theme.paddingMedium
+        anchors.left: background.left
+        anchors.right: background.right
+
+        Item {
+            id: retweet
+            property bool isRetweet: tweet.retweetingUser !== null
+            anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
+            anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
+            visible: isRetweet
+            height: retweetLabel.height + Theme.paddingSmall
+
+            Image {
+                id: retweetIcon
+                anchors.left: parent.left
+                anchors.verticalCenter: retweetLabel.verticalCenter
+                source: "image://theme/icon-s-retweet"
+            }
+
+            Label {
+                id: retweetLabel
+                anchors.left: retweetIcon.right; anchors.leftMargin: Theme.paddingMedium
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.secondaryColor
+                text: retweet.isRetweet ? qsTr("Retweeted by %1").arg(tweet.retweetingUser.name) : ""
+                visible: retweet.isRetweet
+                wrapMode: Text.Wrap
+            }
+        }
+
+        Item {
+            id: header
             anchors.left: parent.left
             anchors.right: parent.right
+            height: Theme.itemSizeSmall
 
-            Item {
-                id: retweet
-                property bool isRetweet: tweet.retweetingUser !== null
-                anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
+            TwitterImage {
+                id: profilePicture
+                anchors.top: parent.top; anchors.left: parent.left
+                width: Theme.itemSizeSmall
+                height: Theme.itemSizeSmall
+                source: container.tweet.user.imageUrl
+            }
+
+            Column {
+                id: headerColumn
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: profilePicture.right; anchors.leftMargin: Theme.paddingMedium
                 anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
-                visible: isRetweet
-                height: retweetLabel.height + Theme.paddingSmall
 
-                Image {
-                    id: retweetIcon
-                    anchors.left: parent.left
-                    anchors.verticalCenter: retweetLabel.verticalCenter
-                    source: "image://theme/icon-s-retweet"
+                Label {
+                    color: Theme.primaryColor
+                    anchors.left: parent.left; anchors.right: parent.right
+                    text: container.tweet.user.name
                 }
 
                 Label {
-                    id: retweetLabel
-                    anchors.left: retweetIcon.right; anchors.leftMargin: Theme.paddingMedium
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    font.pixelSize: Theme.fontSizeSmall
+                    id: screenName
                     color: Theme.secondaryColor
-                    text: retweet.isRetweet ? qsTr("Retweeted by %1").arg(tweet.retweetingUser.name) : ""
-                    visible: retweet.isRetweet
-                    wrapMode: Text.Wrap
+                    font.pixelSize: Theme.fontSizeSmall
+                    anchors.left: parent.left; anchors.right: parent.right
+                    text: "@" + container.tweet.user.screenName
                 }
             }
+        }
 
-            Item {
-                id: header
-                anchors.left: parent.left
-                anchors.right: parent.right
-                height: Theme.itemSizeSmall
+        Label {
+            id: text
+            anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
+            anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
+            font.pixelSize: Theme.fontSizeSmall
+            wrapMode: Text.Wrap
+            color: Theme.highlightColor
+            text: container.tweet.text
+        }
 
-                TwitterImage {
-                    id: profilePicture
-                    anchors.top: parent.top; anchors.left: parent.left
-                    width: Theme.itemSizeSmall
-                    height: Theme.itemSizeSmall
-                    source: container.tweet.user.imageUrl
-                }
+        Item {
+            anchors.left: parent.left; anchors.right: parent.right
+            height: mediaGrid.height
 
-                Column {
-                    id: headerColumn
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: profilePicture.right; anchors.leftMargin: Theme.paddingMedium
-                    anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
-
-                    Label {
-                        color: Theme.highlightColor
-                        anchors.left: parent.left; anchors.right: parent.right
-                        text: container.tweet.user.name
-                    }
-
-                    Label {
-                        id: screenName
-                        color: Theme.secondaryHighlightColor
-                        font.pixelSize: Theme.fontSizeSmall
-                        anchors.left: parent.left; anchors.right: parent.right
-                        text: "@" + container.tweet.user.screenName
-                    }
-                }
-            }
-
-            Label {
-                id: text
-                anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
-                anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
-                font.pixelSize: Theme.fontSizeSmall
-                wrapMode: Text.Wrap
-                color: Theme.highlightColor
-                text: container.tweet.text
-            }
-
-            Item {
-                anchors.left: parent.left; anchors.right: parent.right
-                height: mediaGrid.height
-
-                Rectangle {
-                    anchors.fill: mediaGrid
-                    color: Theme.secondaryHighlightColor
-                }
-
-                Grid {
-                    id: mediaGrid
-                    visible: container.tweet.media.count > 0
-                    property real smallSize: mediaGrid.width * 2 / 3
-                    property real largeSize: mediaGrid.width * 2 / 3
-                    anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
-                    anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
-                    columns: 3
-                    rows: 2
-
-                    Repeater {
-                        model: container.tweet.media
-                        delegate: TwitterImage {
-                            property bool isFirst: index === 0
-                            property bool isSingle: index === 0 && container.tweet.media.count === 1
-                            property real mediaHeight: width / 3 * 2
-                            width: isSingle ? mediaGrid.width : (isFirst ? mediaGrid.largeSize : mediaGrid.smallSize)
-                            height: isSingle ? mediaHeight : (isFirst ? mediaGrid.largeSize : mediaGrid.smallSize)
-                            source: media.url
-                        }
-                    }
-                }
-            }
-
-
-
-            Label {
-                anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
-                anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
+            Rectangle {
+                anchors.fill: mediaGrid
                 color: Theme.secondaryHighlightColor
-                font.pixelSize: Theme.fontSizeSmall
-                wrapMode: Text.Wrap
-                text: container.tweet.sourceName + " | " + Format.formatDate(container.tweet.timestamp, Formatter.DurationElapsed)
             }
+
+            Grid {
+                id: mediaGrid
+                visible: container.tweet.media.count > 0
+                property real smallSize: mediaGrid.width * 2 / 3
+                property real largeSize: mediaGrid.width * 2 / 3
+                anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
+                anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
+                columns: 3
+                rows: 2
+
+                Repeater {
+                    model: container.tweet.media
+                    delegate: TwitterImage {
+                        property bool isFirst: index === 0
+                        property bool isSingle: index === 0 && container.tweet.media.count === 1
+                        property real mediaHeight: width / 3 * 2
+                        width: isSingle ? mediaGrid.width : (isFirst ? mediaGrid.largeSize : mediaGrid.smallSize)
+                        height: isSingle ? mediaHeight : (isFirst ? mediaGrid.largeSize : mediaGrid.smallSize)
+                        source: media.url
+                    }
+                }
+            }
+        }
+
+
+
+        Label {
+            anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
+            anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
+            color: Theme.secondaryHighlightColor
+            font.pixelSize: Theme.fontSizeSmall
+            wrapMode: Text.Wrap
+            text: container.tweet.sourceName + " | " + Format.formatDate(container.tweet.timestamp, Formatter.DurationElapsed)
         }
     }
 }

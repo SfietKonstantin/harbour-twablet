@@ -114,9 +114,10 @@ Rectangle {
         }
 
         Rectangle {
+            property double ratio: (Screen.sizeCategory === Screen.Small ? 1 : 2)
             width: view.cellWidth * container.columnCount
             height: Theme.paddingMedium / 2
-            x: (mainView.contentX - mainView.originX) / view.capacity * container.columnCount - (view.contentX - view.originX)
+            x: ((mainView.contentX - mainView.originX) / view.capacity * container.columnCount - (view.contentX - view.originX)) / ratio
         }
     }
 
@@ -180,7 +181,7 @@ Rectangle {
 
             Item {
                 id: postButtonBar
-                visible: postText.focus && postAccountsModel.count > 1
+                visible: false
                 anchors.left: parent.left; anchors.right: parent.right
                 height: Theme.fontSizeMedium + Theme.paddingSmall
 
@@ -203,13 +204,16 @@ Rectangle {
                     }
                 }
             }
-        }
 
-        Behavior on height {
-            NumberAnimation {
-                duration: 200
-                easing.type: Easing.OutQuad
-            }
+            states: [
+                State {
+                    name: "focused"; when: postText.focus && postAccountsModel.count > 1
+                    PropertyChanges {
+                        target: postButtonBar
+                        visible: true
+                    }
+                }
+            ]
         }
     }
 }
