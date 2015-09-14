@@ -49,7 +49,8 @@ HEADERS += \
     media.h \
     qml/mediaobject.h \
     qml/mediamodel.h \
-    qml/twitterstatus.h
+    qml/twitterstatus.h \
+    qml/accountselectionmodel.h
 
 SOURCES += \
     private/twitterdatautil.cpp \
@@ -79,4 +80,5 @@ SOURCES += \
     media.cpp \
     qml/mediaobject.cpp \
     qml/mediamodel.cpp \
-    qml/twitterstatus.cpp
+    qml/twitterstatus.cpp \
+    qml/accountselectionmodel.cpp

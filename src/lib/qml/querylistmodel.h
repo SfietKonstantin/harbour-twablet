@@ -50,16 +50,15 @@ public:
     explicit QueryListModel(QObject *parent = 0);
     void classBegin() override;
     void componentComplete() override;
-    int rowCount(const QModelIndex &index = QModelIndex()) const override;
-    QVariant data(const QModelIndex &index, int role) const override;
+    int rowCount(const QModelIndex &index = QModelIndex()) const override final;
+    QVariant data(const QModelIndex &index, int role) const override final;
     int count() const;
 public slots:
     int getType(int index);
 signals:
     void countChanged();
-protected:
-    QHash<int, QByteArray> roleNames() const override;
 private:
+    QHash<int, QByteArray> roleNames() const override final;
     struct Data
     {
         QString name;

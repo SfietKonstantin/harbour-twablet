@@ -36,19 +36,30 @@
 #include <map>
 #include "../account.h"
 
+class QNetworkAccessManager;
+class QNetworkReply;
 class TwitterQueryUtil
 {
 public:
+    static QNetworkReply * get(QNetworkAccessManager *network, const QString &path,
+                               const std::map<QString, QString> &parameters,
+                               const Account &account);
+    static QNetworkReply * post(QNetworkAccessManager *network, const QString &path,
+                                const std::map<QString, QString> &parameters,
+                                const std::map<QString, QString> &postData,
+                                const Account &account);
+private:
+    static QNetworkRequest createRequest(const QByteArray &type, const QString &path,
+                                         const std::map<QString, QString> &parameters,
+                                         const std::map<QString, QString> &postData,
+                                         const Account &account);
     static QNetworkRequest createGetRequest(const QString &path,
                                             const std::map<QString, QString> &parameters,
                                             const Account &account);
     static QNetworkRequest createPostRequest(const QString &path,
                                              const std::map<QString, QString> &parameters,
+                                             const std::map<QString, QString> &postData,
                                              const Account &account);
-private:
-    static QNetworkRequest createRequest(const QByteArray &type, const QString &path,
-                                         const std::map<QString, QString> &parameters,
-                                         const Account &account);
 };
 
 #endif // TWITTERQUERYUTIL_H

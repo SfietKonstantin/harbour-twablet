@@ -34,6 +34,7 @@
 #include "twitter-secrets.h"
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
+#include <QtNetwork/QNetworkAccessManager>
 
 #ifndef USE_MOCK_SERVER
 static const char *TWITTER_API_URL = "https://api.twitter.com/1.1/";
@@ -41,39 +42,65 @@ static const char *TWITTER_API_URL = "https://api.twitter.com/1.1/";
 static const char *TWITTER_API_URL = "http://localhost:8000/";
 #endif
 
-QNetworkRequest TwitterQueryUtil::createGetRequest(const QString &path,
-                                                   const std::map<QString, QString> &parameters,
-                                                   const Account &account)
+QNetworkReply * TwitterQueryUtil::get(QNetworkAccessManager *network, const QString &path,
+                                      const std::map<QString, QString> &parameters,
+                                      const Account &account)
 {
-    return createRequest("GET", path, parameters, account);
+    QNetworkRequest request {createGetRequest(path, parameters, account)};
+    return network->get(request);
 }
 
-QNetworkRequest TwitterQueryUtil::createPostRequest(const QString &path,
-                                                    const std::map<QString, QString> &parameters,
-                                                    const Account &account)
+QNetworkReply * TwitterQueryUtil::post(QNetworkAccessManager *network,
+                                       const QString &path,
+                                       const std::map<QString, QString> &parameters,
+                                       const std::map<QString, QString> &postData,
+                                       const Account &account)
 {
-    return createRequest("POST", path, parameters, account);
+    QNetworkRequest request {createPostRequest(path, parameters, postData, account)};
+    QUrlQuery postDataQuery {};
+    for (const std::pair<QString, QString> &parameter : postData) {
+        postDataQuery.addQueryItem(parameter.first, QString::fromLatin1(QUrl::toPercentEncoding(parameter.second)));
+    }
+    return network->post(request, postDataQuery.toString(QUrl::FullyEncoded).toLatin1());
 }
 
 QNetworkRequest TwitterQueryUtil::createRequest(const QByteArray &type, const QString &path,
                                                 const std::map<QString, QString> &parameters,
+                                                const std::map<QString, QString> &postData,
                                                 const Account &account)
 {
     QString url {QLatin1String(TWITTER_API_URL) + path};
-    std::vector<std::pair<QString, QString>> parametersVector (std::begin(parameters), std::end(parameters));
+    std::map<QString, QString> fullParameters (std::begin(parameters), std::end(parameters));
+    fullParameters.insert(std::begin(postData), std::end(postData));
+    std::vector<std::pair<QString, QString>> parametersVector (std::begin(fullParameters), std::end(fullParameters));
 
     QByteArray header {TwitterDataUtil::authorizationHeader(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, type, url.toLocal8Bit(),
                                                             parametersVector, account.token(), account.tokenSecret())};
     QUrl urlObject {url};
     QUrlQuery query {};
-    QList<QPair<QString, QString>> parametersQt {};
     for (const std::pair<QString, QString> &parameter : parameters) {
-        parametersQt.append(qMakePair(parameter.first, parameter.second));
+        query.addQueryItem(parameter.first, parameter.second);
     }
-    query.setQueryItems(parametersQt);
     urlObject.setQuery(query);
 
     QNetworkRequest request {urlObject};
     request.setRawHeader("Authorization", header);
+    return request;
+}
+
+QNetworkRequest TwitterQueryUtil::createGetRequest(const QString &path,
+                                                   const std::map<QString, QString> &parameters,
+                                                   const Account &account)
+{
+    return createRequest("GET", path, parameters, {}, account);
+}
+
+QNetworkRequest TwitterQueryUtil::createPostRequest(const QString &path,
+                                                    const std::map<QString, QString> &parameters,
+                                                    const std::map<QString, QString> &postData,
+                                                    const Account &account)
+{
+    QNetworkRequest request {createRequest("POST", path, parameters, postData, account)};
+    request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("application/x-www-form-urlencoded"));
     return request;
 }

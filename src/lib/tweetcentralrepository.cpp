@@ -56,7 +56,7 @@ void TweetCentralRepository::query(const Account &account, const Query &query,
     QString path {};
     std::map<QString, QString> parameters {};
     handler->createRequest(path, parameters);
-    QNetworkReply *reply = m_network->get(TwitterQueryUtil::createGetRequest(path, parameters, account));
+    QNetworkReply *reply {TwitterQueryUtil::get(m_network.get(), path, parameters, account)};
     repository.start();
 
     connect(reply, &QNetworkReply::finished, this, [this, account, query, handler, reply, &repository]() {

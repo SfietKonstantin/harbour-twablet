@@ -43,18 +43,25 @@ Rectangle {
     property ListView mainView
     anchors.left: parent.left; anchors.right: parent.right
     anchors.bottom: parent.bottom
-    height: layoutModel.count > 0 ? Theme.itemSizeSmall : 0
+    height: layoutModel.count > 0 ? internal.height : 0
     gradient: Gradient {
         GradientStop { position: 0; color: Theme.rgba(Theme.secondaryHighlightColor, 0.2) }
         GradientStop { position: 1; color: "transparent" }
     }
 
+    QtObject {
+        id: internal
+        property double viewHeight: (Screen.sizeCategory === Screen.Small ? Theme.itemSizeSmall : post.height)
+        property double height: (Screen.sizeCategory === Screen.Small ? Theme.itemSizeSmall + post.height : post.height)
+        property double width: (Screen.sizeCategory === Screen.Small ? container.width : container.width / 2)
+    }
 
     SilicaListView {
         id: view
         property int capacity: Math.floor(view.width / Theme.itemSizeMedium)
         property double cellWidth: view.width / capacity === Infinity ? 0 : view.width / capacity
-        anchors.fill: parent
+        width: internal.width
+        height: internal.viewHeight
         model: LayoutModel { id: layoutModel; repository: Repository }
         orientation: Qt.Horizontal
 
@@ -113,5 +120,97 @@ Rectangle {
         }
     }
 
+    Item {
+        id: post
+        width: internal.width
+        height: postColumn.height + 2 * Theme.paddingSmall
+        anchors.right: parent.right; anchors.bottom: parent.bottom
+
+        TwitterStatus {
+            id: status
+        }
+
+        Column {
+            id: postColumn
+            anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
+            anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
+            anchors.top: parent.top; anchors.topMargin: Theme.paddingSmall
+            spacing: Theme.paddingSmall
+
+            Item {
+                height: postText.height
+                anchors.left: parent.left; anchors.right: parent.right
+
+                TwitterStatus {
+                    id: twitterStatus
+                    account: postAccountSelectionModel.selection
+                    text: postText.text
+                    onStatusChanged: {
+                        if (twitterStatus.status === TwitterStatus.Idle) {
+                            postText.text = ""
+                            Repository.refresh()
+                        }
+                    }
+                }
+
+                TextArea {
+                    id: postText
+                    property int textLeft: 140 - postText.text.length
+                    anchors.left: parent.left
+                    anchors.right: postSend.left; anchors.rightMargin: Theme.paddingSmall
+                    placeholderText: qsTr("Tweet something")
+                    label: textLeft >= 0 ? qsTr("%n left", "", textLeft) : qsTr("Tweet too long")
+                }
+
+                Label {
+                    id: postSend
+                    anchors.bottom: parent.bottom; anchors.bottomMargin: Theme.fontSizeSmall + Theme.paddingLarge
+                    anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
+                    text: qsTr("Send")
+                    color: (postText.text.length > 0 && twitterStatus.status !== TwitterStatus.Loading) ? Theme.primaryColor : Theme.secondaryColor
+
+                    MouseArea {
+                        enabled: postText.text.length > 0 && twitterStatus.status !== TwitterStatus.Loading
+                        anchors.fill: parent
+                        onClicked: twitterStatus.post()
+                    }
+                }
+            }
+
+
+            Item {
+                id: postButtonBar
+                visible: postText.focus && postAccountsModel.count > 1
+                anchors.left: parent.left; anchors.right: parent.right
+                height: Theme.fontSizeMedium + Theme.paddingSmall
+
+                AccountSelectionModel {
+                    id: postAccountSelectionModel
+                    repository: Repository
+                    Component.onCompleted: {
+                        postAccountSelectionModel.index = 0
+                    }
+                }
+
+                Label {
+                    anchors.left: parent.left; anchors.leftMargin: Theme.paddingLarge
+                    anchors.bottom: parent.bottom; anchors.bottomMargin: Theme.paddingSmall
+                    // text: qsTr("Account: %1").arg(postAccountsModel.currentAccount.name)
+                    text: qsTr("Account: %1").arg(postAccountSelectionModel.selection.name)
+
+                    MouseArea {
+                        anchors.fill: parent
+                    }
+                }
+            }
+        }
+
+        Behavior on height {
+            NumberAnimation {
+                duration: 200
+                easing.type: Easing.OutQuad
+            }
+        }
+    }
 }
 

@@ -105,17 +105,15 @@ SilicaListView {
 
         ListItem {
             id: header
-            anchors.top: parent.top
             anchors.left: parent.left; anchors.right: parent.right
-            contentHeight: pageHeader.height
             onClicked: header.state = "visible"
+            height: pageHeader.height
 
             PageHeader {
                 id: pageHeader
                 title: container.title
                 height: Theme.itemSizeLarge
                 _titleItem.color: header.pressed ? Theme.highlightColor: Theme.primaryColor
-
             }
 
             BusyIndicator {

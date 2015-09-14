@@ -34,7 +34,6 @@
 #include "private/twitterdatautil.h"
 #include "qobjectutils.h"
 #include <QtCore/QLoggingCategory>
-#include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
 static const char *TWITTER_API_REQUEST_TOKEN = "https://api.twitter.com/oauth/request_token";
@@ -51,7 +50,7 @@ static const char *TWITTER_API_OAUTH_USER_ID_KEY = "user_id";
 static const char *TWITTER_API_OAUTH_SCREEN_NAME_KEY = "screen_name";
 
 TwitterAuthentification::TwitterAuthentification(QObject *parent)
-    : QObject(parent), m_network{new QNetworkAccessManager(this)}
+    : QObject(parent), m_network{new QNetworkAccessManager()}
 {
 }
 

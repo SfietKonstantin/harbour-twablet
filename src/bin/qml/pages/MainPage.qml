@@ -68,11 +68,6 @@ Page {
             }
 
             MenuItem {
-                text: qsTr("New tweet")
-                enabled: false
-            }
-
-            MenuItem {
                 text: qsTr("Accounts")
                 onClicked: pageStack.push(Qt.resolvedUrl("AccountsPage.qml"))
             }

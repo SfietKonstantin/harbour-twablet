@@ -34,11 +34,11 @@
 #include "accountobject.h"
 #include "private/twitterqueryutil.h"
 #include <QtCore/QLoggingCategory>
-#include <QtNetwork/QNetworkAccessManager>
+#include <QtCore/QUrlQuery>
 #include <QtNetwork/QNetworkReply>
 
 TwitterStatus::TwitterStatus(QObject *parent)
-    : QObject(parent), m_network{new QNetworkAccessManager(this)}
+    : QObject(parent), m_network{new QNetworkAccessManager()}
 {
 }
 
@@ -65,16 +65,16 @@ void TwitterStatus::setAccount(AccountObject *account)
     }
 }
 
-QString TwitterStatus::statusUpdate() const
+QString TwitterStatus::text() const
 {
-    return m_statusUpdate;
+    return m_text;
 }
 
-void TwitterStatus::setStatusUpdate(const QString &statusUpdate)
+void TwitterStatus::setText(const QString &statusUpdate)
 {
-    if (m_statusUpdate != statusUpdate) {
-        m_statusUpdate = statusUpdate;
-        emit statusUpdateChanged();
+    if (m_text != statusUpdate) {
+        m_text = statusUpdate;
+        emit textChanged();
     }
 }
 
@@ -93,17 +93,17 @@ void TwitterStatus::setInReplyTo(const QString &inReplyTo)
 
 bool TwitterStatus::post()
 {
-    if (m_account == nullptr || m_statusUpdate.isEmpty()) {
+    if (m_account == nullptr || m_text.isEmpty()) {
         return false;
     }
 
     QString path {QLatin1String("statuses/update.json")};
-    std::map<QString, QString> parameters {{QLatin1String("status"), m_statusUpdate}};
+    std::map<QString, QString> parameters {{QLatin1String("status"), m_text}};
     if (!m_inReplyTo.isEmpty()) {
         parameters.insert({QLatin1String("in_reply_to_status_id"), m_inReplyTo});
     }
 
-    QNetworkReply *reply = m_network->get(TwitterQueryUtil::createPostRequest(path, parameters, m_account->account()));
+    QNetworkReply *reply = TwitterQueryUtil::post(m_network.get(), path, {}, parameters, m_account->account());
     setStatusAndErrorMessage(Loading, QString());
 
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {

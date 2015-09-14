@@ -44,11 +44,12 @@
 #include "qml/twitterdatarepositoryobject.h"
 #include "qml/twitterauthentification.h"
 #include "qml/accountobject.h"
-#include "qml/accountmodel.h"
+#include "qml/accountselectionmodel.h"
 #include "qml/layoutmodel.h"
 #include "qml/queryobject.h"
 #include "qml/querylistmodel.h"
 #include "qml/tweetmodel.h"
+#include "qml/twitterstatus.h"
 
 int main(int argc, char *argv[])
 {
@@ -63,9 +64,11 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<MediaModel>("harbour.twablet", 1, 0, "MediaModel", QLatin1String("Uncreatable"));
     qmlRegisterType<TwitterAuthentification>("harbour.twablet", 1, 0, "TwitterAuthentification");
     qmlRegisterType<AccountModel>("harbour.twablet", 1, 0, "AccountModel");
+    qmlRegisterType<AccountSelectionModel>("harbour.twablet", 1, 0, "AccountSelectionModel");
     qmlRegisterType<LayoutModel>("harbour.twablet", 1, 0, "LayoutModel");
     qmlRegisterType<TweetModel>("harbour.twablet", 1, 0, "TweetModel");
     qmlRegisterType<QueryListModel>("harbour.twablet", 1, 0, "QueryListModel");
+    qmlRegisterType<TwitterStatus>("harbour.twablet", 1, 0, "TwitterStatus");
     qmlRegisterSingletonType<TwitterDataRepositoryObject>("harbour.twablet", 1, 0, "Repository",
                                                           [](QQmlEngine *e, QJSEngine *) -> QObject * {
         return new TwitterDataRepositoryObject(e);

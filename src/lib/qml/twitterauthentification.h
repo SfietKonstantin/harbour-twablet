@@ -33,9 +33,10 @@
 #define TWITTERAUTHENTIFICATION_H
 
 #include <QtCore/QObject>
+#include <QtNetwork/QNetworkAccessManager>
 #include "globals.h"
+#include "qobjectutils.h"
 
-class QNetworkAccessManager;
 class TwitterAuthentification : public QObject
 {
     Q_OBJECT
@@ -67,7 +68,7 @@ signals:
     void done();
 private:
     void setData(QString &&token, QString &&tokenSecret, QString &&userId, QString &&screenName);
-    QNetworkAccessManager *m_network {nullptr};
+    QObjectPtr<QNetworkAccessManager> m_network {nullptr};
     QByteArray m_tempToken {};
     QByteArray m_tempTokenSecret {};
     QString m_pin {};

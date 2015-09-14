@@ -29,24 +29,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEETMODEL_H
-#define TWEETMODEL_H
+#ifndef ACCOUNTSELECTIONMODEL_H
+#define ACCOUNTSELECTIONMODEL_H
 
-#include "tweetobject.h"
-#include "model.h"
+#include "accountmodel.h"
 
-class TweetModel : public Model<Tweet, TweetObject>
+class AccountSelectionModel : public AccountModel
 {
+    Q_OBJECT
+    Q_PROPERTY(int index READ index WRITE setIndex NOTIFY indexChanged)
+    Q_PROPERTY(AccountObject * selection READ selection NOTIFY selectionChanged)
 public:
-    enum Roles {
-        IdRole = Qt::UserRole + 1,
-        ItemRole
-    };
-    explicit TweetModel(QObject *parent = 0);
-    ~TweetModel();
-    QVariant data(const QModelIndex &index, int role) const override final;
+    explicit AccountSelectionModel(QObject *parent = 0);
+    int index() const;
+    void setIndex(int index);
+    AccountObject * selection() const;
+signals:
+    void indexChanged();
+    void selectionChanged();
 private:
-    QHash<int, QByteArray> roleNames() const override final;
+    void setSelection(AccountObject *selection);
+    int m_index {-1};
+    AccountObject * m_selection {nullptr};
 };
 
-#endif // TWEETMODEL_H
+#endif // ACCOUNTSELECTIONMODEL_H

@@ -33,9 +33,10 @@
 #define TWITTERSTATUS_H
 
 #include <QtCore/QObject>
+#include <QtNetwork/QNetworkAccessManager>
 #include "globals.h"
+#include "qobjectutils.h"
 
-class QNetworkAccessManager;
 class AccountObject;
 class TwitterStatus : public QObject
 {
@@ -43,7 +44,7 @@ class TwitterStatus : public QObject
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
     Q_PROPERTY(AccountObject * account READ account WRITE setAccount NOTIFY accountChanged)
-    Q_PROPERTY(QString statusUpdate READ statusUpdate WRITE setStatusUpdate NOTIFY statusUpdateChanged)
+    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
     Q_PROPERTY(QString inReplyTo READ inReplyTo WRITE setInReplyTo NOTIFY inReplyToChanged)
     Q_ENUMS(Status)
 public:
@@ -59,8 +60,8 @@ public:
     QString errorMessage() const;
     AccountObject * account() const;
     void setAccount(AccountObject *account);
-    QString statusUpdate() const;
-    void setStatusUpdate(const QString &statusUpdate);
+    QString text() const;
+    void setText(const QString &text);
     QString inReplyTo() const;
     void setInReplyTo(const QString &inReplyTo);
 public slots:
@@ -69,15 +70,15 @@ signals:
     void statusChanged();
     void errorMessageChanged();
     void accountChanged();
-    void statusUpdateChanged();
+    void textChanged();
     void inReplyToChanged();
 private:
     void setStatusAndErrorMessage(Status status, const QString &errorMessage);
-    QNetworkAccessManager *m_network {nullptr};
+    QObjectPtr<QNetworkAccessManager> m_network {nullptr};
     Status m_status {Idle};
     QString m_errorMessage {};
     AccountObject *m_account {nullptr};
-    QString m_statusUpdate {};
+    QString m_text {};
     QString m_inReplyTo {};
 };
 

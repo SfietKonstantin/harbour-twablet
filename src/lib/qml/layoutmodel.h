@@ -45,9 +45,9 @@ public:
         LayoutRole
     };
     explicit LayoutModel(QObject *parent = 0);
-    QVariant data(const QModelIndex &index, int role) const override;
+    QVariant data(const QModelIndex &index, int role) const override final;
 private:
-    QHash<int, QByteArray> roleNames() const override;
+    QHash<int, QByteArray> roleNames() const override final;
 };
 
 #endif // LAYOUTMODEL_H
