@@ -35,7 +35,7 @@
 #include "imodel.h"
 #include "ilistener.h"
 #include "qobjectutils.h"
-#include "twitterdatarepositoryobjectrepository.h"
+#include "datarepositoryobjectmap.h"
 #include <QtCore/QLoggingCategory>
 
 template<class T, class O>
@@ -83,8 +83,8 @@ public:
                 m_internalRepository->removeListener(*this);
             }
             m_layoutIndex = modelIndex;
-            if (TwitterDataRepositoryObjectRepository<T>::isValid(m_repository, m_layoutIndex)) {
-                m_internalRepository = &TwitterDataRepositoryObjectRepository<T>::get(*m_repository, m_layoutIndex);
+            if (DataRepositoryObjectMap<T>::isValid(m_repository, m_layoutIndex)) {
+                m_internalRepository = &DataRepositoryObjectMap<T>::get(*m_repository, m_layoutIndex);
                 m_internalRepository->addListener(*this);
             } else {
                 m_internalRepository = nullptr;
@@ -93,19 +93,19 @@ public:
             emit layoutIndexChanged();
         }
     }
-    TwitterDataRepositoryObject * repository() const override
+    DataRepositoryObject * repository() const override
     {
         return m_repository;
     }
-    void setRepository(TwitterDataRepositoryObject *repository) override
+    void setRepository(DataRepositoryObject *repository) override
     {
         if (m_repository != repository) {
             if (m_internalRepository != nullptr) {
                 m_internalRepository->removeListener(*this);
             }
             m_repository = repository;
-            if (TwitterDataRepositoryObjectRepository<T>::isValid(m_repository, m_layoutIndex)) {
-                m_internalRepository = &TwitterDataRepositoryObjectRepository<T>::get(*m_repository, m_layoutIndex);
+            if (DataRepositoryObjectMap<T>::isValid(m_repository, m_layoutIndex)) {
+                m_internalRepository = &DataRepositoryObjectMap<T>::get(*m_repository, m_layoutIndex);
                 m_internalRepository->addListener(*this);
             } else {
                 m_internalRepository = nullptr;
@@ -186,8 +186,8 @@ private:
     void refreshData()
     {
         std::deque<QObjectPtr<O>> newData;
-        if (TwitterDataRepositoryObjectRepository<T>::isValid(m_repository, m_layoutIndex)) {
-            for (const T &data : TwitterDataRepositoryObjectRepository<T>::get(*m_repository, m_layoutIndex)) {
+        if (m_internalRepository != nullptr) {
+            for (const T &data : *m_internalRepository) {
                 newData.emplace_back(O::create(data, this));
             }
         }
@@ -228,7 +228,7 @@ private:
     Status m_status {Idle};
     QString m_errorMessage {};
     int m_layoutIndex {-1};
-    TwitterDataRepositoryObject *m_repository {nullptr};
+    DataRepositoryObject *m_repository {nullptr};
     Repository<T> *m_internalRepository {nullptr};
 };
 

@@ -29,8 +29,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERDATAREPOSITORYOBJECT_H
-#define TWITTERDATAREPOSITORYOBJECT_H
+#ifndef DATAREPOSITORYOBJECT_H
+#define DATAREPOSITORYOBJECT_H
 
 #include <QtCore/QObject>
 #include "loadsavemanager.h"
@@ -38,12 +38,12 @@
 #include "layoutrepository.h"
 #include "tweetcentralrepository.h"
 
-class TwitterDataRepositoryObject : public QObject
+class DataRepositoryObject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool hasAccounts READ hasAccounts NOTIFY hasAccountsChanged)
 public:
-    explicit TwitterDataRepositoryObject(QObject *parent = 0);
+    explicit DataRepositoryObject(QObject *parent = 0);
     bool hasAccounts() const;
     AccountRepository & accounts();
     LayoutRepository & layouts();
@@ -85,4 +85,4 @@ private:
     std::map<Layout, RefCountedTweetRepository, LayoutComparator> m_tweetRepositories {};
 };
 
-#endif // TWITTERDATAREPOSITORYOBJECT_H
+#endif // DATAREPOSITORYOBJECT_H

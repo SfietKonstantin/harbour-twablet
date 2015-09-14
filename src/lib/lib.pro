@@ -39,8 +39,8 @@ HEADERS += \
     tweetrepository.h \
     qml/tweetobject.h \
     qml/tweetmodel.h \
-    qml/twitterdatarepositoryobject.h \
-    qml/twitterdatarepositoryobjectrepository.h \
+    qml/datarepositoryobject.h \
+    qml/datarepositoryobjectmap.h \
     iqueryhandler.h \
     hometimelinequeryhandler.h \
     mentionstimelinequeryhandler.h \
@@ -49,8 +49,9 @@ HEADERS += \
     media.h \
     qml/mediaobject.h \
     qml/mediamodel.h \
-    qml/twitterstatus.h \
-    qml/accountselectionmodel.h
+    qml/abstractqueryitem.h \
+    qml/tweetqueryitem.h \
+    qml/accountselectionmodel.h \
 
 SOURCES += \
     private/twitterdatautil.cpp \
@@ -72,7 +73,7 @@ SOURCES += \
     qml/tweetobject.cpp \
     qml/tweetmodel.cpp \
     tweetcentralrepository.cpp \
-    qml/twitterdatarepositoryobject.cpp \
+    qml/datarepositoryobject.cpp \
     hometimelinequeryhandler.cpp \
     mentionstimelinequeryhandler.cpp \
     user.cpp \
@@ -80,5 +81,6 @@ SOURCES += \
     media.cpp \
     qml/mediaobject.cpp \
     qml/mediamodel.cpp \
-    qml/twitterstatus.cpp \
-    qml/accountselectionmodel.cpp
+    qml/abstractqueryitem.cpp \
+    qml/tweetqueryitem.cpp \
+    qml/accountselectionmodel.cpp \

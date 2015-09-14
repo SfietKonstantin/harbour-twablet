@@ -37,6 +37,7 @@ MouseArea {
     id: container
     height: background.height
     property QtObject tweet
+    signal openUser(string id)
 
     Rectangle {
         id: background
@@ -81,11 +82,12 @@ MouseArea {
             }
         }
 
-        Item {
+        BackgroundItem {
             id: header
             anchors.left: parent.left
             anchors.right: parent.right
             height: Theme.itemSizeSmall
+            onClicked: container.openUser(container.tweet.user.id)
 
             TwitterImage {
                 id: profilePicture
@@ -102,14 +104,14 @@ MouseArea {
                 anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
 
                 Label {
-                    color: Theme.primaryColor
+                    color: header.down ? Theme.highlightColor : Theme.primaryColor
                     anchors.left: parent.left; anchors.right: parent.right
                     text: container.tweet.user.name
                 }
 
                 Label {
                     id: screenName
-                    color: Theme.secondaryColor
+                    color: header.down ? Theme.secondaryHighlightColor : Theme.secondaryColor
                     font.pixelSize: Theme.fontSizeSmall
                     anchors.left: parent.left; anchors.right: parent.right
                     text: "@" + container.tweet.user.screenName

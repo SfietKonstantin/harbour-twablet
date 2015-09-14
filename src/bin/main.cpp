@@ -41,7 +41,7 @@
 #endif
 #include <QtQml/qqml.h>
 #include <QtQml/QQmlEngine>
-#include "qml/twitterdatarepositoryobject.h"
+#include "qml/datarepositoryobject.h"
 #include "qml/twitterauthentification.h"
 #include "qml/accountobject.h"
 #include "qml/accountselectionmodel.h"
@@ -49,11 +49,11 @@
 #include "qml/queryobject.h"
 #include "qml/querylistmodel.h"
 #include "qml/tweetmodel.h"
-#include "qml/twitterstatus.h"
+#include "qml/tweetqueryitem.h"
 
 int main(int argc, char *argv[])
 {
-    qmlRegisterUncreatableType<TwitterDataRepositoryObject>("harbour.twablet", 1, 0, "TwitterDataRepository", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<DataRepositoryObject>("harbour.twablet", 1, 0, "DataRepository", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<IModel>("harbour.twablet", 1, 0, "Model", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<AccountObject>("harbour.twablet", 1, 0, "Account", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<LayoutObject>("harbour.twablet", 1, 0, "Layout", QLatin1String("Uncreatable"));
@@ -62,16 +62,17 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<UserObject>("harbour.twablet", 1, 0, "User", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<MediaObject>("harbour.twablet", 1, 0, "Media", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<MediaModel>("harbour.twablet", 1, 0, "MediaModel", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<AbstractQueryItem>("harbour.twablet", 1, 0, "QueryItem", QLatin1String("Uncreatable"));
     qmlRegisterType<TwitterAuthentification>("harbour.twablet", 1, 0, "TwitterAuthentification");
     qmlRegisterType<AccountModel>("harbour.twablet", 1, 0, "AccountModel");
     qmlRegisterType<AccountSelectionModel>("harbour.twablet", 1, 0, "AccountSelectionModel");
     qmlRegisterType<LayoutModel>("harbour.twablet", 1, 0, "LayoutModel");
     qmlRegisterType<TweetModel>("harbour.twablet", 1, 0, "TweetModel");
     qmlRegisterType<QueryListModel>("harbour.twablet", 1, 0, "QueryListModel");
-    qmlRegisterType<TwitterStatus>("harbour.twablet", 1, 0, "TwitterStatus");
-    qmlRegisterSingletonType<TwitterDataRepositoryObject>("harbour.twablet", 1, 0, "Repository",
+    qmlRegisterType<TweetQueryItem>("harbour.twablet", 1, 0, "TweetQueryItem");
+    qmlRegisterSingletonType<DataRepositoryObject>("harbour.twablet", 1, 0, "Repository",
                                                           [](QQmlEngine *e, QJSEngine *) -> QObject * {
-        return new TwitterDataRepositoryObject(e);
+        return new DataRepositoryObject(e);
     });
 
 #ifndef DESKTOP

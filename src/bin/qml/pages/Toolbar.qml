@@ -127,10 +127,6 @@ Rectangle {
         height: postColumn.height + 2 * Theme.paddingSmall
         anchors.right: parent.right; anchors.bottom: parent.bottom
 
-        TwitterStatus {
-            id: status
-        }
-
         Column {
             id: postColumn
             anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
@@ -142,12 +138,12 @@ Rectangle {
                 height: postText.height
                 anchors.left: parent.left; anchors.right: parent.right
 
-                TwitterStatus {
-                    id: twitterStatus
+                TweetQueryItem {
+                    id: tweetQueryItem
                     account: postAccountSelectionModel.selection
                     text: postText.text
                     onStatusChanged: {
-                        if (twitterStatus.status === TwitterStatus.Idle) {
+                        if (tweetQueryItem.status === QueryItem.Idle) {
                             postText.text = ""
                             Repository.refresh()
                         }
@@ -168,12 +164,12 @@ Rectangle {
                     anchors.bottom: parent.bottom; anchors.bottomMargin: Theme.fontSizeSmall + Theme.paddingLarge
                     anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
                     text: qsTr("Send")
-                    color: (postText.text.length > 0 && twitterStatus.status !== TwitterStatus.Loading) ? Theme.primaryColor : Theme.secondaryColor
+                    color: (postText.text.length > 0 && tweetQueryItem.status !== QueryItem.Loading) ? Theme.primaryColor : Theme.secondaryColor
 
                     MouseArea {
-                        enabled: postText.text.length > 0 && twitterStatus.status !== TwitterStatus.Loading
+                        enabled: postText.text.length > 0 && tweetQueryItem.status !== QueryItem.Loading
                         anchors.fill: parent
-                        onClicked: twitterStatus.post()
+                        onClicked: tweetQueryItem.load()
                     }
                 }
             }

@@ -102,7 +102,7 @@ Page {
                     animation.start()
                 }
 
-                property int columnCount: container.isLandscape ? (Screen.sizeCategory === Screen.Large ? 3 : 2) : 1
+                property int columnCount: container.isLandscape ? (Screen.sizeCategory === Screen.Large ? 3 : 2) : (Screen.sizeCategory === Screen.Large ? 2 : 1)
                 property real columnWidth: view.width / columnCount
                 anchors.left: parent.left; anchors.right: parent.right
                 anchors.top: parent.top; anchors.bottom: toolbar.top
@@ -122,12 +122,14 @@ Page {
                     height: view.height
                     layoutIndex: index
                     title: name
+                    onOpenUser: panel.openUser(id)
 
                     Connections {
                         target: toolbar
                         onGoToTop: {
                             if (delegate.layoutIndex == index) {
                                 delegate.scrollToTop()
+                                delegate.setUnread(0)
                             }
                         }
                     }
@@ -161,8 +163,11 @@ Page {
                 mainView: view
                 onGoToIndex: view.animateToIndex(index)
             }
+            RightPanel {
+                id: panel
+                anchors.top: parent.top; anchors.bottom: toolbar.top
+                width: container.isLandscape ? container.width / 3 : container.width / 2
+            }
         }
     }
 }
-
-

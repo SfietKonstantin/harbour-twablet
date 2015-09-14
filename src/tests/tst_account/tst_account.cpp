@@ -32,7 +32,7 @@
 #include <QtTest/QtTest>
 #include <QtTest/QSignalSpy>
 #include <loadsavemanager.h>
-#include <qml/twitterdatarepositoryobject.h>
+#include <qml/datarepositoryobject.h>
 #include <qml/accountmodel.h>
 
 class TstAccount: public QObject
@@ -64,7 +64,7 @@ private Q_SLOTS:
     }
     void testModel()
     {
-        TwitterDataRepositoryObject repositoryObject {};
+        DataRepositoryObject repositoryObject {};
         AccountRepository &repository (repositoryObject.accounts());
 
         for (int i = 0; i < 3; ++i) {

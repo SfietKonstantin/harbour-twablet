@@ -29,57 +29,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERSTATUS_H
-#define TWITTERSTATUS_H
+#ifndef TWEETQUERYITEM_H
+#define TWEETQUERYITEM_H
 
-#include <QtCore/QObject>
-#include <QtNetwork/QNetworkAccessManager>
-#include "globals.h"
-#include "qobjectutils.h"
+#include "abstractqueryitem.h"
 
 class AccountObject;
-class TwitterStatus : public QObject
+class TweetQueryItem : public AbstractQueryItem
 {
     Q_OBJECT
-    Q_PROPERTY(Status status READ status NOTIFY statusChanged)
-    Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
-    Q_PROPERTY(AccountObject * account READ account WRITE setAccount NOTIFY accountChanged)
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
     Q_PROPERTY(QString inReplyTo READ inReplyTo WRITE setInReplyTo NOTIFY inReplyToChanged)
-    Q_ENUMS(Status)
 public:
-    enum Status
-    {
-        Idle,
-        Loading,
-        Error
-    };
-    explicit TwitterStatus(QObject *parent = 0);
-    DISABLE_COPY_DISABLE_MOVE(TwitterStatus);
-    Status status() const;
-    QString errorMessage() const;
-    AccountObject * account() const;
-    void setAccount(AccountObject *account);
+    explicit TweetQueryItem(QObject *parent = 0);
+    DISABLE_COPY_DISABLE_MOVE(TweetQueryItem);
     QString text() const;
     void setText(const QString &text);
     QString inReplyTo() const;
     void setInReplyTo(const QString &inReplyTo);
-public slots:
-    bool post();
 signals:
-    void statusChanged();
-    void errorMessageChanged();
-    void accountChanged();
     void textChanged();
     void inReplyToChanged();
 private:
-    void setStatusAndErrorMessage(Status status, const QString &errorMessage);
-    QObjectPtr<QNetworkAccessManager> m_network {nullptr};
-    Status m_status {Idle};
-    QString m_errorMessage {};
-    AccountObject *m_account {nullptr};
+    bool isQueryValid() const override;
+    QNetworkReply * createQuery() const override;
+    void handleReply(const QByteArray &reply, QNetworkReply::NetworkError error,
+                     const QString &errorMessage) override;
     QString m_text {};
     QString m_inReplyTo {};
 };
 
-#endif // TWITTERSTATUS_H
+#endif // TWEETQUERYITEM_H

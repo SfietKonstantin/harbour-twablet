@@ -29,35 +29,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twitterstatus.h"
-#include "qobjectutils.h"
-#include "accountobject.h"
-#include "private/twitterqueryutil.h"
+#include "abstractqueryitem.h"
 #include <QtCore/QLoggingCategory>
-#include <QtCore/QUrlQuery>
-#include <QtNetwork/QNetworkReply>
 
-TwitterStatus::TwitterStatus(QObject *parent)
+AbstractQueryItem::AbstractQueryItem(QObject *parent)
     : QObject(parent), m_network{new QNetworkAccessManager()}
 {
 }
 
-TwitterStatus::Status TwitterStatus::status() const
-{
-    return m_status;
-}
-
-QString TwitterStatus::errorMessage() const
-{
-    return m_errorMessage;
-}
-
-AccountObject * TwitterStatus::account() const
+AccountObject * AbstractQueryItem::account() const
 {
     return m_account;
 }
 
-void TwitterStatus::setAccount(AccountObject *account)
+void AbstractQueryItem::setAccount(AccountObject *account)
 {
     if (m_account != account) {
         m_account = account;
@@ -65,71 +50,52 @@ void TwitterStatus::setAccount(AccountObject *account)
     }
 }
 
-QString TwitterStatus::text() const
+AbstractQueryItem::Status AbstractQueryItem::status() const
 {
-    return m_text;
+    return m_status;
 }
 
-void TwitterStatus::setText(const QString &statusUpdate)
+QString AbstractQueryItem::errorMessage() const
 {
-    if (m_text != statusUpdate) {
-        m_text = statusUpdate;
-        emit textChanged();
-    }
+    return m_errorMessage;
 }
 
-QString TwitterStatus::inReplyTo() const
+bool AbstractQueryItem::load()
 {
-    return m_inReplyTo;
-}
-
-void TwitterStatus::setInReplyTo(const QString &inReplyTo)
-{
-    if (m_inReplyTo != inReplyTo) {
-        m_inReplyTo = inReplyTo;
-        emit inReplyToChanged();
-    }
-}
-
-bool TwitterStatus::post()
-{
-    if (m_account == nullptr || m_text.isEmpty()) {
+    if (m_account == nullptr || !isQueryValid()) {
         return false;
     }
 
-    QString path {QLatin1String("statuses/update.json")};
-    std::map<QString, QString> parameters {{QLatin1String("status"), m_text}};
-    if (!m_inReplyTo.isEmpty()) {
-        parameters.insert({QLatin1String("in_reply_to_status_id"), m_inReplyTo});
-    }
-
-    QNetworkReply *reply = TwitterQueryUtil::post(m_network.get(), path, {}, parameters, m_account->account());
+    QNetworkReply *reply = createQuery();
     setStatusAndErrorMessage(Loading, QString());
 
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
         QObjectPtr<QNetworkReply> replyPtr {reply};
-
-        if (replyPtr->error() != QNetworkReply::NoError) {
-            qCWarning(QLoggingCategory("twitter-status")) << "Error happened during status update";
-            qCWarning(QLoggingCategory("twitter-status")) << "Error code:" << reply->error();
-            qCWarning(QLoggingCategory("twitter-status")) << "Error message (Qt):" << reply->errorString();
-            qCWarning(QLoggingCategory("twitter-status")) << "Error message (Twitter):" << reply->readAll();
-
-            if (reply->error() == QNetworkReply::ContentOperationNotPermittedError) {
-                setStatusAndErrorMessage(Error, tr("Twitter do not allow to send the same tweet twice."));
-            } else {
+        const QByteArray &data {replyPtr->readAll()};
+        handleReply(data, replyPtr->error(), replyPtr->errorString());
+        if (m_status == Loading) {
+            if (replyPtr->error() != QNetworkReply::NoError) {
+                qCWarning(QLoggingCategory("query-item")) << "Error happened during query";
+                qCWarning(QLoggingCategory("query-item")) << "Error code:" << replyPtr->error();
+                qCWarning(QLoggingCategory("query-item")) << "Error message (Qt):" << replyPtr->errorString();
+                qCWarning(QLoggingCategory("query-item")) << "Error message (Twitter):" << data;
                 setStatusAndErrorMessage(Error, tr("Network error. Please try again later."));
+            } else {
+                setStatusAndErrorMessage(Idle, QString());
             }
-            return;
         }
-
-        setStatusAndErrorMessage(Idle, QString());
     });
 
     return true;
 }
 
-void TwitterStatus::setStatusAndErrorMessage(Status status, const QString &errorMessage)
+QNetworkAccessManager & AbstractQueryItem::network() const
+{
+    return *m_network;
+}
+
+void AbstractQueryItem::setStatusAndErrorMessage(AbstractQueryItem::Status status,
+                                                 const QString &errorMessage)
 {
     if (m_status != status) {
         m_status = status;
@@ -141,4 +107,3 @@ void TwitterStatus::setStatusAndErrorMessage(Status status, const QString &error
         emit errorMessageChanged();
     }
 }
-

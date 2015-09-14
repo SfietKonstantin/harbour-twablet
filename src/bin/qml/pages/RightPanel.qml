@@ -29,37 +29,31 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "accountmodel.h"
+import QtQuick 2.0
+import Sailfish.Silica 1.0
 
-AccountModel::AccountModel(QObject *parent) :
-    Model<Account, AccountObject>(parent)
-{
-}
-
-QVariant AccountModel::data(const QModelIndex &index, int role) const
-{
-    int row = index.row();
-    if (row < 0 || row >= rowCount()) {
-        return QVariant();
+DockedPanel {
+    id: container
+    function openUser(id) {
+        container.open = true
     }
-    const QObjectPtr<AccountObject> &account = m_data[row];
-    switch (role) {
-    case NameRole:
-        return account->name();
-        break;
-    case ScreenNameRole:
-        return account->screenName();
-        break;
-    case AccountRole:
-        return QVariant::fromValue(account.get());
-        break;
-    default:
-        return QVariant();
-        break;
-    }
-}
+    dock: Dock.Right
+    visible: open || moving
 
-QHash<int, QByteArray> AccountModel::roleNames() const
-{
-    return {{NameRole, "name"}, {ScreenNameRole, "screenName"}, {AccountRole, "account"}};
+    PageStack {
+        anchors.fill: parent
+
+        Component.onCompleted: {
+            push(test)
+        }
+
+        Component {
+            id: test
+            Page {
+                Rectangle {
+                    anchors.fill: parent
+                }
+            }
+        }
+    }
 }

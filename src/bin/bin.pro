@@ -30,7 +30,8 @@ OTHER_FILES += \
     qml/pages/TwitterImage.qml \
     qml/pages/StatusPlaceholder.qml \
     qml/pages/StatusHeader.qml \
-    qml/pages/ToolbarButton.qml
+    qml/pages/ToolbarButton.qml \
+    qml/pages/RightPanel.qml
 
 
 DATA += \

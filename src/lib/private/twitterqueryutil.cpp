@@ -42,15 +42,15 @@ static const char *TWITTER_API_URL = "https://api.twitter.com/1.1/";
 static const char *TWITTER_API_URL = "http://localhost:8000/";
 #endif
 
-QNetworkReply * TwitterQueryUtil::get(QNetworkAccessManager *network, const QString &path,
+QNetworkReply * TwitterQueryUtil::get(QNetworkAccessManager &network, const QString &path,
                                       const std::map<QString, QString> &parameters,
                                       const Account &account)
 {
     QNetworkRequest request {createGetRequest(path, parameters, account)};
-    return network->get(request);
+    return network.get(request);
 }
 
-QNetworkReply * TwitterQueryUtil::post(QNetworkAccessManager *network,
+QNetworkReply * TwitterQueryUtil::post(QNetworkAccessManager &network,
                                        const QString &path,
                                        const std::map<QString, QString> &parameters,
                                        const std::map<QString, QString> &postData,
@@ -61,7 +61,7 @@ QNetworkReply * TwitterQueryUtil::post(QNetworkAccessManager *network,
     for (const std::pair<QString, QString> &parameter : postData) {
         postDataQuery.addQueryItem(parameter.first, QString::fromLatin1(QUrl::toPercentEncoding(parameter.second)));
     }
-    return network->post(request, postDataQuery.toString(QUrl::FullyEncoded).toLatin1());
+    return network.post(request, postDataQuery.toString(QUrl::FullyEncoded).toLatin1());
 }
 
 QNetworkRequest TwitterQueryUtil::createRequest(const QByteArray &type, const QString &path,

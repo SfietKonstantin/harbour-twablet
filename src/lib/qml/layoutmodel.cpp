@@ -30,7 +30,6 @@
  */
 
 #include "layoutmodel.h"
-#include "twitterdatarepositoryobject.h"
 
 LayoutModel::LayoutModel(QObject *parent) :
     Model<Layout, LayoutObject>(parent)

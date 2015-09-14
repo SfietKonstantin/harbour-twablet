@@ -37,6 +37,12 @@ SilicaListView {
     id: container
     property string title
     property int layoutIndex
+    signal openUser(string id)
+    function setUnread(index) {
+        if (internal.unread > index && index !== -1) {
+            internal.unread = index
+        }
+    }
     spacing: Theme.paddingMedium
 
     model: TweetModel {
@@ -52,11 +58,6 @@ SilicaListView {
         property bool isInit
         property double opacity: isLoading ? 0. : 1
         property bool isLoading: twitterModel.count === 0 && twitterModel.status === Model.Loading
-        function setUnread(index) {
-            if (internal.unread > index && index !== -1) {
-                internal.unread = index
-            }
-        }
         onUnreadChanged: {
             Repository.updateLayoutUnread(container.layoutIndex, unread)
         }
@@ -71,7 +72,7 @@ SilicaListView {
         id: refreshUnreadCountTimer
         interval: 250
         repeat: false
-        onTriggered: internal.setUnread(container.indexAt(0, container.contentY + 5))
+        onTriggered: container.setUnread(container.indexAt(0, container.contentY + 5))
     }
 
     onContentYChanged: refreshUnreadCountTimer.running = true
@@ -95,8 +96,8 @@ SilicaListView {
             if (!internal.isInit) {
                 container.positionViewAtIndex(1 + insertedCount, ListView.Beginning)
                 container.contentY -= internal.refreshDelta
+                internal.unread += insertedCount
             }
-            internal.unread += insertedCount
         }
     }
 
@@ -172,11 +173,7 @@ SilicaListView {
         id: delegate
         width: container.width
         tweet: model.item
-
-        Component.onCompleted: {
-            internal.setUnread(model.index)
-        }
-
+        onOpenUser: container.openUser(id)
         opacity: internal.opacity
     }
 

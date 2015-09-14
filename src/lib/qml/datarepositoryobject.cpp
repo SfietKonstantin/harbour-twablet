@@ -29,11 +29,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "twitterdatarepositoryobject.h"
+#include "datarepositoryobject.h"
 #include "query.h"
 #include <QtCore/QVariantMap>
 
-TwitterDataRepositoryObject::TwitterDataRepositoryObject(QObject *parent)
+DataRepositoryObject::DataRepositoryObject(QObject *parent)
     : QObject(parent)
 {
     m_loadSaveManager.load(m_accounts);
@@ -43,27 +43,27 @@ TwitterDataRepositoryObject::TwitterDataRepositoryObject(QObject *parent)
     }
 }
 
-bool TwitterDataRepositoryObject::hasAccounts() const
+bool DataRepositoryObject::hasAccounts() const
 {
     return m_accounts.empty();
 }
 
-AccountRepository & TwitterDataRepositoryObject::accounts()
+AccountRepository & DataRepositoryObject::accounts()
 {
     return m_accounts;
 }
 
-LayoutRepository & TwitterDataRepositoryObject::layouts()
+LayoutRepository & DataRepositoryObject::layouts()
 {
     return m_layouts;
 }
 
-TweetRepository & TwitterDataRepositoryObject::tweets(const Layout &layout)
+TweetRepository & DataRepositoryObject::tweets(const Layout &layout)
 {
     return m_tweetRepositories[layout].repository;
 }
 
-int TwitterDataRepositoryObject::addAccount(const QString &name, const QString &userId,
+int DataRepositoryObject::addAccount(const QString &name, const QString &userId,
                                             const QString &screenName,
                                             const QString &token, const QString &tokenSecret)
 {
@@ -79,7 +79,7 @@ int TwitterDataRepositoryObject::addAccount(const QString &name, const QString &
     return m_accounts.size() - 1;
 }
 
-void TwitterDataRepositoryObject::updateAccountName(int index, const QString &name)
+void DataRepositoryObject::updateAccountName(int index, const QString &name)
 {
     if (index < 0 || index >= m_accounts.size()) {
         return;
@@ -90,7 +90,7 @@ void TwitterDataRepositoryObject::updateAccountName(int index, const QString &na
     m_loadSaveManager.save(m_accounts);
 }
 
-void TwitterDataRepositoryObject::removeAccount(int index)
+void DataRepositoryObject::removeAccount(int index)
 {
     if (index < 0 || index >= m_accounts.size()) {
         return;
@@ -119,7 +119,7 @@ void TwitterDataRepositoryObject::removeAccount(int index)
     }
 }
 
-void TwitterDataRepositoryObject::addLayout(const QString &name, int accountIndex, int queryType,
+void DataRepositoryObject::addLayout(const QString &name, int accountIndex, int queryType,
                                             const QVariantMap &arguments)
 {
     if (accountIndex < 0 || accountIndex >= m_accounts.size()) {
@@ -149,7 +149,7 @@ void TwitterDataRepositoryObject::addLayout(const QString &name, int accountInde
     refresh();
 }
 
-void TwitterDataRepositoryObject::addDefaultLayouts(int accountIndex, const QString &homeName,
+void DataRepositoryObject::addDefaultLayouts(int accountIndex, const QString &homeName,
                                                     bool enableHomeTimeline, const QString &mentionsName,
                                                     bool enableMentionsTimeline)
 {
@@ -172,7 +172,7 @@ void TwitterDataRepositoryObject::addDefaultLayouts(int accountIndex, const QStr
     m_loadSaveManager.save(m_layouts);
 }
 
-void TwitterDataRepositoryObject::updateLayoutName(int index, const QString &name)
+void DataRepositoryObject::updateLayoutName(int index, const QString &name)
 {
     if (index < 0 || index >= m_layouts.size()) {
         return;
@@ -183,7 +183,7 @@ void TwitterDataRepositoryObject::updateLayoutName(int index, const QString &nam
     m_loadSaveManager.save(m_layouts);
 }
 
-void TwitterDataRepositoryObject::updateLayoutUnread(int index, int unread)
+void DataRepositoryObject::updateLayoutUnread(int index, int unread)
 {
     if (index < 0 || index >= m_layouts.size()) {
         return;
@@ -193,7 +193,7 @@ void TwitterDataRepositoryObject::updateLayoutUnread(int index, int unread)
     m_layouts.update(index, std::move(layout));
 }
 
-void TwitterDataRepositoryObject::removeLayout(int index)
+void DataRepositoryObject::removeLayout(int index)
 {
     if (index < 0 || index >= m_layouts.size()) {
         return;
@@ -203,7 +203,7 @@ void TwitterDataRepositoryObject::removeLayout(int index)
     m_loadSaveManager.save(m_layouts);
 }
 
-void TwitterDataRepositoryObject::refresh()
+void DataRepositoryObject::refresh()
 {
     for (auto it = std::begin(m_tweetRepositories); it != std::end(m_tweetRepositories); ++it) {
         const Layout &layout {it->first};
@@ -214,18 +214,18 @@ void TwitterDataRepositoryObject::refresh()
     }
 }
 
-void TwitterDataRepositoryObject::insertRepository(const Layout &layout)
+void DataRepositoryObject::insertRepository(const Layout &layout)
 {
     RefCountedTweetRepository &repo = m_tweetRepositories[layout];
     repo.references.insert(&layout);
 }
 
-void TwitterDataRepositoryObject::insertRepository()
+void DataRepositoryObject::insertRepository()
 {
     insertRepository(*(std::end(m_layouts) - 1));
 }
 
-void TwitterDataRepositoryObject::removeLayoutFromRepositories(int index)
+void DataRepositoryObject::removeLayoutFromRepositories(int index)
 {
     const Layout &layout = *(std::begin(m_layouts) + index);
     Q_ASSERT(m_tweetRepositories.find(layout) != m_tweetRepositories.end());
@@ -238,7 +238,7 @@ void TwitterDataRepositoryObject::removeLayoutFromRepositories(int index)
     m_layouts.remove(index);
 }
 
-bool TwitterDataRepositoryObject::LayoutComparator::operator()(const Layout &first,
+bool DataRepositoryObject::LayoutComparator::operator()(const Layout &first,
                                                                const Layout &second) const
 {
     if (first.userId() < second.userId()) {

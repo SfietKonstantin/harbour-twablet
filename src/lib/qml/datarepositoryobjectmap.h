@@ -29,8 +29,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWITTERDATAREPOSITORYOBJECTREPOSITORY_H
-#define TWITTERDATAREPOSITORYOBJECTREPOSITORY_H
+#ifndef DATAREPOSITORYOBJECTMAP_H
+#define DATAREPOSITORYOBJECTMAP_H
 
 #include <QtCore/QtGlobal>
 
@@ -41,41 +41,41 @@ class Layout;
 class Tweet;
 class AccountRepository;
 class LayoutRepository;
-class TwitterDataRepositoryObject;
-template<class T> class TwitterDataRepositoryObjectRepository;
-template<> class TwitterDataRepositoryObjectRepository<Account>
+class DataRepositoryObject;
+template<class T> class DataRepositoryObjectMap;
+template<> class DataRepositoryObjectMap<Account>
 {
 public:
-    static bool isValid(TwitterDataRepositoryObject *repository, int layoutIndex)
+    static bool isValid(DataRepositoryObject *repository, int layoutIndex)
     {
         Q_UNUSED(layoutIndex)
         return repository != nullptr;
     }
-    static AccountRepository & get(TwitterDataRepositoryObject &repository, int layoutIndex)
+    static AccountRepository & get(DataRepositoryObject &repository, int layoutIndex)
     {
         Q_UNUSED(layoutIndex)
         return repository.accounts();
     }
 };
-template<> class TwitterDataRepositoryObjectRepository<Layout>
+template<> class DataRepositoryObjectMap<Layout>
 {
 public:
-    static bool isValid(TwitterDataRepositoryObject *repository, int layoutIndex)
+    static bool isValid(DataRepositoryObject *repository, int layoutIndex)
     {
         Q_UNUSED(layoutIndex)
         return repository != nullptr;
     }
-    static LayoutRepository & get(TwitterDataRepositoryObject &repository, int layoutIndex)
+    static LayoutRepository & get(DataRepositoryObject &repository, int layoutIndex)
     {
         Q_UNUSED(layoutIndex)
         return repository.layouts();
     }
 };
 
-template<> class TwitterDataRepositoryObjectRepository<Tweet>
+template<> class DataRepositoryObjectMap<Tweet>
 {
 public:
-    static bool isValid(TwitterDataRepositoryObject *repository, int layoutIndex)
+    static bool isValid(DataRepositoryObject *repository, int layoutIndex)
     {
         Q_UNUSED(layoutIndex)
         if (repository == nullptr) {
@@ -83,12 +83,12 @@ public:
         }
         return (layoutIndex >= 0 && layoutIndex < repository->layouts().size());
     }
-    static TweetRepository & get(TwitterDataRepositoryObject &repository, int layoutIndex)
+    static TweetRepository & get(DataRepositoryObject &repository, int layoutIndex)
     {
         const Layout &layout {*(std::begin(repository.layouts()) + layoutIndex)};
         return repository.tweets(layout);
     }
 };
 
-#endif // TWITTERDATAREPOSITORYOBJECTREPOSITORY_H
+#endif // DATAREPOSITORYOBJECTMAP_H
 

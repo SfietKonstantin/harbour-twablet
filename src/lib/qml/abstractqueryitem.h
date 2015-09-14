@@ -29,24 +29,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef IMODEL_H
-#define IMODEL_H
+#ifndef ABSTRACTQUERYITEM_H
+#define ABSTRACTQUERYITEM_H
 
-#include <QtCore/QAbstractListModel>
-#include <QtQml/QQmlParserStatus>
+#include <QtCore/QObject>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
 #include "globals.h"
-#include "datarepositoryobject.h"
+#include "qobjectutils.h"
 
-class IModel : public QAbstractListModel, public QQmlParserStatus
+class AccountObject;
+class AbstractQueryItem : public QObject
 {
     Q_OBJECT
-    Q_INTERFACES(QQmlParserStatus)
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
-    Q_PROPERTY(int layoutIndex READ layoutIndex WRITE setLayoutIndex NOTIFY layoutIndexChanged)
-    Q_PROPERTY(DataRepositoryObject * repository READ repository WRITE setRepository
-               NOTIFY repositoryChanged)
+    Q_PROPERTY(AccountObject * account READ account WRITE setAccount NOTIFY accountChanged)
     Q_ENUMS(Status)
 public:
     enum Status
@@ -55,25 +53,30 @@ public:
         Loading,
         Error
     };
-    DISABLE_COPY_DISABLE_MOVE(IModel);
-    virtual ~IModel() {}
-    virtual int count() const = 0;
-    virtual Status status() const = 0;
-    virtual QString errorMessage() const = 0;
-    virtual int layoutIndex() const = 0;
-    virtual void setLayoutIndex(int layoutIndex) = 0;
-    virtual DataRepositoryObject * repository() const = 0;
-    virtual void setRepository(DataRepositoryObject *repository) = 0;
+    DISABLE_COPY_DISABLE_MOVE(AbstractQueryItem);
+    AccountObject * account() const;
+    void setAccount(AccountObject *account);
+    Status status() const;
+    QString errorMessage() const;
+public slots:
+    bool load();
 signals:
-    void countChanged();
-    void prependPre();
-    void prependPost(int insertedCount);
     void statusChanged();
     void errorMessageChanged();
-    void layoutIndexChanged();
-    void repositoryChanged();
+    void accountChanged();
 protected:
-    explicit IModel(QObject *parent = 0) : QAbstractListModel(parent), QQmlParserStatus() {}
+    explicit AbstractQueryItem(QObject *parent = 0);
+    QNetworkAccessManager & network() const;
+    void setStatusAndErrorMessage(Status status, const QString &errorMessage);
+    virtual bool isQueryValid() const = 0;
+    virtual QNetworkReply * createQuery() const = 0;
+    virtual void handleReply(const QByteArray &reply, QNetworkReply::NetworkError error,
+                             const QString &errorMessage) = 0;
+private:
+    QObjectPtr<QNetworkAccessManager> m_network {nullptr};
+    AccountObject *m_account {nullptr};
+    Status m_status {Idle};
+    QString m_errorMessage {};
 };
 
-#endif // IMODEL_H
+#endif // ABSTRACTQUERYITEM_H

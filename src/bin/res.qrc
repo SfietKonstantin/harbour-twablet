@@ -18,5 +18,6 @@
         <file>qml/pages/StatusPlaceholder.qml</file>
         <file>qml/pages/StatusHeader.qml</file>
         <file>qml/pages/ToolbarButton.qml</file>
+        <file>qml/pages/RightPanel.qml</file>
     </qresource>
 </RCC>
