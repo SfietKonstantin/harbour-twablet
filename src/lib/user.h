@@ -33,6 +33,7 @@
 #define USER_H
 
 #include <QtCore/QString>
+#include <QtCore/QDateTime>
 #include <QtCore/QJsonObject>
 #include "globals.h"
 
@@ -58,6 +59,8 @@ public:
     int favouritesCount() const;
     QString imageUrl() const;
     QString bannerUrl() const;
+    QDateTime createdAt() const;
+    QJsonObject entities() const;
 private:
     QString m_id {};
     QString m_name {};
@@ -74,6 +77,8 @@ private:
     int m_favouritesCount {0};
     QString m_imageUrl {};
     QString m_bannerUrl {};
+    QDateTime m_createdAt {};
+    QJsonObject m_entities {};
 };
 
 #endif // USER_H

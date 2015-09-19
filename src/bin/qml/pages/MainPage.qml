@@ -103,8 +103,8 @@ Page {
                 }
 
                 property int columnCount: container.isLandscape ? (Screen.sizeCategory === Screen.Large ? 3 : 2) : (Screen.sizeCategory === Screen.Large ? 2 : 1)
-                property real columnWidth: view.width / columnCount
-                anchors.left: parent.left; anchors.right: parent.right
+                property real columnWidth: container.width / columnCount
+                anchors.left: parent.left; anchors.right: panel.left
                 anchors.top: parent.top; anchors.bottom: toolbar.top
                 onContentXChanged: {
                     toolbar.lastTappedIndex = -1
@@ -115,14 +115,19 @@ Page {
                 cacheBuffer: columnWidth * layoutModel.count
                 orientation: Qt.Horizontal
                 model: layoutModel
-                snapMode: container.isLandscape ? ListView.NoSnap : ListView.SnapOneItem
+                snapMode: view.columnCount > 1 ? ListView.NoSnap : ListView.SnapOneItem
                 delegate: ColumnLayout {
                     id: delegate
                     width: view.columnWidth
                     height: view.height
                     layoutIndex: index
                     title: name
-                    onOpenUser: panel.openUser(id)
+                    onOpenUser: {
+                        var account = accountModel.get(layout.userId)
+                        if (account !== null) {
+                            panel.openUser(id, account)
+                        }
+                    }
 
                     Connections {
                         target: toolbar
@@ -166,7 +171,7 @@ Page {
             RightPanel {
                 id: panel
                 anchors.top: parent.top; anchors.bottom: toolbar.top
-                width: container.isLandscape ? container.width / 3 : container.width / 2
+                width: view.columnWidth
             }
         }
     }

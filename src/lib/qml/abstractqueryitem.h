@@ -70,7 +70,7 @@ protected:
     void setStatusAndErrorMessage(Status status, const QString &errorMessage);
     virtual bool isQueryValid() const = 0;
     virtual QNetworkReply * createQuery() const = 0;
-    virtual void handleReply(const QByteArray &reply, QNetworkReply::NetworkError error,
+    virtual void handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
                              const QString &errorMessage) = 0;
 private:
     QObjectPtr<QNetworkAccessManager> m_network {nullptr};

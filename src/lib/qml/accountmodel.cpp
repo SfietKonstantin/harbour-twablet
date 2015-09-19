@@ -59,6 +59,14 @@ QVariant AccountModel::data(const QModelIndex &index, int role) const
     }
 }
 
+AccountObject * AccountModel::get(const QString &userId) const
+{
+    auto it = std::find_if(std::begin(m_data), std::end(m_data), [userId](const QObjectPtr<AccountObject> &object) {
+        return object->userId() == userId;
+    });
+    return it == std::end(m_data) ? nullptr : it->get();
+}
+
 QHash<int, QByteArray> AccountModel::roleNames() const
 {
     return {{NameRole, "name"}, {ScreenNameRole, "screenName"}, {AccountRole, "account"}};

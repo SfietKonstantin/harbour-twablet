@@ -30,12 +30,8 @@
  */
 
 #include "tweetqueryitem.h"
-#include "qobjectutils.h"
-#include "accountobject.h"
 #include "private/twitterqueryutil.h"
-#include <QtCore/QLoggingCategory>
-#include <QtCore/QUrlQuery>
-#include <QtNetwork/QNetworkReply>
+#include "accountobject.h"
 
 TweetQueryItem::TweetQueryItem(QObject *parent)
     : AbstractQueryItem(parent)
@@ -84,13 +80,13 @@ QNetworkReply * TweetQueryItem::createQuery() const
     return TwitterQueryUtil::post(network(), path, {}, parameters, account()->account());
 }
 
-void TweetQueryItem::handleReply(const QByteArray &reply, QNetworkReply::NetworkError error,
+void TweetQueryItem::handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
                                 const QString &errorMessage)
 {
     Q_UNUSED(reply)
     Q_UNUSED(errorMessage)
-    if (error != QNetworkReply::NoError) {
-        if (error == QNetworkReply::ContentOperationNotPermittedError) {
+    if (networkError != QNetworkReply::NoError) {
+        if (networkError == QNetworkReply::ContentOperationNotPermittedError) {
             setStatusAndErrorMessage(Error, tr("Twitter do not allow to send the same tweet twice."));
         }
     }

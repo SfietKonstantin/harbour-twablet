@@ -37,6 +37,7 @@
 
 class LayoutModel : public Model<Layout, LayoutObject>
 {
+    Q_OBJECT
 public:
     enum Roles {
         NameRole = Qt::UserRole + 1,

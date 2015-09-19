@@ -29,33 +29,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEETQUERYITEM_H
-#define TWEETQUERYITEM_H
+#ifndef TIMEUTIL_H
+#define TIMEUTIL_H
 
-#include "abstractqueryitem.h"
+#include <QtCore/QDateTime>
+#include <QtCore/QLocale>
 
-class TweetQueryItem : public AbstractQueryItem
+static QDateTime fromUtc(const QString &timeUtc)
 {
-    Q_OBJECT
-    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
-    Q_PROPERTY(QString inReplyTo READ inReplyTo WRITE setInReplyTo NOTIFY inReplyToChanged)
-public:
-    explicit TweetQueryItem(QObject *parent = 0);
-    DISABLE_COPY_DISABLE_MOVE(TweetQueryItem);
-    QString text() const;
-    void setText(const QString &text);
-    QString inReplyTo() const;
-    void setInReplyTo(const QString &inReplyTo);
-signals:
-    void textChanged();
-    void inReplyToChanged();
-private:
-    bool isQueryValid() const override final;
-    QNetworkReply * createQuery() const override final;
-    void handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
-                     const QString &errorMessage) override final;
-    QString m_text {};
-    QString m_inReplyTo {};
-};
+    QLocale locale (QLocale::English, QLocale::UnitedStates);
+    return locale.toDateTime(timeUtc, QLatin1String("ddd MMM dd HH:mm:ss +0000 yyyy"));
+}
 
-#endif // TWEETQUERYITEM_H
+
+#endif // TIMEUTIL_H
+

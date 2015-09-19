@@ -33,9 +33,9 @@
 #define MEDIA_H
 
 #include <QtCore/QString>
-#include <QtCore/QJsonObject>
 #include "globals.h"
 
+class QJsonObject;
 class Media
 {
 public:

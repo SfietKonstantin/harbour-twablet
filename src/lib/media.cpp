@@ -31,6 +31,7 @@
 
 #include "media.h"
 #include <QtCore/QLoggingCategory>
+#include <QtCore/QJsonObject>
 
 Media::Media(const QJsonObject &json)
 {

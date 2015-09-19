@@ -19,5 +19,7 @@
         <file>qml/pages/StatusHeader.qml</file>
         <file>qml/pages/ToolbarButton.qml</file>
         <file>qml/pages/RightPanel.qml</file>
+        <file>qml/pages/UserPage.qml</file>
+        <file>qml/pages/MiniButton.qml</file>
     </qresource>
 </RCC>

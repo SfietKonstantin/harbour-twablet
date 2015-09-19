@@ -34,26 +34,24 @@ import Sailfish.Silica 1.0
 
 DockedPanel {
     id: container
-    function openUser(id) {
-        container.open = true
+    function openUser(id, account) {
+        _open(Qt.resolvedUrl("UserPage.qml"), {userId: id, account: account})
     }
+    function _open(page, args) {
+        if (Screen.sizeCategory === Screen.Large) {
+            container.open = true
+            panelPageStack.clear()
+            panelPageStack.push(page, args)
+        } else {
+            pageStack.push(page, args)
+        }
+    }
+
     dock: Dock.Right
     visible: open || moving
 
     PageStack {
+        id: panelPageStack
         anchors.fill: parent
-
-        Component.onCompleted: {
-            push(test)
-        }
-
-        Component {
-            id: test
-            Page {
-                Rectangle {
-                    anchors.fill: parent
-                }
-            }
-        }
     }
 }

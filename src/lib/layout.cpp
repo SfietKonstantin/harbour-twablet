@@ -51,6 +51,11 @@ QString Layout::userId() const
     return m_userId;
 }
 
+void Layout::setUserId(const QString &userId)
+{
+    m_userId = userId;
+}
+
 Query Layout::query() const
 {
     return m_query;

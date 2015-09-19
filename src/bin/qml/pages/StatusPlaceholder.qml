@@ -36,20 +36,42 @@ import harbour.twablet 1.0
 Item {
     id: container
     property QtObject model
+    property QtObject query
     anchors.fill: parent
-    visible: model.count === 0
+    visible: query != null || model != null && model.count === 0
+
+    QtObject {
+        id: internal
+        property bool queryLoading: container.query != null ? container.query.status === QueryItem.Loading : false
+        property bool modelLoading: container.model != null ? (container.model.status === Model.Loading && container.model.count === 0) : false
+        property bool queryError: container.query != null ? container.query.status === QueryItem.Error : false
+        property bool modelError: container.model != null ? (container.model.status === Model.Error && container.model.count === 0) : false
+
+        property bool loading: queryLoading || modelLoading
+        property bool error: queryError || modelError
+        property string errorMessage: container.query != null ? container.query.errorMessage : (container.model != null ? container.model.errorMessage : "")
+
+        function retry() {
+            if (container.query != null) {
+                container.query.load()
+            }
+            if (container.model != null) {
+                Repository.refresh()
+            }
+        }
+    }
 
     BusyIndicator {
         anchors.centerIn: parent
-        running: model.status === Model.Loading
+        running: internal.loading
         size: BusyIndicatorSize.Large
     }
 
     Text {
         anchors.centerIn: parent
         width: parent.width
-        enabled: model.status === Model.Error
-        text: model.errorMessage
+        enabled: internal.error
+        text: internal.errorMessage
         horizontalAlignment: Text.AlignHCenter
         wrapMode: Text.Wrap
         font {
@@ -67,8 +89,8 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom; anchors.bottomMargin: Theme.paddingMedium
         text: qsTr("Retry")
-        onClicked: Repository.refresh()
-        visible: model.status === Model.Error
+        onClicked: internal.retry()
+        visible: internal.error
     }
 }
 

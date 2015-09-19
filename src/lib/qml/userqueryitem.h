@@ -29,33 +29,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEETQUERYITEM_H
-#define TWEETQUERYITEM_H
+#ifndef USERQUERYITEM_H
+#define USERQUERYITEM_H
 
 #include "abstractqueryitem.h"
+#include "userobject.h"
 
-class TweetQueryItem : public AbstractQueryItem
+class UserQueryItem : public AbstractQueryItem
 {
     Q_OBJECT
-    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
-    Q_PROPERTY(QString inReplyTo READ inReplyTo WRITE setInReplyTo NOTIFY inReplyToChanged)
+    Q_PROPERTY(QString userId READ userId WRITE setUserId NOTIFY userIdChanged)
+    Q_PROPERTY(UserObject * user READ user NOTIFY userChanged)
 public:
-    explicit TweetQueryItem(QObject *parent = 0);
-    DISABLE_COPY_DISABLE_MOVE(TweetQueryItem);
-    QString text() const;
-    void setText(const QString &text);
-    QString inReplyTo() const;
-    void setInReplyTo(const QString &inReplyTo);
+    explicit UserQueryItem(QObject *parent = 0);
+    DISABLE_COPY_DISABLE_MOVE(UserQueryItem);
+    QString userId() const;
+    void setUserId(const QString &userId);
+    UserObject * user() const;
 signals:
-    void textChanged();
-    void inReplyToChanged();
+    void userIdChanged();
+    void userChanged();
 private:
     bool isQueryValid() const override final;
     QNetworkReply * createQuery() const override final;
     void handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
                      const QString &errorMessage) override final;
-    QString m_text {};
-    QString m_inReplyTo {};
+    QString m_userId {};
+    QObjectPtr<UserObject> m_user {nullptr};
 };
 
-#endif // TWEETQUERYITEM_H
+#endif // USERQUERYITEM_H

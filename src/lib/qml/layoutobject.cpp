@@ -46,6 +46,11 @@ QString LayoutObject::name() const
     return m_data.name();
 }
 
+QString LayoutObject::userId() const
+{
+    return m_data.userId();
+}
+
 int LayoutObject::unread() const
 {
     return m_data.unread();
@@ -61,6 +66,11 @@ void LayoutObject::update(const Layout &other)
     if (m_data.name() != other.name()) {
         m_data.setName(other.name());
         emit nameChanged();
+    }
+
+    if (m_data.userId() != other.userId()) {
+        m_data.setUserId(other.userId());
+        emit userIdChanged();
     }
 
     if (m_data.query() != other.query()) {

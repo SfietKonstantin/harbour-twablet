@@ -29,33 +29,65 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEETQUERYITEM_H
-#define TWEETQUERYITEM_H
+#include "userqueryitem.h"
+#include "private/twitterqueryutil.h"
+#include "accountobject.h"
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
-#include "abstractqueryitem.h"
-
-class TweetQueryItem : public AbstractQueryItem
+UserQueryItem::UserQueryItem(QObject *parent)
+    : AbstractQueryItem(parent)
 {
-    Q_OBJECT
-    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
-    Q_PROPERTY(QString inReplyTo READ inReplyTo WRITE setInReplyTo NOTIFY inReplyToChanged)
-public:
-    explicit TweetQueryItem(QObject *parent = 0);
-    DISABLE_COPY_DISABLE_MOVE(TweetQueryItem);
-    QString text() const;
-    void setText(const QString &text);
-    QString inReplyTo() const;
-    void setInReplyTo(const QString &inReplyTo);
-signals:
-    void textChanged();
-    void inReplyToChanged();
-private:
-    bool isQueryValid() const override final;
-    QNetworkReply * createQuery() const override final;
-    void handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
-                     const QString &errorMessage) override final;
-    QString m_text {};
-    QString m_inReplyTo {};
-};
+}
 
-#endif // TWEETQUERYITEM_H
+QString UserQueryItem::userId() const
+{
+    return m_userId;
+}
+
+void UserQueryItem::setUserId(const QString &userId)
+{
+    if (m_userId != userId) {
+        m_userId = userId;
+        emit userIdChanged();
+    }
+}
+
+UserObject * UserQueryItem::user() const
+{
+    return m_user.get();
+}
+
+bool UserQueryItem::isQueryValid() const
+{
+    return !m_userId.isEmpty();
+}
+
+QNetworkReply * UserQueryItem::createQuery() const
+{
+    QString path {QLatin1String("users/show.json")};
+    std::map<QString, QString> parameters {{QLatin1String("user_id"), m_userId}};
+
+    return TwitterQueryUtil::get(network(), path, parameters, account()->account());
+}
+
+void UserQueryItem::handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
+                                const QString &errorMessage)
+{
+    Q_UNUSED(errorMessage)
+    if (networkError != QNetworkReply::NoError) {
+        return;
+    }
+
+    QJsonParseError error {-1, QJsonParseError::NoError};
+    QJsonDocument document {QJsonDocument::fromJson(reply, &error)};
+    if (error.error != QJsonParseError::NoError) {
+        setStatusAndErrorMessage(Error, tr("Internal error"));
+        return;
+    }
+
+    const QJsonObject &user {document.object()};
+    m_user.reset(UserObject::create(User(user)));
+    emit userChanged();
+}
+

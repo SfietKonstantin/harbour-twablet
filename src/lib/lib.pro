@@ -52,6 +52,8 @@ HEADERS += \
     qml/abstractqueryitem.h \
     qml/tweetqueryitem.h \
     qml/accountselectionmodel.h \
+    qml/userqueryitem.h \
+    private/timeutil.h
 
 SOURCES += \
     private/twitterdatautil.cpp \
@@ -84,3 +86,4 @@ SOURCES += \
     qml/abstractqueryitem.cpp \
     qml/tweetqueryitem.cpp \
     qml/accountselectionmodel.cpp \
+    qml/userqueryitem.cpp

@@ -50,6 +50,7 @@
 #include "qml/querylistmodel.h"
 #include "qml/tweetmodel.h"
 #include "qml/tweetqueryitem.h"
+#include "qml/userqueryitem.h"
 
 int main(int argc, char *argv[])
 {
@@ -70,6 +71,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<TweetModel>("harbour.twablet", 1, 0, "TweetModel");
     qmlRegisterType<QueryListModel>("harbour.twablet", 1, 0, "QueryListModel");
     qmlRegisterType<TweetQueryItem>("harbour.twablet", 1, 0, "TweetQueryItem");
+    qmlRegisterType<UserQueryItem>("harbour.twablet", 1, 0, "UserQueryItem");
     qmlRegisterSingletonType<DataRepositoryObject>("harbour.twablet", 1, 0, "Repository",
                                                           [](QQmlEngine *e, QJSEngine *) -> QObject * {
         return new DataRepositoryObject(e);

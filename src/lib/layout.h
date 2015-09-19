@@ -44,6 +44,7 @@ public:
     QString name() const;
     void setName(const QString &name);
     QString userId() const;
+    void setUserId(const QString &userId);
     Query query() const;
     void setQuery(Query &&query);
     int unread() const;

@@ -36,6 +36,7 @@ Rectangle {
     id: container
     property alias source: image.source
     color: Theme.secondaryHighlightColor
+    property alias image: image
 
     Image {
         id: image

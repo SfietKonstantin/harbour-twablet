@@ -44,6 +44,7 @@ class UserObject : public QObject
     Q_PROPERTY(QString screenName READ screenName CONSTANT)
     Q_PROPERTY(QString description READ description CONSTANT)
     Q_PROPERTY(QString location READ location CONSTANT)
+    Q_PROPERTY(QString displayUrl READ displayUrl CONSTANT)
     Q_PROPERTY(QString url READ url CONSTANT)
     Q_PROPERTY(bool protected READ isProtected CONSTANT)
     Q_PROPERTY(bool following READ isFollowing CONSTANT)
@@ -54,6 +55,7 @@ class UserObject : public QObject
     Q_PROPERTY(int favouritesCount READ favouritesCount CONSTANT)
     Q_PROPERTY(QString imageUrl READ imageUrl CONSTANT)
     Q_PROPERTY(QString bannerUrl READ bannerUrl CONSTANT)
+    Q_PROPERTY(int tweetsPerDay READ tweetsPerDay CONSTANT)
 public:
     DISABLE_COPY_DISABLE_MOVE(UserObject);
     static UserObject * create(const User &data, QObject *parent = 0);
@@ -63,6 +65,7 @@ public:
     QString screenName() const;
     QString description() const;
     QString location() const;
+    QString displayUrl() const;
     QString url() const;
     bool isProtected() const;
     bool isFollowing() const;
@@ -73,9 +76,13 @@ public:
     int favouritesCount() const;
     QString imageUrl() const;
     QString bannerUrl() const;
+    int tweetsPerDay() const;
 private:
     explicit UserObject(const User &data, QObject *parent = 0);
+    void initializeUrl();
     User m_data {};
+    QString m_displayUrl {};
+    QString m_url {};
 };
 
 #endif // USEROBJECT_H

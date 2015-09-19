@@ -30,9 +30,10 @@
  */
 
 #include "tweet.h"
+#include "private/timeutil.h"
 #include <set>
-#include <QtCore/QLocale>
 #include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
 
 Tweet::Tweet(const QJsonObject &json)
 {
@@ -55,10 +56,7 @@ Tweet::Tweet(const QJsonObject &json)
     m_retweeted = displayedTweet.value(QLatin1String("retweeted")).toBool();
     m_inReplyTo = displayedTweet.value(QLatin1String("in_reply_to_status_id")).toString();
     m_source = tweet.value(QLatin1String("source")).toString();
-
-    QString createdAtString = displayedTweet.value(QLatin1String("created_at")).toString();
-    QLocale locale (QLocale::English, QLocale::UnitedStates);
-    m_timestamp = locale.toDateTime(createdAtString, QLatin1String("ddd MMM dd HH:mm:ss +0000 yyyy"));
+    m_timestamp = std::move(fromUtc(displayedTweet.value(QLatin1String("created_at")).toString()));
     m_user = std::move(User(displayedTweet.value(QLatin1String("user")).toObject()));
 
     QJsonObject entities {displayedTweet.value(QLatin1String("entities")).toObject()};

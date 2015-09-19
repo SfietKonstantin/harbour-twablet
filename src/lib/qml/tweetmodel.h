@@ -37,13 +37,13 @@
 
 class TweetModel : public Model<Tweet, TweetObject>
 {
+    Q_OBJECT
 public:
     enum Roles {
         IdRole = Qt::UserRole + 1,
         ItemRole
     };
     explicit TweetModel(QObject *parent = 0);
-    ~TweetModel();
     QVariant data(const QModelIndex &index, int role) const override final;
 private:
     QHash<int, QByteArray> roleNames() const override final;

@@ -37,6 +37,7 @@
 
 class AccountModel : public Model<Account, AccountObject>
 {
+    Q_OBJECT
 public:
     enum Roles {
         NameRole = Qt::UserRole + 1,
@@ -45,6 +46,8 @@ public:
     };
     explicit AccountModel(QObject *parent = 0);
     QVariant data(const QModelIndex &index, int role) const override final;
+public slots:
+    AccountObject * get(const QString &userId) const;
 private:
     QHash<int, QByteArray> roleNames() const override final;
 };

@@ -30,6 +30,7 @@
  */
 
 #include "user.h"
+#include "private/timeutil.h"
 
 User::User(const QJsonObject &json)
 {
@@ -48,6 +49,8 @@ User::User(const QJsonObject &json)
     m_favouritesCount = json.value(QLatin1String("favourites_count")).toInt();
     m_imageUrl = json.value(QLatin1String("profile_image_url_https")).toString();
     m_bannerUrl = json.value(QLatin1String("profile_banner_url")).toString();
+    m_createdAt = std::move(fromUtc(json.value(QLatin1String("created_at")).toString()));
+    m_entities = std::move(json.value(QLatin1String("entities")).toObject());
 }
 
 bool User::isValid() const
@@ -128,4 +131,14 @@ QString User::imageUrl() const
 QString User::bannerUrl() const
 {
     return m_bannerUrl;
+}
+
+QDateTime User::createdAt() const
+{
+    return m_createdAt;
+}
+
+QJsonObject User::entities() const
+{
+    return m_entities;
 }

@@ -61,7 +61,7 @@ bool MentionsTimelineQueryHandler::treatReply(const QByteArray &data, std::vecto
         return false;
     }
 
-    QJsonArray tweets (document.array());
+    const QJsonArray tweets (document.array());
     items.reserve(tweets.size());
     for (const QJsonValue &tweet : tweets) {
         if (tweet.isObject()) {

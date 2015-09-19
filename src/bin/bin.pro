@@ -31,7 +31,9 @@ OTHER_FILES += \
     qml/pages/StatusPlaceholder.qml \
     qml/pages/StatusHeader.qml \
     qml/pages/ToolbarButton.qml \
-    qml/pages/RightPanel.qml
+    qml/pages/RightPanel.qml \
+    qml/pages/UserPage.qml \
+    qml/pages/MiniButton.qml
 
 
 DATA += \
@@ -47,3 +49,6 @@ INSTALLS += data
 CONFIG += sailfishapp_i18n
 
 TRANSLATIONS += translations/harbour-twablet-de.ts
+
+DISTFILES += \
+    qml/pages/UserPage.qml
