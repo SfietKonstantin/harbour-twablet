@@ -45,6 +45,26 @@ Page {
         }
     }
 
+    onOrientationTransitionRunningChanged: {
+        if (orientationTransitionRunning) {
+            if (panel.open) {
+                internal.panelOpenDuringTransition = true
+                panel.hide(true)
+
+            }
+        } else {
+            if (internal.panelOpenDuringTransition) {
+                internal.panelOpenDuringTransition = false
+                panel.show(true)
+            }
+        }
+    }
+
+    QtObject {
+        id: internal
+        property bool panelOpenDuringTransition: false
+    }
+
     LayoutModel { id: layoutModel; repository: Repository }
 
     Component.onCompleted: {
@@ -104,7 +124,7 @@ Page {
 
                 property int columnCount: container.isLandscape ? (Screen.sizeCategory === Screen.Large ? 3 : 2) : (Screen.sizeCategory === Screen.Large ? 2 : 1)
                 property real columnWidth: container.width / columnCount
-                anchors.left: parent.left; anchors.right: panel.left
+                anchors.left: parent.left; anchors.right: panel.visible ? panel.left : parent.right
                 anchors.top: parent.top; anchors.bottom: toolbar.top
                 onContentXChanged: {
                     toolbar.lastTappedIndex = -1

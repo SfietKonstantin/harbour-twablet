@@ -48,10 +48,40 @@ DockedPanel {
     }
 
     dock: Dock.Right
-    visible: open || moving
+    visible: false
+    onVisibleChanged: console.debug(visible)
 
     PageStack {
         id: panelPageStack
         anchors.fill: parent
     }
+
+    states: [
+        State {
+            name: "opened"; when: container.open
+        }
+    ]
+    transitions: [
+        Transition {
+            from: ""
+            to: "opened"
+            PropertyAction {
+                target: container
+                property: "visible"
+                value: true
+            }
+        },
+        Transition {
+            from: "opened"
+            to: ""
+            SequentialAnimation {
+                PauseAnimation { duration: 500 }
+                PropertyAction {
+                    target: container
+                    property: "visible"
+                    value: false
+                }
+            }
+        }
+    ]
 }
