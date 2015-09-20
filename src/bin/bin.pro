@@ -40,7 +40,8 @@ DATA += \
     data/home.svg \
     data/mail.svg \
     data/inbox.svg \
-    data/search.svg
+    data/search.svg \
+    data/background.png
 
 data.files = $${DATA}
 data.path = /usr/share/harbour-twablet/data
@@ -49,6 +50,3 @@ INSTALLS += data
 CONFIG += sailfishapp_i18n
 
 TRANSLATIONS += translations/harbour-twablet-de.ts
-
-DISTFILES += \
-    qml/pages/UserPage.qml

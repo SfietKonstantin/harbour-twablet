@@ -21,5 +21,6 @@
         <file>qml/pages/RightPanel.qml</file>
         <file>qml/pages/UserPage.qml</file>
         <file>qml/pages/MiniButton.qml</file>
+        <file>data/background.png</file>
     </qresource>
 </RCC>

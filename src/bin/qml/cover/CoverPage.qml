@@ -35,11 +35,31 @@ import harbour.twablet 1.0
 
 CoverBackground {
 
+    Image {
+        source: "../../data/background.png"
+        anchors.left: parent.left; anchors.right: parent.right
+        height: sourceSize.height * width / sourceSize.width
+    }
+
+    ListView {
+        id: view
+        anchors.fill: parent
+        model: LayoutModel { repository: Repository }
+        spacing: Theme.paddingMedium
+        delegate: Column {
+            anchors.left: parent.left; anchors.right: parent.right
+            Label {
+                font.pixelSize: Theme.fontSizeMedium
+                text: model.name
+            }
+            Label {
+                font.pixelSize: Theme.fontSizeSmall
+                text: qsTr("Unread: %n", "", model.unread)
+            }
+        }
+    }
+
     CoverActionList {
-        id: coverAction
-
-
-
         CoverAction {
             iconSource: "image://theme/icon-cover-refresh"
             onTriggered: Repository.refresh()
