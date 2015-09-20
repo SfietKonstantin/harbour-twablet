@@ -37,8 +37,9 @@ Item {
     id: container
     property QtObject model
     property QtObject query
+    property string errorMessage
     anchors.fill: parent
-    visible: query != null || model != null && model.count === 0
+    visible: query != null || model != null && model.count === 0 || internal.errorMessageAvailable
 
     QtObject {
         id: internal
@@ -46,9 +47,11 @@ Item {
         property bool modelLoading: container.model != null ? (container.model.status === Model.Loading && container.model.count === 0) : false
         property bool queryError: container.query != null ? container.query.status === QueryItem.Error : false
         property bool modelError: container.model != null ? (container.model.status === Model.Error && container.model.count === 0) : false
+        property bool errorMessageAvailable: container.errorMessage.length > 0
 
         property bool loading: queryLoading || modelLoading
-        property bool error: queryError || modelError
+        property bool error: queryError || modelError || errorMessageAvailable
+        property string fullErrorMessage: errorMessageAvailable ? container.errorMessage : errorMessage
         property string errorMessage: container.query != null ? container.query.errorMessage : (container.model != null ? container.model.errorMessage : "")
 
         function retry() {
@@ -71,7 +74,7 @@ Item {
         anchors.centerIn: parent
         width: parent.width
         enabled: internal.error
-        text: internal.errorMessage
+        text: internal.fullErrorMessage
         horizontalAlignment: Text.AlignHCenter
         wrapMode: Text.Wrap
         font {
@@ -90,7 +93,7 @@ Item {
         anchors.bottom: parent.bottom; anchors.bottomMargin: Theme.paddingMedium
         text: qsTr("Retry")
         onClicked: internal.retry()
-        visible: internal.error
+        visible: internal.error && !internal.errorMessageAvailable
     }
 }
 

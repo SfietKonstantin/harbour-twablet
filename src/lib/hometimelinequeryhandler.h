@@ -41,7 +41,7 @@ public:
     explicit HomeTimelineQueryHandler();
     DISABLE_COPY_DISABLE_MOVE(HomeTimelineQueryHandler);
 private:
-    void createRequest(QString &path, std::map<QString, QString> &parameters) const override;
+    void createRequest(QString &path, std::map<QByteArray, QByteArray> &parameters) const override;
     bool treatReply(const QByteArray &data, std::vector<Tweet> &items,
                     QString &errorMessage, Placement &placement) override;
     QString m_sinceId {};

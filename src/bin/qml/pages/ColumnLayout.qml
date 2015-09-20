@@ -104,11 +104,11 @@ SilicaListView {
     header: Column {
         width: container.width
 
-        BackgroundItem {
+        ListItem {
             id: header
             anchors.left: parent.left; anchors.right: parent.right
             onClicked: header.state = "visible"
-            height: pageHeader.height
+            contentHeight: pageHeader.height
 
             PageHeader {
                 id: pageHeader
@@ -179,6 +179,7 @@ SilicaListView {
 
     StatusPlaceholder {
         model: twitterModel
+        errorMessage: (model.status === Model.Idle && model.count === 0) ? qsTr("No tweets") : ""
     }
 
     VerticalScrollDecorator {}

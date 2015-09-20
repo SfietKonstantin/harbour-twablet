@@ -29,30 +29,51 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "hometimelinequeryhandler.h"
+#include "searchqueryhandler.h"
+#include <QtCore/QUrl>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
-#include <QtCore/QUrl>
+#include <QtCore/QLoggingCategory>
 #include "tweet.h"
 
-HomeTimelineQueryHandler::HomeTimelineQueryHandler()
+SearchQueryHandler::SearchQueryHandler(const Query::Arguments &arguments)
 {
+    auto qIt = arguments.find(QLatin1String("q"));
+    if (qIt != std::end(arguments)) {
+        m_query = qIt->second;
+    }
+    auto resultTypeIt = arguments.find(QLatin1String("result_type"));
+    if (resultTypeIt != std::end(arguments)) {
+        const QString &resultType = resultTypeIt->second;
+        if (resultType == QLatin1String("mixed")) {
+            m_resultType = "mixed";
+        } else if (resultType == QLatin1String("recent")) {
+            m_resultType = "recent";
+        } else if (resultType == QLatin1String("popular")) {
+            m_resultType = "popular";
+        }
+    }
+    qCDebug(QLoggingCategory("search-query-handler")) << "Searching using q:" << m_query
+                                                      << "result_type:" << m_resultType;
 }
 
-void HomeTimelineQueryHandler::createRequest(QString &path, std::map<QByteArray, QByteArray> &parameters) const
+void SearchQueryHandler::createRequest(QString &path, std::map<QByteArray, QByteArray> &parameters) const
 {
-    path = QLatin1String("statuses/home_timeline.json");
-    parameters.insert({"count", QByteArray::number(200)});
-    parameters.insert({"trim_user", "false"});
+    path = QLatin1String("search/tweets.json");
+    parameters.insert({"count", QByteArray::number(100)});
     parameters.insert({"include_entities", "true"});
+    parameters.insert({"q", QUrl::toPercentEncoding(m_query)});
+    if (!m_resultType.isEmpty()) {
+        parameters.insert({"result_type", m_resultType});
+    }
     if (!m_sinceId.isEmpty()) {
         parameters.insert({"since_id", QUrl::toPercentEncoding(m_sinceId)});
     }
 }
 
-bool HomeTimelineQueryHandler::treatReply(const QByteArray &data, std::vector<Tweet> &items,
-                                          QString &errorMessage, Placement &placement)
+bool SearchQueryHandler::treatReply(const QByteArray &data, std::vector<Tweet> &items,
+                                    QString &errorMessage, IQueryHandler::Placement &placement)
 {
     QJsonParseError error {-1, QJsonParseError::NoError};
     QJsonDocument document {QJsonDocument::fromJson(data, &error)};
@@ -62,7 +83,8 @@ bool HomeTimelineQueryHandler::treatReply(const QByteArray &data, std::vector<Tw
         return false;
     }
 
-    const QJsonArray &tweets (document.array());
+    const QJsonObject &root (document.object());
+    const QJsonArray tweets (root.value(QLatin1String("statuses")).toArray());
     items.reserve(tweets.size());
     for (const QJsonValue &tweet : tweets) {
         if (tweet.isObject()) {

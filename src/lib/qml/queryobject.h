@@ -45,7 +45,8 @@ public:
     {
         Invalid = Query::Invalid,
         Home = Query::Home,
-        Mentions = Query::Mentions
+        Mentions = Query::Mentions,
+        Search = Query::Search
     };
     DISABLE_COPY_DISABLE_MOVE(QueryObject);
     static QueryObject * create(const Query &data, QObject *parent = 0);

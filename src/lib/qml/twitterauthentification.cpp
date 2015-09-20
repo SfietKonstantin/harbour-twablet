@@ -89,7 +89,7 @@ QString TwitterAuthentification::screenName() const
 
 void TwitterAuthentification::startRequest()
 {
-    std::vector<std::pair<QString, QString>> args {{QLatin1String(TWITTER_API_REQUEST_TOKEN_PARAM_KEY), QLatin1String(TWITTER_API_REQUEST_TOKEN_PARAM_VALUE)}};
+    std::vector<std::pair<QByteArray, QByteArray>> args {{TWITTER_API_REQUEST_TOKEN_PARAM_KEY, TWITTER_API_REQUEST_TOKEN_PARAM_VALUE}};
     QByteArray header {TwitterDataUtil::authorizationHeader(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, "POST", TWITTER_API_REQUEST_TOKEN, args)};
     qCDebug(QLoggingCategory("twitter-auth")) << "The authentification header for the start request is:" << header;
 
@@ -139,7 +139,7 @@ void TwitterAuthentification::continueRequest()
 
     qCDebug(QLoggingCategory("twitter-auth")) << "Continuing request with pin:" << m_pin;
 
-    std::vector<std::pair<QString, QString>> args {{QLatin1String(TWITTER_API_ACCESS_TOKEN_PARAM_KEY), m_pin}};
+    std::vector<std::pair<QByteArray, QByteArray>> args {{TWITTER_API_ACCESS_TOKEN_PARAM_KEY, m_pin.toLocal8Bit()}};
     QByteArray header = TwitterDataUtil::authorizationHeader(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, "POST", TWITTER_API_ACCESS_TOKEN, args, m_tempToken, m_tempTokenSecret);
     qCDebug(QLoggingCategory("twitter-auth")) << "The authentification header for the continue request is:" << header;
 

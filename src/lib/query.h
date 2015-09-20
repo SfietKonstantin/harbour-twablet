@@ -43,9 +43,10 @@ public:
     {
         Invalid = 0,
         Home,
-        Mentions
+        Mentions,
+        Search
     };
-    using Arguments = std::vector<std::pair<QString, QString>>;
+    using Arguments = std::map<QString, QString>;
     explicit Query() = default;
     explicit Query(Type type, Arguments &&arguments);
     DEFAULT_COPY_DEFAULT_MOVE(Query);

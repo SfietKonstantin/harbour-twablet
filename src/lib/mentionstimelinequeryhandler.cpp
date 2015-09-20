@@ -30,6 +30,7 @@
  */
 
 #include "mentionstimelinequeryhandler.h"
+#include <QtCore/QUrl>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
@@ -39,14 +40,14 @@ MentionsTimelineQueryHandler::MentionsTimelineQueryHandler()
 {
 }
 
-void MentionsTimelineQueryHandler::createRequest(QString &path, std::map<QString, QString> &parameters) const
+void MentionsTimelineQueryHandler::createRequest(QString &path, std::map<QByteArray, QByteArray> &parameters) const
 {
     path = QLatin1String("statuses/mentions_timeline.json");
-    parameters.insert({QLatin1String("count"), QString::number(200)});
-    parameters.insert({QLatin1String("trim_user"), QLatin1String("false")});
-    parameters.insert({QLatin1String("include_entities"), QLatin1String("true")});
+    parameters.insert({"count", QByteArray::number(200)});
+    parameters.insert({"trim_user", "false"});
+    parameters.insert({"include_entities", "true"});
     if (!m_sinceId.isEmpty()) {
-        parameters.insert({QLatin1String("since_id"), m_sinceId});
+        parameters.insert({"since_id", QUrl::toPercentEncoding(m_sinceId)});
     }
 }
 

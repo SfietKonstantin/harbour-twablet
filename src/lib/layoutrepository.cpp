@@ -54,7 +54,7 @@ void LayoutRepository::load(const QJsonObject &json)
             const QJsonObject &argumentObject {argumentValue.toObject()};
             QString key {argumentObject.value(QLatin1String("key")).toString()};
             QString value {argumentObject.value(QLatin1String("value")).toString()};
-            arguments.emplace_back(key, value);
+            arguments.emplace(key, value);
         }
 
         if (!userId.isEmpty() && queryType != Query::Invalid) {

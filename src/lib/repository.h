@@ -48,6 +48,7 @@ public:
     ~Repository()
     {
         for (IListener<T> *listener : m_listeners) {
+            listener->doInvalidate();
             removeListener(*listener);
         }
     }
@@ -115,18 +116,22 @@ public:
     }
     void start()
     {
+        m_status = Loading;
         for (IListener<T> *listener : m_listeners) {
             listener->doStart();
         }
     }
     void error(const QString &error)
     {
+        m_status = Error;
+        m_lastError = error;
         for (IListener<T> *listener : m_listeners) {
             listener->doError(error);
         }
     }
     void finish()
     {
+        m_status = Idle;
         for (IListener<T> *listener : m_listeners) {
             listener->doFinish();
         }
@@ -134,6 +139,16 @@ public:
     void addListener(IListener<T> &listener)
     {
         m_listeners.insert(&listener);
+        switch (m_status) {
+        case Idle:
+            break;
+        case Loading:
+            listener.doStart();
+            break;
+        case Error:
+            listener.doError(m_lastError);
+            break;
+        }
     }
     void removeListener(IListener<T> &listener)
     {
@@ -141,7 +156,14 @@ public:
     }
     std::deque<T> m_data {};
 private:
+    enum Status {
+        Idle,
+        Loading,
+        Error
+    };
     std::set<IListener<T> *> m_listeners {};
+    Status m_status {Idle};
+    QString m_lastError {};
 };
 
 #endif // REPOSITORY_H

@@ -48,7 +48,7 @@ protected:
         Append,
         Prepend,
     };
-    virtual void createRequest(QString &path, std::map<QString, QString> &parameters) const = 0;
+    virtual void createRequest(QString &path, std::map<QByteArray, QByteArray> &parameters) const = 0;
     virtual bool treatReply(const QByteArray &data, std::vector<Tweet> &items,
                             QString &errorMessage, Placement &placement) = 0;
     friend class TweetCentralRepository;

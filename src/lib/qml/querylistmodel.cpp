@@ -38,6 +38,7 @@ QueryListModel::QueryListModel(QObject *parent) :
 {
     m_data.emplace_back(new Data {tr("Home"), QueryObject::Home});
     m_data.emplace_back(new Data {tr("Mentions"), QueryObject::Mentions});
+    m_data.emplace_back(new Data {tr("Search"), QueryObject::Search});
 }
 
 void QueryListModel::classBegin()

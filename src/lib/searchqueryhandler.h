@@ -29,65 +29,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "userqueryitem.h"
-#include "private/twitterqueryutil.h"
-#include "accountobject.h"
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
+#ifndef SEARCHQUERYHANDLER_H
+#define SEARCHQUERYHANDLER_H
 
-UserQueryItem::UserQueryItem(QObject *parent)
-    : AbstractQueryItem(parent)
+#include "iqueryhandler.h"
+#include "query.h"
+#include "globals.h"
+
+class SearchQueryHandler: public IQueryHandler
 {
-}
+public:
+    explicit SearchQueryHandler(const Query::Arguments &arguments);
+    DISABLE_COPY_DISABLE_MOVE(SearchQueryHandler);
+private:
+    void createRequest(QString &path, std::map<QByteArray, QByteArray> &parameters) const override;
+    bool treatReply(const QByteArray &data, std::vector<Tweet> &items,
+                    QString &errorMessage, Placement &placement) override;
+    QString m_query {};
+    QByteArray m_resultType {};
+    QString m_sinceId {};
+};
 
-QString UserQueryItem::userId() const
-{
-    return m_userId;
-}
-
-void UserQueryItem::setUserId(const QString &userId)
-{
-    if (m_userId != userId) {
-        m_userId = userId;
-        emit userIdChanged();
-    }
-}
-
-UserObject * UserQueryItem::user() const
-{
-    return m_user.get();
-}
-
-bool UserQueryItem::isQueryValid() const
-{
-    return !m_userId.isEmpty();
-}
-
-QNetworkReply * UserQueryItem::createQuery() const
-{
-    QString path {QLatin1String("users/show.json")};
-    std::map<QByteArray, QByteArray> parameters {{"user_id", QUrl::toPercentEncoding(m_userId)}};
-
-    return TwitterQueryUtil::get(network(), path, parameters, account()->account());
-}
-
-void UserQueryItem::handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
-                                const QString &errorMessage)
-{
-    Q_UNUSED(errorMessage)
-    if (networkError != QNetworkReply::NoError) {
-        return;
-    }
-
-    QJsonParseError error {-1, QJsonParseError::NoError};
-    QJsonDocument document {QJsonDocument::fromJson(reply, &error)};
-    if (error.error != QJsonParseError::NoError) {
-        setStatusAndErrorMessage(Error, tr("Internal error"));
-        return;
-    }
-
-    const QJsonObject &user {document.object()};
-    m_user.reset(UserObject::create(User(user)));
-    emit userChanged();
-}
-
+#endif // SEARCHQUERYHANDLER_H

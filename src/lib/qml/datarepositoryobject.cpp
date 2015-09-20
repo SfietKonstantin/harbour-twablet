@@ -132,6 +132,8 @@ void DataRepositoryObject::addLayout(const QString &name, int accountIndex, int 
         break;
     case Query::Mentions:
         break;
+    case Query::Search:
+        break;
     default:
         return;
         break;
@@ -139,7 +141,7 @@ void DataRepositoryObject::addLayout(const QString &name, int accountIndex, int 
 
     Query::Arguments queryArguments {};
     for (const QString &key : arguments.keys()) {
-        queryArguments.push_back(std::make_pair(key, arguments.value(key).toString()));
+        queryArguments.emplace(key, arguments.value(key).toString());
     }
 
     m_layouts.append(Layout(name, account.userId(), Query(static_cast<Query::Type>(queryType),

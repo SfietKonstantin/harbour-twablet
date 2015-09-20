@@ -37,13 +37,19 @@ Dialog {
     id: container
     property AccountModel accountModel
 
-    canAccept: nameField.text.length > 0
+    canAccept: nameField.text.length > 0 && searchQuery.isSearchOk
     allowedOrientations: app.defaultAllowedOrientations
 
     onAccepted: {
         var accountIndex = accountCombo.currentIndex
         var queryType = queryListModel.getType(queryCombo.currentIndex)
-        Repository.addLayout(nameField.text, accountIndex, queryType, {})
+
+        var args = new Object
+        if (searchQuery.isSearch) {
+            args.q = searchQuery.text.trim()
+            args.result_type = resultTypeModel.get(resultTypeCombo.currentIndex).value
+        }
+        Repository.addLayout(nameField.text, accountIndex, queryType, args)
     }
 
     SilicaFlickable {
@@ -61,6 +67,7 @@ Dialog {
                 id: nameField
                 anchors.left: parent.left; anchors.right: parent.right
                 placeholderText: qsTr("Name of the column")
+                label: qsTr("Name of the column")
             }
 
             ComboBox {
@@ -84,6 +91,45 @@ Dialog {
                         model: QueryListModel {id: queryListModel}
                         delegate: MenuItem {
                             text: model.name
+                        }
+                    }
+                }
+            }
+
+            TextField {
+                id: searchQuery
+                property bool isSearch: (queryListModel.getType(queryCombo.currentIndex) === Query.Search)
+                property bool isSearchOk: (isSearch && searchQuery.text.length > 0 || !isSearch)
+                anchors.left: parent.left; anchors.right: parent.right
+                visible: isSearch
+                placeholderText: qsTr("Search query")
+                label: qsTr("Search query")
+            }
+
+            ComboBox {
+                id: resultTypeCombo
+                visible: searchQuery.isSearch
+                label: qsTr("Search result type")
+                menu: ContextMenu {
+                    Repeater {
+                        model: ListModel {
+                            id: resultTypeModel
+                            ListElement {
+                                text: QT_TR_NOOP("Recent")
+                                value: "recent"
+                            }
+                            ListElement {
+                                text: QT_TR_NOOP("Popular")
+                                value: "popular"
+                            }
+                            ListElement {
+                                text: QT_TR_NOOP("Mixed")
+                                value: "mixed"
+                            }
+                        }
+
+                        delegate: MenuItem {
+                            text: qsTr(model.text)
                         }
                     }
                 }

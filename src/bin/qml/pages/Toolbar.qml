@@ -37,6 +37,7 @@ Rectangle {
     id: container
     signal goToIndex(int index)
     signal goToTop(int index)
+    property bool isLandscape: false
     property int lastTappedIndex: -1
     property alias currentIndex: view.currentIndex
     property int columnCount
@@ -51,9 +52,10 @@ Rectangle {
 
     QtObject {
         id: internal
-        property double viewHeight: (Screen.sizeCategory === Screen.Small ? Theme.itemSizeSmall : post.height)
-        property double height: (Screen.sizeCategory === Screen.Small ? Theme.itemSizeSmall + post.height : post.height)
-        property double width: (Screen.sizeCategory === Screen.Small ? container.width : container.width / 2)
+        property bool isSplit: container.columnCount > 1
+        property double viewHeight: (isSplit ? post.height : Theme.itemSizeSmall)
+        property double height: (isSplit ? post.height : Theme.itemSizeSmall + post.height)
+        property double width: (isSplit ? container.width / 2 : container.width)
     }
 
     SilicaListView {
@@ -64,6 +66,7 @@ Rectangle {
         height: internal.viewHeight
         model: LayoutModel { id: layoutModel; repository: Repository }
         orientation: Qt.Horizontal
+        clip: true
 
         delegate: ToolbarButton {
             id: delegate
@@ -94,6 +97,9 @@ Rectangle {
                 case Query.Mentions:
                     Qt.resolvedUrl("../../data/mail.svg")
                     break
+                case Query.Search:
+                    Qt.resolvedUrl("../../data/search.svg")
+                    break
                 }
             }
 
@@ -114,7 +120,7 @@ Rectangle {
         }
 
         Rectangle {
-            property double ratio: (Screen.sizeCategory === Screen.Small ? 1 : 2)
+            property double ratio: (internal.isSplit ? 2 : 1)
             width: view.cellWidth * container.columnCount
             height: Theme.paddingMedium / 2
             x: ((mainView.contentX - mainView.originX) / view.capacity * container.columnCount - (view.contentX - view.originX)) / ratio

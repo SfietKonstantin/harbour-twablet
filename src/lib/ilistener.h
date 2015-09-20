@@ -46,6 +46,7 @@ private:
     virtual void doPrepend(const std::vector<T> &data) = 0;
     virtual void doUpdate(int index, const T &data) = 0;
     virtual void doRemove(int index) = 0;
+    virtual void doInvalidate() = 0;
     virtual void doStart() = 0;
     virtual void doError(const QString &error) = 0;
     virtual void doFinish() = 0;

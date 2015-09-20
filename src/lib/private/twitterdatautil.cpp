@@ -51,7 +51,7 @@ QByteArray TwitterDataUtil::authorizationHeader(const QByteArray &oauthConsumerK
                                                 const QByteArray &oauthConsumerSecret,
                                                 const QByteArray &requestMethod,
                                                 const QByteArray &requestUrl,
-                                                const std::vector<std::pair<QString, QString>> &parameters,
+                                                const std::vector<std::pair<QByteArray, QByteArray>> &parameters,
                                                 const QByteArray &oauthToken,
                                                 const QByteArray &oauthTokenSecret,
                                                 const QByteArray &oauthNonce,
@@ -69,16 +69,16 @@ QByteArray TwitterDataUtil::authorizationHeader(const QByteArray &oauthConsumerK
 
     // now build up the encoded parameters map.  We use a map to perform alphabetical sorting.
     QMap<QByteArray, QByteArray> encodedParams {};
-    encodedParams.insert(QUrl::toPercentEncoding(QLatin1String("oauth_consumer_key")), QUrl::toPercentEncoding(QLatin1String(oauthConsumerKey)));
-    encodedParams.insert(QUrl::toPercentEncoding(QLatin1String("oauth_nonce")), QUrl::toPercentEncoding(QLatin1String(nonce)));
-    encodedParams.insert(QUrl::toPercentEncoding(QLatin1String("oauth_signature_method")), QUrl::toPercentEncoding(QLatin1String(OAUTH_SIGNATURE_METHOD)));
-    encodedParams.insert(QUrl::toPercentEncoding(QLatin1String("oauth_timestamp")), QUrl::toPercentEncoding(QLatin1String(timestamp)));
-    encodedParams.insert(QUrl::toPercentEncoding(QLatin1String("oauth_version")), QUrl::toPercentEncoding(QLatin1String(OAUTH_VERSION)));
+    encodedParams.insert(QByteArray("oauth_consumer_key").toPercentEncoding(), QByteArray(oauthConsumerKey).toPercentEncoding());
+    encodedParams.insert(QByteArray("oauth_nonce").toPercentEncoding(), nonce.toPercentEncoding());
+    encodedParams.insert(QByteArray("oauth_signature_method").toPercentEncoding(), QByteArray(OAUTH_SIGNATURE_METHOD).toPercentEncoding());
+    encodedParams.insert(QByteArray("oauth_timestamp").toPercentEncoding(), timestamp.toPercentEncoding());
+    encodedParams.insert(QByteArray("oauth_version").toPercentEncoding(), QByteArray(OAUTH_VERSION).toPercentEncoding());
     if (!oauthToken.isEmpty()) {
-        encodedParams.insert(QUrl::toPercentEncoding(QLatin1String("oauth_token")), QUrl::toPercentEncoding(QLatin1String(oauthToken)));
+        encodedParams.insert(QByteArray("oauth_token").toPercentEncoding(), oauthToken.toPercentEncoding());
     }
-    for (const std::pair<QString, QString> &parameter : parameters) {
-        encodedParams.insert(QUrl::toPercentEncoding(parameter.first), QUrl::toPercentEncoding(parameter.second));
+    for (const std::pair<QByteArray, QByteArray> &parameter : parameters) {
+        encodedParams.insert(parameter.first, parameter.second);
     }
 
     QByteArray parametersByteArray {};
@@ -88,18 +88,18 @@ QByteArray TwitterDataUtil::authorizationHeader(const QByteArray &oauthConsumerK
     }
     parametersByteArray.chop(1);
 
-    QByteArray signatureBaseString {requestMethod.toUpper() + QByteArray("&") + QUrl::toPercentEncoding(QLatin1String(requestUrl)) + QByteArray("&") + QUrl::toPercentEncoding(QLatin1String(parametersByteArray))};
-    QByteArray signingKey {QUrl::toPercentEncoding(QLatin1String(oauthConsumerSecret)) + QByteArray("&") + QUrl::toPercentEncoding(QLatin1String(oauthTokenSecret))};
+    QByteArray signatureBaseString {requestMethod.toUpper() + QByteArray("&") + requestUrl.toPercentEncoding() + QByteArray("&") + parametersByteArray.toPercentEncoding()};
+    QByteArray signingKey {oauthConsumerSecret.toPercentEncoding() + QByteArray("&") + oauthTokenSecret.toPercentEncoding()};
 
     QByteArray oauthSignature {QMessageAuthenticationCode::hash(signatureBaseString, signingKey, QCryptographicHash::Sha1).toBase64()};
-    encodedParams.insert(QUrl::toPercentEncoding(QLatin1String("oauth_signature")), QUrl::toPercentEncoding(QLatin1String(oauthSignature)));
+    encodedParams.insert(QByteArray("oauth_signature").toPercentEncoding(), oauthSignature.toPercentEncoding());
 
     // now generate the Authorization header from the encoded parameters map.
     // we need to remove the query items from the encoded parameters map first.
     QByteArray authHeader = QByteArray("OAuth ");
 
-    for (const std::pair<QString, QString> &parameter : parameters) {
-        encodedParams.remove(QUrl::toPercentEncoding(parameter.first));
+    for (const std::pair<QByteArray, QByteArray> &parameter : parameters) {
+        encodedParams.remove(parameter.first);
     }
     keys = encodedParams.keys();
     foreach (const QByteArray &key, keys) {

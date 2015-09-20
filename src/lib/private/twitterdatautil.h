@@ -44,7 +44,7 @@ public:
                                           const QByteArray &oauthConsumerSecret,
                                           const QByteArray &requestMethod,
                                           const QByteArray &requestUrl,
-                                          const std::vector<std::pair<QString, QString>> &parameters,
+                                          const std::vector<std::pair<QByteArray, QByteArray> > &parameters,
                                           const QByteArray &oauthToken = QByteArray(),
                                           const QByteArray &oauthTokenSecret = QByteArray(),
                                           const QByteArray &oauthNonce = QByteArray(),

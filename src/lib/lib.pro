@@ -59,7 +59,8 @@ HEADERS += \
     urlentity.h \
     qml/entitiesformatter.h \
     usermentionentity.h \
-    qml/tweetformatter.h
+    qml/tweetformatter.h \
+    searchqueryhandler.h
 
 SOURCES += \
     private/twitterdatautil.cpp \
@@ -98,4 +99,5 @@ SOURCES += \
     entity.cpp \
     qml/entitiesformatter.cpp \
     usermentionentity.cpp \
-    qml/tweetformatter.cpp
+    qml/tweetformatter.cpp \
+    searchqueryhandler.cpp

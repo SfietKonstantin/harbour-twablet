@@ -32,6 +32,7 @@
 #include "tweetcentralrepository.h"
 #include "hometimelinequeryhandler.h"
 #include "mentionstimelinequeryhandler.h"
+#include "searchqueryhandler.h"
 #include "private/twitterqueryutil.h"
 #include <QtCore/QLoggingCategory>
 #include <QtCore/QJsonDocument>
@@ -45,7 +46,7 @@ TweetCentralRepository::TweetCentralRepository()
 }
 
 void TweetCentralRepository::query(const Account &account, const Query &query,
-                                          TweetRepository &repository)
+                                   TweetRepository &repository)
 {
     // Create the request
     IQueryHandler * handler = getQueryHandler(query);
@@ -54,7 +55,7 @@ void TweetCentralRepository::query(const Account &account, const Query &query,
     }
 
     QString path {};
-    std::map<QString, QString> parameters {};
+    std::map<QByteArray, QByteArray> parameters {};
     handler->createRequest(path, parameters);
     QNetworkReply *reply {TwitterQueryUtil::get(*m_network, path, parameters, account)};
     repository.start();
@@ -132,6 +133,12 @@ IQueryHandler * TweetCentralRepository::getQueryHandler(const Query &query)
     case Query::Mentions:
     {
         std::unique_ptr<IQueryHandler> handler {new MentionsTimelineQueryHandler()};
+        return m_queries.emplace(query, std::move(handler)).first->second.get();
+        break;
+    }
+    case Query::Search:
+    {
+        std::unique_ptr<IQueryHandler> handler {new SearchQueryHandler(query.arguments())};
         return m_queries.emplace(query, std::move(handler)).first->second.get();
         break;
     }

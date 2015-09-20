@@ -42,23 +42,23 @@ class TwitterQueryUtil
 {
 public:
     static QNetworkReply * get(QNetworkAccessManager &network, const QString &path,
-                               const std::map<QString, QString> &parameters,
+                               const std::map<QByteArray, QByteArray> &parameters,
                                const Account &account);
     static QNetworkReply * post(QNetworkAccessManager &network, const QString &path,
-                                const std::map<QString, QString> &parameters,
-                                const std::map<QString, QString> &postData,
+                                const std::map<QByteArray, QByteArray> &parameters,
+                                const std::map<QByteArray, QByteArray> &postData,
                                 const Account &account);
 private:
     static QNetworkRequest createRequest(const QByteArray &type, const QString &path,
-                                         const std::map<QString, QString> &parameters,
-                                         const std::map<QString, QString> &postData,
+                                         const std::map<QByteArray, QByteArray> &parameters,
+                                         const std::map<QByteArray, QByteArray> &postData,
                                          const Account &account);
     static QNetworkRequest createGetRequest(const QString &path,
-                                            const std::map<QString, QString> &parameters,
+                                            const std::map<QByteArray, QByteArray> &parameters,
                                             const Account &account);
     static QNetworkRequest createPostRequest(const QString &path,
-                                             const std::map<QString, QString> &parameters,
-                                             const std::map<QString, QString> &postData,
+                                             const std::map<QByteArray, QByteArray> &parameters,
+                                             const std::map<QByteArray, QByteArray> &postData,
                                              const Account &account);
 };
 

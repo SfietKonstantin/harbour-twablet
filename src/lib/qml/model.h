@@ -168,6 +168,10 @@ private:
         emit countChanged();
         endRemoveRows();
     }
+    void doInvalidate() override
+    {
+        m_internalRepository = nullptr;
+    }
     void doStart() override
     {
         setStatusAndErrorMessage(Loading, QString());

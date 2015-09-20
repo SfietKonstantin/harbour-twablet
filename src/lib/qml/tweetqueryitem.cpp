@@ -72,9 +72,9 @@ bool TweetQueryItem::isQueryValid() const
 QNetworkReply * TweetQueryItem::createQuery() const
 {
     QString path {QLatin1String("statuses/update.json")};
-    std::map<QString, QString> parameters {{QLatin1String("status"), m_text}};
+    std::map<QByteArray, QByteArray> parameters {{"status", QUrl::toPercentEncoding(m_text)}};
     if (!m_inReplyTo.isEmpty()) {
-        parameters.insert({QLatin1String("in_reply_to_status_id"), m_inReplyTo});
+        parameters.insert({"in_reply_to_status_id", QUrl::toPercentEncoding(m_inReplyTo)});
     }
 
     return TwitterQueryUtil::post(network(), path, {}, parameters, account()->account());
