@@ -34,7 +34,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSize>
-#include "media.h"
+#include "mediaentity.h"
 
 class MediaObject : public QObject
 {
@@ -48,21 +48,21 @@ class MediaObject : public QObject
 public:
     enum Type
     {
-        Invalid = Media::Invalid,
-        Photo = Media::Photo,
-        Video = Media::Video,
-        Gif = Media::Gif
+        Invalid = MediaEntity::InvalidMedia,
+        Photo = MediaEntity::Photo,
+        Video = MediaEntity::Video,
+        Gif = MediaEntity::Gif
     };
     DISABLE_COPY_DISABLE_MOVE(MediaObject);
-    static MediaObject * create(const Media &data, QObject *parent = 0);
+    static MediaObject * create(const MediaEntity &data, QObject *parent = 0);
     QString id() const;
     QString url() const;
     Type type() const;
     QSize size() const;
     int duration() const;
 private:
-    explicit MediaObject(const Media &data, QObject *parent = 0);
-    Media m_data {};
+    explicit MediaObject(const MediaEntity &data, QObject *parent = 0);
+    MediaEntity m_data {};
     QSize m_size {};
 };
 

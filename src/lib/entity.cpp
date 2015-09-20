@@ -29,46 +29,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEET_H
-#define TWEET_H
+#include "entity.h"
+#include "urlentity.h"
+#include "mediaentity.h"
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
 
-#include <QtCore/QString>
-#include <QtCore/QDateTime>
-#include "globals.h"
-#include "user.h"
-
-class Tweet
+std::vector<Entity::Ptr> Entity::create(const QJsonObject &json)
 {
-public:
-    explicit Tweet() = default;
-    explicit Tweet(const QJsonObject &json);
-    DEFAULT_COPY_DEFAULT_MOVE(Tweet);
-    bool isValid() const;
-    QString id() const;
-    QString text() const;
-    User user() const;
-    User retweetingUser() const;
-    QDateTime timestamp() const;
-    int favoriteCount() const;
-    bool isFavorited() const;
-    int retweetCount() const;
-    bool isRetweeted() const;
-    QString inReplyTo() const;
-    QString source() const;
-    std::vector<Entity::Ptr> entities() const;
-private:
-    QString m_id {};
-    QString m_text {};
-    User m_user {};
-    User m_retweetingUser {};
-    QDateTime m_timestamp {};
-    int m_favoriteCount {};
-    bool m_favorited {};
-    int m_retweetCount {};
-    bool m_retweeted {};
-    QString m_inReplyTo {};
-    QString m_source {};
-    std::vector<Entity::Ptr> m_entities;
-};
+    std::vector<Entity::Ptr> returned {};
+    const QJsonArray &urls (json.value(QLatin1String("urls")).toArray());
+    for (const QJsonValue &value : urls) {
+        returned.emplace_back(new UrlEntity(value.toObject()));
+    }
+    const QJsonArray &media (json.value(QLatin1String("media")).toArray());
+    for (const QJsonValue &value : media) {
+        returned.emplace_back(new MediaEntity(value.toObject()));
+    }
 
-#endif // TWEET_H
+    const QJsonArray &extended (json.value(QLatin1String("extended_entities")).toArray());
+    for (const QJsonValue &value : extended) {
+        returned.emplace_back(new MediaEntity(value.toObject()));
+    }
+
+    return returned;
+}

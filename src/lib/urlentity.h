@@ -29,46 +29,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEET_H
-#define TWEET_H
+#ifndef URLENTITY_H
+#define URLENTITY_H
 
-#include <QtCore/QString>
-#include <QtCore/QDateTime>
+#include "entity.h"
 #include "globals.h"
-#include "user.h"
 
-class Tweet
+class QJsonObject;
+class UrlEntity: public Entity
 {
 public:
-    explicit Tweet() = default;
-    explicit Tweet(const QJsonObject &json);
-    DEFAULT_COPY_DEFAULT_MOVE(Tweet);
-    bool isValid() const;
-    QString id() const;
-    QString text() const;
-    User user() const;
-    User retweetingUser() const;
-    QDateTime timestamp() const;
-    int favoriteCount() const;
-    bool isFavorited() const;
-    int retweetCount() const;
-    bool isRetweeted() const;
-    QString inReplyTo() const;
-    QString source() const;
-    std::vector<Entity::Ptr> entities() const;
+    explicit UrlEntity() = default;
+    explicit UrlEntity(const QJsonObject &json);
+    DEFAULT_COPY_DEFAULT_MOVE(UrlEntity);
+    Type type() const override;
+    bool isValid() const override;
+    QString text() const override;
+    QString displayUrl() const;
+    QString expandedUrl() const;
 private:
-    QString m_id {};
     QString m_text {};
-    User m_user {};
-    User m_retweetingUser {};
-    QDateTime m_timestamp {};
-    int m_favoriteCount {};
-    bool m_favorited {};
-    int m_retweetCount {};
-    bool m_retweeted {};
-    QString m_inReplyTo {};
-    QString m_source {};
-    std::vector<Entity::Ptr> m_entities;
+    QString m_displayUrl {};
+    QString m_expandedUrl {};
 };
 
-#endif // TWEET_H
+#endif // URLENTITY_H

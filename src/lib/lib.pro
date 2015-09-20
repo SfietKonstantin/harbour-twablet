@@ -46,14 +46,18 @@ HEADERS += \
     mentionstimelinequeryhandler.h \
     user.h \
     qml/userobject.h \
-    media.h \
+    mediaentity.h \
     qml/mediaobject.h \
     qml/mediamodel.h \
     qml/abstractqueryitem.h \
     qml/tweetqueryitem.h \
     qml/accountselectionmodel.h \
     qml/userqueryitem.h \
-    private/timeutil.h
+    private/timeutil.h \
+    qml/descriptionformatter.h \
+    entity.h \
+    urlentity.h \
+    qml/entitiesformatter.h
 
 SOURCES += \
     private/twitterdatautil.cpp \
@@ -80,10 +84,14 @@ SOURCES += \
     mentionstimelinequeryhandler.cpp \
     user.cpp \
     qml/userobject.cpp \
-    media.cpp \
+    mediaentity.cpp \
     qml/mediaobject.cpp \
     qml/mediamodel.cpp \
     qml/abstractqueryitem.cpp \
     qml/tweetqueryitem.cpp \
     qml/accountselectionmodel.cpp \
-    qml/userqueryitem.cpp
+    qml/userqueryitem.cpp \
+    qml/descriptionformatter.cpp \
+        urlentity.cpp \
+    entity.cpp \
+    qml/entitiesformatter.cpp

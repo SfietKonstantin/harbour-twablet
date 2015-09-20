@@ -31,20 +31,29 @@
 
 #include "mediamodel.h"
 
-MediaModel::MediaModel(const std::vector<Media> &media, QObject *parent)
+MediaModel::MediaModel(const std::vector<Entity::Ptr> &entities, QObject *parent)
     : QAbstractListModel(parent)
 {
+    std::vector<MediaEntity> media {};
+    for (const Entity::Ptr &entity : entities) {
+        if (entity->type() == Entity::Media) {
+            MediaEntity *mediaEntity {dynamic_cast<MediaEntity *>(entity.get())};
+            media.emplace_back(*mediaEntity);
+        }
+    }
+
+
     beginInsertRows(QModelIndex(), 0, media.size() - 1);
-    for (const Media &medium : media) {
+    for (const MediaEntity &medium : media) {
         m_data.emplace_back(MediaObject::create(medium, this));
     }
     emit countChanged();
     endInsertRows();
 }
 
-MediaModel * MediaModel::create(const std::vector<Media> &media, QObject *parent)
+MediaModel * MediaModel::create(const std::vector<Entity::Ptr> &entities, QObject *parent)
 {
-    return new MediaModel(media, parent);
+    return new MediaModel(entities, parent);
 }
 
 int MediaModel::rowCount(const QModelIndex &parent) const

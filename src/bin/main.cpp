@@ -51,6 +51,7 @@
 #include "qml/tweetmodel.h"
 #include "qml/tweetqueryitem.h"
 #include "qml/userqueryitem.h"
+#include "qml/descriptionformatter.h"
 
 int main(int argc, char *argv[])
 {
@@ -72,6 +73,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<QueryListModel>("harbour.twablet", 1, 0, "QueryListModel");
     qmlRegisterType<TweetQueryItem>("harbour.twablet", 1, 0, "TweetQueryItem");
     qmlRegisterType<UserQueryItem>("harbour.twablet", 1, 0, "UserQueryItem");
+    qmlRegisterType<DescriptionFormatter>("harbour.twablet", 1, 0, "DescriptionFormatter");
     qmlRegisterSingletonType<DataRepositoryObject>("harbour.twablet", 1, 0, "Repository",
                                                           [](QQmlEngine *e, QJSEngine *) -> QObject * {
         return new DataRepositoryObject(e);

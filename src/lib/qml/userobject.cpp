@@ -31,6 +31,7 @@
 
 #include "userobject.h"
 #include <QtCore/QJsonArray>
+#include "urlentity.h"
 
 UserObject::UserObject(const User &data, QObject *parent)
     : QObject(parent), m_data{data}
@@ -134,28 +135,27 @@ int UserObject::tweetsPerDay() const
     return static_cast<double>(m_data.statusesCount()) / static_cast<double>(days);
 }
 
+User UserObject::data() const
+{
+    return m_data;
+}
+
 void UserObject::initializeUrl()
 {
-    QJsonObject urlEntities (m_data.entities().value(QLatin1String("url")).toObject());
-    const QJsonArray &urls (urlEntities.value(QLatin1String("urls")).toArray());
-    if (urls.count() != 1) {
+    if (m_data.urlEntities().size() != 1) {
         return;
     }
 
-    const QJsonObject &url (urls.first().toObject());
-    const QJsonArray &indices (url.value(QLatin1String("indices")).toArray());
-    if (indices.count() != 2) {
+    Entity::Ptr entity {*std::begin(m_data.urlEntities())};
+    if (entity->type() != Entity::Url) {
         return;
     }
 
-    int first = indices[0].toInt();
-    int second = indices[1].toInt();
-    int size = second - first;
-
-    if (first != 0 || size != m_data.url().size()) {
+    UrlEntity *urlEntity {dynamic_cast<UrlEntity *>(entity.get())};
+    if (urlEntity->text() != m_data.url()) {
         return;
     }
 
-    m_url = std::move(url.value(QLatin1String("expanded_url")).toString());
-    m_displayUrl = std::move(url.value(QLatin1String("display_url")).toString());
+    m_url = urlEntity->expandedUrl();
+    m_displayUrl = urlEntity->displayUrl();
 }

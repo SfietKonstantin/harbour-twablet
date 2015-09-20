@@ -44,13 +44,16 @@ User::User(const QJsonObject &json)
     m_following = json.value(QLatin1String("following")).toBool();
     m_statusesCount = json.value(QLatin1String("statuses_count")).toInt();
     m_followersCount = json.value(QLatin1String("followers_count")).toInt();
-    m_friendsCount = json.value(QLatin1String("location")).toInt();
+    m_friendsCount = json.value(QLatin1String("friends_count")).toInt();
     m_listedCount = json.value(QLatin1String("listed_count")).toInt();
     m_favouritesCount = json.value(QLatin1String("favourites_count")).toInt();
     m_imageUrl = json.value(QLatin1String("profile_image_url_https")).toString();
     m_bannerUrl = json.value(QLatin1String("profile_banner_url")).toString();
     m_createdAt = std::move(fromUtc(json.value(QLatin1String("created_at")).toString()));
-    m_entities = std::move(json.value(QLatin1String("entities")).toObject());
+
+    const QJsonObject &entities (json.value(QLatin1String("entities")).toObject());
+    m_descriptionEntities = Entity::create(entities.value(QLatin1String("description")).toObject());
+    m_urlEntities = Entity::create(entities.value(QLatin1String("url")).toObject());
 }
 
 bool User::isValid() const
@@ -78,6 +81,11 @@ QString User::description() const
     return m_description;
 }
 
+std::vector<Entity::Ptr> User::descriptionEntities() const
+{
+    return m_descriptionEntities;
+}
+
 QString User::location() const
 {
     return m_location;
@@ -86,6 +94,11 @@ QString User::location() const
 QString User::url() const
 {
     return m_url;
+}
+
+std::vector<Entity::Ptr> User::urlEntities() const
+{
+    return m_urlEntities;
 }
 
 bool User::isProtected() const
@@ -136,9 +149,4 @@ QString User::bannerUrl() const
 QDateTime User::createdAt() const
 {
     return m_createdAt;
-}
-
-QJsonObject User::entities() const
-{
-    return m_entities;
 }

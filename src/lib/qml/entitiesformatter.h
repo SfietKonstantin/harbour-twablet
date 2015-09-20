@@ -29,39 +29,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef MEDIA_H
-#define MEDIA_H
+#ifndef ENTITIESFORMATTER_H
+#define ENTITIESFORMATTER_H
 
-#include <QtCore/QString>
-#include "globals.h"
+#include <QtCore/QObject>
+#include <QtQml/QQmlParserStatus>
+#include "entity.h"
 
-class QJsonObject;
-class Media
+class UrlEntity;
+class EntitiesFormatter : public QObject, public QQmlParserStatus
 {
+    Q_OBJECT
+    Q_INTERFACES(QQmlParserStatus)
+    Q_PROPERTY(QString text READ text NOTIFY textChanged)
 public:
-    enum Type
-    {
-        Invalid,
-        Photo,
-        Video,
-        Gif
-    };
-    explicit Media() = default;
-    explicit Media(const QJsonObject &json);
-    DEFAULT_COPY_DEFAULT_MOVE(Media);
-    QString id() const;
-    QString url() const;
-    Type type() const;
-    int width() const;
-    int height() const;
-    int duration() const;
+    void classBegin() override;
+    void componentComplete() override;
+    QString text() const;
+signals:
+    void textChanged();
+protected:
+    explicit EntitiesFormatter(QObject *parent = 0);
+    virtual void format() = 0;
+    void doFormat(const QString &input, const std::vector<Entity::Ptr> &entities);
 private:
-    QString m_id {};
-    QString m_url {};
-    Type m_type {Invalid};
-    int m_width {-1};
-    int m_height {-1};
-    int m_duration {-1};
+    void doFormatUrl(QString &text, UrlEntity *entity);
+    bool m_complete {false};
+    QString m_text {};
 };
 
-#endif // MEDIA_H
+#endif // ENTITIESFORMATTER_H

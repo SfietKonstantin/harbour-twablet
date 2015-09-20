@@ -36,6 +36,7 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QJsonObject>
 #include "globals.h"
+#include "entity.h"
 
 class User
 {
@@ -48,8 +49,10 @@ public:
     QString name() const;
     QString screenName() const;
     QString description() const;
+    std::vector<Entity::Ptr> descriptionEntities() const;
     QString location() const;
     QString url() const;
+    std::vector<Entity::Ptr> urlEntities() const;
     bool isProtected() const;
     bool isFollowing() const;
     int statusesCount() const;
@@ -60,14 +63,15 @@ public:
     QString imageUrl() const;
     QString bannerUrl() const;
     QDateTime createdAt() const;
-    QJsonObject entities() const;
 private:
     QString m_id {};
     QString m_name {};
     QString m_screenName {};
     QString m_description {};
+    std::vector<Entity::Ptr> m_descriptionEntities {};
     QString m_location {};
     QString m_url {};
+    std::vector<Entity::Ptr> m_urlEntities {};
     bool m_protected {false};
     bool m_following {false};
     int m_statusesCount {0};
@@ -78,7 +82,6 @@ private:
     QString m_imageUrl {};
     QString m_bannerUrl {};
     QDateTime m_createdAt {};
-    QJsonObject m_entities {};
 };
 
 #endif // USER_H

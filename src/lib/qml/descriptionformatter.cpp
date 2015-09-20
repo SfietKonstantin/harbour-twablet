@@ -29,46 +29,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEET_H
-#define TWEET_H
+#include "descriptionformatter.h"
+#include "userobject.h"
 
-#include <QtCore/QString>
-#include <QtCore/QDateTime>
-#include "globals.h"
-#include "user.h"
-
-class Tweet
+DescriptionFormatter::DescriptionFormatter(QObject *parent)
+    : EntitiesFormatter(parent)
 {
-public:
-    explicit Tweet() = default;
-    explicit Tweet(const QJsonObject &json);
-    DEFAULT_COPY_DEFAULT_MOVE(Tweet);
-    bool isValid() const;
-    QString id() const;
-    QString text() const;
-    User user() const;
-    User retweetingUser() const;
-    QDateTime timestamp() const;
-    int favoriteCount() const;
-    bool isFavorited() const;
-    int retweetCount() const;
-    bool isRetweeted() const;
-    QString inReplyTo() const;
-    QString source() const;
-    std::vector<Entity::Ptr> entities() const;
-private:
-    QString m_id {};
-    QString m_text {};
-    User m_user {};
-    User m_retweetingUser {};
-    QDateTime m_timestamp {};
-    int m_favoriteCount {};
-    bool m_favorited {};
-    int m_retweetCount {};
-    bool m_retweeted {};
-    QString m_inReplyTo {};
-    QString m_source {};
-    std::vector<Entity::Ptr> m_entities;
-};
+}
 
-#endif // TWEET_H
+UserObject * DescriptionFormatter::user() const
+{
+    return m_user;
+}
+
+void DescriptionFormatter::setUser(UserObject *user)
+{
+    if (m_user != user) {
+        m_user = user;
+        emit userChanged();
+
+        format();
+    }
+}
+
+void DescriptionFormatter::format()
+{
+    if (m_user == nullptr) {
+        return;
+    }
+    doFormat(m_user->description(), m_user->data().descriptionEntities());
+}
+

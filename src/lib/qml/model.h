@@ -214,7 +214,7 @@ private:
     }
     void setStatusAndErrorMessage(Status status, const QString &errorMessage)
     {
-        qCDebug(QLoggingCategory("Model")) << "Current status" << status << errorMessage;
+        qCDebug(QLoggingCategory("model")) << "Current status" << status << errorMessage;
         if (m_status != status) {
             m_status = status;
             emit statusChanged();

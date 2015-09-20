@@ -29,46 +29,31 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEET_H
-#define TWEET_H
+#ifndef ENTITY_H
+#define ENTITY_H
 
 #include <QtCore/QString>
-#include <QtCore/QDateTime>
-#include "globals.h"
-#include "user.h"
+#include <memory>
 
-class Tweet
+class QJsonObject;
+class Entity
 {
 public:
-    explicit Tweet() = default;
-    explicit Tweet(const QJsonObject &json);
-    DEFAULT_COPY_DEFAULT_MOVE(Tweet);
-    bool isValid() const;
-    QString id() const;
-    QString text() const;
-    User user() const;
-    User retweetingUser() const;
-    QDateTime timestamp() const;
-    int favoriteCount() const;
-    bool isFavorited() const;
-    int retweetCount() const;
-    bool isRetweeted() const;
-    QString inReplyTo() const;
-    QString source() const;
-    std::vector<Entity::Ptr> entities() const;
-private:
-    QString m_id {};
-    QString m_text {};
-    User m_user {};
-    User m_retweetingUser {};
-    QDateTime m_timestamp {};
-    int m_favoriteCount {};
-    bool m_favorited {};
-    int m_retweetCount {};
-    bool m_retweeted {};
-    QString m_inReplyTo {};
-    QString m_source {};
-    std::vector<Entity::Ptr> m_entities;
+    using Ptr = std::shared_ptr<Entity>;
+    enum Type
+    {
+        Invalid,
+        Media,
+        Url,
+        UserMention,
+        Hashtag,
+        Symbol
+    };
+    virtual ~Entity() {}
+    virtual Type type() const = 0;
+    virtual bool isValid() const = 0;
+    virtual QString text() const = 0;
+    static std::vector<Entity::Ptr> create(const QJsonObject &json);
 };
 
-#endif // TWEET_H
+#endif // ENTITY_H

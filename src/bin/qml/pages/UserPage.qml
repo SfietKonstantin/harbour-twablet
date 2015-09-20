@@ -117,6 +117,11 @@ Page {
                 anchors.left: parent.left; anchors.right: parent.right
                 height: description.height + 2 * Theme.paddingMedium
 
+                DescriptionFormatter {
+                    id: descriptionFormatter
+                    user: query.user
+                }
+
                 Label {
                     id: description
                     anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
@@ -124,7 +129,9 @@ Page {
                     anchors.verticalCenter: parent.verticalCenter
                     wrapMode: Text.Wrap
                     color: Theme.highlightColor
-                    text: query.user ? query.user.description : ""
+                    linkColor: Theme.primaryColor
+                    text: descriptionFormatter.text
+                    textFormat: Text.StyledText
                 }
             }
 

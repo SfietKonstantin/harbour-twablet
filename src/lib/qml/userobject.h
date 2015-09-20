@@ -77,6 +77,7 @@ public:
     QString imageUrl() const;
     QString bannerUrl() const;
     int tweetsPerDay() const;
+    User data() const;
 private:
     explicit UserObject(const User &data, QObject *parent = 0);
     void initializeUrl();

@@ -29,46 +29,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEET_H
-#define TWEET_H
+#ifndef DESCRIPTIONFORMATTER_H
+#define DESCRIPTIONFORMATTER_H
 
-#include <QtCore/QString>
-#include <QtCore/QDateTime>
-#include "globals.h"
-#include "user.h"
+#include "entitiesformatter.h"
+#include <QtQml/QQmlParserStatus>
 
-class Tweet
+class UserObject;
+class DescriptionFormatter : public EntitiesFormatter
 {
+    Q_OBJECT
+    Q_INTERFACES(QQmlParserStatus)
+    Q_PROPERTY(UserObject * user READ user WRITE setUser NOTIFY userChanged)
 public:
-    explicit Tweet() = default;
-    explicit Tweet(const QJsonObject &json);
-    DEFAULT_COPY_DEFAULT_MOVE(Tweet);
-    bool isValid() const;
-    QString id() const;
-    QString text() const;
-    User user() const;
-    User retweetingUser() const;
-    QDateTime timestamp() const;
-    int favoriteCount() const;
-    bool isFavorited() const;
-    int retweetCount() const;
-    bool isRetweeted() const;
-    QString inReplyTo() const;
-    QString source() const;
-    std::vector<Entity::Ptr> entities() const;
+    explicit DescriptionFormatter(QObject *parent = 0);
+    UserObject * user() const;
+    void setUser(UserObject *user);
+signals:
+    void userChanged();
 private:
-    QString m_id {};
-    QString m_text {};
-    User m_user {};
-    User m_retweetingUser {};
-    QDateTime m_timestamp {};
-    int m_favoriteCount {};
-    bool m_favorited {};
-    int m_retweetCount {};
-    bool m_retweeted {};
-    QString m_inReplyTo {};
-    QString m_source {};
-    std::vector<Entity::Ptr> m_entities;
+    void format() override;
+    UserObject *m_user {nullptr};
 };
 
-#endif // TWEET_H
+#endif // DESCRIPTIONFORMATTER_H

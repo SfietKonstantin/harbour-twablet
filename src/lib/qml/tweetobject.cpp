@@ -33,7 +33,7 @@
 #include <QtCore/QRegularExpression>
 
 TweetObject::TweetObject(const Tweet &data, QObject *parent)
-    : QObject(parent), m_data{data}, m_user{nullptr}
+    : QObject(parent), m_data{std::move(data)}, m_user{nullptr}
 {
     m_user = UserObject::create(m_data.user(), this);
     if (m_data.retweetingUser().isValid()) {
@@ -42,7 +42,7 @@ TweetObject::TweetObject(const Tweet &data, QObject *parent)
     QRegularExpression urlParser {QLatin1String("<a[^>]*>([^<]*)</a>")};
     QRegularExpressionMatch match {urlParser.match(m_data.source())};
     m_sourceName = match.captured(1);
-    m_media.reset(MediaModel::create(m_data.media(), this));
+    m_media.reset(MediaModel::create(m_data.entities(), this));
 }
 
 TweetObject * TweetObject::create(const Tweet &data, QObject *parent)

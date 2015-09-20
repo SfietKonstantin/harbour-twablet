@@ -29,46 +29,38 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEET_H
-#define TWEET_H
+#include "urlentity.h"
+#include <QtCore/QJsonObject>
 
-#include <QtCore/QString>
-#include <QtCore/QDateTime>
-#include "globals.h"
-#include "user.h"
-
-class Tweet
+UrlEntity::UrlEntity(const QJsonObject &json)
 {
-public:
-    explicit Tweet() = default;
-    explicit Tweet(const QJsonObject &json);
-    DEFAULT_COPY_DEFAULT_MOVE(Tweet);
-    bool isValid() const;
-    QString id() const;
-    QString text() const;
-    User user() const;
-    User retweetingUser() const;
-    QDateTime timestamp() const;
-    int favoriteCount() const;
-    bool isFavorited() const;
-    int retweetCount() const;
-    bool isRetweeted() const;
-    QString inReplyTo() const;
-    QString source() const;
-    std::vector<Entity::Ptr> entities() const;
-private:
-    QString m_id {};
-    QString m_text {};
-    User m_user {};
-    User m_retweetingUser {};
-    QDateTime m_timestamp {};
-    int m_favoriteCount {};
-    bool m_favorited {};
-    int m_retweetCount {};
-    bool m_retweeted {};
-    QString m_inReplyTo {};
-    QString m_source {};
-    std::vector<Entity::Ptr> m_entities;
-};
+    m_text = std::move(json.value(QLatin1String("url")).toString());
+    m_displayUrl = std::move(json.value(QLatin1String("display_url")).toString());
+    m_expandedUrl = std::move(json.value(QLatin1String("expanded_url")).toString());
+}
 
-#endif // TWEET_H
+
+Entity::Type UrlEntity::type() const
+{
+    return Url;
+}
+
+bool UrlEntity::isValid() const
+{
+    return !m_text.isEmpty() && !m_displayUrl.isEmpty() && !m_expandedUrl.isEmpty();
+}
+
+QString UrlEntity::text() const
+{
+    return m_text;
+}
+
+QString UrlEntity::displayUrl() const
+{
+    return m_displayUrl;
+}
+
+QString UrlEntity::expandedUrl() const
+{
+    return m_expandedUrl;
+}

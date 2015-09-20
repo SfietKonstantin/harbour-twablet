@@ -29,46 +29,47 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEET_H
-#define TWEET_H
+#ifndef MEDIAENTITY_H
+#define MEDIAENTITY_H
 
-#include <QtCore/QString>
-#include <QtCore/QDateTime>
+#include "entity.h"
 #include "globals.h"
-#include "user.h"
 
-class Tweet
+class QJsonObject;
+class MediaEntity: public Entity
 {
 public:
-    explicit Tweet() = default;
-    explicit Tweet(const QJsonObject &json);
-    DEFAULT_COPY_DEFAULT_MOVE(Tweet);
-    bool isValid() const;
+    enum MediaType
+    {
+        InvalidMedia,
+        Photo,
+        Video,
+        Gif
+    };
+    explicit MediaEntity() = default;
+    explicit MediaEntity(const QJsonObject &json);
+    DEFAULT_COPY_DEFAULT_MOVE(MediaEntity);
+    Type type() const override;
+    bool isValid() const override;
     QString id() const;
     QString text() const;
-    User user() const;
-    User retweetingUser() const;
-    QDateTime timestamp() const;
-    int favoriteCount() const;
-    bool isFavorited() const;
-    int retweetCount() const;
-    bool isRetweeted() const;
-    QString inReplyTo() const;
-    QString source() const;
-    std::vector<Entity::Ptr> entities() const;
+    QString displayUrl() const;
+    QString expandedUrl() const;
+    QString mediaUrl() const;
+    MediaType mediaType() const;
+    int width() const;
+    int height() const;
+    int duration() const;
 private:
     QString m_id {};
     QString m_text {};
-    User m_user {};
-    User m_retweetingUser {};
-    QDateTime m_timestamp {};
-    int m_favoriteCount {};
-    bool m_favorited {};
-    int m_retweetCount {};
-    bool m_retweeted {};
-    QString m_inReplyTo {};
-    QString m_source {};
-    std::vector<Entity::Ptr> m_entities;
+    QString m_displayUrl {};
+    QString m_expandedUrl {};
+    QString m_mediaUrl {};
+    MediaType m_mediaType {InvalidMedia};
+    int m_width {-1};
+    int m_height {-1};
+    int m_duration {-1};
 };
 
-#endif // TWEET_H
+#endif // MEDIAENTITY_H

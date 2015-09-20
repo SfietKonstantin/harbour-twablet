@@ -29,61 +29,58 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "media.h"
-#include <QtCore/QLoggingCategory>
-#include <QtCore/QJsonObject>
+#include "entitiesformatter.h"
+#include "urlentity.h"
 
-Media::Media(const QJsonObject &json)
+EntitiesFormatter::EntitiesFormatter(QObject *parent)
+    : QObject(parent)
 {
-    m_id = json.value(QLatin1String("id_str")).toString();
-    m_url = json.value(QLatin1String("media_url_https")).toString();
-    QString type {json.value(QLatin1String("type")).toString()};
-    if (type == QLatin1String("photo")) {
-        m_type = Photo;
-    } else if (type == QLatin1String("video")) {
-        m_type = Video;
-    } else {
-        qCDebug(QLoggingCategory("media")) << "Unknown type" << type;
+}
+
+void EntitiesFormatter::classBegin()
+{
+}
+
+void EntitiesFormatter::componentComplete()
+{
+    m_complete = true;
+    format();
+}
+
+QString EntitiesFormatter::text() const
+{
+    return m_text;
+}
+
+void EntitiesFormatter::doFormat(const QString &input, const std::vector<Entity::Ptr> &entities)
+{
+    if (!m_complete) {
+        return;
     }
 
-    // Use "large" for size
-    QJsonObject sizes {json.value(QLatin1String("sizes")).toObject()};
-    QJsonObject sizeLarge {sizes.value(QLatin1String("large")).toObject()};
-    m_width = sizeLarge.value(QLatin1String("w")).toInt();
-    m_height = sizeLarge.value(QLatin1String("h")).toInt();
+    QString text {input};
+    for (const Entity::Ptr &entity : entities) {
+        switch (entity->type()) {
+        case Entity::Url:
+            doFormatUrl(text, dynamic_cast<UrlEntity *>(entity.get()));
+            break;
+        default:
+            break;
+        }
+    }
 
-    if (json.contains(QLatin1String("duration_millis"))) {
-        m_duration = json.value(QLatin1String("duration_millis")).toInt();
+    if (m_text != text) {
+        m_text = text;
+        emit textChanged();
     }
 }
 
-QString Media::id() const
+void EntitiesFormatter::doFormatUrl(QString &text, UrlEntity *entity)
 {
-    return m_id;
-}
+    if (!entity || !entity->isValid()) {
+        return;
+    }
 
-QString Media::url() const
-{
-    return m_url;
+    QString after {QString(QLatin1String("<a href=\"%1\">%2</a>")).arg(entity->expandedUrl(), entity->displayUrl())};
+    text.replace(entity->text(), after);
 }
-
-Media::Type Media::type() const
-{
-    return m_type;
-}
-
-int Media::width() const
-{
-    return m_width;
-}
-
-int Media::height() const
-{
-    return m_height;
-}
-
-int Media::duration() const
-{
-    return m_duration;
-}
-

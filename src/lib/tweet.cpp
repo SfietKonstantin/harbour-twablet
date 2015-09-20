@@ -48,27 +48,29 @@ Tweet::Tweet(const QJsonObject &json)
         m_retweetingUser = std::move(User(json.value(QLatin1String("user")).toObject()));
     }
 
-    m_id = tweet.value(QLatin1String("id_str")).toString();
-    m_text = displayedTweet.value(QLatin1String("text")).toString();
+    m_id = std::move(tweet.value(QLatin1String("id_str")).toString());
+    m_text = std::move(displayedTweet.value(QLatin1String("text")).toString());
     m_favoriteCount = displayedTweet.value(QLatin1String("favorite_count")).toInt();
     m_favorited = displayedTweet.value(QLatin1String("favorited")).toBool();
     m_retweetCount = displayedTweet.value(QLatin1String("retweet_count")).toInt();
     m_retweeted = displayedTweet.value(QLatin1String("retweeted")).toBool();
-    m_inReplyTo = displayedTweet.value(QLatin1String("in_reply_to_status_id")).toString();
-    m_source = tweet.value(QLatin1String("source")).toString();
+    m_inReplyTo = std::move(displayedTweet.value(QLatin1String("in_reply_to_status_id")).toString());
+    m_source = std::move(tweet.value(QLatin1String("source")).toString());
     m_timestamp = std::move(fromUtc(displayedTweet.value(QLatin1String("created_at")).toString()));
     m_user = std::move(User(displayedTweet.value(QLatin1String("user")).toObject()));
 
     QJsonObject entities {displayedTweet.value(QLatin1String("entities")).toObject()};
 
-    QJsonArray media (entities.value(QLatin1String("media")).toArray());
+    /*QJsonArray media (entities.value(QLatin1String("media")).toArray());
     for (const QJsonValue &medium : media) {
         m_media.emplace_back(medium.toObject());
     }
     QJsonArray extendedEntities (entities.value(QLatin1String("extended_entities")).toArray());
     for (const QJsonValue &medium : extendedEntities) {
         m_media.emplace_back(medium.toObject());
-    }
+    }*/
+
+    m_entities = Entity::create(entities);
 }
 
 bool Tweet::isValid() const
@@ -131,8 +133,8 @@ QString Tweet::source() const
     return m_source;
 }
 
-std::vector<Media> Tweet::media() const
+std::vector<Entity::Ptr> Tweet::entities() const
 {
-    return m_media;
+    return m_entities;
 }
 

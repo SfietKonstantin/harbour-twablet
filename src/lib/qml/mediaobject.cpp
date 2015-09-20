@@ -31,13 +31,13 @@
 
 #include "mediaobject.h"
 
-MediaObject::MediaObject(const Media &data, QObject *parent)
+MediaObject::MediaObject(const MediaEntity &data, QObject *parent)
     : QObject(parent), m_data{data}
 {
     m_size = std::move(QSize(m_data.width(), m_data.height()));
 }
 
-MediaObject *MediaObject::create(const Media &data, QObject *parent)
+MediaObject *MediaObject::create(const MediaEntity &data, QObject *parent)
 {
     return new MediaObject(data, parent);
 }
@@ -49,12 +49,12 @@ QString MediaObject::id() const
 
 QString MediaObject::url() const
 {
-    return m_data.url();
+    return m_data.mediaUrl();
 }
 
 MediaObject::Type MediaObject::type() const
 {
-    return static_cast<Type>(m_data.type());
+    return static_cast<Type>(m_data.mediaType());
 }
 
 QSize MediaObject::size() const
