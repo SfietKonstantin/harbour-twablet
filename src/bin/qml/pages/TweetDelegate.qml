@@ -54,30 +54,34 @@ MouseArea {
         anchors.left: background.left
         anchors.right: background.right
 
-        Item {
+        BackgroundItem {
             id: retweet
             property bool isRetweet: tweet.retweetingUser !== null
-            anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
-            anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
+            anchors.left: parent.left
+            anchors.right: parent.right
             visible: isRetweet
-            height: retweetLabel.height + Theme.paddingSmall
+            height: retweetLabel.height + 2 * Theme.paddingSmall
+            onClicked: {
+                if (isRetweet) {
+                    container.openUser(tweet.retweetingUser.id)
+                }
+            }
 
             Image {
                 id: retweetIcon
-                anchors.left: parent.left
-                anchors.verticalCenter: retweetLabel.verticalCenter
-                source: "image://theme/icon-s-retweet"
+                anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
+                anchors.verticalCenter: parent.verticalCenter
+                source: "image://theme/icon-s-retweet" + (retweet.pressed ? ("?"  + Theme.highlightColor) : "")
             }
 
             Label {
                 id: retweetLabel
                 anchors.left: retweetIcon.right; anchors.leftMargin: Theme.paddingMedium
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
+                anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
+                anchors.verticalCenter: parent.verticalCenter
                 font.pixelSize: Theme.fontSizeSmall
-                color: Theme.secondaryColor
+                color: retweet.pressed ? Theme.secondaryHighlightColor : Theme.secondaryColor
                 text: retweet.isRetweet ? qsTr("Retweeted by %1").arg(tweet.retweetingUser.name) : ""
-                visible: retweet.isRetweet
                 wrapMode: Text.Wrap
             }
         }

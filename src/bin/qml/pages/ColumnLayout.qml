@@ -104,7 +104,7 @@ SilicaListView {
     header: Column {
         width: container.width
 
-        ListItem {
+        BackgroundItem {
             id: header
             anchors.left: parent.left; anchors.right: parent.right
             onClicked: header.state = "visible"
