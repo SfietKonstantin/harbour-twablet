@@ -37,7 +37,7 @@ MouseArea {
     id: container
     height: background.height
     property QtObject tweet
-    signal openUser(string id)
+    signal handleLink(string url)
 
     Rectangle {
         id: background
@@ -63,7 +63,7 @@ MouseArea {
             height: retweetLabel.height + 2 * Theme.paddingSmall
             onClicked: {
                 if (isRetweet) {
-                    container.openUser(tweet.retweetingUser.id)
+                    container.handleLink("user://" + tweet.retweetingUser.id)
                 }
             }
 
@@ -91,7 +91,7 @@ MouseArea {
             anchors.left: parent.left
             anchors.right: parent.right
             height: Theme.itemSizeSmall
-            onClicked: container.openUser(container.tweet.user.id)
+            onClicked: container.handleLink("user://" + container.tweet.user.id)
 
             TwitterImage {
                 id: profilePicture
@@ -130,7 +130,15 @@ MouseArea {
             font.pixelSize: Theme.fontSizeSmall
             wrapMode: Text.Wrap
             color: Theme.highlightColor
-            text: container.tweet.text
+            linkColor: Theme.primaryColor
+            text: tweetFormatter.text
+            textFormat: Text.StyledText
+            onLinkActivated: container.handleLink(link)
+        }
+
+        TweetFormatter {
+            id: tweetFormatter
+            tweet: container.tweet
         }
 
         Item {

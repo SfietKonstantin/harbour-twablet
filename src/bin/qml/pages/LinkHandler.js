@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,26 +29,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef DESCRIPTIONFORMATTER_H
-#define DESCRIPTIONFORMATTER_H
+.pragma library
 
-#include "entitiesformatter.h"
-#include <QtQml/QQmlParserStatus>
-
-class UserObject;
-class DescriptionFormatter : public EntitiesFormatter
+function handleLink(url, panel, account)
 {
-    Q_OBJECT
-    Q_PROPERTY(UserObject * user READ user WRITE setUser NOTIFY userChanged)
-public:
-    explicit DescriptionFormatter(QObject *parent = 0);
-    UserObject * user() const;
-    void setUser(UserObject *user);
-signals:
-    void userChanged();
-private:
-    void format() override;
-    UserObject *m_user {nullptr};
-};
-
-#endif // DESCRIPTIONFORMATTER_H
+    if (url.indexOf("http") === 0) {
+        Qt.openUrlExternally(url)
+    } else if (url.indexOf("user://") === 0) {
+        var userId = url.slice(7)
+        panel.openUser(userId, account)
+    }
+}

@@ -29,26 +29,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef DESCRIPTIONFORMATTER_H
-#define DESCRIPTIONFORMATTER_H
+#include "tweetformatter.h"
+#include "tweetobject.h"
 
-#include "entitiesformatter.h"
-#include <QtQml/QQmlParserStatus>
-
-class UserObject;
-class DescriptionFormatter : public EntitiesFormatter
+TweetFormatter::TweetFormatter(QObject *parent)
+    : EntitiesFormatter(parent)
 {
-    Q_OBJECT
-    Q_PROPERTY(UserObject * user READ user WRITE setUser NOTIFY userChanged)
-public:
-    explicit DescriptionFormatter(QObject *parent = 0);
-    UserObject * user() const;
-    void setUser(UserObject *user);
-signals:
-    void userChanged();
-private:
-    void format() override;
-    UserObject *m_user {nullptr};
-};
+}
 
-#endif // DESCRIPTIONFORMATTER_H
+TweetObject * TweetFormatter::tweet() const
+{
+    return m_tweet;
+}
+
+void TweetFormatter::setTweet(TweetObject *tweet)
+{
+    if (m_tweet != tweet) {
+        m_tweet = tweet;
+        emit tweetChanged();
+
+        format();
+    }
+}
+
+void TweetFormatter::format()
+{
+    if (m_tweet == nullptr) {
+        return;
+    }
+    doFormat(m_tweet->text(), m_tweet->data().entities());
+}
+

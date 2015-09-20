@@ -22,5 +22,6 @@
         <file>qml/pages/UserPage.qml</file>
         <file>qml/pages/MiniButton.qml</file>
         <file>data/background.png</file>
+        <file>qml/pages/LinkHandler.js</file>
     </qresource>
 </RCC>

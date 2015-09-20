@@ -115,6 +115,11 @@ MediaModel * TweetObject::media() const
     return m_media.get();
 }
 
+Tweet TweetObject::data() const
+{
+    return m_data;
+}
+
 void TweetObject::update(const Tweet &other)
 {
     Q_UNUSED(other)

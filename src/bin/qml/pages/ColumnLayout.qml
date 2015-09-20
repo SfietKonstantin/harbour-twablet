@@ -37,7 +37,7 @@ SilicaListView {
     id: container
     property string title
     property int layoutIndex
-    signal openUser(string id)
+    signal handleLink(string url)
     function setUnread(index) {
         if (internal.unread > index && index !== -1) {
             internal.unread = index
@@ -173,7 +173,7 @@ SilicaListView {
         id: delegate
         width: container.width
         tweet: model.item
-        onOpenUser: container.openUser(id)
+        onHandleLink: container.handleLink(url)
         opacity: internal.opacity
     }
 

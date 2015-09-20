@@ -32,24 +32,44 @@
 #include "entity.h"
 #include "urlentity.h"
 #include "mediaentity.h"
+#include "usermentionentity.h"
+#include <set>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
+
+template <class T>
+static void checkAndInsert(const QJsonValue &value, std::vector<Entity::Ptr> &returned,
+                           std::set<QString> &inserted)
+{
+    Entity::Ptr entity {new T(value.toObject())};
+    if (inserted.find(entity->text()) == std::end(inserted)) {
+        returned.push_back(entity);
+        inserted.insert(entity->text());
+    }
+}
 
 std::vector<Entity::Ptr> Entity::create(const QJsonObject &json)
 {
     std::vector<Entity::Ptr> returned {};
-    const QJsonArray &urls (json.value(QLatin1String("urls")).toArray());
-    for (const QJsonValue &value : urls) {
-        returned.emplace_back(new UrlEntity(value.toObject()));
-    }
+    std::set<QString> inserted {};
     const QJsonArray &media (json.value(QLatin1String("media")).toArray());
     for (const QJsonValue &value : media) {
-        returned.emplace_back(new MediaEntity(value.toObject()));
+        checkAndInsert<MediaEntity>(value, returned, inserted);
+    }
+
+    const QJsonArray &urls (json.value(QLatin1String("urls")).toArray());
+    for (const QJsonValue &value : urls) {
+        checkAndInsert<UrlEntity>(value, returned, inserted);
+    }
+
+    const QJsonArray &users (json.value(QLatin1String("user_mentions")).toArray());
+    for (const QJsonValue &value : users) {
+        checkAndInsert<UserMentionEntity>(value, returned, inserted);
     }
 
     const QJsonArray &extended (json.value(QLatin1String("extended_entities")).toArray());
     for (const QJsonValue &value : extended) {
-        returned.emplace_back(new MediaEntity(value.toObject()));
+        checkAndInsert<MediaEntity>(value, returned, inserted);
     }
 
     return returned;

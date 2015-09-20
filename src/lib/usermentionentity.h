@@ -29,26 +29,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef DESCRIPTIONFORMATTER_H
-#define DESCRIPTIONFORMATTER_H
+#ifndef USERMENTIONENTITY_H
+#define USERMENTIONENTITY_H
 
-#include "entitiesformatter.h"
-#include <QtQml/QQmlParserStatus>
+#include "entity.h"
+#include "globals.h"
 
-class UserObject;
-class DescriptionFormatter : public EntitiesFormatter
+class QJsonObject;
+class UserMentionEntity: public Entity
 {
-    Q_OBJECT
-    Q_PROPERTY(UserObject * user READ user WRITE setUser NOTIFY userChanged)
 public:
-    explicit DescriptionFormatter(QObject *parent = 0);
-    UserObject * user() const;
-    void setUser(UserObject *user);
-signals:
-    void userChanged();
+    explicit UserMentionEntity() = default;
+    explicit UserMentionEntity(const QJsonObject &json);
+    DEFAULT_COPY_DEFAULT_MOVE(UserMentionEntity);
+    Type type() const override;
+    bool isValid() const override;
+    QString text() const override;
+    QString id() const;
+    QString screenName() const;
+    QString name() const;
 private:
-    void format() override;
-    UserObject *m_user {nullptr};
+    QString m_text {};
+    QString m_id {};
+    QString m_screenName {};
+    QString m_name {};
 };
 
-#endif // DESCRIPTIONFORMATTER_H
+#endif // USERMENTIONENTITY_H

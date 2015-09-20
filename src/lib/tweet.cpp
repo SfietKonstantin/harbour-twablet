@@ -60,16 +60,6 @@ Tweet::Tweet(const QJsonObject &json)
     m_user = std::move(User(displayedTweet.value(QLatin1String("user")).toObject()));
 
     QJsonObject entities {displayedTweet.value(QLatin1String("entities")).toObject()};
-
-    /*QJsonArray media (entities.value(QLatin1String("media")).toArray());
-    for (const QJsonValue &medium : media) {
-        m_media.emplace_back(medium.toObject());
-    }
-    QJsonArray extendedEntities (entities.value(QLatin1String("extended_entities")).toArray());
-    for (const QJsonValue &medium : extendedEntities) {
-        m_media.emplace_back(medium.toObject());
-    }*/
-
     m_entities = Entity::create(entities);
 }
 

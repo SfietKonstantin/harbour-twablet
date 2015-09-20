@@ -32,6 +32,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.twablet 1.0
+import "LinkHandler.js" as LH
 
 Page {
     id: container
@@ -142,10 +143,10 @@ Page {
                     height: view.height
                     layoutIndex: index
                     title: name
-                    onOpenUser: {
+                    onHandleLink: {
                         var account = accountModel.get(layout.userId)
                         if (account !== null) {
-                            panel.openUser(id, account)
+                            LH.handleLink(url, panel, account)
                         }
                     }
 

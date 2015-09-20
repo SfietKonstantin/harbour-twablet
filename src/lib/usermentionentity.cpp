@@ -29,26 +29,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef DESCRIPTIONFORMATTER_H
-#define DESCRIPTIONFORMATTER_H
+#include "usermentionentity.h"
+#include <QtCore/QJsonObject>
 
-#include "entitiesformatter.h"
-#include <QtQml/QQmlParserStatus>
-
-class UserObject;
-class DescriptionFormatter : public EntitiesFormatter
+UserMentionEntity::UserMentionEntity(const QJsonObject &json)
 {
-    Q_OBJECT
-    Q_PROPERTY(UserObject * user READ user WRITE setUser NOTIFY userChanged)
-public:
-    explicit DescriptionFormatter(QObject *parent = 0);
-    UserObject * user() const;
-    void setUser(UserObject *user);
-signals:
-    void userChanged();
-private:
-    void format() override;
-    UserObject *m_user {nullptr};
-};
+    m_screenName = std::move(json.value(QLatin1String("screen_name")).toString());
+    m_text = QString(QLatin1String("@%1")).arg(m_screenName);
+    m_id = std::move(json.value(QLatin1String("id_str")).toString());
+    m_name = std::move(json.value(QLatin1String("name")).toString());
+}
 
-#endif // DESCRIPTIONFORMATTER_H
+Entity::Type UserMentionEntity::type() const
+{
+    return UserMention;
+}
+
+bool UserMentionEntity::isValid() const
+{
+    return !m_id.isEmpty() && !m_screenName.isEmpty() && !m_name.isEmpty();
+}
+
+QString UserMentionEntity::text() const
+{
+    return m_text;
+}
+
+QString UserMentionEntity::id() const
+{
+    return m_id;
+}
+
+QString UserMentionEntity::screenName() const
+{
+    return m_screenName;
+}
+
+QString UserMentionEntity::name() const
+{
+    return m_name;
+}
+

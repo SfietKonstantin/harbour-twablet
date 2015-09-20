@@ -30,7 +30,9 @@
  */
 
 #include "entitiesformatter.h"
+#include "mediaentity.h"
 #include "urlentity.h"
+#include "usermentionentity.h"
 
 EntitiesFormatter::EntitiesFormatter(QObject *parent)
     : QObject(parent)
@@ -61,8 +63,14 @@ void EntitiesFormatter::doFormat(const QString &input, const std::vector<Entity:
     QString text {input};
     for (const Entity::Ptr &entity : entities) {
         switch (entity->type()) {
+        case Entity::Media:
+            doFormatMedia(text, dynamic_cast<MediaEntity *>(entity.get()));
+            break;
         case Entity::Url:
             doFormatUrl(text, dynamic_cast<UrlEntity *>(entity.get()));
+            break;
+        case Entity::UserMention:
+            doFormatUserMention(text, dynamic_cast<UserMentionEntity *>(entity.get()));
             break;
         default:
             break;
@@ -75,6 +83,16 @@ void EntitiesFormatter::doFormat(const QString &input, const std::vector<Entity:
     }
 }
 
+void EntitiesFormatter::doFormatMedia(QString &text, MediaEntity *entity)
+{
+    if (!entity || !entity->isValid()) {
+        return;
+    }
+
+    QString after {QString(QLatin1String("<a href=\"%1\">%2</a>")).arg(entity->expandedUrl(), entity->displayUrl())};
+    text.replace(entity->text(), after);
+}
+
 void EntitiesFormatter::doFormatUrl(QString &text, UrlEntity *entity)
 {
     if (!entity || !entity->isValid()) {
@@ -82,5 +100,15 @@ void EntitiesFormatter::doFormatUrl(QString &text, UrlEntity *entity)
     }
 
     QString after {QString(QLatin1String("<a href=\"%1\">%2</a>")).arg(entity->expandedUrl(), entity->displayUrl())};
+    text.replace(entity->text(), after);
+}
+
+void EntitiesFormatter::doFormatUserMention(QString &text, UserMentionEntity *entity)
+{
+    if (!entity || !entity->isValid()) {
+        return;
+    }
+
+    QString after {QString(QLatin1String("<a href=\"user://%1\">@%2</a>")).arg(entity->id(), entity->screenName())};
     text.replace(entity->text(), after);
 }

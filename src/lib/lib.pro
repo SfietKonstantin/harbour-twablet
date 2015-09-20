@@ -57,7 +57,9 @@ HEADERS += \
     qml/descriptionformatter.h \
     entity.h \
     urlentity.h \
-    qml/entitiesformatter.h
+    qml/entitiesformatter.h \
+    usermentionentity.h \
+    qml/tweetformatter.h
 
 SOURCES += \
     private/twitterdatautil.cpp \
@@ -92,6 +94,8 @@ SOURCES += \
     qml/accountselectionmodel.cpp \
     qml/userqueryitem.cpp \
     qml/descriptionformatter.cpp \
-        urlentity.cpp \
+    urlentity.cpp \
     entity.cpp \
-    qml/entitiesformatter.cpp
+    qml/entitiesformatter.cpp \
+    usermentionentity.cpp \
+    qml/tweetformatter.cpp

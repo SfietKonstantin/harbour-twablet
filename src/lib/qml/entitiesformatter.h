@@ -36,7 +36,9 @@
 #include <QtQml/QQmlParserStatus>
 #include "entity.h"
 
+class MediaEntity;
 class UrlEntity;
+class UserMentionEntity;
 class EntitiesFormatter : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
@@ -53,7 +55,9 @@ protected:
     virtual void format() = 0;
     void doFormat(const QString &input, const std::vector<Entity::Ptr> &entities);
 private:
+    void doFormatMedia(QString &text, MediaEntity *entity);
     void doFormatUrl(QString &text, UrlEntity *entity);
+    void doFormatUserMention(QString &text, UserMentionEntity *entity);
     bool m_complete {false};
     QString m_text {};
 };

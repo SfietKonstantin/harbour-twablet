@@ -70,6 +70,7 @@ public:
     QString source() const;
     QString sourceName() const;
     MediaModel * media() const;
+    Tweet data() const;
 private:
     explicit TweetObject(const Tweet &data, QObject *parent = 0);
     void update(const Tweet &other);

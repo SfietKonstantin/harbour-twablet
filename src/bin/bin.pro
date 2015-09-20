@@ -33,7 +33,8 @@ OTHER_FILES += \
     qml/pages/ToolbarButton.qml \
     qml/pages/RightPanel.qml \
     qml/pages/UserPage.qml \
-    qml/pages/MiniButton.qml
+    qml/pages/MiniButton.qml \
+    qml/pages/LinkHandler.js
 
 
 DATA += \
