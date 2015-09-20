@@ -7,6 +7,7 @@ URL: http://github.com/sfietkonstantin/harbour-twablet
 License: BSD
 Sources:
 - '%{name}-%{version}.tar.bz2'
+- 'twitter-secrets.h'
 Description: |
   A Twitter application for big screens
 Configure: none
@@ -16,6 +17,7 @@ PkgConfigBR:
   - Qt5Core
   - Qt5Qml
   - Qt5Quick
+  - Qt5Test
 Requires:
   - sailfishsilica-qt5 >= 0.10.9 
 Files:

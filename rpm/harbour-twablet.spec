@@ -19,12 +19,14 @@ Group:      Qt/Qt
 License:    BSD
 URL:        http://github.com/sfietkonstantin/harbour-twablet
 Source0:    %{name}-%{version}.tar.bz2
+Source1:    twitter-secrets.h
 Source100:  harbour-twablet.yaml
 Requires:   sailfishsilica-qt5 >= 0.10.9
 BuildRequires:  pkgconfig(sailfishapp) >= 1.0.2
 BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(Qt5Quick)
+BuildRequires:  pkgconfig(Qt5Test)
 BuildRequires:  desktop-file-utils
 
 %description
@@ -35,6 +37,7 @@ A Twitter application for big screens
 %setup -q -n %{name}-%{version}
 
 # >> setup
+cp -p %{SOURCE1} src/lib
 # << setup
 
 %build
