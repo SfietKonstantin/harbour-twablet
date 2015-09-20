@@ -43,19 +43,13 @@ CoverBackground {
 
     ListView {
         id: view
-        anchors.fill: parent
+        anchors.fill: parent; anchors.margins: Theme.paddingMedium
         model: LayoutModel { repository: Repository }
         spacing: Theme.paddingMedium
-        delegate: Column {
+        delegate: Label {
             anchors.left: parent.left; anchors.right: parent.right
-            Label {
-                font.pixelSize: Theme.fontSizeMedium
-                text: model.name
-            }
-            Label {
-                font.pixelSize: Theme.fontSizeSmall
-                text: qsTr("Unread: %n", "", model.unread)
-            }
+            font.pixelSize: Theme.fontSizeMedium
+            text: qsTr("%1: %n", "", model.unread).arg(model.name)
         }
     }
 
