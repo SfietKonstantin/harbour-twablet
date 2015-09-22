@@ -114,6 +114,7 @@ SilicaListView {
 
             PageHeader {
                 id: pageHeader
+                anchors.left: headerRemove.right; anchors.right: parent.right
                 title: container.title
                 height: Theme.itemSizeLarge
                 _titleItem.color: header.pressed || container.temporary ? Theme.highlightColor: Theme.primaryColor
