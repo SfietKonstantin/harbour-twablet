@@ -145,6 +145,8 @@ Page {
                 MiniButton {
                     width: parent.width / 3
                     text: query.user ? qsTr("%n\ntweets", "", query.user.statusesCount) : ""
+                    onClicked: container.panel.openUserTimeline(query.userId, query.user.screenName,
+                                                                container.account, false)
                 }
                 MiniButton {
                     width: parent.width / 3
@@ -178,6 +180,8 @@ Page {
 
             MiniButton {
                 text: query.user ? qsTr("%n favourites", "", query.user.favouritesCount) : ""
+                onClicked: container.panel.openFavorites(query.userId, query.user.screenName,
+                                                         container.account, false)
             }
 
             MiniButton {

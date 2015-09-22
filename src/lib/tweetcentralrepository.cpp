@@ -33,6 +33,8 @@
 #include "hometimelinequeryhandler.h"
 #include "mentionstimelinequeryhandler.h"
 #include "searchqueryhandler.h"
+#include "favoritesqueryhandler.h"
+#include "usertimelinequeryhandler.h"
 #include "private/twitterqueryutil.h"
 #include <QtCore/QLoggingCategory>
 #include <QtCore/QJsonDocument>
@@ -139,6 +141,18 @@ IQueryHandler * TweetCentralRepository::getQueryHandler(const Query &query)
     case Query::Search:
     {
         std::unique_ptr<IQueryHandler> handler {new SearchQueryHandler(query.arguments())};
+        return m_queries.emplace(query, std::move(handler)).first->second.get();
+        break;
+    }
+    case Query::Favorites:
+    {
+        std::unique_ptr<IQueryHandler> handler {new FavoritesQueryHandler(query.arguments())};
+        return m_queries.emplace(query, std::move(handler)).first->second.get();
+        break;
+    }
+    case Query::UserTimeline:
+    {
+        std::unique_ptr<IQueryHandler> handler {new UserTimelineQueryHandler(query.arguments())};
         return m_queries.emplace(query, std::move(handler)).first->second.get();
         break;
     }

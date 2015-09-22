@@ -44,7 +44,9 @@ public:
         Invalid = 0,
         Home,
         Mentions,
-        Search
+        Search,
+        Favorites,
+        UserTimeline
     };
     using Arguments = std::map<QString, QString>;
     explicit Query() = default;

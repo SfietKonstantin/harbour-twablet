@@ -42,6 +42,7 @@ DATA += \
     data/mail.svg \
     data/inbox.svg \
     data/search.svg \
+    data/me.svg \
     data/background.png
 
 data.files = $${DATA}

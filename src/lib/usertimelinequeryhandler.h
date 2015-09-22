@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,50 +29,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-import QtQuick 2.0
-import Sailfish.Silica 1.0
-import harbour.twablet 1.0
-import "LinkHandler.js" as LH
+#ifndef USERTIMELINEQUERYHANDLER_H
+#define USERTIMELINEQUERYHANDLER_H
 
-Page {
-    id: container
-    property string query
-    property QtObject account
-    property RightPanel panel
 
-    Component.onCompleted: {
-        var layoutIndex = Repository.addTemporaryLayout(container.account, Query.Search,
-                                                        {q: container.query, result_type: "recent"})
-        if (layoutIndex >= 0) {
-            layout.layoutIndex = layoutIndex
-        }
-    }
+#include "iqueryhandler.h"
+#include "query.h"
+#include "globals.h"
 
-    Component.onDestruction: {
-        Repository.removeTemporaryLayout(layout.layoutIndex)
-    }
+class UserTimelineQueryHandler: public IQueryHandler
+{
+public:
+    explicit UserTimelineQueryHandler(const Query::Arguments &arguments);
+    DISABLE_COPY_DISABLE_MOVE(UserTimelineQueryHandler);
+private:
+    void createRequest(QString &path, std::map<QByteArray, QByteArray> &parameters) const override;
+    bool treatReply(const QByteArray &data, std::vector<Tweet> &items,
+                    QString &errorMessage, Placement &placement) override;
+    QString m_userId {};
+    QString m_excludeReplies {QLatin1String("false")};
+    QString m_includeRts {QLatin1String("true")};
+    QString m_sinceId {};
+};
 
-    ColumnLayout {
-        id: layout
-        anchors.fill: parent
-        temporary: true
-        title: container.query
-        onHandleLink: {
-            LH.handleLink(url, container.panel, container.account, false)
-        }
-
-        PullDownMenu {
-            MenuItem {
-                text: qsTr("Add as column")
-                onClicked: Repository.addLayout(container.query, container.account, Query.Search,
-                                                {q: container.query, result_type: "recent"})
-            }
-
-            MenuItem {
-                text: qsTr("Refresh")
-                onClicked: Repository.refreshTemporary(container.layoutIndex)
-            }
-        }
-    }
-}
-
+#endif // USERTIMELINEQUERYHANDLER_H

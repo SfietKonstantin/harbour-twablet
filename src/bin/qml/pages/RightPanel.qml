@@ -40,7 +40,40 @@ DockedPanel {
         _open(Qt.resolvedUrl("UserPage.qml"), {userId: id, account: account, panel: container}, clear)
     }
     function openSearch(query, account, clear) {
-        _open(Qt.resolvedUrl("SearchPage.qml"), {query: query, account: account, panel: container}, clear)
+        var args = {q: query, result_type: "recent"}
+        var params = {
+            title: query,
+            queryType: Query.Search,
+            args: args,
+            account: account,
+            panel: container
+        }
+
+        _open(Qt.resolvedUrl("TweetsPage.qml"), params, clear)
+    }
+    function openFavorites(userId, screenName, account, clear) {
+        var args = {user_id: userId}
+        var params = {
+            title: qsTr("%1's favorites").arg(screenName),
+            queryType: Query.Favorites,
+            args: args,
+            account: account,
+            panel: container
+        }
+
+        _open(Qt.resolvedUrl("TweetsPage.qml"), params, clear)
+    }
+    function openUserTimeline(userId, screenName, account, clear) {
+        var args = {user_id: userId}
+        var params = {
+            title: qsTr("Tweets from %1").arg(screenName),
+            queryType: Query.UserTimeline,
+            args: args,
+            account: account,
+            panel: container
+        }
+
+        _open(Qt.resolvedUrl("TweetsPage.qml"), params, clear)
     }
 
     function _open(page, args, clear) {

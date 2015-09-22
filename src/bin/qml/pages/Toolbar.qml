@@ -100,6 +100,15 @@ Rectangle {
                 case Query.Search:
                     Qt.resolvedUrl("../../data/search.svg")
                     break
+                case Query.Favorites:
+                    "image://theme/icon-l-favorite"
+                    break
+                case Query.UserTimeline:
+                    Qt.resolvedUrl("../../data/me.svg")
+                    break
+                default:
+                    ""
+                    break
                 }
             }
 

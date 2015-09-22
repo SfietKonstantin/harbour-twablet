@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,33 +29,52 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef QUERYOBJECT_H
-#define QUERYOBJECT_H
+import QtQuick 2.0
+import Sailfish.Silica 1.0
+import harbour.twablet 1.0
+import "LinkHandler.js" as LH
 
-#include <QtCore/QObject>
-#include "query.h"
+Page {
+    id: container
+    property string title
+    property int queryType
+    property var args
+    property QtObject account
+    property RightPanel panel
 
-class QueryObject : public QObject
-{
-    Q_OBJECT
-    Q_ENUMS(Type)
-    Q_PROPERTY(Type type READ type CONSTANT)
-public:
-    enum Type
-    {
-        Invalid = Query::Invalid,
-        Home = Query::Home,
-        Mentions = Query::Mentions,
-        Search = Query::Search,
-        Favorites = Query::Favorites,
-        UserTimeline = Query::UserTimeline
-    };
-    DISABLE_COPY_DISABLE_MOVE(QueryObject);
-    static QueryObject * create(const Query &data, QObject *parent = 0);
-    Type type() const;
-private:
-    explicit QueryObject(const Query &data, QObject *parent = 0);
-    Query m_data {};
-};
+    Component.onCompleted: {
+        var layoutIndex = Repository.addTemporaryLayout(container.account, container.queryType,
+                                                        container.args)
+        if (layoutIndex >= 0) {
+            layout.layoutIndex = layoutIndex
+        }
+    }
 
-#endif // QUERYOBJECT_H
+    Component.onDestruction: {
+        Repository.removeTemporaryLayout(layout.layoutIndex)
+    }
+
+    ColumnLayout {
+        id: layout
+        anchors.fill: parent
+        temporary: true
+        title: container.title
+        onHandleLink: {
+            LH.handleLink(url, container.panel, container.account, false)
+        }
+
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("Add as column")
+                onClicked: Repository.addLayout(container.title, container.account, container.queryType,
+                                                container.args)
+            }
+
+            MenuItem {
+                text: qsTr("Refresh")
+                onClicked: Repository.refreshTemporary(container.layoutIndex)
+            }
+        }
+    }
+}
+

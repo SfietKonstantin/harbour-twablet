@@ -29,33 +29,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef QUERYOBJECT_H
-#define QUERYOBJECT_H
+#ifndef FAVORITESQUERYHANDLER_H
+#define FAVORITESQUERYHANDLER_H
 
-#include <QtCore/QObject>
+#include "iqueryhandler.h"
 #include "query.h"
+#include "globals.h"
 
-class QueryObject : public QObject
+class FavoritesQueryHandler: public IQueryHandler
 {
-    Q_OBJECT
-    Q_ENUMS(Type)
-    Q_PROPERTY(Type type READ type CONSTANT)
 public:
-    enum Type
-    {
-        Invalid = Query::Invalid,
-        Home = Query::Home,
-        Mentions = Query::Mentions,
-        Search = Query::Search,
-        Favorites = Query::Favorites,
-        UserTimeline = Query::UserTimeline
-    };
-    DISABLE_COPY_DISABLE_MOVE(QueryObject);
-    static QueryObject * create(const Query &data, QObject *parent = 0);
-    Type type() const;
+    explicit FavoritesQueryHandler(const Query::Arguments &arguments);
+    DISABLE_COPY_DISABLE_MOVE(FavoritesQueryHandler);
 private:
-    explicit QueryObject(const Query &data, QObject *parent = 0);
-    Query m_data {};
+    void createRequest(QString &path, std::map<QByteArray, QByteArray> &parameters) const override;
+    bool treatReply(const QByteArray &data, std::vector<Tweet> &items,
+                    QString &errorMessage, Placement &placement) override;
+    QString m_userId {};
+    QString m_sinceId {};
 };
 
-#endif // QUERYOBJECT_H
+#endif // FAVORITESQUERYHANDLER_H

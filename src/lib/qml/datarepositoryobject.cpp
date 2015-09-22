@@ -309,6 +309,10 @@ bool DataRepositoryObject::addLayoutCheckQuery(int queryType, const QVariantMap 
         break;
     case Query::Search:
         break;
+    case Query::Favorites:
+        break;
+    case Query::UserTimeline:
+        break;
     default:
         return false;
         break;
