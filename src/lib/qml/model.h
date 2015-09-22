@@ -53,6 +53,7 @@ public:
     }
     void componentComplete() override
     {
+        m_complete = true;
         refreshData();
     }
     int rowCount(const QModelIndex &parent = QModelIndex()) const override final
@@ -76,15 +77,15 @@ public:
     {
         return m_layoutIndex;
     }
-    void setLayoutIndex(int modelIndex) override
+    void setLayoutIndex(int layoutIndex) override
     {
-        if (m_layoutIndex != modelIndex) {
+        if (m_layoutIndex != layoutIndex) {
             if (m_internalRepository != nullptr) {
                 m_internalRepository->removeListener(*this);
             }
-            m_layoutIndex = modelIndex;
-            if (DataRepositoryObjectMap<T>::isValid(m_repository, m_layoutIndex)) {
-                m_internalRepository = &DataRepositoryObjectMap<T>::get(*m_repository, m_layoutIndex);
+            m_layoutIndex = layoutIndex;
+            if (DataRepositoryObjectMap<T>::isValid(m_repository, m_layoutIndex, m_temporary)) {
+                m_internalRepository = &DataRepositoryObjectMap<T>::get(*m_repository, m_layoutIndex, m_temporary);
                 m_internalRepository->addListener(*this);
             } else {
                 m_internalRepository = nullptr;
@@ -104,14 +105,35 @@ public:
                 m_internalRepository->removeListener(*this);
             }
             m_repository = repository;
-            if (DataRepositoryObjectMap<T>::isValid(m_repository, m_layoutIndex)) {
-                m_internalRepository = &DataRepositoryObjectMap<T>::get(*m_repository, m_layoutIndex);
+            if (DataRepositoryObjectMap<T>::isValid(m_repository, m_layoutIndex, m_temporary)) {
+                m_internalRepository = &DataRepositoryObjectMap<T>::get(*m_repository, m_layoutIndex, m_temporary);
                 m_internalRepository->addListener(*this);
             } else {
                 m_internalRepository = nullptr;
             }
             refreshData();
             emit repositoryChanged();
+        }
+    }
+    bool isTemporary() const override
+    {
+        return m_temporary;
+    }
+    void setTemporary(bool temporary) override
+    {
+        if (m_temporary != temporary) {
+            if (m_internalRepository != nullptr) {
+                m_internalRepository->removeListener(*this);
+            }
+            m_temporary = temporary;
+            if (DataRepositoryObjectMap<T>::isValid(m_repository, m_layoutIndex, m_temporary)) {
+                m_internalRepository = &DataRepositoryObjectMap<T>::get(*m_repository, m_layoutIndex, m_temporary);
+                m_internalRepository->addListener(*this);
+            } else {
+                m_internalRepository = nullptr;
+            }
+            refreshData();
+            emit temporaryChanged();
         }
     }
 protected:
@@ -189,6 +211,9 @@ private:
 
     void refreshData()
     {
+        if (!m_complete) {
+            return;
+        }
         std::deque<QObjectPtr<O>> newData;
         if (m_internalRepository != nullptr) {
             for (const T &data : *m_internalRepository) {
@@ -229,10 +254,12 @@ private:
             emit errorMessageChanged();
         }
     }
+    bool m_complete {false};
     Status m_status {Idle};
     QString m_errorMessage {};
     int m_layoutIndex {-1};
     DataRepositoryObject *m_repository {nullptr};
+    bool m_temporary {false};
     Repository<T> *m_internalRepository {nullptr};
 };
 

@@ -38,6 +38,7 @@
 #include "layoutrepository.h"
 #include "tweetcentralrepository.h"
 
+class AccountObject;
 class DataRepositoryObject : public QObject
 {
     Q_OBJECT
@@ -48,6 +49,8 @@ public:
     AccountRepository & accounts();
     LayoutRepository & layouts();
     TweetRepository & tweets(const Layout &layout);
+    const Layout * temporaryLayout(int index) const;
+    bool isTemporaryLayoutValid(int index) const;
 signals:
     void hasAccountsChanged();
 public slots:
@@ -58,15 +61,27 @@ public slots:
     void removeAccount(int index);
     // Layouts
     void addLayout(const QString &name, int accountIndex, int queryType, const QVariantMap &arguments);
+    void addLayout(const QString &name, AccountObject *account, int queryType, const QVariantMap &arguments);
     void addDefaultLayouts(int accountIndex, const QString &homeName, bool enableHomeTimeline,
                            const QString &mentionsName, bool enableMentionsTimeline);
     void updateLayoutName(int index, const QString &name);
     void updateLayoutUnread(int index, int unread);
     void removeLayout(int index);
     void refresh();
+    // Temporary layout
+    int addTemporaryLayout(AccountObject *account, int queryType, const QVariantMap &arguments);
+    void removeTemporaryLayout(int index);
+    void clearTemporary();
+    void refreshTemporary(int index);
 private:
+    void refresh(const Layout &layout);
+    void addLayout(const QString &name, const QString &userId, int queryType, const QVariantMap &arguments);
+    bool addLayoutCheckAccount(int accountIndex, QString &userId);
+    bool addLayoutCheckQuery(int queryType, const QVariantMap &arguments,
+                             Query::Arguments &queryArguments) const;
     void insertRepository(const Layout &layout);
     void insertRepository();
+    void removeLayoutFromRepositories(const Layout &layout);
     void removeLayoutFromRepositories(int index);
     class LayoutComparator
     {
@@ -83,6 +98,8 @@ private:
         std::set<const Layout *> references {};
     };
     std::map<Layout, RefCountedTweetRepository, LayoutComparator> m_tweetRepositories {};
+    std::map<int, Layout> m_temporaryLayouts {};
+    int m_temporaryLayoutsIndex {0};
 };
 
 #endif // DATAREPOSITORYOBJECT_H

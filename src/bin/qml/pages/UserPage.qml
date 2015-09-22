@@ -32,11 +32,13 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.twablet 1.0
+import "LinkHandler.js" as LH
 
 Page {
     id: container
     property alias userId: query.userId
     property alias account: query.account
+    property RightPanel panel
 
     onStatusChanged: {
         if (status === PageStatus.Activating) {
@@ -132,6 +134,9 @@ Page {
                     linkColor: Theme.primaryColor
                     text: descriptionFormatter.text
                     textFormat: Text.StyledText
+                    onLinkActivated: {
+                        LH.handleLink(link, container.panel, container.account, false)
+                    }
                 }
             }
 

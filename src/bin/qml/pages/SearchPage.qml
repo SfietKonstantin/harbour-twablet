@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,39 +29,50 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef ENTITIESFORMATTER_H
-#define ENTITIESFORMATTER_H
+import QtQuick 2.0
+import Sailfish.Silica 1.0
+import harbour.twablet 1.0
+import "LinkHandler.js" as LH
 
-#include <QtCore/QObject>
-#include <QtQml/QQmlParserStatus>
-#include "entity.h"
+Page {
+    id: container
+    property string query
+    property QtObject account
+    property RightPanel panel
 
-class MediaEntity;
-class UrlEntity;
-class UserMentionEntity;
-class HashtagEntity;
-class EntitiesFormatter : public QObject, public QQmlParserStatus
-{
-    Q_OBJECT
-    Q_INTERFACES(QQmlParserStatus)
-    Q_PROPERTY(QString text READ text NOTIFY textChanged)
-public:
-    void classBegin() override;
-    void componentComplete() override;
-    QString text() const;
-signals:
-    void textChanged();
-protected:
-    explicit EntitiesFormatter(QObject *parent = 0);
-    virtual void format() = 0;
-    void doFormat(const QString &input, const std::vector<Entity::Ptr> &entities);
-private:
-    void doFormatMedia(QString &text, MediaEntity *entity);
-    void doFormatUrl(QString &text, UrlEntity *entity);
-    void doFormatUserMention(QString &text, UserMentionEntity *entity);
-    void doFormatHashtag(QString &text, HashtagEntity *entity);
-    bool m_complete {false};
-    QString m_text {};
-};
+    Component.onCompleted: {
+        var layoutIndex = Repository.addTemporaryLayout(container.account, Query.Search,
+                                                        {q: container.query, result_type: "recent"})
+        if (layoutIndex >= 0) {
+            layout.layoutIndex = layoutIndex
+        }
+    }
 
-#endif // ENTITIESFORMATTER_H
+    Component.onDestruction: {
+        Repository.removeTemporaryLayout(layout.layoutIndex)
+    }
+
+    ColumnLayout {
+        id: layout
+        anchors.fill: parent
+        temporary: true
+        title: container.query
+        onHandleLink: {
+            LH.handleLink(url, container.panel, container.account, false)
+        }
+
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("Add as column")
+                onClicked: Repository.addLayout(container.query, container.account, Query.Search,
+                                                {q: container.query, result_type: "recent"})
+            }
+
+            MenuItem {
+                text: qsTr("Refresh")
+                onClicked: Repository.refreshTemporary(container.layoutIndex)
+            }
+        }
+    }
+}
+

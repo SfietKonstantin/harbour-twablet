@@ -31,12 +31,15 @@
 
 .pragma library
 
-function handleLink(url, panel, account)
+function handleLink(url, panel, account, clear)
 {
     if (url.indexOf("http") === 0) {
         Qt.openUrlExternally(url)
     } else if (url.indexOf("user://") === 0) {
         var userId = url.slice(7)
-        panel.openUser(userId, account)
+        panel.openUser(userId, account, clear)
+    } else if (url.indexOf("hashtag://") === 0) {
+        var hashtag = url.slice(10)
+        panel.openSearch("#" + hashtag, account, clear)
     }
 }

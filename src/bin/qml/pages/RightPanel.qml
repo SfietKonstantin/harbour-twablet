@@ -31,16 +31,25 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.twablet 1.0
 
 DockedPanel {
     id: container
-    function openUser(id, account) {
-        _open(Qt.resolvedUrl("UserPage.qml"), {userId: id, account: account})
+
+    function openUser(id, account, clear) {
+        _open(Qt.resolvedUrl("UserPage.qml"), {userId: id, account: account, panel: container}, clear)
     }
-    function _open(page, args) {
+    function openSearch(query, account, clear) {
+        _open(Qt.resolvedUrl("SearchPage.qml"), {query: query, account: account, panel: container}, clear)
+    }
+
+    function _open(page, args, clear) {
         if (Screen.sizeCategory === Screen.Large) {
+            if (clear) {
+                panelPageStack.clear()
+                Repository.clearTemporary()
+            }
             container.open = true
-            panelPageStack.clear()
             panelPageStack.push(page, args)
         } else {
             pageStack.push(page, args)
@@ -49,7 +58,6 @@ DockedPanel {
 
     dock: Dock.Right
     visible: false
-    onVisibleChanged: console.debug(visible)
 
     PageStack {
         id: panelPageStack

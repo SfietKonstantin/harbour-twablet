@@ -33,6 +33,7 @@
 #include "urlentity.h"
 #include "mediaentity.h"
 #include "usermentionentity.h"
+#include "hashtagentity.h"
 #include <set>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
@@ -65,6 +66,11 @@ std::vector<Entity::Ptr> Entity::create(const QJsonObject &json)
     const QJsonArray &users (json.value(QLatin1String("user_mentions")).toArray());
     for (const QJsonValue &value : users) {
         checkAndInsert<UserMentionEntity>(value, returned, inserted);
+    }
+
+    const QJsonArray &hashtags (json.value(QLatin1String("hashtags")).toArray());
+    for (const QJsonValue &value : hashtags) {
+        checkAndInsert<HashtagEntity>(value, returned, inserted);
     }
 
     const QJsonArray &extended (json.value(QLatin1String("extended_entities")).toArray());

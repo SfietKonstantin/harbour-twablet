@@ -29,39 +29,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef ENTITIESFORMATTER_H
-#define ENTITIESFORMATTER_H
+#include "hashtagentity.h"
+#include <QtCore/QJsonObject>
 
-#include <QtCore/QObject>
-#include <QtQml/QQmlParserStatus>
-#include "entity.h"
-
-class MediaEntity;
-class UrlEntity;
-class UserMentionEntity;
-class HashtagEntity;
-class EntitiesFormatter : public QObject, public QQmlParserStatus
+HashtagEntity::HashtagEntity(const QJsonObject &json)
 {
-    Q_OBJECT
-    Q_INTERFACES(QQmlParserStatus)
-    Q_PROPERTY(QString text READ text NOTIFY textChanged)
-public:
-    void classBegin() override;
-    void componentComplete() override;
-    QString text() const;
-signals:
-    void textChanged();
-protected:
-    explicit EntitiesFormatter(QObject *parent = 0);
-    virtual void format() = 0;
-    void doFormat(const QString &input, const std::vector<Entity::Ptr> &entities);
-private:
-    void doFormatMedia(QString &text, MediaEntity *entity);
-    void doFormatUrl(QString &text, UrlEntity *entity);
-    void doFormatUserMention(QString &text, UserMentionEntity *entity);
-    void doFormatHashtag(QString &text, HashtagEntity *entity);
-    bool m_complete {false};
-    QString m_text {};
-};
+    m_text = std::move(json.value(QLatin1String("text")).toString());
+}
 
-#endif // ENTITIESFORMATTER_H
+Entity::Type HashtagEntity::type() const
+{
+    return Hashtag;
+}
+
+bool HashtagEntity::isValid() const
+{
+    return !m_text.isEmpty();
+}
+
+QString HashtagEntity::text() const
+{
+    return m_text;
+}

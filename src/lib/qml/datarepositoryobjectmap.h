@@ -46,28 +46,32 @@ template<class T> class DataRepositoryObjectMap;
 template<> class DataRepositoryObjectMap<Account>
 {
 public:
-    static bool isValid(DataRepositoryObject *repository, int layoutIndex)
+    static bool isValid(DataRepositoryObject *repository, int layoutIndex, bool temporary)
     {
         Q_UNUSED(layoutIndex)
+        Q_UNUSED(temporary)
         return repository != nullptr;
     }
-    static AccountRepository & get(DataRepositoryObject &repository, int layoutIndex)
+    static AccountRepository & get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
     {
         Q_UNUSED(layoutIndex)
+        Q_UNUSED(temporary)
         return repository.accounts();
     }
 };
 template<> class DataRepositoryObjectMap<Layout>
 {
 public:
-    static bool isValid(DataRepositoryObject *repository, int layoutIndex)
+    static bool isValid(DataRepositoryObject *repository, int layoutIndex, bool temporary)
     {
         Q_UNUSED(layoutIndex)
+        Q_UNUSED(temporary)
         return repository != nullptr;
     }
-    static LayoutRepository & get(DataRepositoryObject &repository, int layoutIndex)
+    static LayoutRepository & get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
     {
         Q_UNUSED(layoutIndex)
+        Q_UNUSED(temporary)
         return repository.layouts();
     }
 };
@@ -75,17 +79,27 @@ public:
 template<> class DataRepositoryObjectMap<Tweet>
 {
 public:
-    static bool isValid(DataRepositoryObject *repository, int layoutIndex)
+    static bool isValid(DataRepositoryObject *repository, int layoutIndex, bool temporary)
     {
-        Q_UNUSED(layoutIndex)
         if (repository == nullptr) {
             return false;
         }
+
+        if (temporary) {
+            return repository->isTemporaryLayoutValid(layoutIndex);
+        }
+
         return (layoutIndex >= 0 && layoutIndex < repository->layouts().size());
     }
-    static TweetRepository & get(DataRepositoryObject &repository, int layoutIndex)
+    static TweetRepository & get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
     {
-        const Layout &layout {*(std::begin(repository.layouts()) + layoutIndex)};
+        Layout layout {};
+        if (temporary) {
+            layout = *repository.temporaryLayout(layoutIndex);
+        } else {
+            layout = *(std::begin(repository.layouts()) + layoutIndex);
+        }
+
         return repository.tweets(layout);
     }
 };

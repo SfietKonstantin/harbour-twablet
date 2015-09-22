@@ -36,18 +36,19 @@ import harbour.twablet 1.0
 SilicaListView {
     id: container
     property string title
-    property int layoutIndex
+    property alias temporary: twitterModel.temporary
+    property alias layoutIndex: twitterModel.layoutIndex
     signal handleLink(string url)
     function setUnread(index) {
         if (internal.unread > index && index !== -1) {
             internal.unread = index
         }
     }
+    clip: true
     spacing: Theme.paddingMedium
 
     model: TweetModel {
         id: twitterModel
-        layoutIndex: container.layoutIndex
         repository: Repository
     }
 
@@ -109,12 +110,13 @@ SilicaListView {
             anchors.left: parent.left; anchors.right: parent.right
             onClicked: header.state = "visible"
             contentHeight: pageHeader.height
+            enabled: !container.temporary
 
             PageHeader {
                 id: pageHeader
                 title: container.title
                 height: Theme.itemSizeLarge
-                _titleItem.color: header.pressed ? Theme.highlightColor: Theme.primaryColor
+                _titleItem.color: header.pressed || container.temporary ? Theme.highlightColor: Theme.primaryColor
             }
 
             BusyIndicator {

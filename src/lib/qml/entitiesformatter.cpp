@@ -33,6 +33,7 @@
 #include "mediaentity.h"
 #include "urlentity.h"
 #include "usermentionentity.h"
+#include "hashtagentity.h"
 
 EntitiesFormatter::EntitiesFormatter(QObject *parent)
     : QObject(parent)
@@ -71,6 +72,9 @@ void EntitiesFormatter::doFormat(const QString &input, const std::vector<Entity:
             break;
         case Entity::UserMention:
             doFormatUserMention(text, dynamic_cast<UserMentionEntity *>(entity.get()));
+            break;
+        case Entity::Hashtag:
+            doFormatHashtag(text, dynamic_cast<HashtagEntity *>(entity.get()));
             break;
         default:
             break;
@@ -111,4 +115,15 @@ void EntitiesFormatter::doFormatUserMention(QString &text, UserMentionEntity *en
 
     QString after {QString(QLatin1String("<a href=\"user://%1\">@%2</a>")).arg(entity->id(), entity->screenName())};
     text.replace(entity->text(), after);
+}
+
+void EntitiesFormatter::doFormatHashtag(QString &text, HashtagEntity *entity)
+{
+    if (!entity || !entity->isValid()) {
+        return;
+    }
+
+    QString before {QString(QLatin1String("#%1")).arg(entity->text())};
+    QString after {QString(QLatin1String("<a href=\"hashtag://%1\">#%1</a>")).arg(entity->text())};
+    text.replace(before, after);
 }

@@ -96,7 +96,7 @@ public:
 
     void update(int index, T &&data)
     {
-        if (index < 0 || static_cast<typename List::size_type>(index) >= m_data.size()) {
+        if (index < 0 || static_cast<std::size_t>(index) >= m_data.size()) {
             return;
         }
         m_data[index] = std::move(data);
@@ -106,7 +106,7 @@ public:
     }
     void remove(int index)
     {
-        if (index < 0 || static_cast<typename List::size_type>(index) >= m_data.size()) {
+        if (index < 0 || static_cast<std::size_t>(index) >= m_data.size()) {
             return;
         }
         m_data.erase(std::begin(m_data) + index);

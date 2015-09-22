@@ -23,5 +23,6 @@
         <file>qml/pages/MiniButton.qml</file>
         <file>data/background.png</file>
         <file>qml/pages/LinkHandler.js</file>
+        <file>qml/pages/SearchPage.qml</file>
     </qresource>
 </RCC>

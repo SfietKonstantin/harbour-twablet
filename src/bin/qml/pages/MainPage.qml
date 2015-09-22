@@ -146,7 +146,7 @@ Page {
                     onHandleLink: {
                         var account = accountModel.get(layout.userId)
                         if (account !== null) {
-                            LH.handleLink(url, panel, account)
+                            LH.handleLink(url, panel, account, true)
                         }
                     }
 
@@ -172,8 +172,7 @@ Page {
                     }
                 }
 
-                add: Transition { AddAnimation {} }
-                remove: Transition { RemoveAnimation {} }
+                remove: Transition { FadeAnimation {} }
 
                 NumberAnimation {
                     id: animation

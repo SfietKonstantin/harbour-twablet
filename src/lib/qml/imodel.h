@@ -47,6 +47,7 @@ class IModel : public QAbstractListModel, public QQmlParserStatus
     Q_PROPERTY(int layoutIndex READ layoutIndex WRITE setLayoutIndex NOTIFY layoutIndexChanged)
     Q_PROPERTY(DataRepositoryObject * repository READ repository WRITE setRepository
                NOTIFY repositoryChanged)
+    Q_PROPERTY(bool temporary READ isTemporary WRITE setTemporary NOTIFY temporaryChanged)
     Q_ENUMS(Status)
 public:
     enum Status
@@ -64,6 +65,8 @@ public:
     virtual void setLayoutIndex(int layoutIndex) = 0;
     virtual DataRepositoryObject * repository() const = 0;
     virtual void setRepository(DataRepositoryObject *repository) = 0;
+    virtual bool isTemporary() const = 0;
+    virtual void setTemporary(bool temporary) = 0;
 signals:
     void countChanged();
     void prependPre();
@@ -72,6 +75,7 @@ signals:
     void errorMessageChanged();
     void layoutIndexChanged();
     void repositoryChanged();
+    void temporaryChanged();
 protected:
     explicit IModel(QObject *parent = 0) : QAbstractListModel(parent), QQmlParserStatus() {}
 };
