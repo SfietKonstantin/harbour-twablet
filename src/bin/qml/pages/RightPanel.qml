@@ -35,9 +35,11 @@ import harbour.twablet 1.0
 
 DockedPanel {
     id: container
+    clip: true
 
     function openUser(id, account, clear) {
-        _open(Qt.resolvedUrl("UserPage.qml"), {userId: id, account: account, panel: container}, clear)
+        var page = _open(Qt.resolvedUrl("UserPage.qml"), {userId: id, account: account, panel: container}, clear)
+        page.load()
     }
     function openSearch(query, account, clear) {
         var args = {q: query, result_type: "recent"}
@@ -83,9 +85,12 @@ DockedPanel {
                 Repository.clearTemporary()
             }
             container.open = true
-            panelPageStack.push(page, args)
+            return panelPageStack.push(page, args)
         } else {
-            pageStack.push(page, args)
+            if (clear) {
+                Repository.clearTemporary()
+            }
+            return pageStack.push(page, args)
         }
     }
 

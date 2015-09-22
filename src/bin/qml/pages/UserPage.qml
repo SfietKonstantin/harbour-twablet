@@ -39,12 +39,7 @@ Page {
     property alias userId: query.userId
     property alias account: query.account
     property RightPanel panel
-
-    onStatusChanged: {
-        if (status === PageStatus.Activating) {
-            query.load()
-        }
-    }
+    function load() { query.load() }
 
     UserQueryItem {
         id: query
