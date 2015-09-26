@@ -33,9 +33,11 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.twablet 1.0
 
-DockedPanel {
+Item {
     id: container
-    clip: true
+    property bool open: false
+    anchors.top: parent.top; anchors.bottom: parent.bottom
+    visible: false
 
     function openUser(id, account, clear) {
         var page = _open(Qt.resolvedUrl("UserPage.qml"), {userId: id, account: account, panel: container}, clear)
@@ -94,34 +96,125 @@ DockedPanel {
         }
     }
 
-    dock: Dock.Right
-    visible: false
-
-    PageStack {
-        id: panelPageStack
-        anchors.fill: parent
+    // Background
+    Rectangle {
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Theme.rgba(Theme.highlightColor, 0.15) }
+            GradientStop { position: 1.0; color: Theme.rgba(Theme.highlightColor, 0.3) }
+        }
     }
 
+    MouseArea {
+        id: mouse
+        property bool moving: mouse.drag.active
+        property real xMin: container.parent.width - container.width
+        property real xMax: container.parent.width
+        property int threshold: Theme.itemSizeSmall
+        enabled: panelPageStack.depth == 1
+        function close(active) {
+            var delta = container.x - mouse.xMin
+            if (!active && delta >  threshold) {
+                container.open = false
+            }
+        }
+        anchors.fill: parent
+        drag {
+            target: container
+            minimumX: mouse.xMin
+            maximumX: mouse.xMax
+            axis: Drag.XAxis
+            filterChildren: true
+            onActiveChanged: mouse.close(drag.active)
+        }
+
+        MouseArea {
+            anchors.horizontalCenter: parent.left
+            anchors.top: parent.top; anchors.bottom: parent.bottom
+            width: Theme.itemSizeSmall
+
+            Rectangle {
+                anchors.top: parent.top; anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.horizontalCenterOffset: width / 2
+                width: Theme.paddingSmall
+                color: Theme.highlightColor
+            }
+            drag {
+                target: container
+                minimumX: mouse.xMin
+                maximumX: mouse.xMax
+                axis: Drag.XAxis
+                filterChildren: true
+                onActiveChanged: mouse.close(drag.active)
+            }
+        }
+
+
+        PageStack {
+            id: panelPageStack
+            anchors.fill: parent
+            clip: true
+
+            function _overridePageIndicator() {
+                if (_pageStackIndicator && _pageStackIndicator.parent != panelPageStack) {
+                    _pageStackIndicator.parent = panelPageStack
+                }
+            }
+
+            onBackNavigationChanged: {
+                if (backNavigation) {
+                    _overridePageIndicator()
+                }
+            }
+            onForwardNavigationChanged: {
+                if (forwardNavigation) {
+                    _overridePageIndicator()
+                }
+            }
+        }
+    }
+
+    state: "closed"
     states: [
         State {
-            name: "opened"; when: container.open
+            name: "closed"; when: !container.open
+            PropertyChanges {
+                target: container
+                x: mouse.xMax
+            }
+        },
+        State {
+            name: "open"; when: container.open
+            PropertyChanges {
+                target: container
+                x: mouse.xMin
+            }
         }
     ]
     transitions: [
         Transition {
-            from: ""
-            to: "opened"
-            PropertyAction {
-                target: container
-                property: "visible"
-                value: true
+            to: "open"
+            SequentialAnimation {
+                PropertyAction {
+                    target: container
+                    property: "visible"
+                    value: true
+                }
+                NumberAnimation {
+                    target: container
+                    property: "x"
+                    duration: 300; easing.type: Easing.OutQuad
+                }
             }
         },
         Transition {
-            from: "opened"
-            to: ""
+            to: "closed"
             SequentialAnimation {
-                PauseAnimation { duration: 500 }
+                NumberAnimation {
+                    target: container
+                    property: "x"
+                    duration: 300; easing.type: Easing.OutQuad
+                }
                 PropertyAction {
                     target: container
                     property: "visible"
