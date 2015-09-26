@@ -88,8 +88,8 @@ int DataRepositoryObject::addAccount(const QString &name, const QString &userId,
                                      const QString &token, const QString &tokenSecret)
 {
     bool oldHasAccounts = hasAccounts();
-    Account &addedAccount {m_accounts.append(Account(name, userId, screenName, token.toLocal8Bit(),
-                                                     tokenSecret.toLocal8Bit()))};
+    Account &addedAccount (m_accounts.append(Account(name, userId, screenName, token.toLocal8Bit(),
+                                                     tokenSecret.toLocal8Bit())));
     m_accountsMapping.emplace(addedAccount.userId(), addedAccount);
     m_loadSaveManager.save(m_accounts);
 
