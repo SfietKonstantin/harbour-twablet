@@ -32,18 +32,6 @@
 #include "accountrepository.h"
 #include <QtCore/QJsonArray>
 
-Account AccountRepository::find(const QString &userId) const
-{
-    List::const_iterator it {std::find_if(std::begin(m_data), std::end(m_data), [userId](const Account &user) {
-        return (user.userId() == userId);
-    })};
-
-    if (it != std::end(m_data)) {
-        return *it;
-    }
-    return Account();
-}
-
 void AccountRepository::load(const QJsonObject &json)
 {
     const QJsonArray &accountsArray {json.value(QLatin1String("accounts")).toArray()};

@@ -68,12 +68,13 @@ public:
     {
         return m_data.size();
     }
-    void append(T &&data)
+    T & append(T &&data)
     {
         m_data.emplace_back(data);
         for (IListener<T> *listener : m_listeners) {
             listener->doAppend(*(std::end(m_data) - 1));
         }
+        return *(std::end(m_data) - 1);
     }
     void append(const std::vector<T> &data)
     {

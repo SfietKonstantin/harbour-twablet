@@ -74,6 +74,7 @@ public slots:
     void clearTemporary();
     void refreshTemporary(int index);
 private:
+    Account accountFromId(const QString &userId) const;
     void refresh(const Layout &layout);
     void addLayout(const QString &name, const QString &userId, int queryType, const QVariantMap &arguments);
     bool addLayoutCheckAccount(int accountIndex, QString &userId);
@@ -83,21 +84,12 @@ private:
     void insertRepository();
     void removeLayoutFromRepositories(const Layout &layout);
     void removeLayoutFromRepositories(int index);
-    class LayoutComparator
-    {
-    public:
-        bool operator()(const Layout &first, const Layout &second) const;
-    };
+
     LoadSaveManager m_loadSaveManager {};
     AccountRepository m_accounts {};
+    std::map<QString, const Account &> m_accountsMapping {};
     LayoutRepository m_layouts {};
     TweetCentralRepository m_tweetsCentralRepository {};
-    struct RefCountedTweetRepository
-    {
-        TweetRepository repository {};
-        std::set<const Layout *> references {};
-    };
-    std::map<Layout, RefCountedTweetRepository, LayoutComparator> m_tweetRepositories {};
     std::map<int, Layout> m_temporaryLayouts {};
     int m_temporaryLayoutsIndex {0};
 };

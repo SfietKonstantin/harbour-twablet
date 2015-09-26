@@ -39,7 +39,6 @@
 class AccountRepository: public Repository<Account>, public ILoadSave
 {
 public:
-    Account find(const QString &userId) const;
     void load(const QJsonObject &json) override;
     void save(QJsonObject &json) const override;
 };

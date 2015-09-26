@@ -44,25 +44,41 @@
 #include "tweetrepository.h"
 #include "iqueryhandler.h"
 
-class QNetworkReply;
-class TweetCentralRepository: public QObject
+class Layout;
+class TweetCentralRepository
 {
-    Q_OBJECT
 public:
     explicit TweetCentralRepository();
     DISABLE_COPY_DEFAULT_MOVE(TweetCentralRepository);
-    void query(const Account &account, const Query &query,
-               TweetRepository &repository);
+    TweetRepository & repository(const Account &account, const Query &query);
+    void refQuery(const Account &account, const Query &query);
+    void derefQuery(const Account &account, const Query &query);
+    void refresh();
+    void refresh(const Account &account, const Query &query);
 private:
-    class QueryComparator
+    struct MappingKey
+    {
+        explicit MappingKey(const Account &inputAccount, const Query &inputQuery);
+        Account account {};
+        Query query {};
+    };
+    struct MappingData
+    {
+        explicit MappingData(std::unique_ptr<IQueryHandler> &&inputQuery);
+        TweetRepository repository {};
+        int refcount {0};
+        std::unique_ptr<IQueryHandler> query {};
+    };
+    class MappingKeyComparator
     {
     public:
-        bool operator()(const Query &first, const Query &second) const;
+        bool operator()(const MappingKey &first, const MappingKey &second) const;
     };
-    IQueryHandler * getQueryHandler(const Query &query);
+    void refresh(const MappingKey &key, MappingData &mappingData);
+    MappingData * getMappingData(const Account &account, const Query &query);
     std::map<QString, Tweet> m_data {};
     QObjectPtr<QNetworkAccessManager> m_network {nullptr};
-    std::map<Query, std::unique_ptr<IQueryHandler>, QueryComparator> m_queries {};
+    std::map<MappingKey, MappingData, MappingKeyComparator> m_mapping {};
 };
 
 #endif // TWEETCENTRALREPOSITORY_H

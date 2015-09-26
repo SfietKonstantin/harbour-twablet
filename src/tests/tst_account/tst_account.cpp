@@ -49,7 +49,7 @@ private Q_SLOTS:
         AccountRepository repository {};
         for (int i = 0; i < 4; ++i) {
             repository.append(Account(QString::number(i + 1), QString(), QString(),
-                                             QByteArray(), QByteArray()));
+                                      QByteArray(), QByteArray()));
         }
         QCOMPARE((std::begin(repository) + 0)->name(), QString::number(1));
         QCOMPARE((std::begin(repository) + 1)->name(), QString::number(2));

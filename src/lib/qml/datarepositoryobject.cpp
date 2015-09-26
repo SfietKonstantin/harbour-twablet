@@ -33,11 +33,15 @@
 #include "query.h"
 #include "accountobject.h"
 #include <QtCore/QVariantMap>
+#include <QtCore/QLoggingCategory>
 
 DataRepositoryObject::DataRepositoryObject(QObject *parent)
     : QObject(parent)
 {
     m_loadSaveManager.load(m_accounts);
+    for (const Account &account : m_accounts) {
+        m_accountsMapping.emplace(account.userId(), account);
+    }
     m_loadSaveManager.load(m_layouts);
     for (const Layout &layout : m_layouts) {
         insertRepository(layout);
@@ -61,7 +65,7 @@ LayoutRepository & DataRepositoryObject::layouts()
 
 TweetRepository & DataRepositoryObject::tweets(const Layout &layout)
 {
-    return m_tweetRepositories[layout].repository;
+    return m_tweetsCentralRepository.repository(accountFromId(layout.userId()), layout.query());
 }
 
 const Layout * DataRepositoryObject::temporaryLayout(int index) const
@@ -80,12 +84,13 @@ bool DataRepositoryObject::isTemporaryLayoutValid(int index) const
 }
 
 int DataRepositoryObject::addAccount(const QString &name, const QString &userId,
-                                            const QString &screenName,
-                                            const QString &token, const QString &tokenSecret)
+                                     const QString &screenName,
+                                     const QString &token, const QString &tokenSecret)
 {
     bool oldHasAccounts = hasAccounts();
-    m_accounts.append(Account(name, userId, screenName, token.toLocal8Bit(),
-                              tokenSecret.toLocal8Bit()));
+    Account &addedAccount {m_accounts.append(Account(name, userId, screenName, token.toLocal8Bit(),
+                                                     tokenSecret.toLocal8Bit()))};
+    m_accountsMapping.emplace(addedAccount.userId(), addedAccount);
     m_loadSaveManager.save(m_accounts);
 
     if (hasAccounts() != oldHasAccounts) {
@@ -114,6 +119,7 @@ void DataRepositoryObject::removeAccount(int index)
 
     bool oldHasAccounts = hasAccounts();
     const QString userId {(std::begin(m_accounts) + index)->userId()};
+    m_accountsMapping.erase(userId);
     m_accounts.remove(index);
     m_loadSaveManager.save(m_accounts);
 
@@ -208,9 +214,7 @@ void DataRepositoryObject::removeLayout(int index)
 
 void DataRepositoryObject::refresh()
 {
-    for (auto it = std::begin(m_tweetRepositories); it != std::end(m_tweetRepositories); ++it) {
-        refresh(it->first);
-    }
+    m_tweetsCentralRepository.refresh();
 }
 
 int DataRepositoryObject::addTemporaryLayout(AccountObject *account, int queryType, const QVariantMap &arguments)
@@ -266,12 +270,15 @@ void DataRepositoryObject::refreshTemporary(int index)
     refresh(it->second);
 }
 
+Account DataRepositoryObject::accountFromId(const QString &userId) const
+{
+    return m_accountsMapping.at(userId);
+}
+
 void DataRepositoryObject::refresh(const Layout &layout)
 {
-    const Account &account {m_accounts.find(layout.userId())};
-    if (!account.isNull()) {
-        m_tweetsCentralRepository.query(account, layout.query(), m_tweetRepositories[layout].repository);
-    }
+    const Account &account {accountFromId(layout.userId())};
+    m_tweetsCentralRepository.refresh(account, layout.query());
 }
 
 void DataRepositoryObject::addLayout(const QString &name, const QString &userId, int queryType,
@@ -327,8 +334,7 @@ bool DataRepositoryObject::addLayoutCheckQuery(int queryType, const QVariantMap 
 
 void DataRepositoryObject::insertRepository(const Layout &layout)
 {
-    RefCountedTweetRepository &repo = m_tweetRepositories[layout];
-    repo.references.insert(&layout);
+    m_tweetsCentralRepository.refQuery(accountFromId(layout.userId()), layout.query());
 }
 
 void DataRepositoryObject::insertRepository()
@@ -338,13 +344,7 @@ void DataRepositoryObject::insertRepository()
 
 void DataRepositoryObject::removeLayoutFromRepositories(const Layout &layout)
 {
-    Q_ASSERT(m_tweetRepositories.find(layout) != m_tweetRepositories.end());
-    RefCountedTweetRepository &repo = m_tweetRepositories[layout];
-    repo.references.erase(&layout);
-
-    if (repo.references.empty()) {
-        m_tweetRepositories.erase(layout);
-    }
+    m_tweetsCentralRepository.derefQuery(accountFromId(layout.userId()), layout.query());
 }
 
 void DataRepositoryObject::removeLayoutFromRepositories(int index)
@@ -352,28 +352,4 @@ void DataRepositoryObject::removeLayoutFromRepositories(int index)
     const Layout &layout = *(std::begin(m_layouts) + index);
     removeLayoutFromRepositories(layout);
     m_layouts.remove(index);
-}
-
-bool DataRepositoryObject::LayoutComparator::operator()(const Layout &first,
-                                                               const Layout &second) const
-{
-    if (first.userId() < second.userId()) {
-        return true;
-    }
-    if (first.userId() > second.userId()) {
-        return false;
-    }
-
-    const Query &firstQuery {first.query()};
-    const Query &secondQuery {second.query()};
-
-    if (firstQuery.type() < secondQuery.type()) {
-        return true;
-    }
-
-    if (firstQuery.type() > secondQuery.type()) {
-        return false;
-    }
-
-    return firstQuery.arguments() < secondQuery.arguments();
 }
