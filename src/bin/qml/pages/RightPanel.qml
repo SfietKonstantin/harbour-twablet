@@ -155,7 +155,7 @@ Item {
             anchors.fill: parent
             clip: true
 
-            function _overridePageIndicator() {
+            /*function _overridePageIndicator() {
                 if (_pageStackIndicator && _pageStackIndicator.parent != panelPageStack) {
                     _pageStackIndicator.parent = panelPageStack
                 }
@@ -170,7 +170,7 @@ Item {
                 if (forwardNavigation) {
                     _overridePageIndicator()
                 }
-            }
+            }*/
         }
     }
 
