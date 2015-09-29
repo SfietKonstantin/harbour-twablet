@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,52 +29,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "accountobject.h"
+#ifndef USERMODEL_H
+#define USERMODEL_H
 
-AccountObject::AccountObject(const Account &data, QObject *parent)
-    : QObject(parent), m_data(data)
-{
-}
+#include "userobject.h"
+#include "model.h"
 
-AccountObject * AccountObject::create(const Account &data, QObject *parent)
+class UserModel : public Model<User, UserObject>
 {
-    return new AccountObject(data, parent);
-}
+    Q_OBJECT
+public:
+    enum Roles {
+        IdRole = Qt::UserRole + 1,
+        ItemRole
+    };
+    explicit UserModel(QObject *parent = 0);
+    QVariant data(const QModelIndex &index, int role) const override final;
+private:
+    QHash<int, QByteArray> roleNames() const override final;
+};
 
-QString AccountObject::name() const
-{
-    return m_data.name();
-}
-
-QString AccountObject::userId() const
-{
-    return m_data.userId();
-}
-
-QString AccountObject::screenName() const
-{
-    return m_data.screenName();
-}
-
-QByteArray AccountObject::token() const
-{
-    return m_data.token();
-}
-
-QByteArray AccountObject::tokenSecret() const
-{
-    return m_data.tokenSecret();
-}
-
-const Account & AccountObject::data() const
-{
-    return m_data;
-}
-
-void AccountObject::update(const Account &other)
-{
-    if (m_data.name() != other.name()) {
-        m_data.setName(other.name());
-        emit nameChanged();
-    }
-}
+#endif // USERMODEL_H

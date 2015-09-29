@@ -64,7 +64,13 @@ HEADERS += \
     hashtagentity.h \
     favoritesqueryhandler.h \
     usertimelinequeryhandler.h \
-    abstracttweetqueryhandler.h
+    abstracttweetqueryhandler.h \
+    userrepository.h \
+    qml/usermodel.h \
+    usercentralrepository.h \
+    abstractuserqueryhandler.h \
+    friendsqueryhandler.h \
+    followersqueryhandler.h
 
 SOURCES += \
     private/twitterdatautil.cpp \
@@ -108,4 +114,9 @@ SOURCES += \
     hashtagentity.cpp \
     favoritesqueryhandler.cpp \
     usertimelinequeryhandler.cpp \
-    abstracttweetqueryhandler.cpp
+    abstracttweetqueryhandler.cpp \
+    qml/usermodel.cpp \
+    usercentralrepository.cpp \
+    abstractuserqueryhandler.cpp \
+    friendsqueryhandler.cpp \
+    followersqueryhandler.cpp

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,52 +29,45 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "accountobject.h"
+#ifndef USERCENTRALREPOSITORY_H
+#define USERCENTRALREPOSITORY_H
 
-AccountObject::AccountObject(const Account &data, QObject *parent)
-    : QObject(parent), m_data(data)
-{
-}
+#include <map>
+#include <QtNetwork/QNetworkAccessManager>
+#include "globals.h"
+#include "qobjectutils.h"
+#include "account.h"
+#include "query.h"
+#include "userrepository.h"
+#include "iqueryhandler.h"
 
-AccountObject * AccountObject::create(const Account &data, QObject *parent)
+class UserCentralRepository
 {
-    return new AccountObject(data, parent);
-}
+public:
+    explicit UserCentralRepository();
+    DISABLE_COPY_DEFAULT_MOVE(UserCentralRepository);
+    bool isValid(int index) const;
+    UserRepository & repository(int index);
+    void refresh(int index);
+    void loadMore(int index);
+    int addRepository(const Account &account, const Query &query);
+    void removeRepository(int index);
+private:
+    struct MappingData
+    {
+        explicit MappingData(const Account &inputAccount, const Query &inputQuery,
+                             std::unique_ptr<IQueryHandler<User>> &&inputHandler);
+        Account account {};
+        Query query {};
+        UserRepository repository {};
+        std::unique_ptr<IQueryHandler<User>> handler {};
+    };
+    void load(MappingData &mappingData,
+              IQueryHandler<User>::RequestType requestType);
+    MappingData * getMappingData(int index, const Account &account, const Query &query);
+    QObjectPtr<QNetworkAccessManager> m_network {nullptr};
+    std::map<int, MappingData> m_mapping {};
+    int m_index {0};
+};
 
-QString AccountObject::name() const
-{
-    return m_data.name();
-}
-
-QString AccountObject::userId() const
-{
-    return m_data.userId();
-}
-
-QString AccountObject::screenName() const
-{
-    return m_data.screenName();
-}
-
-QByteArray AccountObject::token() const
-{
-    return m_data.token();
-}
-
-QByteArray AccountObject::tokenSecret() const
-{
-    return m_data.tokenSecret();
-}
-
-const Account & AccountObject::data() const
-{
-    return m_data;
-}
-
-void AccountObject::update(const Account &other)
-{
-    if (m_data.name() != other.name()) {
-        m_data.setName(other.name());
-        emit nameChanged();
-    }
-}
+#endif // USERCENTRALREPOSITORY_H

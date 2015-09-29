@@ -80,6 +80,32 @@ Item {
         _open(Qt.resolvedUrl("TweetsPage.qml"), params, clear)
     }
 
+    function openFriends(userId, screenName, account, clear) {
+        var args = {"user_id": userId}
+        var params = {
+            title: qsTr("%1's friends").arg(screenName),
+            queryType: Query.Friends,
+            args: args,
+            account: account,
+            panel: container
+        }
+
+        _open(Qt.resolvedUrl("UsersPage.qml"), params, clear)
+    }
+
+    function openFollowers(userId, screenName, account, clear) {
+        var args = {"user_id": userId}
+        var params = {
+            title: qsTr("%1's followers").arg(screenName),
+            queryType: Query.Followers,
+            args: args,
+            account: account,
+            panel: container
+        }
+
+        _open(Qt.resolvedUrl("UsersPage.qml"), params, clear)
+    }
+
     function _open(page, args, clear) {
         if (Screen.sizeCategory === Screen.Large) {
             if (clear) {

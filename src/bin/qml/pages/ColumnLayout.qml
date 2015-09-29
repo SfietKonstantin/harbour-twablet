@@ -181,24 +181,9 @@ SilicaListView {
         opacity: internal.opacity
     }
 
-    footer: Item {
-        visible: twitterModel.count > 0
-        anchors.left: parent.left; anchors.right: parent.right
-        height: loadMore.height + 2 * Theme.paddingMedium
-
-        Button {
-            id: loadMore
-            anchors.centerIn: parent.verticalCenter
-            text: qsTr("Load more")
-            onClicked: Repository.loadMore(container.layoutIndex)
-        }
-
-        BusyIndicator {
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
-            running: model.status === Model.Loading
-            size: BusyIndicatorSize.Small
-        }
+    footer: LoadMoreButton {
+        model: twitterModel
+        onClicked: Repository.loadMore(container.layoutIndex)
     }
 
     StatusPlaceholder {

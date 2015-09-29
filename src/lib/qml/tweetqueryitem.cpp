@@ -77,7 +77,7 @@ QNetworkReply * TweetQueryItem::createQuery() const
         parameters.insert({"in_reply_to_status_id", QUrl::toPercentEncoding(m_inReplyTo)});
     }
 
-    return TwitterQueryUtil::post(network(), path, {}, parameters, account()->account());
+    return TwitterQueryUtil::post(network(), path, {}, parameters, account()->data());
 }
 
 void TweetQueryItem::handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,

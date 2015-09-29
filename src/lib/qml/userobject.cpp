@@ -140,6 +140,11 @@ User UserObject::data() const
     return m_data;
 }
 
+void UserObject::update(const User &other)
+{
+    Q_UNUSED(other)
+}
+
 void UserObject::initializeUrl()
 {
     if (m_data.urlEntities().size() != 1) {

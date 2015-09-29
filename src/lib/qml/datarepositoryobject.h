@@ -37,6 +37,7 @@
 #include "accountrepository.h"
 #include "layoutrepository.h"
 #include "tweetcentralrepository.h"
+#include "usercentralrepository.h"
 
 class AccountObject;
 class DataRepositoryObject : public QObject
@@ -51,6 +52,8 @@ public:
     TweetRepository & tweets(const Layout &layout);
     const Layout * temporaryLayout(int index) const;
     bool isTemporaryLayoutValid(int index) const;
+    bool isUserRepositoryValid(int index) const;
+    UserRepository & user(int index);
 signals:
     void hasAccountsChanged();
 public slots:
@@ -74,6 +77,10 @@ public slots:
     void removeTemporaryLayout(int index);
     void clearTemporary();
     void refreshTemporary(int index);
+    // Users
+    int addUser(AccountObject *account, int queryType, const QVariantMap &arguments);
+    void removeUser(int index);
+    void userLoadMore(int index);
 private:
     Account accountFromId(const QString &userId) const;
     void refresh(const Layout &layout);
@@ -81,6 +88,8 @@ private:
     bool addLayoutCheckAccount(int accountIndex, QString &userId);
     bool addLayoutCheckQuery(int queryType, const QVariantMap &arguments,
                              Query::Arguments &queryArguments) const;
+    bool addUserCheckQuery(int queryType, const QVariantMap &arguments,
+                           Query::Arguments &queryArguments) const;
     void insertRepository(const Layout &layout);
     void insertRepository();
     void removeLayoutFromRepositories(const Layout &layout);
@@ -92,6 +101,7 @@ private:
     LayoutRepository m_layouts {};
     TweetCentralRepository m_tweetsCentralRepository {};
     std::map<int, Layout> m_temporaryLayouts {};
+    UserCentralRepository m_userCentralRepository {};
     int m_temporaryLayoutsIndex {0};
 };
 

@@ -68,7 +68,7 @@ QNetworkReply * UserQueryItem::createQuery() const
     QString path {QLatin1String("users/show.json")};
     std::map<QByteArray, QByteArray> parameters {{"user_id", QUrl::toPercentEncoding(m_userId)}};
 
-    return TwitterQueryUtil::get(network(), path, parameters, account()->account());
+    return TwitterQueryUtil::get(network(), path, parameters, account()->data());
 }
 
 void UserQueryItem::handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,

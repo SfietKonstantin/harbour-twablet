@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,52 +29,35 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "accountobject.h"
+#include "usermodel.h"
 
-AccountObject::AccountObject(const Account &data, QObject *parent)
-    : QObject(parent), m_data(data)
+UserModel::UserModel(QObject *parent) :
+    Model<User, UserObject>(parent)
 {
 }
 
-AccountObject * AccountObject::create(const Account &data, QObject *parent)
+QVariant UserModel::data(const QModelIndex &index, int role) const
 {
-    return new AccountObject(data, parent);
-}
-
-QString AccountObject::name() const
-{
-    return m_data.name();
-}
-
-QString AccountObject::userId() const
-{
-    return m_data.userId();
-}
-
-QString AccountObject::screenName() const
-{
-    return m_data.screenName();
-}
-
-QByteArray AccountObject::token() const
-{
-    return m_data.token();
-}
-
-QByteArray AccountObject::tokenSecret() const
-{
-    return m_data.tokenSecret();
-}
-
-const Account & AccountObject::data() const
-{
-    return m_data;
-}
-
-void AccountObject::update(const Account &other)
-{
-    if (m_data.name() != other.name()) {
-        m_data.setName(other.name());
-        emit nameChanged();
+    int row = index.row();
+    if (row < 0 || row >= rowCount()) {
+        return QVariant();
+    }
+    const QObjectPtr<UserObject> &user = m_data[row];
+    switch (role) {
+    case IdRole:
+        return user->id();
+        break;
+    case ItemRole:
+        return QVariant::fromValue(user.get());
+        break;
+    default:
+        return QVariant();
+        break;
     }
 }
+
+QHash<int, QByteArray> UserModel::roleNames() const
+{
+    return {{IdRole, "id"}, {ItemRole, "item"}};
+}
+

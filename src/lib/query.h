@@ -46,7 +46,9 @@ public:
         Mentions,
         Search,
         Favorites,
-        UserTimeline
+        UserTimeline,
+        Friends,
+        Followers
     };
     using Arguments = std::map<QString, QString>;
     explicit Query() = default;

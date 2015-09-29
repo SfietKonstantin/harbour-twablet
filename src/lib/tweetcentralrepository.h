@@ -33,14 +33,11 @@
 #define TWEETCENTRALREPOSITORY_H
 
 #include <map>
-#include <QtCore/QObject>
 #include <QtNetwork/QNetworkAccessManager>
 #include "globals.h"
 #include "qobjectutils.h"
-#include "tweet.h"
 #include "account.h"
 #include "query.h"
-#include "repository.h"
 #include "tweetrepository.h"
 #include "iqueryhandler.h"
 
@@ -65,10 +62,10 @@ private:
     };
     struct MappingData
     {
-        explicit MappingData(std::unique_ptr<IQueryHandler> &&inputQuery);
+        explicit MappingData(std::unique_ptr<IQueryHandler<Tweet> > &&inputHandler);
         TweetRepository repository {};
         int refcount {0};
-        std::unique_ptr<IQueryHandler> query {};
+        std::unique_ptr<IQueryHandler<Tweet>> handler {};
     };
     class MappingKeyComparator
     {
@@ -76,7 +73,7 @@ private:
         bool operator()(const MappingKey &first, const MappingKey &second) const;
     };
     void load(const MappingKey &key, MappingData &mappingData,
-              IQueryHandler::RequestType requestType);
+              IQueryHandler<Tweet>::RequestType requestType);
     MappingData * getMappingData(const Account &account, const Query &query);
     std::map<QString, Tweet> m_data {};
     QObjectPtr<QNetworkAccessManager> m_network {nullptr};

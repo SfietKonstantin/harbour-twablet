@@ -48,7 +48,9 @@ public:
         Mentions = Query::Mentions,
         Search = Query::Search,
         Favorites = Query::Favorites,
-        UserTimeline = Query::UserTimeline
+        UserTimeline = Query::UserTimeline,
+        Friends = Query::Friends,
+        Followers = Query::Followers
     };
     DISABLE_COPY_DISABLE_MOVE(QueryObject);
     static QueryObject * create(const Query &data, QObject *parent = 0);

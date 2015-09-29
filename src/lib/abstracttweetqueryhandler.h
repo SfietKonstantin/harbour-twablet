@@ -35,7 +35,7 @@
 #include "iqueryhandler.h"
 #include "globals.h"
 
-class AbstractTweetQueryHandler: public IQueryHandler
+class AbstractTweetQueryHandler: public IQueryHandler<Tweet>
 {
 public:
     DISABLE_COPY_DISABLE_MOVE(AbstractTweetQueryHandler);

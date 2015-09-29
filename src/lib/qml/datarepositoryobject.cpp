@@ -83,6 +83,16 @@ bool DataRepositoryObject::isTemporaryLayoutValid(int index) const
     return m_temporaryLayouts.find(index) != std::end(m_temporaryLayouts);
 }
 
+bool DataRepositoryObject::isUserRepositoryValid(int index) const
+{
+    return m_userCentralRepository.isValid(index);
+}
+
+UserRepository & DataRepositoryObject::user(int index)
+{
+    return m_userCentralRepository.repository(index);
+}
+
 int DataRepositoryObject::addAccount(const QString &name, const QString &userId,
                                      const QString &screenName,
                                      const QString &token, const QString &tokenSecret)
@@ -230,12 +240,12 @@ void DataRepositoryObject::loadMore(int layoutIndex)
 int DataRepositoryObject::addTemporaryLayout(AccountObject *account, int queryType, const QVariantMap &arguments)
 {
     if (account == nullptr) {
-        return 0;
+        return -1;
     }
 
     Query::Arguments queryArguments {};
     if (!addLayoutCheckQuery(queryType, arguments, queryArguments)) {
-        return 0;
+        return -1;
     }
 
     int index = m_temporaryLayoutsIndex;
@@ -278,6 +288,31 @@ void DataRepositoryObject::refreshTemporary(int index)
         return;
     }
     refresh(it->second);
+}
+
+int DataRepositoryObject::addUser(AccountObject *account, int queryType, const QVariantMap &arguments)
+{
+    if (account == nullptr) {
+        return -1;
+    }
+
+    Query::Arguments queryArguments {};
+    if (!addUserCheckQuery(queryType, arguments, queryArguments)) {
+        return -1;
+    }
+
+    return m_userCentralRepository.addRepository(account->data(), std::move(Query(static_cast<Query::Type>(queryType),
+                                                                                  std::move(queryArguments))));
+}
+
+void DataRepositoryObject::removeUser(int index)
+{
+    m_userCentralRepository.removeRepository(index);
+}
+
+void DataRepositoryObject::userLoadMore(int index)
+{
+    m_userCentralRepository.loadMore(index);
 }
 
 Account DataRepositoryObject::accountFromId(const QString &userId) const
@@ -329,6 +364,27 @@ bool DataRepositoryObject::addLayoutCheckQuery(int queryType, const QVariantMap 
     case Query::Favorites:
         break;
     case Query::UserTimeline:
+        break;
+
+    default:
+        return false;
+        break;
+    }
+
+    for (const QString &key : arguments.keys()) {
+        queryArguments.emplace(key, arguments.value(key).toString());
+    }
+
+    return true;
+}
+
+bool DataRepositoryObject::addUserCheckQuery(int queryType, const QVariantMap &arguments,
+                                             Query::Arguments &queryArguments) const
+{
+    switch (queryType) {
+    case Query::Friends:
+        break;
+    case Query::Followers:
         break;
     default:
         return false;

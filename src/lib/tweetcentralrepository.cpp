@@ -86,7 +86,7 @@ void TweetCentralRepository::derefQuery(const Account &account, const Query &que
 void TweetCentralRepository::refresh()
 {
     for (auto it = std::begin(m_mapping); it != std::end(m_mapping); ++it) {
-        load(it->first, it->second, IQueryHandler::Refresh);
+        load(it->first, it->second, IQueryHandler<Tweet>::Refresh);
     }
 }
 
@@ -94,7 +94,7 @@ void TweetCentralRepository::refresh(const Account &account, const Query &query)
 {
     auto it = m_mapping.find(MappingKey{account, query});
     if (it != std::end(m_mapping)) {
-        load(it->first, it->second, IQueryHandler::Refresh);
+        load(it->first, it->second, IQueryHandler<Tweet>::Refresh);
     }
 }
 
@@ -102,16 +102,16 @@ void TweetCentralRepository::loadMore(const Account &account, const Query &query
 {
     auto it = m_mapping.find(MappingKey{account, query});
     if (it != std::end(m_mapping)) {
-        load(it->first, it->second, IQueryHandler::LoadMore);
+        load(it->first, it->second, IQueryHandler<Tweet>::LoadMore);
     }
 }
 
 void TweetCentralRepository::load(const MappingKey &key, MappingData &mappingData,
-                                  IQueryHandler::RequestType requestType)
+                                  IQueryHandler<Tweet>::RequestType requestType)
 {
     QString path {};
     std::map<QByteArray, QByteArray> parameters {};
-    mappingData.query->createRequest(requestType, path, parameters);
+    mappingData.handler->createRequest(requestType, path, parameters);
 
     QNetworkReply *reply {TwitterQueryUtil::get(*m_network, path, parameters, key.account)};
     mappingData.repository.start();
@@ -146,8 +146,8 @@ void TweetCentralRepository::load(const MappingKey &key, MappingData &mappingDat
 
         std::vector<Tweet> items {};
         QString errorMessage {};
-        IQueryHandler::Placement placement {IQueryHandler::Discard};
-        bool returned = mappingData.query->treatReply(requestType, reply->readAll(), items, errorMessage, placement);
+        IQueryHandler<Tweet>::Placement placement {IQueryHandler<Tweet>::Discard};
+        bool returned = mappingData.handler->treatReply(requestType, reply->readAll(), items, errorMessage, placement);
         if (!returned) {
             qCWarning(QLoggingCategory("tweet-central-repository")) << "Error happened during request for layout" << key.account.userId() << key.query.type();
             qCWarning(QLoggingCategory("tweet-central-repository")) << "Parsing error: " << errorMessage;
@@ -159,13 +159,13 @@ void TweetCentralRepository::load(const MappingKey &key, MappingData &mappingDat
             }
             qDebug(QLoggingCategory("tweet-central-repository")) << "New data available for layout" << key.account.userId() << key.query.type() << ". Count:" << items.size();
             switch (placement) {
-            case IQueryHandler::Append:
+            case IQueryHandler<Tweet>::Append:
                 mappingData.repository.append(items);
                 break;
-            case IQueryHandler::Prepend:
+            case IQueryHandler<Tweet>::Prepend:
                 mappingData.repository.prepend(items);
                 break;
-            case IQueryHandler::Discard:
+            case IQueryHandler<Tweet>::Discard:
                 break;
             }
             mappingData.repository.finish();
@@ -183,35 +183,36 @@ TweetCentralRepository::MappingData * TweetCentralRepository::getMappingData(con
     switch (query.type()) {
     case Query::Home:
     {
-        std::unique_ptr<IQueryHandler> handler {new HomeTimelineQueryHandler()};
+        std::unique_ptr<IQueryHandler<Tweet>> handler {new HomeTimelineQueryHandler()};
         return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
         break;
     }
     case Query::Mentions:
     {
-        std::unique_ptr<IQueryHandler> handler {new MentionsTimelineQueryHandler()};
+        std::unique_ptr<IQueryHandler<Tweet>> handler {new MentionsTimelineQueryHandler()};
         return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
         break;
     }
     case Query::Search:
     {
-        std::unique_ptr<IQueryHandler> handler {new SearchQueryHandler(query.arguments())};
+        std::unique_ptr<IQueryHandler<Tweet>> handler {new SearchQueryHandler(query.arguments())};
         return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
         break;
     }
     case Query::Favorites:
     {
-        std::unique_ptr<IQueryHandler> handler {new FavoritesQueryHandler(query.arguments())};
+        std::unique_ptr<IQueryHandler<Tweet>> handler {new FavoritesQueryHandler(query.arguments())};
         return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
         break;
     }
     case Query::UserTimeline:
     {
-        std::unique_ptr<IQueryHandler> handler {new UserTimelineQueryHandler(query.arguments())};
+        std::unique_ptr<IQueryHandler<Tweet>> handler {new UserTimelineQueryHandler(query.arguments())};
         return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
         break;
     }
     default:
+        qCWarning(QLoggingCategory("tweet-central-repository")) << "Unhandled type" << query.type();
         return nullptr;
         break;
     }
@@ -236,8 +237,8 @@ bool TweetCentralRepository::MappingKeyComparator::operator()(const MappingKey &
     return first.query.arguments() < second.query.arguments();
 }
 
-TweetCentralRepository::MappingData::MappingData(std::unique_ptr<IQueryHandler> &&inputQuery)
-    : query(std::move(inputQuery))
+TweetCentralRepository::MappingData::MappingData(std::unique_ptr<IQueryHandler<Tweet>> &&inputHandler)
+    : handler(std::move(inputHandler))
 {
 }
 

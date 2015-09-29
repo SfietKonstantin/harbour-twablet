@@ -35,6 +35,7 @@
 #include <QtCore/QtGlobal>
 
 #include "tweetrepository.h"
+#include "userrepository.h"
 
 class Account;
 class Layout;
@@ -101,6 +102,25 @@ public:
         }
 
         return repository.tweets(layout);
+    }
+};
+
+template<> class DataRepositoryObjectMap<User>
+{
+public:
+    static bool isValid(DataRepositoryObject *repository, int layoutIndex, bool temporary)
+    {
+        Q_UNUSED(temporary)
+        if (repository == nullptr) {
+            return false;
+        }
+
+        return repository->isUserRepositoryValid(layoutIndex);
+    }
+    static UserRepository & get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
+    {
+        Q_UNUSED(temporary)
+        return repository.user(layoutIndex);
     }
 };
 

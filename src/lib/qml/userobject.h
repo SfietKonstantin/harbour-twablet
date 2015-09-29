@@ -34,6 +34,7 @@
 
 #include <QtCore/QObject>
 #include "user.h"
+#include "model.h"
 
 class UserObject : public QObject
 {
@@ -80,10 +81,12 @@ public:
     User data() const;
 private:
     explicit UserObject(const User &data, QObject *parent = 0);
+    void update(const User &other);
     void initializeUrl();
     User m_data {};
     QString m_displayUrl {};
     QString m_url {};
+    friend class Model<User, UserObject>;
 };
 
 #endif // USEROBJECT_H

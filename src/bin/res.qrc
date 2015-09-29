@@ -25,5 +25,7 @@
         <file>qml/pages/LinkHandler.js</file>
         <file>qml/pages/TweetsPage.qml</file>
         <file>data/me.svg</file>
+        <file>qml/pages/UsersPage.qml</file>
+        <file>qml/pages/LoadMoreButton.qml</file>
     </qresource>
 </RCC>

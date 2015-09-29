@@ -34,6 +34,7 @@ OTHER_FILES += \
     qml/pages/RightPanel.qml \
     qml/pages/UserPage.qml \
     qml/pages/MiniButton.qml \
+    qml/pages/UsersPage.qml \
     qml/pages/LinkHandler.js
 
 

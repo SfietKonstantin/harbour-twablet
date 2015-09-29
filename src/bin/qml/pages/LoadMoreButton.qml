@@ -29,52 +29,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "accountobject.h"
+import QtQuick 2.0
+import Sailfish.Silica 1.0
+import harbour.twablet 1.0
 
-AccountObject::AccountObject(const Account &data, QObject *parent)
-    : QObject(parent), m_data(data)
-{
-}
+Item {
+    id: container
+    property QtObject model
+    visible: model.count > 0
+    anchors.left: parent.left; anchors.right: parent.right
+    height: loadMore.height + 2 * Theme.paddingMedium
+    signal clicked()
 
-AccountObject * AccountObject::create(const Account &data, QObject *parent)
-{
-    return new AccountObject(data, parent);
-}
+    Button {
+        id: loadMore
+        anchors.centerIn: parent.verticalCenter
+        text: qsTr("Load more")
+        onClicked: container.clicked()
+    }
 
-QString AccountObject::name() const
-{
-    return m_data.name();
-}
-
-QString AccountObject::userId() const
-{
-    return m_data.userId();
-}
-
-QString AccountObject::screenName() const
-{
-    return m_data.screenName();
-}
-
-QByteArray AccountObject::token() const
-{
-    return m_data.token();
-}
-
-QByteArray AccountObject::tokenSecret() const
-{
-    return m_data.tokenSecret();
-}
-
-const Account & AccountObject::data() const
-{
-    return m_data;
-}
-
-void AccountObject::update(const Account &other)
-{
-    if (m_data.name() != other.name()) {
-        m_data.setName(other.name());
-        emit nameChanged();
+    BusyIndicator {
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
+        running: model.status === Model.Loading
+        size: BusyIndicatorSize.Small
     }
 }
+

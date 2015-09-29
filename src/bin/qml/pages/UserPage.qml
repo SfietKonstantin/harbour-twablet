@@ -146,10 +146,14 @@ Page {
                 MiniButton {
                     width: parent.width / 3
                     text: query.user ? qsTr("%n\nfriends", "", query.user.friendsCount) : ""
+                    onClicked: container.panel.openFriends(query.userId, query.user.screenName,
+                                                           container.account, false)
                 }
                 MiniButton {
                     width: parent.width / 3
                     text: query.user ? qsTr("%n\nfollowers", "", query.user.followersCount) : ""
+                    onClicked: container.panel.openFollowers(query.userId, query.user.screenName,
+                                                             container.account, false)
                 }
             }
 

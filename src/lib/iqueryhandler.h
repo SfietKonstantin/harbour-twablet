@@ -37,6 +37,7 @@
 #include <vector>
 #include "tweet.h"
 
+template<class T>
 class IQueryHandler
 {
 public:
@@ -46,20 +47,18 @@ public:
         Refresh,
         LoadMore
     };
-    virtual ~IQueryHandler() {}
-protected:
     enum Placement
     {
         Discard,
         Append,
         Prepend,
     };
+    virtual ~IQueryHandler() {}
     virtual void createRequest(RequestType requestType, QString &outPath,
                                Parameters &outParameters) const = 0;
     virtual bool treatReply(RequestType requestType, const QByteArray &data,
-                            std::vector<Tweet> &items, QString &errorMessage,
+                            std::vector<T> &items, QString &errorMessage,
                             Placement &placement) = 0;
-    friend class TweetCentralRepository;
 };
 
 #endif // IQUERYHANDLER_H
