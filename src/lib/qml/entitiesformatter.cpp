@@ -114,7 +114,7 @@ void EntitiesFormatter::doFormatUserMention(QString &text, UserMentionEntity *en
     }
 
     QString after {QString(QLatin1String("<a href=\"user://%1\">@%2</a>")).arg(entity->id(), entity->screenName())};
-    text.replace(entity->text(), after);
+    text.replace(entity->text(), after, Qt::CaseInsensitive);
 }
 
 void EntitiesFormatter::doFormatHashtag(QString &text, HashtagEntity *entity)
@@ -125,5 +125,5 @@ void EntitiesFormatter::doFormatHashtag(QString &text, HashtagEntity *entity)
 
     QString before {QString(QLatin1String("#%1")).arg(entity->text())};
     QString after {QString(QLatin1String("<a href=\"hashtag://%1\">#%1</a>")).arg(entity->text())};
-    text.replace(before, after);
+    text.replace(before, after, Qt::CaseInsensitive);
 }
