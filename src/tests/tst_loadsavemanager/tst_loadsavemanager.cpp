@@ -85,7 +85,7 @@ private Q_SLOTS:
         SimpleLoadSave save {};
         save.setString(QLatin1String("test"));
         save.setDouble(12.34);
-        QVERIFY(!m_loadSaveManager.load(save));
+        QVERIFY(m_loadSaveManager.load(save));
         QVERIFY(m_loadSaveManager.save(save));
 
         SimpleLoadSave load {};
