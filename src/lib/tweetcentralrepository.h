@@ -55,6 +55,7 @@ public:
     void derefQuery(const Account &account, const Query &query);
     void refresh();
     void refresh(const Account &account, const Query &query);
+    void loadMore(const Account &account, const Query &query);
 private:
     struct MappingKey
     {
@@ -74,7 +75,8 @@ private:
     public:
         bool operator()(const MappingKey &first, const MappingKey &second) const;
     };
-    void refresh(const MappingKey &key, MappingData &mappingData);
+    void load(const MappingKey &key, MappingData &mappingData,
+              IQueryHandler::RequestType requestType);
     MappingData * getMappingData(const Account &account, const Query &query);
     std::map<QString, Tweet> m_data {};
     QObjectPtr<QNetworkAccessManager> m_network {nullptr};

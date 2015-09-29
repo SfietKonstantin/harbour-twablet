@@ -29,19 +29,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef HOMETIMELINEQUERYHANDLER_H
-#define HOMETIMELINEQUERYHANDLER_H
+#ifndef ABSTRACTTWEETQUERYHANDLER_H
+#define ABSTRACTTWEETQUERYHANDLER_H
 
-#include "abstracttweetqueryhandler.h"
+#include "iqueryhandler.h"
+#include "globals.h"
 
-class HomeTimelineQueryHandler: public AbstractTweetQueryHandler
+class AbstractTweetQueryHandler: public IQueryHandler
 {
 public:
-    explicit HomeTimelineQueryHandler();
-    DISABLE_COPY_DISABLE_MOVE(HomeTimelineQueryHandler);
+    DISABLE_COPY_DISABLE_MOVE(AbstractTweetQueryHandler);
+protected:
+    explicit AbstractTweetQueryHandler();
+    virtual QString path() const = 0;
+    virtual Parameters commonParameters() const = 0;
+    void createRequest(RequestType requestType, QString &outPath,
+                       Parameters &outParameters) const override;
+    bool treatReply(RequestType requestType, const QByteArray &data, std::vector<Tweet> &items,
+                    QString &errorMessage, Placement &placement) override;
+    bool treatReply(RequestType requestType, const QJsonArray &data, std::vector<Tweet> &items,
+                    Placement &placement);
 private:
-    QString path() const override;
-    Parameters commonParameters() const override;
+    QString m_sinceId {};
+    QString m_maxId {};
 };
 
-#endif // HOMETIMELINEQUERYHANDLER_H
+#endif // ABSTRACTTWEETQUERYHANDLER_H

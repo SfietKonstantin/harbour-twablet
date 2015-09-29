@@ -68,6 +68,7 @@ public slots:
     void updateLayoutUnread(int index, int unread);
     void removeLayout(int index);
     void refresh();
+    void loadMore(int layoutIndex);
     // Temporary layout
     int addTemporaryLayout(AccountObject *account, int queryType, const QVariantMap &arguments);
     void removeTemporaryLayout(int index);

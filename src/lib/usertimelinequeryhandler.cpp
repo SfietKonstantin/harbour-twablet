@@ -30,13 +30,10 @@
  */
 
 #include "usertimelinequeryhandler.h"
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
 #include <QtCore/QUrl>
-#include "tweet.h"
 
 UserTimelineQueryHandler::UserTimelineQueryHandler(const Query::Arguments &arguments)
+    : AbstractTweetQueryHandler()
 {
     auto userIdIt = arguments.find(QLatin1String("user_id"));
     if (userIdIt != std::end(arguments)) {
@@ -54,45 +51,20 @@ UserTimelineQueryHandler::UserTimelineQueryHandler(const Query::Arguments &argum
     }
 }
 
-void UserTimelineQueryHandler::createRequest(QString &path, std::map<QByteArray, QByteArray> &parameters) const
+QString UserTimelineQueryHandler::path() const
 {
-    path = QLatin1String("statuses/user_timeline.json");
-
-    parameters.insert({"count", QByteArray::number(200)});
-    parameters.insert({"trim_user", "false"});
-    parameters.insert({"include_entities", "true"});
-    parameters.insert({"user_id", QUrl::toPercentEncoding(m_userId)});
-    parameters.insert({"exclude_replies", QUrl::toPercentEncoding(m_excludeReplies)});
-    parameters.insert({"include_rts", QUrl::toPercentEncoding(m_includeRts)});
-    if (!m_sinceId.isEmpty()) {
-        parameters.insert({"since_id", QUrl::toPercentEncoding(m_sinceId)});
-    }
+    return QLatin1String("statuses/user_timeline.json");
 }
 
-bool UserTimelineQueryHandler::treatReply(const QByteArray &data, std::vector<Tweet> &items,
-                                          QString &errorMessage, Placement &placement)
+AbstractTweetQueryHandler::Parameters UserTimelineQueryHandler::commonParameters() const
 {
-    QJsonParseError error {-1, QJsonParseError::NoError};
-    QJsonDocument document {QJsonDocument::fromJson(data, &error)};
-    if (error.error != QJsonParseError::NoError) {
-        errorMessage = error.errorString();
-        placement = Discard;
-        return false;
-    }
-
-    const QJsonArray &tweets (document.array());
-    items.reserve(tweets.size());
-    for (const QJsonValue &tweet : tweets) {
-        if (tweet.isObject()) {
-            items.emplace_back(tweet.toObject());
-        }
-    }
-
-    if (!items.empty()) {
-        m_sinceId = std::begin(items)->id();
-    }
-
-    placement = Prepend;
-    return true;
+    return Parameters{
+        {"count", QByteArray::number(200)},
+        {"trim_user", "false"},
+        {"include_entities", "true"},
+        {"user_id", QUrl::toPercentEncoding(m_userId)},
+        {"exclude_replies", QUrl::toPercentEncoding(m_excludeReplies)},
+        {"include_rts", QUrl::toPercentEncoding(m_includeRts)}
+    };
 }
 

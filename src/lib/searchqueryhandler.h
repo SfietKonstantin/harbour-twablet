@@ -32,22 +32,21 @@
 #ifndef SEARCHQUERYHANDLER_H
 #define SEARCHQUERYHANDLER_H
 
-#include "iqueryhandler.h"
+#include "abstracttweetqueryhandler.h"
 #include "query.h"
-#include "globals.h"
 
-class SearchQueryHandler: public IQueryHandler
+class SearchQueryHandler: public AbstractTweetQueryHandler
 {
 public:
     explicit SearchQueryHandler(const Query::Arguments &arguments);
     DISABLE_COPY_DISABLE_MOVE(SearchQueryHandler);
 private:
-    void createRequest(QString &path, std::map<QByteArray, QByteArray> &parameters) const override;
-    bool treatReply(const QByteArray &data, std::vector<Tweet> &items,
+    QString path() const override;
+    Parameters commonParameters() const override;
+    bool treatReply(RequestType requestType, const QByteArray &data, std::vector<Tweet> &items,
                     QString &errorMessage, Placement &placement) override;
     QString m_query {};
     QByteArray m_resultType {};
-    QString m_sinceId {};
 };
 
 #endif // SEARCHQUERYHANDLER_H

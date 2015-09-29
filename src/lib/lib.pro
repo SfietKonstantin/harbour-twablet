@@ -63,7 +63,8 @@ HEADERS += \
     searchqueryhandler.h \
     hashtagentity.h \
     favoritesqueryhandler.h \
-    usertimelinequeryhandler.h
+    usertimelinequeryhandler.h \
+    abstracttweetqueryhandler.h
 
 SOURCES += \
     private/twitterdatautil.cpp \
@@ -106,4 +107,5 @@ SOURCES += \
     searchqueryhandler.cpp \
     hashtagentity.cpp \
     favoritesqueryhandler.cpp \
-    usertimelinequeryhandler.cpp
+    usertimelinequeryhandler.cpp \
+    abstracttweetqueryhandler.cpp

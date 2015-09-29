@@ -38,6 +38,7 @@
 #include "tweet.h"
 
 SearchQueryHandler::SearchQueryHandler(const Query::Arguments &arguments)
+    : AbstractTweetQueryHandler()
 {
     auto qIt = arguments.find(QLatin1String("q"));
     if (qIt != std::end(arguments)) {
@@ -58,22 +59,27 @@ SearchQueryHandler::SearchQueryHandler(const Query::Arguments &arguments)
                                                       << "result_type:" << m_resultType;
 }
 
-void SearchQueryHandler::createRequest(QString &path, std::map<QByteArray, QByteArray> &parameters) const
+QString SearchQueryHandler::path() const
 {
-    path = QLatin1String("search/tweets.json");
-    parameters.insert({"count", QByteArray::number(100)});
-    parameters.insert({"include_entities", "true"});
-    parameters.insert({"q", QUrl::toPercentEncoding(m_query)});
-    if (!m_resultType.isEmpty()) {
-        parameters.insert({"result_type", m_resultType});
-    }
-    if (!m_sinceId.isEmpty()) {
-        parameters.insert({"since_id", QUrl::toPercentEncoding(m_sinceId)});
-    }
+    return QLatin1String{"search/tweets.json"};
 }
 
-bool SearchQueryHandler::treatReply(const QByteArray &data, std::vector<Tweet> &items,
-                                    QString &errorMessage, IQueryHandler::Placement &placement)
+AbstractTweetQueryHandler::Parameters SearchQueryHandler::commonParameters() const
+{
+    Parameters returned {
+        {"count", QByteArray::number(100)},
+        {"include_entities", "true"},
+        {"q", QUrl::toPercentEncoding(m_query)}
+    };
+    if (!m_resultType.isEmpty()) {
+        returned.insert({"result_type", m_resultType});
+    }
+    return returned;
+}
+
+bool SearchQueryHandler::treatReply(RequestType requestType, const QByteArray &data,
+                                    std::vector<Tweet> &items, QString &errorMessage,
+                                    IQueryHandler::Placement &placement)
 {
     QJsonParseError error {-1, QJsonParseError::NoError};
     QJsonDocument document {QJsonDocument::fromJson(data, &error)};
@@ -85,18 +91,6 @@ bool SearchQueryHandler::treatReply(const QByteArray &data, std::vector<Tweet> &
 
     const QJsonObject &root (document.object());
     const QJsonArray tweets (root.value(QLatin1String("statuses")).toArray());
-    items.reserve(tweets.size());
-    for (const QJsonValue &tweet : tweets) {
-        if (tweet.isObject()) {
-            items.emplace_back(tweet.toObject());
-        }
-    }
-
-    if (!items.empty()) {
-        m_sinceId = std::begin(items)->id();
-    }
-
-    placement = Prepend;
-    return true;
+    return AbstractTweetQueryHandler::treatReply(requestType, tweets, items, placement);
 }
 

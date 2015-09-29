@@ -32,21 +32,18 @@
 #ifndef FAVORITESQUERYHANDLER_H
 #define FAVORITESQUERYHANDLER_H
 
-#include "iqueryhandler.h"
+#include "abstracttweetqueryhandler.h"
 #include "query.h"
-#include "globals.h"
 
-class FavoritesQueryHandler: public IQueryHandler
+class FavoritesQueryHandler: public AbstractTweetQueryHandler
 {
 public:
     explicit FavoritesQueryHandler(const Query::Arguments &arguments);
     DISABLE_COPY_DISABLE_MOVE(FavoritesQueryHandler);
 private:
-    void createRequest(QString &path, std::map<QByteArray, QByteArray> &parameters) const override;
-    bool treatReply(const QByteArray &data, std::vector<Tweet> &items,
-                    QString &errorMessage, Placement &placement) override;
+    QString path() const override;
+    Parameters commonParameters() const override;
     QString m_userId {};
-    QString m_sinceId {};
 };
 
 #endif // FAVORITESQUERYHANDLER_H

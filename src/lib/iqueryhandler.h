@@ -40,6 +40,12 @@
 class IQueryHandler
 {
 public:
+    using Parameters = std::map<QByteArray, QByteArray>;
+    enum RequestType
+    {
+        Refresh,
+        LoadMore
+    };
     virtual ~IQueryHandler() {}
 protected:
     enum Placement
@@ -48,9 +54,11 @@ protected:
         Append,
         Prepend,
     };
-    virtual void createRequest(QString &path, std::map<QByteArray, QByteArray> &parameters) const = 0;
-    virtual bool treatReply(const QByteArray &data, std::vector<Tweet> &items,
-                            QString &errorMessage, Placement &placement) = 0;
+    virtual void createRequest(RequestType requestType, QString &outPath,
+                               Parameters &outParameters) const = 0;
+    virtual bool treatReply(RequestType requestType, const QByteArray &data,
+                            std::vector<Tweet> &items, QString &errorMessage,
+                            Placement &placement) = 0;
     friend class TweetCentralRepository;
 };
 

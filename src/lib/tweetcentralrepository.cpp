@@ -86,7 +86,7 @@ void TweetCentralRepository::derefQuery(const Account &account, const Query &que
 void TweetCentralRepository::refresh()
 {
     for (auto it = std::begin(m_mapping); it != std::end(m_mapping); ++it) {
-        refresh(it->first, it->second);
+        load(it->first, it->second, IQueryHandler::Refresh);
     }
 }
 
@@ -94,20 +94,29 @@ void TweetCentralRepository::refresh(const Account &account, const Query &query)
 {
     auto it = m_mapping.find(MappingKey{account, query});
     if (it != std::end(m_mapping)) {
-        refresh(it->first, it->second);
+        load(it->first, it->second, IQueryHandler::Refresh);
     }
 }
 
-void TweetCentralRepository::refresh(const MappingKey &key, MappingData &mappingData)
+void TweetCentralRepository::loadMore(const Account &account, const Query &query)
+{
+    auto it = m_mapping.find(MappingKey{account, query});
+    if (it != std::end(m_mapping)) {
+        load(it->first, it->second, IQueryHandler::LoadMore);
+    }
+}
+
+void TweetCentralRepository::load(const MappingKey &key, MappingData &mappingData,
+                                  IQueryHandler::RequestType requestType)
 {
     QString path {};
     std::map<QByteArray, QByteArray> parameters {};
-    mappingData.query->createRequest(path, parameters);
+    mappingData.query->createRequest(requestType, path, parameters);
 
     QNetworkReply *reply {TwitterQueryUtil::get(*m_network, path, parameters, key.account)};
     mappingData.repository.start();
 
-    QObject::connect(reply, &QNetworkReply::finished, [this, &key, &mappingData, reply]() {
+    QObject::connect(reply, &QNetworkReply::finished, [this, &key, &mappingData, reply, requestType]() {
         QObjectPtr<QNetworkReply> replyPtr {reply};
 
         if (replyPtr->error() != QNetworkReply::NoError) {
@@ -138,7 +147,8 @@ void TweetCentralRepository::refresh(const MappingKey &key, MappingData &mapping
         std::vector<Tweet> items {};
         QString errorMessage {};
         IQueryHandler::Placement placement {IQueryHandler::Discard};
-        if (!mappingData.query->treatReply(reply->readAll(), items, errorMessage, placement)) {
+        bool returned = mappingData.query->treatReply(requestType, reply->readAll(), items, errorMessage, placement);
+        if (!returned) {
             qCWarning(QLoggingCategory("tweet-central-repository")) << "Error happened during request for layout" << key.account.userId() << key.query.type();
             qCWarning(QLoggingCategory("tweet-central-repository")) << "Parsing error: " << errorMessage;
             mappingData.repository.error(QObject::tr("Internal error"));

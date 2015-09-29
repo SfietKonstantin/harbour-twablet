@@ -32,24 +32,20 @@
 #ifndef USERTIMELINEQUERYHANDLER_H
 #define USERTIMELINEQUERYHANDLER_H
 
-
-#include "iqueryhandler.h"
+#include "abstracttweetqueryhandler.h"
 #include "query.h"
-#include "globals.h"
 
-class UserTimelineQueryHandler: public IQueryHandler
+class UserTimelineQueryHandler: public AbstractTweetQueryHandler
 {
 public:
     explicit UserTimelineQueryHandler(const Query::Arguments &arguments);
     DISABLE_COPY_DISABLE_MOVE(UserTimelineQueryHandler);
 private:
-    void createRequest(QString &path, std::map<QByteArray, QByteArray> &parameters) const override;
-    bool treatReply(const QByteArray &data, std::vector<Tweet> &items,
-                    QString &errorMessage, Placement &placement) override;
+    QString path() const override;
+    Parameters commonParameters() const override;
     QString m_userId {};
     QString m_excludeReplies {QLatin1String("false")};
     QString m_includeRts {QLatin1String("true")};
-    QString m_sinceId {};
 };
 
 #endif // USERTIMELINEQUERYHANDLER_H

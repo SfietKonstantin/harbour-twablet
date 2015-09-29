@@ -30,13 +30,10 @@
  */
 
 #include "favoritesqueryhandler.h"
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
 #include <QtCore/QUrl>
-#include "tweet.h"
 
 FavoritesQueryHandler::FavoritesQueryHandler(const Query::Arguments &arguments)
+    : AbstractTweetQueryHandler()
 {
     auto userIdIt = arguments.find(QLatin1String("user_id"));
     if (userIdIt != std::end(arguments)) {
@@ -44,40 +41,16 @@ FavoritesQueryHandler::FavoritesQueryHandler(const Query::Arguments &arguments)
     }
 }
 
-void FavoritesQueryHandler::createRequest(QString &path, std::map<QByteArray, QByteArray> &parameters) const
+QString FavoritesQueryHandler::path() const
 {
-    path = QLatin1String("favorites/list.json");
-    parameters.insert({"count", QByteArray::number(200)});
-    parameters.insert({"include_entities", "true"});
-    parameters.insert({"user_id", QUrl::toPercentEncoding(m_userId)});
-    if (!m_sinceId.isEmpty()) {
-        parameters.insert({"since_id", QUrl::toPercentEncoding(m_sinceId)});
-    }
+    return QLatin1String{"favorites/list.json"};
 }
 
-bool FavoritesQueryHandler::treatReply(const QByteArray &data, std::vector<Tweet> &items,
-                                      QString &errorMessage, Placement &placement)
+AbstractTweetQueryHandler::Parameters FavoritesQueryHandler::commonParameters() const
 {
-    QJsonParseError error {-1, QJsonParseError::NoError};
-    QJsonDocument document {QJsonDocument::fromJson(data, &error)};
-    if (error.error != QJsonParseError::NoError) {
-        errorMessage = error.errorString();
-        placement = Discard;
-        return false;
-    }
-
-    const QJsonArray &tweets (document.array());
-    items.reserve(tweets.size());
-    for (const QJsonValue &tweet : tweets) {
-        if (tweet.isObject()) {
-            items.emplace_back(tweet.toObject());
-        }
-    }
-
-    if (!items.empty()) {
-        m_sinceId = std::begin(items)->id();
-    }
-
-    placement = Prepend;
-    return true;
+    return Parameters{
+        {"count", QByteArray::number(200)},
+        {"include_entities", "true"},
+        {"user_id", QUrl::toPercentEncoding(m_userId)}
+    };
 }

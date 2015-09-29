@@ -89,6 +89,8 @@ Item {
             container.open = true
             args.width = container.width
             args.height = container.height
+            args.orientation = Orientation.Portrait
+            args.allowedOrientations = Orientation.Portrait
             return panelPageStack.push(page, args)
         } else {
             if (clear) {
@@ -137,7 +139,7 @@ Item {
             Rectangle {
                 anchors.top: parent.top; anchors.bottom: parent.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.horizontalCenterOffset: width / 2
+                anchors.horizontalCenterOffset: -width / 2
                 width: Theme.paddingSmall
                 color: Theme.highlightColor
             }

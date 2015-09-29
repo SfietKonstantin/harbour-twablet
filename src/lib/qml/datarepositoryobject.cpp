@@ -217,6 +217,16 @@ void DataRepositoryObject::refresh()
     m_tweetsCentralRepository.refresh();
 }
 
+void DataRepositoryObject::loadMore(int layoutIndex)
+{
+    if (layoutIndex < 0 || layoutIndex >= m_layouts.count()) {
+        return;
+    }
+
+    const Layout &layout {*(std::begin(m_layouts) + layoutIndex)};
+    m_tweetsCentralRepository.loadMore(accountFromId(layout.userId()), layout.query());
+}
+
 int DataRepositoryObject::addTemporaryLayout(AccountObject *account, int queryType, const QVariantMap &arguments)
 {
     if (account == nullptr) {
@@ -349,7 +359,7 @@ void DataRepositoryObject::removeLayoutFromRepositories(const Layout &layout)
 
 void DataRepositoryObject::removeLayoutFromRepositories(int index)
 {
-    const Layout &layout = *(std::begin(m_layouts) + index);
+    const Layout &layout {*(std::begin(m_layouts) + index)};
     removeLayoutFromRepositories(layout);
     m_layouts.remove(index);
 }

@@ -32,19 +32,16 @@
 #ifndef MENTIONSTIMELINEQUERYHANDLER_H
 #define MENTIONSTIMELINEQUERYHANDLER_H
 
-#include "iqueryhandler.h"
-#include "globals.h"
+#include "abstracttweetqueryhandler.h"
 
-class MentionsTimelineQueryHandler: public IQueryHandler
+class MentionsTimelineQueryHandler: public AbstractTweetQueryHandler
 {
 public:
     explicit MentionsTimelineQueryHandler();
     DISABLE_COPY_DISABLE_MOVE(MentionsTimelineQueryHandler);
 private:
-    void createRequest(QString &path, std::map<QByteArray, QByteArray> &parameters) const override;
-    bool treatReply(const QByteArray &data, std::vector<Tweet> &items,
-                    QString &errorMessage, Placement &placement) override;
-    QString m_sinceId {};
+    QString path() const override;
+    Parameters commonParameters() const override;
 };
 
 #endif // MENTIONSTIMELINEQUERYHANDLER_H
