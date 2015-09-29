@@ -87,6 +87,8 @@ Item {
                 Repository.clearTemporary()
             }
             container.open = true
+            args.width = container.width
+            args.height = container.height
             return panelPageStack.push(page, args)
         } else {
             if (clear) {
@@ -155,7 +157,7 @@ Item {
             anchors.fill: parent
             clip: true
 
-            /*function _overridePageIndicator() {
+            function _overridePageIndicator() {
                 if (_pageStackIndicator && _pageStackIndicator.parent != panelPageStack) {
                     _pageStackIndicator.parent = panelPageStack
                 }
@@ -170,7 +172,7 @@ Item {
                 if (forwardNavigation) {
                     _overridePageIndicator()
                 }
-            }*/
+            }
         }
     }
 
