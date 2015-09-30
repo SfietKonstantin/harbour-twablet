@@ -162,7 +162,7 @@ Rectangle {
             property double ratio: (internal.isSplit ? 2 : 1)
             width: view.cellWidth * container.columnCount
             height: Theme.paddingMedium / 2
-            x: ((mainView.contentX - mainView.originX) / view.capacity * container.columnCount - (view.contentX - view.originX)) / ratio
+            x: ((mainView.contentX - mainView.originX) / view.capacity * container.columnCount / ratio) - (view.contentX - view.originX)
         }
     }
 
