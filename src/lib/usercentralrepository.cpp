@@ -93,6 +93,7 @@ void UserCentralRepository::load(UserCentralRepository::MappingData &mappingData
     QString path {};
     std::map<QByteArray, QByteArray> parameters {};
     mappingData.handler->createRequest(requestType, path, parameters);
+    qCDebug(QLoggingCategory("user-central-repository")) << "Request:" << path << parameters;
 
     QNetworkReply *reply {TwitterQueryUtil::get(*m_network, path, parameters, mappingData.account)};
     mappingData.repository.start();

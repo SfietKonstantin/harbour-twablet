@@ -86,7 +86,7 @@ bool AbstractTweetQueryHandler::treatReply(RequestType requestType, const QJsonA
     }
 
     QString sinceId = !items.empty() ? std::begin(items)->id() : QString();
-    ulong maxId = items.empty() ? 0 : (std::end(items) - 1)->id().toULong();
+    quint64 maxId = items.empty() ? 0 : (std::end(items) - 1)->id().toULongLong();
     QString maxIdStr = maxId > 0 ? QString::number(maxId - 1) : QString();
     if (!items.empty()) {
         switch (requestType) {

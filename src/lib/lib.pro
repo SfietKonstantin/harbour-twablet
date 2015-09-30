@@ -121,4 +121,5 @@ SOURCES += \
     abstractuserqueryhandler.cpp \
     friendsqueryhandler.cpp \
     followersqueryhandler.cpp \
-    qml/tweetqueryitem.cpp
+    qml/tweetqueryitem.cpp \
+    iqueryhandler.cpp

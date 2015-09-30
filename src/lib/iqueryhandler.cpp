@@ -29,40 +29,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef IQUERYHANDLER_H
-#define IQUERYHANDLER_H
+#include "iqueryhandler.h"
 
-#include <QtCore/QString>
-#include <QtCore/QDebug>
-#include <map>
-#include <vector>
-#include "tweet.h"
-
-template<class T>
-class IQueryHandler
+QDebug & operator<<(QDebug &debug, const std::map<QByteArray, QByteArray> &parameters)
 {
-public:
-    using Parameters = std::map<QByteArray, QByteArray>;
-    enum RequestType
-    {
-        Refresh,
-        LoadMore
-    };
-    enum Placement
-    {
-        Discard,
-        Append,
-        Prepend,
-    };
-    virtual ~IQueryHandler() {}
-    virtual void createRequest(RequestType requestType, QString &outPath,
-                               Parameters &outParameters) const = 0;
-    virtual bool treatReply(RequestType requestType, const QByteArray &data,
-                            std::vector<T> &items, QString &errorMessage,
-                            Placement &placement) = 0;
-};
-
-QDebug & operator<<(QDebug &debug, const std::map<QByteArray, QByteArray> &parameters);
-
-#endif // IQUERYHANDLER_H
-
+    QDebugStateSaver saver(debug);
+    debug.noquote();
+    debug.nospace() << "(";
+    for (auto it = std::begin(parameters); it != std::end(parameters); ++it) {
+        if (it != std::begin(parameters)) {
+            debug << ", ";
+        }
+        debug << it->first << ":" << it->second;
+    }
+    debug << ")";
+    return debug;
+}
