@@ -106,6 +106,11 @@ Item {
         _open(Qt.resolvedUrl("UsersPage.qml"), params, clear)
     }
 
+    function openTweet(tweetId, account, clear) {
+        var page = _open(Qt.resolvedUrl("TweetPage.qml"), {tweetId: tweetId, account: account, panel: container}, clear)
+        page.load()
+    }
+
     function _open(page, args, clear) {
         if (Screen.sizeCategory === Screen.Large) {
             if (clear) {

@@ -29,70 +29,66 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "tweetqueryitem.h"
+#include "statusupdatequeryitem.h"
 #include "private/twitterqueryutil.h"
 #include "accountobject.h"
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
 
-TweetQueryItem::TweetQueryItem(QObject *parent)
+StatusUpdateQueryItem::StatusUpdateQueryItem(QObject *parent)
     : AbstractQueryItem(parent)
 {
 }
 
-QString TweetQueryItem::identifier() const
+QString StatusUpdateQueryItem::text() const
 {
-    return m_identifier;
+    return m_text;
 }
 
-void TweetQueryItem::setIdentifier(const QString &identifier)
+void StatusUpdateQueryItem::setText(const QString &text)
 {
-    if (m_identifier != identifier) {
-        m_identifier = identifier;
-        emit identifierChanged();
+    if (m_text != text) {
+        m_text = text;
+        emit textChanged();
     }
 }
 
-TweetObject * TweetQueryItem::data() const
+QString StatusUpdateQueryItem::inReplyTo() const
 {
-    return m_data.get();
+    return m_inReplyTo;
 }
 
-bool TweetQueryItem::isQueryValid() const
+void StatusUpdateQueryItem::setInReplyTo(const QString &inReplyTo)
 {
-    return !m_identifier.isEmpty();
+    if (m_inReplyTo != inReplyTo) {
+        m_inReplyTo = inReplyTo;
+        emit inReplyToChanged();
+    }
 }
 
-QNetworkReply * TweetQueryItem::createQuery() const
+bool StatusUpdateQueryItem::isQueryValid() const
 {
-    QString path {QLatin1String("statuses/show.json")};
-    std::map<QByteArray, QByteArray> parameters {
-        {"id", QUrl::toPercentEncoding(m_identifier)},
-        {"trim_user", "false"},
-        {"include_entities", "true"}
-    };
-
-    return TwitterQueryUtil::get(network(), path, parameters, account()->data());
+    return !m_text.isEmpty();
 }
 
-void TweetQueryItem::handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
-                                 const QString &errorMessage)
+QNetworkReply * StatusUpdateQueryItem::createQuery() const
+{
+    QString path {QLatin1String("statuses/update.json")};
+    std::map<QByteArray, QByteArray> parameters {{"status", QUrl::toPercentEncoding(m_text)}};
+    if (!m_inReplyTo.isEmpty()) {
+        parameters.insert({"in_reply_to_status_id", QUrl::toPercentEncoding(m_inReplyTo)});
+    }
+
+    return TwitterQueryUtil::post(network(), path, {}, parameters, account()->data());
+}
+
+void StatusUpdateQueryItem::handleReply(const QByteArray &reply,
+                                        QNetworkReply::NetworkError networkError,
+                                        const QString &errorMessage)
 {
     Q_UNUSED(reply)
     Q_UNUSED(errorMessage)
     if (networkError != QNetworkReply::NoError) {
-        setStatusAndErrorMessage(Error, tr("Failed to retrieve tweet"));
-        return;
+        if (networkError == QNetworkReply::ContentOperationNotPermittedError) {
+            setStatusAndErrorMessage(Error, tr("Twitter do not allow to send the same tweet twice."));
+        }
     }
-
-    QJsonParseError error {-1, QJsonParseError::NoError};
-    QJsonDocument document {QJsonDocument::fromJson(reply, &error)};
-    if (error.error != QJsonParseError::NoError) {
-        setStatusAndErrorMessage(Error, tr("Failed to retrieve tweet"));
-        return;
-    }
-
-    Tweet tweet {document.object()};
-    m_data.reset(TweetObject::create(tweet));
-    emit dataChanged();
 }

@@ -42,6 +42,7 @@ class TweetObject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString id READ id CONSTANT)
+    Q_PROPERTY(QString originalId READ originalId CONSTANT)
     Q_PROPERTY(QString text READ text CONSTANT)
     Q_PROPERTY(UserObject * user READ user CONSTANT)
     Q_PROPERTY(UserObject * retweetingUser READ retweetingUser CONSTANT)
@@ -58,6 +59,7 @@ public:
     DISABLE_COPY_DISABLE_MOVE(TweetObject);
     static TweetObject * create(const Tweet &data, QObject *parent = 0);
     QString id() const;
+    QString originalId() const;
     QString text() const;
     UserObject * user() const;
     UserObject * retweetingUser() const;

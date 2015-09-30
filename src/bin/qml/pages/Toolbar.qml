@@ -153,12 +153,12 @@ Rectangle {
                 height: postText.height
                 anchors.left: parent.left; anchors.right: parent.right
 
-                TweetQueryItem {
-                    id: tweetQueryItem
+                StatusUpdateQueryItem {
+                    id: statusUpdateQueryItem
                     account: postAccountSelectionModel.selection
                     text: postText.text
                     onStatusChanged: {
-                        if (tweetQueryItem.status === QueryItem.Idle) {
+                        if (statusUpdateQueryItem.status === QueryItem.Idle) {
                             postText.text = ""
                             Repository.refresh()
                         }

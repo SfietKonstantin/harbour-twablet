@@ -34,12 +34,12 @@
 
 User::User(const QJsonObject &json)
 {
-    m_id = json.value(QLatin1String("id_str")).toString();
-    m_name = json.value(QLatin1String("name")).toString();
-    m_screenName = json.value(QLatin1String("screen_name")).toString();
-    m_description = json.value(QLatin1String("description")).toString();
-    m_location = json.value(QLatin1String("location")).toString();
-    m_url = json.value(QLatin1String("url")).toString();
+    m_id = std::move(json.value(QLatin1String("id_str")).toString());
+    m_name = std::move(json.value(QLatin1String("name")).toString());
+    m_screenName = std::move(json.value(QLatin1String("screen_name")).toString());
+    m_description = std::move(json.value(QLatin1String("description")).toString());
+    m_location = std::move(json.value(QLatin1String("location")).toString());
+    m_url = std::move(json.value(QLatin1String("url")).toString());
     m_protected = json.value(QLatin1String("protected")).toBool();
     m_following = json.value(QLatin1String("following")).toBool();
     m_statusesCount = json.value(QLatin1String("statuses_count")).toInt();
@@ -47,8 +47,8 @@ User::User(const QJsonObject &json)
     m_friendsCount = json.value(QLatin1String("friends_count")).toInt();
     m_listedCount = json.value(QLatin1String("listed_count")).toInt();
     m_favouritesCount = json.value(QLatin1String("favourites_count")).toInt();
-    m_imageUrl = json.value(QLatin1String("profile_image_url_https")).toString();
-    m_bannerUrl = json.value(QLatin1String("profile_banner_url")).toString();
+    m_imageUrl = std::move(json.value(QLatin1String("profile_image_url_https")).toString());
+    m_bannerUrl = std::move(json.value(QLatin1String("profile_banner_url")).toString());
     m_createdAt = std::move(fromUtc(json.value(QLatin1String("created_at")).toString()));
 
     const QJsonObject &entities (json.value(QLatin1String("entities")).toObject());

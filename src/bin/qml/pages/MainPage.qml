@@ -149,6 +149,12 @@ Page {
                             LH.handleLink(url, panel, account, true)
                         }
                     }
+                    onOpenTweet: {
+                        var account = accountModel.get(layout.userId)
+                        if (account !== null) {
+                            panel.openTweet(tweetId, account, true)
+                        }
+                    }
 
                     Connections {
                         target: toolbar

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,55 +29,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-import QtQuick 2.0
-import Sailfish.Silica 1.0
-import harbour.twablet 1.0
-import "LinkHandler.js" as LH
+#ifndef STATUSUPDATEQUERYITEM_H
+#define STATUSUPDATEQUERYITEM_H
 
-Page {
-    id: container
-    property string title
-    property int queryType
-    property var args
-    property QtObject account
-    property RightPanel panel
+#include "abstractqueryitem.h"
 
-    Component.onCompleted: {
-        var layoutIndex = Repository.addTemporaryLayout(container.account, container.queryType,
-                                                        container.args)
-        if (layoutIndex >= 0) {
-            layout.layoutIndex = layoutIndex
-        }
-    }
+class StatusUpdateQueryItem : public AbstractQueryItem
+{
+    Q_OBJECT
+    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
+    Q_PROPERTY(QString inReplyTo READ inReplyTo WRITE setInReplyTo NOTIFY inReplyToChanged)
+public:
+    explicit StatusUpdateQueryItem(QObject *parent = 0);
+    DISABLE_COPY_DISABLE_MOVE(StatusUpdateQueryItem);
+    QString text() const;
+    void setText(const QString &text);
+    QString inReplyTo() const;
+    void setInReplyTo(const QString &inReplyTo);
+signals:
+    void textChanged();
+    void inReplyToChanged();
+private:
+    bool isQueryValid() const override final;
+    QNetworkReply * createQuery() const override final;
+    void handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
+                     const QString &errorMessage) override final;
+    QString m_text {};
+    QString m_inReplyTo {};
+};
 
-    Component.onDestruction: {
-        Repository.removeTemporaryLayout(layout.layoutIndex)
-    }
-
-    ColumnLayout {
-        id: layout
-        anchors.fill: parent
-        temporary: true
-        title: container.title
-        onHandleLink: {
-            LH.handleLink(url, container.panel, container.account, false)
-        }
-        onOpenTweet: {
-            container.panel.openTweet(tweetId, container.account, false)
-        }
-
-        PullDownMenu {
-            MenuItem {
-                text: qsTr("Add as column")
-                onClicked: Repository.addLayout(container.title, container.account, container.queryType,
-                                                container.args)
-            }
-
-            MenuItem {
-                text: qsTr("Refresh")
-                onClicked: Repository.refreshTemporary(container.layoutIndex)
-            }
-        }
-    }
-}
-
+#endif // STATUSUPDATEQUERYITEM_H

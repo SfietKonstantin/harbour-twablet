@@ -50,7 +50,7 @@ HEADERS += \
     qml/mediaobject.h \
     qml/mediamodel.h \
     qml/abstractqueryitem.h \
-    qml/tweetqueryitem.h \
+    qml/statusupdatequeryitem.h \
     qml/accountselectionmodel.h \
     qml/userqueryitem.h \
     private/timeutil.h \
@@ -70,7 +70,8 @@ HEADERS += \
     usercentralrepository.h \
     abstractuserqueryhandler.h \
     friendsqueryhandler.h \
-    followersqueryhandler.h
+    followersqueryhandler.h \
+    qml/tweetqueryitem.h
 
 SOURCES += \
     private/twitterdatautil.cpp \
@@ -101,7 +102,7 @@ SOURCES += \
     qml/mediaobject.cpp \
     qml/mediamodel.cpp \
     qml/abstractqueryitem.cpp \
-    qml/tweetqueryitem.cpp \
+    qml/statusupdatequeryitem.cpp \
     qml/accountselectionmodel.cpp \
     qml/userqueryitem.cpp \
     qml/descriptionformatter.cpp \
@@ -119,4 +120,5 @@ SOURCES += \
     usercentralrepository.cpp \
     abstractuserqueryhandler.cpp \
     friendsqueryhandler.cpp \
-    followersqueryhandler.cpp
+    followersqueryhandler.cpp \
+    qml/tweetqueryitem.cpp

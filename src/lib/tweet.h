@@ -45,6 +45,7 @@ public:
     DEFAULT_COPY_DEFAULT_MOVE(Tweet);
     bool isValid() const;
     QString id() const;
+    QString originalId() const;
     QString text() const;
     User user() const;
     User retweetingUser() const;
@@ -58,6 +59,7 @@ public:
     std::vector<Entity::Ptr> entities() const;
 private:
     QString m_id {};
+    QString m_originalId {};
     QString m_text {};
     User m_user {};
     User m_retweetingUser {};

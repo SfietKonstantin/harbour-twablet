@@ -32,52 +32,44 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.twablet 1.0
-import "LinkHandler.js" as LH
 
 Page {
     id: container
-    property string title
-    property int queryType
-    property var args
-    property QtObject account
+    property alias tweetId: query.identifier
+    property alias account: query.account
     property RightPanel panel
+    function load() { query.load() }
 
-    Component.onCompleted: {
-        var layoutIndex = Repository.addTemporaryLayout(container.account, container.queryType,
-                                                        container.args)
-        if (layoutIndex >= 0) {
-            layout.layoutIndex = layoutIndex
-        }
+    TweetQueryItem {
+        id: query
     }
 
-    Component.onDestruction: {
-        Repository.removeTemporaryLayout(layout.layoutIndex)
-    }
-
-    ColumnLayout {
-        id: layout
+    SilicaFlickable {
         anchors.fill: parent
-        temporary: true
-        title: container.title
-        onHandleLink: {
-            LH.handleLink(url, container.panel, container.account, false)
-        }
-        onOpenTweet: {
-            container.panel.openTweet(tweetId, container.account, false)
-        }
+        clip: true
+        contentHeight: column.height
 
-        PullDownMenu {
-            MenuItem {
-                text: qsTr("Add as column")
-                onClicked: Repository.addLayout(container.title, container.account, container.queryType,
-                                                container.args)
+        Column {
+            id: column
+            visible: query.status === QueryItem.Idle
+            anchors.left: parent.left; anchors.right: parent.right
+
+            PageHeader {
+                title: qsTr("Tweet")
             }
 
-            MenuItem {
-                text: qsTr("Refresh")
-                onClicked: Repository.refreshTemporary(container.layoutIndex)
+            TweetDelegate {
+                enabled: false
+                anchors.left: parent.left; anchors.right: parent.right
+                tweet: query.data
             }
         }
+
+        StatusPlaceholder {
+            query: query
+        }
+
+        VerticalScrollDecorator {}
     }
 }
 

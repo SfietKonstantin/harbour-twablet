@@ -45,10 +45,11 @@ Tweet::Tweet(const QJsonObject &json)
         displayedTweet = retweetedTweet;
 
         // Adding the retweeting user when retweeting
-        m_retweetingUser = std::move(User(json.value(QLatin1String("user")).toObject()));
+        m_retweetingUser = std::move(User(tweet.value(QLatin1String("user")).toObject()));
     }
 
     m_id = std::move(tweet.value(QLatin1String("id_str")).toString());
+    m_originalId = std::move(displayedTweet.value(QLatin1String("id_str")).toString());
     m_text = std::move(displayedTweet.value(QLatin1String("text")).toString());
     m_favoriteCount = displayedTweet.value(QLatin1String("favorite_count")).toInt();
     m_favorited = displayedTweet.value(QLatin1String("favorited")).toBool();
@@ -71,6 +72,11 @@ bool Tweet::isValid() const
 QString Tweet::id() const
 {
     return m_id;
+}
+
+QString Tweet::originalId() const
+{
+    return m_originalId;
 }
 
 QString Tweet::text() const

@@ -41,11 +41,12 @@ MouseArea {
 
     Rectangle {
         id: background
+        visible: container.enabled
         anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
         anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
         color: Theme.secondaryHighlightColor
         height: column.height + Theme.paddingSmall
-        opacity: 0.4
+        opacity: container.pressed ? 0.8 : 0.4
     }
 
     Column {

@@ -33,29 +33,29 @@
 #define TWEETQUERYITEM_H
 
 #include "abstractqueryitem.h"
+#include "tweetobject.h"
 
 class TweetQueryItem : public AbstractQueryItem
 {
     Q_OBJECT
-    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
-    Q_PROPERTY(QString inReplyTo READ inReplyTo WRITE setInReplyTo NOTIFY inReplyToChanged)
+    Q_PROPERTY(QString identifier READ identifier WRITE setIdentifier NOTIFY identifierChanged)
+    Q_PROPERTY(TweetObject * data READ data NOTIFY dataChanged)
 public:
     explicit TweetQueryItem(QObject *parent = 0);
     DISABLE_COPY_DISABLE_MOVE(TweetQueryItem);
-    QString text() const;
-    void setText(const QString &text);
-    QString inReplyTo() const;
-    void setInReplyTo(const QString &inReplyTo);
+    QString identifier() const;
+    void setIdentifier(const QString &identifier);
+    TweetObject * data() const;
 signals:
-    void textChanged();
-    void inReplyToChanged();
+    void identifierChanged();
+    void dataChanged();
 private:
     bool isQueryValid() const override final;
     QNetworkReply * createQuery() const override final;
     void handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
                      const QString &errorMessage) override final;
-    QString m_text {};
-    QString m_inReplyTo {};
+    QString m_identifier {};
+    QObjectPtr<TweetObject> m_data {};
 };
 
 #endif // TWEETQUERYITEM_H

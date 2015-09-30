@@ -55,6 +55,11 @@ QString TweetObject::id() const
     return m_data.id();
 }
 
+QString TweetObject::originalId() const
+{
+    return m_data.originalId();
+}
+
 QString TweetObject::text() const
 {
     return m_data.text();

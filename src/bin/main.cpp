@@ -49,11 +49,12 @@
 #include "qml/queryobject.h"
 #include "qml/querylistmodel.h"
 #include "qml/tweetmodel.h"
-#include "qml/tweetqueryitem.h"
+#include "qml/statusupdatequeryitem.h"
 #include "qml/userqueryitem.h"
 #include "qml/descriptionformatter.h"
 #include "qml/tweetformatter.h"
 #include "qml/usermodel.h"
+#include "qml/tweetqueryitem.h"
 
 int main(int argc, char *argv[])
 {
@@ -73,11 +74,12 @@ int main(int argc, char *argv[])
     qmlRegisterType<LayoutModel>("harbour.twablet", 1, 0, "LayoutModel");
     qmlRegisterType<TweetModel>("harbour.twablet", 1, 0, "TweetModel");
     qmlRegisterType<QueryListModel>("harbour.twablet", 1, 0, "QueryListModel");
-    qmlRegisterType<TweetQueryItem>("harbour.twablet", 1, 0, "TweetQueryItem");
+    qmlRegisterType<StatusUpdateQueryItem>("harbour.twablet", 1, 0, "StatusUpdateQueryItem");
     qmlRegisterType<UserQueryItem>("harbour.twablet", 1, 0, "UserQueryItem");
     qmlRegisterType<DescriptionFormatter>("harbour.twablet", 1, 0, "DescriptionFormatter");
     qmlRegisterType<TweetFormatter>("harbour.twablet", 1, 0, "TweetFormatter");
     qmlRegisterType<UserModel>("harbour.twablet", 1, 0, "UserModel");
+    qmlRegisterType<TweetQueryItem>("harbour.twablet", 1, 0, "TweetQueryItem");
     qmlRegisterSingletonType<DataRepositoryObject>("harbour.twablet", 1, 0, "Repository",
                                                           [](QQmlEngine *e, QJSEngine *) -> QObject * {
         return new DataRepositoryObject(e);
