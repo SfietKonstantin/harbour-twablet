@@ -43,7 +43,7 @@ Item {
 
     Button {
         id: loadMore
-        anchors.centerIn: parent.verticalCenter
+        anchors.centerIn: parent
         text: qsTr("Load more")
         onClicked: container.clicked()
     }

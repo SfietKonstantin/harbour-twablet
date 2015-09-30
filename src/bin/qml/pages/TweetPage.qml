@@ -48,7 +48,7 @@ Page {
     SilicaFlickable {
         anchors.fill: parent
         clip: true
-        contentHeight: column.height
+        contentHeight: Math.max(column.height, container.height)
 
         Column {
             id: column

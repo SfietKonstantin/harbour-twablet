@@ -97,7 +97,7 @@ Page {
                     anchors.bottom: name.top; anchors.bottomMargin: Theme.paddingSmall
                     font.pixelSize: Theme.fontSizeMedium
                     color: Theme.highlightColor
-                    text: query.user ? query.user.screenName : ""
+                    text: query.user ? "@" + query.user.screenName : ""
                 }
 
                 Label {
