@@ -37,6 +37,15 @@ Rectangle {
     id: container
     signal goToIndex(int index)
     signal goToTop(int index)
+    function setReply(inReplyTo, screenName)
+    {
+        postText.text = screenName + " "
+        internal.replyScreenName = screenName
+        statusUpdateQueryItem.inReplyTo = inReplyTo
+        internal.checkReply()
+        postText.cursorPosition = postText.text.length
+        postText.focus = true
+    }
     property bool isLandscape: false
     property int lastTappedIndex: -1
     property alias currentIndex: view.currentIndex
@@ -52,10 +61,31 @@ Rectangle {
 
     QtObject {
         id: internal
+        function clearReply() {
+            replyScreenName = ""
+            statusUpdateQueryItem.inReplyTo = ""
+        }
+        function checkReply() {
+            internal.isReply = (statusUpdateQueryItem.inReplyTo.length > 0
+                                && postText.text.indexOf(internal.replyScreenName) === 0)
+        }
+
         property bool isSplit: container.columnCount > 1
         property double viewHeight: (isSplit ? post.height : Theme.itemSizeSmall)
         property double height: (isSplit ? post.height : Theme.itemSizeSmall + post.height)
         property double width: (isSplit ? container.width / 2 : container.width)
+        property string replyScreenName
+        property bool isReply: false
+        onIsReplyChanged: {
+            if (!isReply) {
+                clearReply()
+            }
+        }
+    }
+
+    Connections {
+        target: postText
+        onTextChanged: internal.checkReply()
     }
 
     SilicaListView {
@@ -161,6 +191,7 @@ Rectangle {
                         if (statusUpdateQueryItem.status === QueryItem.Idle) {
                             postText.text = ""
                             Repository.refresh()
+                            internal.clearReply()
                         }
                     }
                 }
@@ -178,13 +209,13 @@ Rectangle {
                     id: postSend
                     anchors.bottom: parent.bottom; anchors.bottomMargin: Theme.fontSizeSmall + Theme.paddingLarge
                     anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
-                    text: qsTr("Send")
-                    color: (postText.text.length > 0 && tweetQueryItem.status !== QueryItem.Loading) ? Theme.primaryColor : Theme.secondaryColor
+                    text: internal.isReply ? qsTr("Reply") : qsTr("Send")
+                    color: (postText.text.length > 0 && statusUpdateQueryItem.status !== QueryItem.Loading) ? Theme.primaryColor : Theme.secondaryColor
 
                     MouseArea {
-                        enabled: postText.text.length > 0 && tweetQueryItem.status !== QueryItem.Loading
+                        enabled: postText.text.length > 0 && statusUpdateQueryItem.status !== QueryItem.Loading
                         anchors.fill: parent
-                        onClicked: tweetQueryItem.load()
+                        onClicked: statusUpdateQueryItem.load()
                     }
                 }
             }

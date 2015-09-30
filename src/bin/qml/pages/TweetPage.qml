@@ -32,6 +32,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.twablet 1.0
+import "LinkHandler.js" as LH
 
 Page {
     id: container
@@ -62,6 +63,22 @@ Page {
                 enabled: false
                 anchors.left: parent.left; anchors.right: parent.right
                 tweet: query.data
+                onHandleLink: LH.handleLink(url, container.panel, container.account, false)
+            }
+
+            Row {
+               IconButton {
+                   icon.source: "image://theme/icon-s-chat"
+                   onClicked: container.panel.requestReply(query.data.id, "@" + query.data.user.screenName)
+               }
+               IconButton {
+                   icon.source: "image://theme/icon-s-retweet"
+                   enabled: false
+               }
+               IconButton {
+                   icon.source: "image://theme/icon-s-favorite"
+                   enabled: false
+               }
             }
         }
 

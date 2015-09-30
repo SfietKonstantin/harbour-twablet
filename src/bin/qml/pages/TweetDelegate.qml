@@ -89,14 +89,16 @@ MouseArea {
 
         BackgroundItem {
             id: header
-            anchors.left: parent.left
-            anchors.right: parent.right
+            property real padding: container.enabled ? 0 : Theme.paddingMedium
+            anchors.left: parent.left; anchors.leftMargin: -padding
+            anchors.right: parent.right; anchors.rightMargin: -padding
             height: Theme.itemSizeSmall
             onClicked: container.handleLink("user://" + container.tweet.user.id)
 
             TwitterImage {
                 id: profilePicture
-                anchors.top: parent.top; anchors.left: parent.left
+                anchors.top: parent.top;
+                anchors.left: parent.left; anchors.leftMargin: header.padding
                 width: Theme.itemSizeSmall
                 height: Theme.itemSizeSmall
                 source: container.tweet.user.imageUrl
@@ -106,7 +108,8 @@ MouseArea {
                 id: headerColumn
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: profilePicture.right; anchors.leftMargin: Theme.paddingMedium
-                anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.paddingMedium + header.padding
 
                 Label {
                     color: header.down ? Theme.highlightColor : Theme.primaryColor
