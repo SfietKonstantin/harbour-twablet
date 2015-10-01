@@ -52,7 +52,7 @@ Page {
 
         Column {
             id: column
-            visible: query.status === QueryItem.Idle
+            opacity: query.status === QueryItem.Idle && query.data ? 1 : 0
             anchors.left: parent.left; anchors.right: parent.right
 
             PageHeader {
@@ -79,6 +79,10 @@ Page {
                    icon.source: "image://theme/icon-s-favorite"
                    enabled: false
                }
+            }
+
+            Behavior on opacity {
+                NumberAnimation { duration: 200 }
             }
         }
 

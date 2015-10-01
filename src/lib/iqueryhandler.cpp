@@ -34,13 +34,12 @@
 QDebug & operator<<(QDebug &debug, const std::map<QByteArray, QByteArray> &parameters)
 {
     QDebugStateSaver saver(debug);
-    debug.noquote();
     debug.nospace() << "(";
     for (auto it = std::begin(parameters); it != std::end(parameters); ++it) {
         if (it != std::begin(parameters)) {
             debug << ", ";
         }
-        debug << it->first << ":" << it->second;
+        debug << it->first.data() << ":" << it->second.data();
     }
     debug << ")";
     return debug;
