@@ -35,8 +35,8 @@
 #include <QtCore/QAbstractListModel>
 #include <QtQml/QQmlParserStatus>
 #include "globals.h"
-#include "datarepositoryobject.h"
 
+class DataRepositoryObject;
 class IModel : public QAbstractListModel, public QQmlParserStatus
 {
     Q_OBJECT
@@ -76,6 +76,8 @@ signals:
     void layoutIndexChanged();
     void repositoryChanged();
     void temporaryChanged();
+    void finished();
+    void error();
 protected:
     explicit IModel(QObject *parent = 0) : QAbstractListModel(parent), QQmlParserStatus() {}
 };

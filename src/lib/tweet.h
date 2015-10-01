@@ -52,8 +52,10 @@ public:
     QDateTime timestamp() const;
     int favoriteCount() const;
     bool isFavorited() const;
+    void setFavorited(bool faviroted);
     int retweetCount() const;
     bool isRetweeted() const;
+    void setRetweeted(bool retweeted);
     QString inReplyTo() const;
     QString source() const;
     std::vector<Entity::Ptr> entities() const;

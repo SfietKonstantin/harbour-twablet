@@ -36,13 +36,27 @@ import "LinkHandler.js" as LH
 
 Page {
     id: container
-    property alias tweetId: query.identifier
+    property alias tweetId: query.tweetId
+    property string retweetId // Used to mark retweeted
     property alias account: query.account
     property RightPanel panel
     function load() { query.load() }
 
     TweetQueryItem {
         id: query
+    }
+
+    RetweetQueryItem {
+        id: retweetQuery
+        account: query.account
+        tweetId: query.data ? query.data.id : ""
+        onFinished: {
+            Repository.setTweetRetweeted(container.tweetId)
+            if (container.retweetId !== container.tweetId) {
+                Repository.setTweetRetweeted(container.retweetId)
+            }
+            query.setRetweeted(true)
+        }
     }
 
     SilicaFlickable {
@@ -71,13 +85,18 @@ Page {
                    icon.source: "image://theme/icon-s-chat"
                    onClicked: replyStatusUpdater.focus()
                }
-               IconButton {
-                   icon.source: "image://theme/icon-s-retweet"
-                   enabled: false
+               ProgressIconButton {
+                   source: "image://theme/icon-s-retweet"
+                   enabled: query.data ? !query.data.retweeted && container.account.userId !== query.data.user.id: false
+                   highlighted: down || query.data.retweeted
+                   busy: retweetQuery.status === QueryItem.Loading
+                   error: retweetQuery.status === QueryItem.Error
+                   onClicked: retweetQuery.load()
                }
-               IconButton {
-                   icon.source: "image://theme/icon-s-favorite"
+               ProgressIconButton {
+                   source: "image://theme/icon-s-favorite"
                    enabled: false
+                   highlighted: down || query.data.favorited
                }
             }
 
@@ -96,6 +115,14 @@ Page {
 
         StatusPlaceholder {
             query: query
+        }
+
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("Open in browser")
+                enabled: query.data
+                onClicked: Qt.openUrlExternally("https://twitter.com/" + query.data.user.screenName + "/status/" + query.data.id)
+            }
         }
 
         VerticalScrollDecorator {}

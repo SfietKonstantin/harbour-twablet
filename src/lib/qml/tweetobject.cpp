@@ -128,4 +128,13 @@ Tweet TweetObject::data() const
 void TweetObject::update(const Tweet &other)
 {
     Q_UNUSED(other)
+    if (m_data.isFavorited() != other.isFavorited()) {
+        m_data.setFavorited(other.isFavorited());
+        emit favoritedChanged();
+    }
+
+    if (m_data.isRetweeted() != other.isRetweeted()) {
+        m_data.setRetweeted(other.isRetweeted());
+        emit retweetedChanged();
+    }
 }

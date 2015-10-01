@@ -36,6 +36,7 @@
 
 #include "tweetrepository.h"
 #include "userrepository.h"
+#include "datarepositoryobject.h"
 
 class Account;
 class Layout;

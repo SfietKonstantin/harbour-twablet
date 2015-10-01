@@ -38,10 +38,8 @@ Dialog {
     canAccept: false
     allowedOrientations: app.defaultAllowedOrientations
     Component.onCompleted: state = "initial"
-    onStatusChanged: {
-        if (status === PageStatus.Active) {
-            authentification.startRequest()
-        }
+    function load() {
+        authentification.startRequest()
     }
 
     TwitterAuthentification {

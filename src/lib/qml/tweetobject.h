@@ -48,9 +48,9 @@ class TweetObject : public QObject
     Q_PROPERTY(UserObject * retweetingUser READ retweetingUser CONSTANT)
     Q_PROPERTY(QDateTime timestamp READ timestamp CONSTANT)
     Q_PROPERTY(int favoriteCount READ favoriteCount CONSTANT)
-    Q_PROPERTY(bool favorited READ isFavorited CONSTANT)
+    Q_PROPERTY(bool favorited READ isFavorited NOTIFY favoritedChanged)
     Q_PROPERTY(int retweetCount READ retweetCount CONSTANT)
-    Q_PROPERTY(bool retweeted READ isRetweeted CONSTANT)
+    Q_PROPERTY(bool retweeted READ isRetweeted NOTIFY retweetedChanged)
     Q_PROPERTY(QString inReplyTo READ inReplyTo CONSTANT)
     Q_PROPERTY(QString source READ source CONSTANT)
     Q_PROPERTY(QString sourceName READ sourceName CONSTANT)
@@ -73,15 +73,17 @@ public:
     QString sourceName() const;
     MediaModel * media() const;
     Tweet data() const;
+    void update(const Tweet &other);
+signals:
+    void favoritedChanged();
+    void retweetedChanged();
 private:
     explicit TweetObject(const Tweet &data, QObject *parent = 0);
-    void update(const Tweet &other);
     Tweet m_data {};
     UserObject *m_user {nullptr};
     UserObject *m_retweetingUser {nullptr};
     QString m_sourceName {};
     QObjectPtr<MediaModel> m_media {nullptr};
-    friend class Model<Tweet, TweetObject>;
 };
 
 #endif // TWEETOBJECT_H

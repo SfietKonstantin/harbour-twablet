@@ -88,7 +88,7 @@ void StatusUpdateQueryItem::handleReply(const QByteArray &reply,
     Q_UNUSED(errorMessage)
     if (networkError != QNetworkReply::NoError) {
         if (networkError == QNetworkReply::ContentOperationNotPermittedError) {
-            setStatusAndErrorMessage(Error, tr("Twitter do not allow to send the same tweet twice."));
+            setStatusAndErrorMessage(Error, tr("Sending the same tweet twice is not allowed."));
         }
     }
 }

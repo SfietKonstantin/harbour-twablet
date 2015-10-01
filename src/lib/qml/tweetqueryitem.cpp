@@ -40,16 +40,16 @@ TweetQueryItem::TweetQueryItem(QObject *parent)
 {
 }
 
-QString TweetQueryItem::identifier() const
+QString TweetQueryItem::tweetId() const
 {
-    return m_identifier;
+    return m_tweetId;
 }
 
-void TweetQueryItem::setIdentifier(const QString &identifier)
+void TweetQueryItem::setTweetId(const QString &tweetId)
 {
-    if (m_identifier != identifier) {
-        m_identifier = identifier;
-        emit identifierChanged();
+    if (m_tweetId != tweetId) {
+        m_tweetId = tweetId;
+        emit tweetIdChanged();
     }
 }
 
@@ -58,16 +58,38 @@ TweetObject * TweetQueryItem::data() const
     return m_data.get();
 }
 
+void TweetQueryItem::setFavorited(bool favorited)
+{
+    if (m_data == nullptr) {
+        return;
+    }
+
+    Tweet tweet {std::move(m_data->data())};
+    tweet.setFavorited(favorited);
+    m_data->update(tweet);
+}
+
+void TweetQueryItem::setRetweeted()
+{
+    if (m_data == nullptr) {
+        return;
+    }
+
+    Tweet tweet {std::move(m_data->data())};
+    tweet.setRetweeted(true);
+    m_data->update(tweet);
+}
+
 bool TweetQueryItem::isQueryValid() const
 {
-    return !m_identifier.isEmpty();
+    return !m_tweetId.isEmpty();
 }
 
 QNetworkReply * TweetQueryItem::createQuery() const
 {
     QString path {QLatin1String("statuses/show.json")};
     std::map<QByteArray, QByteArray> parameters {
-        {"id", QUrl::toPercentEncoding(m_identifier)},
+        {"id", QUrl::toPercentEncoding(m_tweetId)},
         {"trim_user", "false"},
         {"include_entities", "true"}
     };

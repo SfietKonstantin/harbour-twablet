@@ -53,6 +53,8 @@ public:
     void refresh();
     void refresh(const Account &account, const Query &query);
     void loadMore(const Account &account, const Query &query);
+    Tweet tweet(const QString &id) const;
+    void updateTweet(const Tweet &tweet);
 private:
     struct MappingKey
     {

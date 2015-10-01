@@ -29,36 +29,51 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEETQUERYITEM_H
-#define TWEETQUERYITEM_H
+#include "retweetqueryitem.h"
+#include "private/twitterqueryutil.h"
+#include "accountobject.h"
 
-#include "abstractqueryitem.h"
-#include "tweetobject.h"
-
-class TweetQueryItem : public AbstractQueryItem
+RetweetQueryItem::RetweetQueryItem(QObject *parent)
+    : AbstractQueryItem(parent)
 {
-    Q_OBJECT
-    Q_PROPERTY(QString tweetId READ tweetId WRITE setTweetId NOTIFY tweetIdChanged)
-    Q_PROPERTY(TweetObject * data READ data NOTIFY dataChanged)
-public:
-    explicit TweetQueryItem(QObject *parent = 0);
-    DISABLE_COPY_DISABLE_MOVE(TweetQueryItem);
-    QString tweetId() const;
-    void setTweetId(const QString &tweetId);
-    TweetObject * data() const;
-public slots:
-    void setFavorited(bool favorited);
-    void setRetweeted();
-signals:
-    void tweetIdChanged();
-    void dataChanged();
-private:
-    bool isQueryValid() const override final;
-    QNetworkReply * createQuery() const override final;
-    void handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
-                     const QString &errorMessage) override final;
-    QString m_tweetId {};
-    QObjectPtr<TweetObject> m_data {};
-};
+}
 
-#endif // TWEETQUERYITEM_H
+QString RetweetQueryItem::tweetId() const
+{
+    return m_tweetId;
+}
+
+void RetweetQueryItem::setTweetId(QString tweetId)
+{
+    if (m_tweetId != tweetId) {
+        m_tweetId = tweetId;
+        emit tweetIdChanged();
+    }
+}
+
+bool RetweetQueryItem::isQueryValid() const
+{
+    return !m_tweetId.isEmpty();
+}
+
+QNetworkReply * RetweetQueryItem::createQuery() const
+{
+    QString path {QLatin1String("statuses/retweet.json")};
+    std::map<QByteArray, QByteArray> parameters {{"id", QUrl::toPercentEncoding(m_tweetId)}};
+
+    return TwitterQueryUtil::post(network(), path, {}, parameters, account()->data());
+}
+
+void RetweetQueryItem::handleReply(const QByteArray &reply,
+                                   QNetworkReply::NetworkError networkError,
+                                   const QString &errorMessage)
+{
+    Q_UNUSED(reply)
+    Q_UNUSED(errorMessage)
+    if (networkError != QNetworkReply::NoError) {
+        if (networkError == QNetworkReply::ContentOperationNotPermittedError) {
+            setStatusAndErrorMessage(Error, tr("Retweeting is not allowed."));
+        }
+    }
+}
+

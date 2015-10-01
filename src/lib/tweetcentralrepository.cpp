@@ -106,6 +106,33 @@ void TweetCentralRepository::loadMore(const Account &account, const Query &query
     }
 }
 
+Tweet TweetCentralRepository::tweet(const QString &id) const
+{
+    auto it = m_data.find(id);
+    if (it != std::end(m_data)) {
+        return it->second;
+    }
+    return Tweet();
+}
+
+void TweetCentralRepository::updateTweet(const Tweet &tweet)
+{
+    auto it = m_data.find(tweet.id());
+    if (it != std::end(m_data)) {
+        it->second = tweet;
+    }
+
+    for (auto it = std::begin(m_mapping); it != std::end(m_mapping); ++it) {
+        TweetRepository &repository = it->second.repository;
+        for (int i = 0; i < repository.size(); ++i) {
+            const Tweet &currentTweet {*(std::begin(repository) + i)};
+            if (currentTweet.id() == tweet.id()) {
+                repository.update(i, std::move(Tweet(tweet)));
+            }
+        }
+    }
+}
+
 void TweetCentralRepository::load(const MappingKey &key, MappingData &mappingData,
                                   IQueryHandler<Tweet>::RequestType requestType)
 {
@@ -157,6 +184,7 @@ void TweetCentralRepository::load(const MappingKey &key, MappingData &mappingDat
         } else {
             for (const Tweet &tweet : items) {
                 m_data.emplace(tweet.id(), tweet);
+                qCDebug(QLoggingCategory("tweet-central-repository")) << "Adding tweet with id" << tweet.id();
             }
             qDebug(QLoggingCategory("tweet-central-repository")) << "New data available for layout" << key.account.userId() << key.query.type() << ". Count:" << items.size();
             switch (placement) {

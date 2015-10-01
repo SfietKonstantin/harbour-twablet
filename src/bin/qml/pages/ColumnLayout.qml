@@ -39,7 +39,7 @@ SilicaListView {
     property alias temporary: twitterModel.temporary
     property alias layoutIndex: twitterModel.layoutIndex
     signal handleLink(string url)
-    signal openTweet(string tweetId)
+    signal openTweet(string tweetId, string retweetId)
     function setUnread(index) {
         if (internal.unread > index && index !== -1) {
             internal.unread = index
@@ -177,7 +177,7 @@ SilicaListView {
     delegate: TweetDelegate {
         id: delegate
         onClicked: {
-            container.openTweet(model.item.originalId)
+            container.openTweet(model.item.originalId, model.item.id)
         }
         width: container.width
         tweet: model.item

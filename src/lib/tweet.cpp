@@ -109,6 +109,11 @@ bool Tweet::isFavorited() const
     return m_favorited;
 }
 
+void Tweet::setFavorited(bool faviroted)
+{
+    m_favorited = faviroted;
+}
+
 int Tweet::retweetCount() const
 {
     return m_retweetCount;
@@ -117,6 +122,11 @@ int Tweet::retweetCount() const
 bool Tweet::isRetweeted() const
 {
     return m_retweeted;
+}
+
+void Tweet::setRetweeted(bool retweeted)
+{
+    m_retweeted = retweeted;
 }
 
 QString Tweet::inReplyTo() const

@@ -63,7 +63,7 @@ Page {
             LH.handleLink(url, container.panel, container.account, false)
         }
         onOpenTweet: {
-            container.panel.openTweet(tweetId, container.account, false)
+            container.panel.openTweet(tweetId, retweetId, container.account, false)
         }
 
         PullDownMenu {

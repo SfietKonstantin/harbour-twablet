@@ -37,6 +37,7 @@ OTHER_FILES += \
     qml/pages/UsersPage.qml \
     qml/pages/TweetPage.qml \
     qml/pages/StatusUpdater.qml \
+    qml/pages/ProgressIconButton.qml \
     qml/pages/LinkHandler.js
 
 

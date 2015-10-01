@@ -315,6 +315,15 @@ void DataRepositoryObject::userLoadMore(int index)
     m_userCentralRepository.loadMore(index);
 }
 
+void DataRepositoryObject::setTweetRetweeted(const QString &tweetId)
+{
+    Tweet tweet = m_tweetsCentralRepository.tweet(tweetId);
+    if (tweet.isValid()) {
+        tweet.setRetweeted(true);
+        m_tweetsCentralRepository.updateTweet(tweet);
+    }
+}
+
 Account DataRepositoryObject::accountFromId(const QString &userId) const
 {
     return m_accountsMapping.at(userId);

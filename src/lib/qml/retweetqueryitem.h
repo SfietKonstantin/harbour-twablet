@@ -29,36 +29,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEETQUERYITEM_H
-#define TWEETQUERYITEM_H
+#ifndef RETWEETQUERYITEM_H
+#define RETWEETQUERYITEM_H
 
 #include "abstractqueryitem.h"
-#include "tweetobject.h"
 
-class TweetQueryItem : public AbstractQueryItem
+class RetweetQueryItem : public AbstractQueryItem
 {
     Q_OBJECT
     Q_PROPERTY(QString tweetId READ tweetId WRITE setTweetId NOTIFY tweetIdChanged)
-    Q_PROPERTY(TweetObject * data READ data NOTIFY dataChanged)
 public:
-    explicit TweetQueryItem(QObject *parent = 0);
-    DISABLE_COPY_DISABLE_MOVE(TweetQueryItem);
+    explicit RetweetQueryItem(QObject *parent = 0);
+    DISABLE_COPY_DISABLE_MOVE(RetweetQueryItem);
     QString tweetId() const;
-    void setTweetId(const QString &tweetId);
-    TweetObject * data() const;
-public slots:
-    void setFavorited(bool favorited);
-    void setRetweeted();
+    void setTweetId(QString tweetId);
 signals:
+    void repositoryChanged();
     void tweetIdChanged();
-    void dataChanged();
 private:
     bool isQueryValid() const override final;
     QNetworkReply * createQuery() const override final;
     void handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
                      const QString &errorMessage) override final;
     QString m_tweetId {};
-    QObjectPtr<TweetObject> m_data {};
 };
 
-#endif // TWEETQUERYITEM_H
+#endif // RETWEETQUERYITEM_H

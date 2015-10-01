@@ -29,5 +29,6 @@
         <file>qml/pages/LoadMoreButton.qml</file>
         <file>qml/pages/TweetPage.qml</file>
         <file>qml/pages/StatusUpdater.qml</file>
+        <file>qml/pages/ProgressIconButton.qml</file>
     </qresource>
 </RCC>

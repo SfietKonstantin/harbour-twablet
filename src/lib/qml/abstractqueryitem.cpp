@@ -101,6 +101,16 @@ void AbstractQueryItem::setStatusAndErrorMessage(AbstractQueryItem::Status statu
     if (m_status != status) {
         m_status = status;
         emit statusChanged();
+        switch (m_status) {
+        case Idle:
+            emit finished();
+            break;
+        case Error:
+            emit error();
+            break;
+        default:
+            break;
+        }
     }
 
     if (m_errorMessage != errorMessage) {

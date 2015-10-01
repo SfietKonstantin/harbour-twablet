@@ -64,6 +64,8 @@ signals:
     void statusChanged();
     void errorMessageChanged();
     void accountChanged();
+    void finished();
+    void error();
 protected:
     explicit AbstractQueryItem(QObject *parent = 0);
     QNetworkAccessManager & network() const;

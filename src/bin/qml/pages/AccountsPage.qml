@@ -110,7 +110,10 @@ Page {
         PullDownMenu {
             MenuItem {
                 text: qsTr("Add account")
-                onClicked: pageStack.push(Qt.resolvedUrl("AuthentificationPage.qml"))
+                onClicked: {
+                    var page = pageStack.push(Qt.resolvedUrl("AuthentificationPage.qml"))
+                    page.load()
+                }
             }
         }
     }

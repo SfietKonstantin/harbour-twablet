@@ -60,12 +60,10 @@ Item {
                 id: queryItem
                 account: postAccountSelectionModel.selection
                 text: (container.replyOnly ? container.inReplyScreenName + " " : "") + textArea.text
-                onStatusChanged: {
-                    if (queryItem.status === QueryItem.Idle) {
-                        textArea.text = ""
-                        Repository.refresh()
-                        container.statusUpdated()
-                    }
+                onFinished: {
+                    textArea.text = ""
+                    Repository.refresh()
+                    container.statusUpdated()
                 }
             }
 

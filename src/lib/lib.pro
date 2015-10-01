@@ -71,7 +71,8 @@ HEADERS += \
     abstractuserqueryhandler.h \
     friendsqueryhandler.h \
     followersqueryhandler.h \
-    qml/tweetqueryitem.h
+    qml/tweetqueryitem.h \
+    qml/retweetqueryitem.h
 
 SOURCES += \
     private/twitterdatautil.cpp \
@@ -122,4 +123,5 @@ SOURCES += \
     friendsqueryhandler.cpp \
     followersqueryhandler.cpp \
     qml/tweetqueryitem.cpp \
-    iqueryhandler.cpp
+    iqueryhandler.cpp \
+    qml/retweetqueryitem.cpp

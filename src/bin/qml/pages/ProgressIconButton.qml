@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,36 +29,43 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEETQUERYITEM_H
-#define TWEETQUERYITEM_H
+import QtQuick 2.0
+import Sailfish.Silica 1.0
 
-#include "abstractqueryitem.h"
-#include "tweetobject.h"
+Item {
+    id: container
+    property string source
+    property alias down: iconButton.down
+    property alias highlighted: iconButton.highlighted
+    property bool busy: false
+    property bool error: false
+    signal clicked()
+    onErrorChanged: {
+        if (error) {
+            errorTimer.start()
+        }
+    }
 
-class TweetQueryItem : public AbstractQueryItem
-{
-    Q_OBJECT
-    Q_PROPERTY(QString tweetId READ tweetId WRITE setTweetId NOTIFY tweetIdChanged)
-    Q_PROPERTY(TweetObject * data READ data NOTIFY dataChanged)
-public:
-    explicit TweetQueryItem(QObject *parent = 0);
-    DISABLE_COPY_DISABLE_MOVE(TweetQueryItem);
-    QString tweetId() const;
-    void setTweetId(const QString &tweetId);
-    TweetObject * data() const;
-public slots:
-    void setFavorited(bool favorited);
-    void setRetweeted();
-signals:
-    void tweetIdChanged();
-    void dataChanged();
-private:
-    bool isQueryValid() const override final;
-    QNetworkReply * createQuery() const override final;
-    void handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
-                     const QString &errorMessage) override final;
-    QString m_tweetId {};
-    QObjectPtr<TweetObject> m_data {};
-};
+    width: iconButton.width
+    height: iconButton.height
 
-#endif // TWEETQUERYITEM_H
+    IconButton {
+        id: iconButton
+        enabled: container.enabled
+        visible: !container.busy || errorTimer.running
+        icon.source: errorTimer.running ? "image://theme/icon-s-high-importance?#ff0000" : container.source
+        onClicked: container.clicked()
+    }
+
+    BusyIndicator {
+        anchors.centerIn: parent
+        running: container.busy && !errorTimer.running
+        size: BusyIndicatorSize.Small
+    }
+
+    Timer {
+        id: errorTimer
+        interval: 1000
+
+    }
+}

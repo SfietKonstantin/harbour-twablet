@@ -81,6 +81,8 @@ public slots:
     int addUser(AccountObject *account, int queryType, const QVariantMap &arguments);
     void removeUser(int index);
     void userLoadMore(int index);
+    // Action on tweets
+    void setTweetRetweeted(const QString &tweetId);
 private:
     Account accountFromId(const QString &userId) const;
     void refresh(const Layout &layout);
