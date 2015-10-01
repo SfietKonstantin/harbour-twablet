@@ -324,6 +324,15 @@ void DataRepositoryObject::setTweetRetweeted(const QString &tweetId)
     }
 }
 
+void DataRepositoryObject::setTweetFavorited(const QString &tweetId, bool favorited)
+{
+    Tweet tweet = m_tweetsCentralRepository.tweet(tweetId);
+    if (tweet.isValid()) {
+        tweet.setFavorited(favorited);
+        m_tweetsCentralRepository.updateTweet(tweet);
+    }
+}
+
 Account DataRepositoryObject::accountFromId(const QString &userId) const
 {
     return m_accountsMapping.at(userId);

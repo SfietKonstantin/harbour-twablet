@@ -44,7 +44,6 @@ public:
     QString tweetId() const;
     void setTweetId(QString tweetId);
 signals:
-    void repositoryChanged();
     void tweetIdChanged();
 private:
     bool isQueryValid() const override final;

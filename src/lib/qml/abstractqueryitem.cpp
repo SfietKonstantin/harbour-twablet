@@ -97,7 +97,7 @@ QNetworkAccessManager & AbstractQueryItem::network() const
 void AbstractQueryItem::setStatusAndErrorMessage(AbstractQueryItem::Status status,
                                                  const QString &errorMessage)
 {
-    qCDebug(QLoggingCategory("abstract-query-item")) << "Current status" << status << errorMessage;
+    qCDebug(QLoggingCategory("query-item")) << "Current status" << status << errorMessage;
     if (m_status != status) {
         m_status = status;
         emit statusChanged();

@@ -49,13 +49,32 @@ Page {
     RetweetQueryItem {
         id: retweetQuery
         account: query.account
-        tweetId: query.data ? query.data.id : ""
+        tweetId: container.retweetId
         onFinished: {
             Repository.setTweetRetweeted(container.tweetId)
             if (container.retweetId !== container.tweetId) {
                 Repository.setTweetRetweeted(container.retweetId)
             }
             query.setRetweeted(true)
+        }
+    }
+
+    FavoriteQueryItem {
+        id: favoriteQuery
+        account: query.account
+        tweetId: container.retweetId
+        favorited: query.data && query.data.favorited
+        onFinished: {
+            if (!query.data) {
+                return
+            }
+
+            var favorited = !query.data.favorited
+            Repository.setTweetFavorited(container.tweetId, favorited)
+            if (container.retweetId !== container.tweetId) {
+                Repository.setTweetFavorited(container.retweetId, favorited)
+            }
+            query.setFavorited(favorited)
         }
     }
 
@@ -87,7 +106,7 @@ Page {
                }
                ProgressIconButton {
                    source: "image://theme/icon-s-retweet"
-                   enabled: query.data ? !query.data.retweeted && container.account.userId !== query.data.user.id: false
+                   enabled: true//query.data ? !query.data.retweeted && container.account.userId !== query.data.user.id: false
                    highlighted: down || query.data.retweeted
                    busy: retweetQuery.status === QueryItem.Loading
                    error: retweetQuery.status === QueryItem.Error
@@ -95,8 +114,10 @@ Page {
                }
                ProgressIconButton {
                    source: "image://theme/icon-s-favorite"
-                   enabled: false
                    highlighted: down || query.data.favorited
+                   busy: favoriteQuery.status === QueryItem.Loading
+                   error: favoriteQuery.status === QueryItem.Error
+                   onClicked: favoriteQuery.load()
                }
             }
 

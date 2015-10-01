@@ -108,8 +108,7 @@ MouseArea {
                 id: headerColumn
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: profilePicture.right; anchors.leftMargin: Theme.paddingMedium
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.paddingMedium + header.padding
+                anchors.right: indicators.right
 
                 Label {
                     color: header.down ? Theme.highlightColor : Theme.primaryColor
@@ -123,6 +122,27 @@ MouseArea {
                     font.pixelSize: Theme.fontSizeSmall
                     anchors.left: parent.left; anchors.right: parent.right
                     text: "@" + container.tweet.user.screenName
+                }
+            }
+
+            Column {
+                id: indicators
+                visible: container.tweet.favorited || container.tweet.retweeted
+                width: visible ? Theme.iconSizeSmall + Theme.paddingSmall : 0
+                anchors.right: parent.right
+                anchors.rightMargin: Theme.paddingMedium + header.padding
+
+                Image {
+                    width: Theme.iconThemeSmall
+                    height: Theme.iconThemeSmall
+                    source: "image://theme/icon-s-retweet?" + Theme.highlightColor
+                    visible: container.tweet.retweeted
+                }
+                Image {
+                    width: Theme.iconThemeSmall
+                    height: Theme.iconThemeSmall
+                    source: "image://theme/icon-s-favorite?" + Theme.highlightColor
+                    visible: container.tweet.favorited
                 }
             }
         }

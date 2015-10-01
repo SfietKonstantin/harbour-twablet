@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,54 +29,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-import QtQuick 2.0
-import Sailfish.Silica 1.0
+#ifndef FAVORITEQUERYITEM_H
+#define FAVORITEQUERYITEM_H
 
-Item {
-    id: container
-    property string source
-    property alias down: iconButton.down
-    property alias highlighted: iconButton.highlighted
-    property bool busy: false
-    property bool error: false
-    signal clicked()
-    onErrorChanged: {
-        if (error) {
-            errorTimer.start()
-        }
-    }
-    onBusyChanged: {
-        if (error) {
-            errorTimer.start()
-        }
-    }
+#include "abstractqueryitem.h"
 
-    width: iconButton.width
-    height: iconButton.height
+class FavoriteQueryItem : public AbstractQueryItem
+{
+    Q_OBJECT
+    Q_PROPERTY(QString tweetId READ tweetId WRITE setTweetId NOTIFY tweetIdChanged)
+    Q_PROPERTY(bool favorited READ isFavorited WRITE setFavorited NOTIFY favoritedChanged)
+public:
+    explicit FavoriteQueryItem(QObject *parent = 0);
+    QString tweetId() const;
+    void setTweetId(QString tweetId);
+    bool isFavorited() const;
+    void setFavorited(bool favorited);
+signals:
+    void tweetIdChanged();
+    void favoritedChanged();
+private:
+    bool isQueryValid() const override final;
+    QNetworkReply * createQuery() const override final;
+    void handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
+                     const QString &errorMessage) override final;
+    QString m_tweetId {};
+    bool m_favorited {false};
+};
 
-    IconButton {
-        id: iconButton
-        enabled: container.enabled
-        visible: !container.busy && !errorTimer.running
-        icon.source: container.source
-        onClicked: container.clicked()
-    }
-
-    Image {
-        visible: errorTimer.running
-        anchors.centerIn: parent
-        source: "image://theme/icon-s-high-importance?#ff0000"
-    }
-
-    BusyIndicator {
-        anchors.centerIn: parent
-        running: container.busy && !errorTimer.running
-        size: BusyIndicatorSize.Small
-    }
-
-    Timer {
-        id: errorTimer
-        interval: 1000
-
-    }
-}
+#endif // FAVORITEQUERYITEM_H

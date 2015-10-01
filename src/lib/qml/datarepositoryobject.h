@@ -83,6 +83,7 @@ public slots:
     void userLoadMore(int index);
     // Action on tweets
     void setTweetRetweeted(const QString &tweetId);
+    void setTweetFavorited(const QString &tweetId, bool favorited);
 private:
     Account accountFromId(const QString &userId) const;
     void refresh(const Layout &layout);
