@@ -36,6 +36,7 @@ OTHER_FILES += \
     qml/pages/MiniButton.qml \
     qml/pages/UsersPage.qml \
     qml/pages/TweetPage.qml \
+    qml/pages/StatusUpdater.qml \
     qml/pages/LinkHandler.js
 
 

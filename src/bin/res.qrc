@@ -28,5 +28,6 @@
         <file>qml/pages/UsersPage.qml</file>
         <file>qml/pages/LoadMoreButton.qml</file>
         <file>qml/pages/TweetPage.qml</file>
+        <file>qml/pages/StatusUpdater.qml</file>
     </qresource>
 </RCC>

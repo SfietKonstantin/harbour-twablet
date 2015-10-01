@@ -198,9 +198,6 @@ Page {
                 id: panel
                 anchors.top: parent.top; anchors.bottom: toolbar.top
                 width: view.columnWidth
-                onRequestReply: {
-                    toolbar.setReply(inReplyTo, screenName)
-                }
             }
         }
     }

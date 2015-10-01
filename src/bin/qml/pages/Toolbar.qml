@@ -37,15 +37,6 @@ Rectangle {
     id: container
     signal goToIndex(int index)
     signal goToTop(int index)
-    function setReply(inReplyTo, screenName)
-    {
-        postText.text = screenName + " "
-        internal.replyScreenName = screenName
-        statusUpdateQueryItem.inReplyTo = inReplyTo
-        internal.checkReply()
-        postText.cursorPosition = postText.text.length
-        postText.focus = true
-    }
     property bool isLandscape: false
     property int lastTappedIndex: -1
     property alias currentIndex: view.currentIndex
@@ -61,31 +52,10 @@ Rectangle {
 
     QtObject {
         id: internal
-        function clearReply() {
-            replyScreenName = ""
-            statusUpdateQueryItem.inReplyTo = ""
-        }
-        function checkReply() {
-            internal.isReply = (statusUpdateQueryItem.inReplyTo.length > 0
-                                && postText.text.indexOf(internal.replyScreenName) === 0)
-        }
-
         property bool isSplit: container.columnCount > 1
-        property double viewHeight: (isSplit ? post.height : Theme.itemSizeSmall)
-        property double height: (isSplit ? post.height : Theme.itemSizeSmall + post.height)
+        property double viewHeight: (isSplit ? statusUpdater.height : Theme.itemSizeSmall)
+        property double height: (isSplit ? statusUpdater.height : Theme.itemSizeSmall + statusUpdater.height)
         property double width: (isSplit ? container.width / 2 : container.width)
-        property string replyScreenName
-        property bool isReply: false
-        onIsReplyChanged: {
-            if (!isReply) {
-                clearReply()
-            }
-        }
-    }
-
-    Connections {
-        target: postText
-        onTextChanged: internal.checkReply()
     }
 
     SilicaListView {
@@ -166,97 +136,10 @@ Rectangle {
         }
     }
 
-    Item {
-        id: post
+    StatusUpdater {
+        id: statusUpdater
         width: internal.width
-        height: postColumn.height + 2 * Theme.paddingSmall
         anchors.right: parent.right; anchors.bottom: parent.bottom
-
-        Column {
-            id: postColumn
-            anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
-            anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
-            anchors.top: parent.top; anchors.topMargin: Theme.paddingSmall
-            spacing: Theme.paddingSmall
-
-            Item {
-                height: postText.height
-                anchors.left: parent.left; anchors.right: parent.right
-
-                StatusUpdateQueryItem {
-                    id: statusUpdateQueryItem
-                    account: postAccountSelectionModel.selection
-                    text: postText.text
-                    onStatusChanged: {
-                        if (statusUpdateQueryItem.status === QueryItem.Idle) {
-                            postText.text = ""
-                            Repository.refresh()
-                            internal.clearReply()
-                        }
-                    }
-                }
-
-                TextArea {
-                    id: postText
-                    property int textLeft: 140 - postText.text.length
-                    anchors.left: parent.left
-                    anchors.right: postSend.left; anchors.rightMargin: Theme.paddingSmall
-                    placeholderText: qsTr("Tweet something")
-                    label: textLeft >= 0 ? qsTr("%n left", "", textLeft) : qsTr("Tweet too long")
-                }
-
-                Label {
-                    id: postSend
-                    anchors.bottom: parent.bottom; anchors.bottomMargin: Theme.fontSizeSmall + Theme.paddingLarge
-                    anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
-                    text: internal.isReply ? qsTr("Reply") : qsTr("Send")
-                    color: (postText.text.length > 0 && statusUpdateQueryItem.status !== QueryItem.Loading) ? Theme.primaryColor : Theme.secondaryColor
-
-                    MouseArea {
-                        enabled: postText.text.length > 0 && statusUpdateQueryItem.status !== QueryItem.Loading
-                        anchors.fill: parent
-                        onClicked: statusUpdateQueryItem.load()
-                    }
-                }
-            }
-
-
-            Item {
-                id: postButtonBar
-                visible: false
-                anchors.left: parent.left; anchors.right: parent.right
-                height: Theme.fontSizeMedium + Theme.paddingSmall
-
-                AccountSelectionModel {
-                    id: postAccountSelectionModel
-                    repository: Repository
-                    Component.onCompleted: {
-                        postAccountSelectionModel.index = 0
-                    }
-                }
-
-                Label {
-                    anchors.left: parent.left; anchors.leftMargin: Theme.paddingLarge
-                    anchors.bottom: parent.bottom; anchors.bottomMargin: Theme.paddingSmall
-                    // text: qsTr("Account: %1").arg(postAccountsModel.currentAccount.name)
-                    text: qsTr("Account: %1").arg(postAccountSelectionModel.selection.name)
-
-                    MouseArea {
-                        anchors.fill: parent
-                    }
-                }
-            }
-
-            states: [
-                State {
-                    name: "focused"; when: postText.focus && postAccountsModel.count > 1
-                    PropertyChanges {
-                        target: postButtonBar
-                        visible: true
-                    }
-                }
-            ]
-        }
     }
 }
 

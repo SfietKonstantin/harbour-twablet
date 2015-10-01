@@ -69,7 +69,7 @@ Page {
             Row {
                IconButton {
                    icon.source: "image://theme/icon-s-chat"
-                   onClicked: container.panel.requestReply(query.data.id, "@" + query.data.user.screenName)
+                   onClicked: replyStatusUpdater.focus()
                }
                IconButton {
                    icon.source: "image://theme/icon-s-retweet"
@@ -79,6 +79,14 @@ Page {
                    icon.source: "image://theme/icon-s-favorite"
                    enabled: false
                }
+            }
+
+            StatusUpdater {
+                id: replyStatusUpdater
+                replyOnly: true
+                inReplyTo: query.data ? query.data.id : ""
+                inReplyScreenName: query.data ? "@" + query.data.user.screenName : ""
+                anchors.left: parent.left; anchors.right: parent.right
             }
 
             Behavior on opacity {

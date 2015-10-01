@@ -35,7 +35,6 @@ import harbour.twablet 1.0
 
 Item {
     id: container
-    signal requestReply(string inReplyTo, string screenName)
     property bool open: false
     anchors.top: parent.top; anchors.bottom: parent.bottom
     visible: false
