@@ -2,3 +2,4 @@ build
 *.pro.*
 src/lib/twitter-secrets.h
 report
+doc
