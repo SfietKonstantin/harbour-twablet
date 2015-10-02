@@ -106,7 +106,7 @@ Page {
                }
                ProgressIconButton {
                    source: "image://theme/icon-s-retweet"
-                   enabled: true//query.data ? !query.data.retweeted && container.account.userId !== query.data.user.id: false
+                   enabled: query.data ? !query.data.retweeted && container.account.userId !== query.data.user.id: false
                    highlighted: down || query.data.retweeted
                    busy: retweetQuery.status === QueryItem.Loading
                    error: retweetQuery.status === QueryItem.Error
