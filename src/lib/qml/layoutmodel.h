@@ -35,6 +35,9 @@
 #include "layoutobject.h"
 #include "model.h"
 
+namespace qml
+{
+
 class LayoutModel : public Model<Layout, LayoutObject>
 {
     Q_OBJECT
@@ -50,5 +53,7 @@ public:
 private:
     QHash<int, QByteArray> roleNames() const override final;
 };
+
+}
 
 #endif // LAYOUTMODEL_H

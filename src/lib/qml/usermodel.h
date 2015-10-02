@@ -35,6 +35,9 @@
 #include "userobject.h"
 #include "model.h"
 
+namespace qml
+{
+
 class UserModel : public Model<User, UserObject>
 {
     Q_OBJECT
@@ -48,5 +51,7 @@ public:
 private:
     QHash<int, QByteArray> roleNames() const override final;
 };
+
+}
 
 #endif // USERMODEL_H

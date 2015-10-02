@@ -31,6 +31,9 @@
 
 #include "mediamodel.h"
 
+namespace qml
+{
+
 MediaModel::MediaModel(const std::vector<Entity::Ptr> &entities, QObject *parent)
     : QAbstractListModel(parent)
 {
@@ -87,4 +90,6 @@ int MediaModel::count() const
 QHash<int, QByteArray> MediaModel::roleNames() const
 {
     return {{MediaRole, "media"}};
+}
+
 }

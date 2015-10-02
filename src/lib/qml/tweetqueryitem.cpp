@@ -35,6 +35,9 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
+namespace qml
+{
+
 TweetQueryItem::TweetQueryItem(QObject *parent)
     : AbstractQueryItem(parent)
 {
@@ -94,7 +97,7 @@ QNetworkReply * TweetQueryItem::createQuery() const
         {"include_entities", "true"}
     };
 
-    return TwitterQueryUtil::get(network(), path, parameters, account()->data());
+    return private_util::TwitterQueryUtil::get(network(), path, parameters, account()->data());
 }
 
 void TweetQueryItem::handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
@@ -117,4 +120,6 @@ void TweetQueryItem::handleReply(const QByteArray &reply, QNetworkReply::Network
     Tweet tweet {document.object()};
     m_data.reset(TweetObject::create(tweet));
     emit dataChanged();
+}
+
 }

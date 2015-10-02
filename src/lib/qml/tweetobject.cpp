@@ -32,6 +32,9 @@
 #include "tweetobject.h"
 #include <QtCore/QRegularExpression>
 
+namespace qml
+{
+
 TweetObject::TweetObject(const Tweet &data, QObject *parent)
     : QObject(parent), m_data{std::move(data)}, m_user{nullptr}
 {
@@ -137,4 +140,6 @@ void TweetObject::update(const Tweet &other)
         m_data.setRetweeted(other.isRetweeted());
         emit retweetedChanged();
     }
+}
+
 }

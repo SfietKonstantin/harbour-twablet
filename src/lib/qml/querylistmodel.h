@@ -37,6 +37,9 @@
 #include <QtQml/QQmlParserStatus>
 #include "queryobject.h"
 
+namespace qml
+{
+
 class QueryListModel : public QAbstractListModel, public QQmlParserStatus
 {
     Q_OBJECT
@@ -66,5 +69,7 @@ private:
     };
     std::vector<std::unique_ptr<Data>> m_data {};
 };
+
+}
 
 #endif // QUERYLISTMODEL_H

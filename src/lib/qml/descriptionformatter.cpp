@@ -32,6 +32,9 @@
 #include "descriptionformatter.h"
 #include "userobject.h"
 
+namespace qml
+{
+
 DescriptionFormatter::DescriptionFormatter(QObject *parent)
     : EntitiesFormatter(parent)
 {
@@ -60,3 +63,4 @@ void DescriptionFormatter::format()
     doFormat(m_user->description(), m_user->data().descriptionEntities());
 }
 
+}

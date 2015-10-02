@@ -35,6 +35,9 @@
 #include "tweetobject.h"
 #include "model.h"
 
+namespace qml
+{
+
 class TweetModel : public Model<Tweet, TweetObject>
 {
     Q_OBJECT
@@ -48,5 +51,7 @@ public:
 private:
     QHash<int, QByteArray> roleNames() const override final;
 };
+
+}
 
 #endif // TWEETMODEL_H

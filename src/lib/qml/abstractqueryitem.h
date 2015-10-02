@@ -38,13 +38,16 @@
 #include "globals.h"
 #include "qobjectutils.h"
 
+namespace qml
+{
+
 class AccountObject;
 class AbstractQueryItem : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
-    Q_PROPERTY(AccountObject * account READ account WRITE setAccount NOTIFY accountChanged)
+    Q_PROPERTY(qml::AccountObject * account READ account WRITE setAccount NOTIFY accountChanged)
     Q_ENUMS(Status)
 public:
     enum Status
@@ -80,5 +83,7 @@ private:
     Status m_status {Idle};
     QString m_errorMessage {};
 };
+
+}
 
 #endif // ABSTRACTQUERYITEM_H

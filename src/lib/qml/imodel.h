@@ -36,6 +36,9 @@
 #include <QtQml/QQmlParserStatus>
 #include "globals.h"
 
+namespace qml
+{
+
 class DataRepositoryObject;
 class IModel : public QAbstractListModel, public QQmlParserStatus
 {
@@ -45,7 +48,7 @@ class IModel : public QAbstractListModel, public QQmlParserStatus
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
     Q_PROPERTY(int layoutIndex READ layoutIndex WRITE setLayoutIndex NOTIFY layoutIndexChanged)
-    Q_PROPERTY(DataRepositoryObject * repository READ repository WRITE setRepository
+    Q_PROPERTY(qml::DataRepositoryObject * repository READ repository WRITE setRepository
                NOTIFY repositoryChanged)
     Q_PROPERTY(bool temporary READ isTemporary WRITE setTemporary NOTIFY temporaryChanged)
     Q_ENUMS(Status)
@@ -81,5 +84,7 @@ signals:
 protected:
     explicit IModel(QObject *parent = 0) : QAbstractListModel(parent), QQmlParserStatus() {}
 };
+
+}
 
 #endif // IMODEL_H

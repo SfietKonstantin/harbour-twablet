@@ -31,6 +31,9 @@
 
 #include "accountmodel.h"
 
+namespace qml
+{
+
 AccountModel::AccountModel(QObject *parent) :
     Model<Account, AccountObject>(parent)
 {
@@ -70,4 +73,6 @@ AccountObject * AccountModel::get(const QString &userId) const
 QHash<int, QByteArray> AccountModel::roleNames() const
 {
     return {{NameRole, "name"}, {ScreenNameRole, "screenName"}, {AccountRole, "account"}};
+}
+
 }

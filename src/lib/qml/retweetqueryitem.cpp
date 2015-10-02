@@ -33,6 +33,9 @@
 #include "private/twitterqueryutil.h"
 #include "accountobject.h"
 
+namespace qml
+{
+
 RetweetQueryItem::RetweetQueryItem(QObject *parent)
     : AbstractQueryItem(parent)
 {
@@ -61,7 +64,7 @@ QNetworkReply * RetweetQueryItem::createQuery() const
     QString path {QLatin1String("statuses/retweet.json")};
     std::map<QByteArray, QByteArray> parameters {{"id", QUrl::toPercentEncoding(m_tweetId)}};
 
-    return TwitterQueryUtil::post(network(), path, {}, parameters, account()->data());
+    return private_util::TwitterQueryUtil::post(network(), path, {}, parameters, account()->data());
 }
 
 void RetweetQueryItem::handleReply(const QByteArray &reply,
@@ -77,3 +80,4 @@ void RetweetQueryItem::handleReply(const QByteArray &reply,
     }
 }
 
+}

@@ -31,6 +31,9 @@
 
 #include "accountobject.h"
 
+namespace qml
+{
+
 AccountObject::AccountObject(const Account &data, QObject *parent)
     : QObject(parent), m_data(data)
 {
@@ -77,4 +80,6 @@ void AccountObject::update(const Account &other)
         m_data.setName(other.name());
         emit nameChanged();
     }
+}
+
 }

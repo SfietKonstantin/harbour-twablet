@@ -43,6 +43,10 @@ class Layout;
 class Tweet;
 class AccountRepository;
 class LayoutRepository;
+
+namespace qml
+{
+
 class DataRepositoryObject;
 template<class T> class DataRepositoryObjectMap;
 template<> class DataRepositoryObjectMap<Account>
@@ -124,6 +128,8 @@ public:
         return repository.user(layoutIndex);
     }
 };
+
+}
 
 #endif // DATAREPOSITORYOBJECTMAP_H
 

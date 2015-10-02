@@ -36,6 +36,9 @@
 #include "user.h"
 #include "model.h"
 
+namespace qml
+{
+
 class UserObject : public QObject
 {
     Q_OBJECT
@@ -88,5 +91,7 @@ private:
     QString m_url {};
     friend class Model<User, UserObject>;
 };
+
+}
 
 #endif // USEROBJECT_H

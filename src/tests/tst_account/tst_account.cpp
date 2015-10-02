@@ -64,7 +64,7 @@ private Q_SLOTS:
     }
     void testModel()
     {
-        DataRepositoryObject repositoryObject {};
+        qml::DataRepositoryObject repositoryObject {};
         AccountRepository &repository (repositoryObject.accounts());
 
         for (int i = 0; i < 3; ++i) {
@@ -72,7 +72,7 @@ private Q_SLOTS:
                                              QByteArray(), QByteArray()));
         }
 
-        AccountModel model {};
+        qml::AccountModel model {};
         model.classBegin();
         model.setRepository(&repositoryObject);
         model.componentComplete();
@@ -83,7 +83,7 @@ private Q_SLOTS:
         QCOMPARE(getObject(model, 2)->name(), QString::number(3));
 
         repository.append(Account(QString::number(4), QString(), QString(),
-                                         QByteArray(), QByteArray()));
+                                  QByteArray(), QByteArray()));
 
         QCOMPARE(model.count(), 4);
         QCOMPARE(getObject(model, 0)->name(), QString::number(1));
@@ -98,9 +98,9 @@ private Q_SLOTS:
         QCOMPARE(getObject(model, 2)->name(), QString::number(4));
     }
 private:
-    static AccountObject * getObject(AccountModel &model, int index)
+    static qml::AccountObject * getObject(qml::AccountModel &model, int index)
     {
-        return model.data(model.index(index), AccountModel::AccountRole).value<AccountObject *>();
+        return model.data(model.index(index), qml::AccountModel::AccountRole).value<qml::AccountObject *>();
     }
 };
 

@@ -32,6 +32,9 @@
 #include "abstractqueryitem.h"
 #include <QtCore/QLoggingCategory>
 
+namespace qml
+{
+
 AbstractQueryItem::AbstractQueryItem(QObject *parent)
     : QObject(parent), m_network{new QNetworkAccessManager()}
 {
@@ -117,4 +120,6 @@ void AbstractQueryItem::setStatusAndErrorMessage(AbstractQueryItem::Status statu
         m_errorMessage = errorMessage;
         emit errorMessageChanged();
     }
+}
+
 }

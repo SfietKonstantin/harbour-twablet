@@ -36,6 +36,9 @@
 #include <QtCore/QSize>
 #include "mediaentity.h"
 
+namespace qml
+{
+
 class MediaObject : public QObject
 {
     Q_OBJECT
@@ -65,5 +68,7 @@ private:
     MediaEntity m_data {};
     QSize m_size {};
 };
+
+}
 
 #endif // MEDIAOBJECT_H

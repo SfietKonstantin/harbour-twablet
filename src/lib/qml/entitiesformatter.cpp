@@ -35,6 +35,9 @@
 #include "usermentionentity.h"
 #include "hashtagentity.h"
 
+namespace qml
+{
+
 EntitiesFormatter::EntitiesFormatter(QObject *parent)
     : QObject(parent)
 {
@@ -126,4 +129,6 @@ void EntitiesFormatter::doFormatHashtag(QString &text, HashtagEntity *entity)
     QString before {QString(QLatin1String("#%1")).arg(entity->text())};
     QString after {QString(QLatin1String("<a href=\"hashtag://%1\">#%1</a>")).arg(entity->text())};
     text.replace(before, after, Qt::CaseInsensitive);
+}
+
 }

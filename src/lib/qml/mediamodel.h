@@ -36,6 +36,9 @@
 #include "qobjectutils.h"
 #include "mediaobject.h"
 
+namespace qml
+{
+
 class MediaModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -56,5 +59,7 @@ private:
     QHash<int, QByteArray> roleNames() const override final;
     std::vector<QObjectPtr<MediaObject>> m_data {};
 };
+
+}
 
 #endif // MEDIAMODEL_H

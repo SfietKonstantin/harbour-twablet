@@ -141,7 +141,7 @@ void TweetCentralRepository::load(const MappingKey &key, MappingData &mappingDat
     mappingData.handler->createRequest(requestType, path, parameters);
     qCDebug(QLoggingCategory("tweet-central-repository")) << "Request:" << path << parameters;
 
-    QNetworkReply *reply {TwitterQueryUtil::get(*m_network, path, parameters, key.account)};
+    QNetworkReply *reply {private_util::TwitterQueryUtil::get(*m_network, path, parameters, key.account)};
     mappingData.repository.start();
 
     QObject::connect(reply, &QNetworkReply::finished, [this, &key, &mappingData, reply, requestType]() {

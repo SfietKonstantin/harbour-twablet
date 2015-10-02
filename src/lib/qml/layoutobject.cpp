@@ -31,6 +31,9 @@
 
 #include "layoutobject.h"
 
+namespace qml
+{
+
 LayoutObject::LayoutObject(const Layout &data, QObject *parent)
     : QObject(parent), m_data{data}
 {
@@ -85,4 +88,6 @@ void LayoutObject::update(const Layout &other)
         m_data.setUnread(other.unread());
         emit unreadChanged();
     }
+}
+
 }

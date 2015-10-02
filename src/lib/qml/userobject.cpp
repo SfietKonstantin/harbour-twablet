@@ -33,6 +33,9 @@
 #include <QtCore/QJsonArray>
 #include "urlentity.h"
 
+namespace qml
+{
+
 UserObject::UserObject(const User &data, QObject *parent)
     : QObject(parent), m_data{data}
 {
@@ -163,4 +166,6 @@ void UserObject::initializeUrl()
 
     m_url = urlEntity->expandedUrl();
     m_displayUrl = urlEntity->displayUrl();
+}
+
 }

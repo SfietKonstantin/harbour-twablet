@@ -35,6 +35,9 @@
 #include <QtCore/QVariantMap>
 #include <QtCore/QLoggingCategory>
 
+namespace qml
+{
+
 DataRepositoryObject::DataRepositoryObject(QObject *parent)
     : QObject(parent)
 {
@@ -436,4 +439,6 @@ void DataRepositoryObject::removeLayoutFromRepositories(int index)
     const Layout &layout {*(std::begin(m_layouts) + index)};
     removeLayoutFromRepositories(layout);
     m_layouts.remove(index);
+}
+
 }

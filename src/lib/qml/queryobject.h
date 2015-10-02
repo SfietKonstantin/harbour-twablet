@@ -35,6 +35,9 @@
 #include <QtCore/QObject>
 #include "query.h"
 
+namespace qml
+{
+
 class QueryObject : public QObject
 {
     Q_OBJECT
@@ -59,5 +62,7 @@ private:
     explicit QueryObject(const Query &data, QObject *parent = 0);
     Query m_data {};
 };
+
+}
 
 #endif // QUERYOBJECT_H

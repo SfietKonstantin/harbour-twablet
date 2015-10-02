@@ -31,6 +31,9 @@
 
 #include "tweetmodel.h"
 
+namespace qml
+{
+
 TweetModel::TweetModel(QObject *parent) :
     Model<Tweet, TweetObject>(parent)
 {
@@ -59,4 +62,6 @@ QVariant TweetModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> TweetModel::roleNames() const
 {
     return {{IdRole, "id"}, {ItemRole, "item"}};
+}
+
 }

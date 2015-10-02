@@ -33,6 +33,9 @@
 #include "private/twitterqueryutil.h"
 #include "accountobject.h"
 
+namespace qml
+{
+
 FavoriteQueryItem::FavoriteQueryItem(QObject *parent)
     : AbstractQueryItem(parent)
 {
@@ -79,7 +82,7 @@ QNetworkReply * FavoriteQueryItem::createQuery() const
     }
     std::map<QByteArray, QByteArray> parameters {{"id", QUrl::toPercentEncoding(m_tweetId)}};
 
-    return TwitterQueryUtil::post(network(), path, {}, parameters, account()->data());
+    return private_util::TwitterQueryUtil::post(network(), path, {}, parameters, account()->data());
 }
 
 void FavoriteQueryItem::handleReply(const QByteArray &reply,
@@ -97,4 +100,4 @@ void FavoriteQueryItem::handleReply(const QByteArray &reply,
     }
 }
 
-
+}

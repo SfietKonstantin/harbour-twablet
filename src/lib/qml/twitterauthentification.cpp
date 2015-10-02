@@ -36,6 +36,9 @@
 #include <QtCore/QLoggingCategory>
 #include <QtNetwork/QNetworkReply>
 
+namespace qml
+{
+
 static const char *TWITTER_API_REQUEST_TOKEN = "https://api.twitter.com/oauth/request_token";
 static const char *TWITTER_API_REQUEST_TOKEN_PARAM_KEY = "oauth_callback";
 static const char *TWITTER_API_REQUEST_TOKEN_PARAM_VALUE = "oob";
@@ -90,7 +93,7 @@ QString TwitterAuthentification::screenName() const
 void TwitterAuthentification::startRequest()
 {
     std::vector<std::pair<QByteArray, QByteArray>> args {{TWITTER_API_REQUEST_TOKEN_PARAM_KEY, TWITTER_API_REQUEST_TOKEN_PARAM_VALUE}};
-    QByteArray header {TwitterDataUtil::authorizationHeader(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, "POST", TWITTER_API_REQUEST_TOKEN, args)};
+    QByteArray header {private_util::TwitterDataUtil::authorizationHeader(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, "POST", TWITTER_API_REQUEST_TOKEN, args)};
     qCDebug(QLoggingCategory("twitter-auth")) << "The authentification header for the start request is:" << header;
 
     QByteArray url {QByteArray(TWITTER_API_REQUEST_TOKEN) + "?" + TWITTER_API_REQUEST_TOKEN_PARAM_KEY + "=" + TWITTER_API_REQUEST_TOKEN_PARAM_VALUE};
@@ -140,7 +143,7 @@ void TwitterAuthentification::continueRequest()
     qCDebug(QLoggingCategory("twitter-auth")) << "Continuing request with pin:" << m_pin;
 
     std::vector<std::pair<QByteArray, QByteArray>> args {{TWITTER_API_ACCESS_TOKEN_PARAM_KEY, m_pin.toLocal8Bit()}};
-    QByteArray header = TwitterDataUtil::authorizationHeader(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, "POST", TWITTER_API_ACCESS_TOKEN, args, m_tempToken, m_tempTokenSecret);
+    QByteArray header = private_util::TwitterDataUtil::authorizationHeader(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, "POST", TWITTER_API_ACCESS_TOKEN, args, m_tempToken, m_tempTokenSecret);
     qCDebug(QLoggingCategory("twitter-auth")) << "The authentification header for the continue request is:" << header;
 
     QNetworkRequest request (QUrl(QLatin1String(TWITTER_API_ACCESS_TOKEN) + QLatin1String("?") + QLatin1String(TWITTER_API_ACCESS_TOKEN_PARAM_KEY) + QLatin1String("=") + m_pin));
@@ -201,4 +204,6 @@ void TwitterAuthentification::setData(QString &&token, QString &&tokenSecret,
         m_screenName = std::move(screenName);
         emit nameChanged();
     }
+}
+
 }

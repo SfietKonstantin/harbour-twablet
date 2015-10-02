@@ -38,6 +38,9 @@
 #include "datarepositoryobjectmap.h"
 #include <QtCore/QLoggingCategory>
 
+namespace qml
+{
+
 template<class T, class O>
 class Model: public IModel, public IListener<T>
 {
@@ -272,6 +275,8 @@ private:
     bool m_temporary {false};
     Repository<T> *m_internalRepository {nullptr};
 };
+
+}
 
 #endif // MODEL_H
 

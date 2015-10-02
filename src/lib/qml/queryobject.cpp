@@ -31,6 +31,9 @@
 
 #include "queryobject.h"
 
+namespace qml
+{
+
 QueryObject::QueryObject(const Query &data, QObject *parent)
     : QObject(parent), m_data{data}
 {
@@ -44,4 +47,6 @@ QueryObject * QueryObject::create(const Query &data, QObject *parent)
 QueryObject::Type QueryObject::type() const
 {
     return static_cast<Type>(m_data.type());
+}
+
 }

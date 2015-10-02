@@ -34,6 +34,9 @@
 
 #include "abstractqueryitem.h"
 
+namespace qml
+{
+
 class FavoriteQueryItem : public AbstractQueryItem
 {
     Q_OBJECT
@@ -56,5 +59,7 @@ private:
     QString m_tweetId {};
     bool m_favorited {false};
 };
+
+}
 
 #endif // FAVORITEQUERYITEM_H

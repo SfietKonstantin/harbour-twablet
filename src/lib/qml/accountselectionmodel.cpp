@@ -31,6 +31,9 @@
 
 #include "accountselectionmodel.h"
 
+namespace qml
+{
+
 AccountSelectionModel::AccountSelectionModel(QObject *parent)
     : AccountModel(parent)
 {
@@ -68,3 +71,4 @@ void AccountSelectionModel::setSelection(AccountObject *selection)
     }
 }
 
+}

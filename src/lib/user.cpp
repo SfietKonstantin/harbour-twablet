@@ -49,7 +49,7 @@ User::User(const QJsonObject &json)
     m_favouritesCount = json.value(QLatin1String("favourites_count")).toInt();
     m_imageUrl = std::move(json.value(QLatin1String("profile_image_url_https")).toString());
     m_bannerUrl = std::move(json.value(QLatin1String("profile_banner_url")).toString());
-    m_createdAt = std::move(fromUtc(json.value(QLatin1String("created_at")).toString()));
+    m_createdAt = std::move(private_util::fromUtc(json.value(QLatin1String("created_at")).toString()));
 
     const QJsonObject &entities (json.value(QLatin1String("entities")).toObject());
     m_descriptionEntities = Entity::create(entities.value(QLatin1String("description")).toObject());

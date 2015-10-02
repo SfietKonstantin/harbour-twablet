@@ -32,6 +32,8 @@
 #include "querylistmodel.h"
 #include "queryobject.h"
 
+namespace qml
+{
 
 QueryListModel::QueryListModel(QObject *parent) :
     QAbstractListModel(parent)
@@ -91,4 +93,6 @@ int QueryListModel::getType(int index)
 QHash<int, QByteArray> QueryListModel::roleNames() const
 {
     return {{NameRole, "name"}, {QueryTypeRole, "type"}};
+}
+
 }

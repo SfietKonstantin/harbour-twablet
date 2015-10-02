@@ -35,11 +35,14 @@
 #include "abstractqueryitem.h"
 #include "tweetobject.h"
 
+namespace qml
+{
+
 class TweetQueryItem : public AbstractQueryItem
 {
     Q_OBJECT
     Q_PROPERTY(QString tweetId READ tweetId WRITE setTweetId NOTIFY tweetIdChanged)
-    Q_PROPERTY(TweetObject * data READ data NOTIFY dataChanged)
+    Q_PROPERTY(qml::TweetObject * data READ data NOTIFY dataChanged)
 public:
     explicit TweetQueryItem(QObject *parent = 0);
     DISABLE_COPY_DISABLE_MOVE(TweetQueryItem);
@@ -60,5 +63,7 @@ private:
     QString m_tweetId {};
     QObjectPtr<TweetObject> m_data {};
 };
+
+}
 
 #endif // TWEETQUERYITEM_H

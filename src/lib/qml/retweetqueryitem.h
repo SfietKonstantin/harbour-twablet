@@ -34,6 +34,9 @@
 
 #include "abstractqueryitem.h"
 
+namespace qml
+{
+
 class RetweetQueryItem : public AbstractQueryItem
 {
     Q_OBJECT
@@ -52,5 +55,7 @@ private:
                      const QString &errorMessage) override final;
     QString m_tweetId {};
 };
+
+}
 
 #endif // RETWEETQUERYITEM_H

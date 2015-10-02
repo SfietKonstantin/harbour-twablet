@@ -31,6 +31,9 @@
 
 #include "usermodel.h"
 
+namespace qml
+{
+
 UserModel::UserModel(QObject *parent) :
     Model<User, UserObject>(parent)
 {
@@ -61,3 +64,4 @@ QHash<int, QByteArray> UserModel::roleNames() const
     return {{IdRole, "id"}, {ItemRole, "item"}};
 }
 
+}

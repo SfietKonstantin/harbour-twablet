@@ -35,11 +35,14 @@
 #include "abstractqueryitem.h"
 #include "userobject.h"
 
+namespace qml
+{
+
 class UserQueryItem : public AbstractQueryItem
 {
     Q_OBJECT
     Q_PROPERTY(QString userId READ userId WRITE setUserId NOTIFY userIdChanged)
-    Q_PROPERTY(UserObject * user READ user NOTIFY userChanged)
+    Q_PROPERTY(qml::UserObject * user READ user NOTIFY userChanged)
 public:
     explicit UserQueryItem(QObject *parent = 0);
     DISABLE_COPY_DISABLE_MOVE(UserQueryItem);
@@ -57,5 +60,7 @@ private:
     QString m_userId {};
     QObjectPtr<UserObject> m_user {nullptr};
 };
+
+}
 
 #endif // USERQUERYITEM_H

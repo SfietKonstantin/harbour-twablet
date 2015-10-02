@@ -31,6 +31,9 @@
 
 #include "layoutmodel.h"
 
+namespace qml
+{
+
 LayoutModel::LayoutModel(QObject *parent) :
     Model<Layout, LayoutObject>(parent)
 {
@@ -65,4 +68,6 @@ QVariant LayoutModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> LayoutModel::roleNames() const
 {
     return {{NameRole, "name"}, {QueryTypeRole, "queryType"}, {UnreadRole, "unread"}, {LayoutRole, "layout"}};
+}
+
 }

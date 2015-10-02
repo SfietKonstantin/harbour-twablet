@@ -60,33 +60,33 @@
 
 int main(int argc, char *argv[])
 {
-    qmlRegisterUncreatableType<DataRepositoryObject>("harbour.twablet", 1, 0, "DataRepository", QLatin1String("Uncreatable"));
-    qmlRegisterUncreatableType<IModel>("harbour.twablet", 1, 0, "Model", QLatin1String("Uncreatable"));
-    qmlRegisterUncreatableType<AccountObject>("harbour.twablet", 1, 0, "Account", QLatin1String("Uncreatable"));
-    qmlRegisterUncreatableType<LayoutObject>("harbour.twablet", 1, 0, "Layout", QLatin1String("Uncreatable"));
-    qmlRegisterUncreatableType<QueryObject>("harbour.twablet", 1, 0, "Query", QLatin1String("Uncreatable"));
-    qmlRegisterUncreatableType<TweetObject>("harbour.twablet", 1, 0, "Tweet", QLatin1String("Uncreatable"));
-    qmlRegisterUncreatableType<UserObject>("harbour.twablet", 1, 0, "User", QLatin1String("Uncreatable"));
-    qmlRegisterUncreatableType<MediaObject>("harbour.twablet", 1, 0, "Media", QLatin1String("Uncreatable"));
-    qmlRegisterUncreatableType<MediaModel>("harbour.twablet", 1, 0, "MediaModel", QLatin1String("Uncreatable"));
-    qmlRegisterUncreatableType<AbstractQueryItem>("harbour.twablet", 1, 0, "QueryItem", QLatin1String("Uncreatable"));
-    qmlRegisterType<TwitterAuthentification>("harbour.twablet", 1, 0, "TwitterAuthentification");
-    qmlRegisterType<AccountModel>("harbour.twablet", 1, 0, "AccountModel");
-    qmlRegisterType<AccountSelectionModel>("harbour.twablet", 1, 0, "AccountSelectionModel");
-    qmlRegisterType<LayoutModel>("harbour.twablet", 1, 0, "LayoutModel");
-    qmlRegisterType<TweetModel>("harbour.twablet", 1, 0, "TweetModel");
-    qmlRegisterType<QueryListModel>("harbour.twablet", 1, 0, "QueryListModel");
-    qmlRegisterType<StatusUpdateQueryItem>("harbour.twablet", 1, 0, "StatusUpdateQueryItem");
-    qmlRegisterType<UserQueryItem>("harbour.twablet", 1, 0, "UserQueryItem");
-    qmlRegisterType<DescriptionFormatter>("harbour.twablet", 1, 0, "DescriptionFormatter");
-    qmlRegisterType<TweetFormatter>("harbour.twablet", 1, 0, "TweetFormatter");
-    qmlRegisterType<UserModel>("harbour.twablet", 1, 0, "UserModel");
-    qmlRegisterType<TweetQueryItem>("harbour.twablet", 1, 0, "TweetQueryItem");
-    qmlRegisterType<RetweetQueryItem>("harbour.twablet", 1, 0, "RetweetQueryItem");
-    qmlRegisterType<FavoriteQueryItem>("harbour.twablet", 1, 0, "FavoriteQueryItem");
-    qmlRegisterSingletonType<DataRepositoryObject>("harbour.twablet", 1, 0, "Repository",
+    qmlRegisterUncreatableType<qml::DataRepositoryObject>("harbour.twablet", 1, 0, "DataRepository", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<qml::IModel>("harbour.twablet", 1, 0, "Model", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<qml::AccountObject>("harbour.twablet", 1, 0, "Account", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<qml::LayoutObject>("harbour.twablet", 1, 0, "Layout", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<qml::QueryObject>("harbour.twablet", 1, 0, "Query", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<qml::TweetObject>("harbour.twablet", 1, 0, "Tweet", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<qml::UserObject>("harbour.twablet", 1, 0, "User", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<qml::MediaObject>("harbour.twablet", 1, 0, "Media", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<qml::MediaModel>("harbour.twablet", 1, 0, "MediaModel", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<qml::AbstractQueryItem>("harbour.twablet", 1, 0, "QueryItem", QLatin1String("Uncreatable"));
+    qmlRegisterType<qml::TwitterAuthentification>("harbour.twablet", 1, 0, "TwitterAuthentification");
+    qmlRegisterType<qml::AccountModel>("harbour.twablet", 1, 0, "AccountModel");
+    qmlRegisterType<qml::AccountSelectionModel>("harbour.twablet", 1, 0, "AccountSelectionModel");
+    qmlRegisterType<qml::LayoutModel>("harbour.twablet", 1, 0, "LayoutModel");
+    qmlRegisterType<qml::TweetModel>("harbour.twablet", 1, 0, "TweetModel");
+    qmlRegisterType<qml::QueryListModel>("harbour.twablet", 1, 0, "QueryListModel");
+    qmlRegisterType<qml::StatusUpdateQueryItem>("harbour.twablet", 1, 0, "StatusUpdateQueryItem");
+    qmlRegisterType<qml::UserQueryItem>("harbour.twablet", 1, 0, "UserQueryItem");
+    qmlRegisterType<qml::DescriptionFormatter>("harbour.twablet", 1, 0, "DescriptionFormatter");
+    qmlRegisterType<qml::TweetFormatter>("harbour.twablet", 1, 0, "TweetFormatter");
+    qmlRegisterType<qml::UserModel>("harbour.twablet", 1, 0, "UserModel");
+    qmlRegisterType<qml::TweetQueryItem>("harbour.twablet", 1, 0, "TweetQueryItem");
+    qmlRegisterType<qml::RetweetQueryItem>("harbour.twablet", 1, 0, "RetweetQueryItem");
+    qmlRegisterType<qml::FavoriteQueryItem>("harbour.twablet", 1, 0, "FavoriteQueryItem");
+    qmlRegisterSingletonType<qml::DataRepositoryObject>("harbour.twablet", 1, 0, "Repository",
                                                           [](QQmlEngine *e, QJSEngine *) -> QObject * {
-        return new DataRepositoryObject(e);
+        return new qml::DataRepositoryObject(e);
     });
 
 #ifndef DESKTOP

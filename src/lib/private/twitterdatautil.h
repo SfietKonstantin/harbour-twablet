@@ -38,6 +38,9 @@
 #include <vector>
 #include <utility>
 
+namespace private_util
+{
+
 class TwitterDataUtil {
 public:
     static QByteArray authorizationHeader(const QByteArray &oauthConsumerKey,
@@ -50,5 +53,7 @@ public:
                                           const QByteArray &oauthNonce = QByteArray(),
                                           const QByteArray &oauthTimestamp = QByteArray());
 };
+
+}
 
 #endif // TWITTERDATAUTIL_P_H

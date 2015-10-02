@@ -38,14 +38,17 @@
 #include "mediamodel.h"
 #include "model.h"
 
+namespace qml
+{
+
 class TweetObject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString id READ id CONSTANT)
     Q_PROPERTY(QString originalId READ originalId CONSTANT)
     Q_PROPERTY(QString text READ text CONSTANT)
-    Q_PROPERTY(UserObject * user READ user CONSTANT)
-    Q_PROPERTY(UserObject * retweetingUser READ retweetingUser CONSTANT)
+    Q_PROPERTY(qml::UserObject * user READ user CONSTANT)
+    Q_PROPERTY(qml::UserObject * retweetingUser READ retweetingUser CONSTANT)
     Q_PROPERTY(QDateTime timestamp READ timestamp CONSTANT)
     Q_PROPERTY(int favoriteCount READ favoriteCount CONSTANT)
     Q_PROPERTY(bool favorited READ isFavorited NOTIFY favoritedChanged)
@@ -54,7 +57,7 @@ class TweetObject : public QObject
     Q_PROPERTY(QString inReplyTo READ inReplyTo CONSTANT)
     Q_PROPERTY(QString source READ source CONSTANT)
     Q_PROPERTY(QString sourceName READ sourceName CONSTANT)
-    Q_PROPERTY(MediaModel * media READ media CONSTANT)
+    Q_PROPERTY(qml::MediaModel * media READ media CONSTANT)
 public:
     DISABLE_COPY_DISABLE_MOVE(TweetObject);
     static TweetObject * create(const Tweet &data, QObject *parent = 0);
@@ -85,5 +88,7 @@ private:
     QString m_sourceName {};
     QObjectPtr<MediaModel> m_media {nullptr};
 };
+
+}
 
 #endif // TWEETOBJECT_H

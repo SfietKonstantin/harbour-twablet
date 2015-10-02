@@ -42,7 +42,9 @@
 #include <QtCore/QUrl>
 #include <QtCore/QStringList>
 #include <QtCore/QMessageAuthenticationCode>
-#include <QtCore/QDebug>
+
+namespace private_util
+{
 
 static const char *OAUTH_SIGNATURE_METHOD = "HMAC-SHA1";
 static const char *OAUTH_VERSION = "1.0";
@@ -109,3 +111,4 @@ QByteArray TwitterDataUtil::authorizationHeader(const QByteArray &oauthConsumerK
     return authHeader;
 }
 
+}

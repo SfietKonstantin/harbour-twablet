@@ -34,6 +34,9 @@
 
 #include "abstractqueryitem.h"
 
+namespace qml
+{
+
 class StatusUpdateQueryItem : public AbstractQueryItem
 {
     Q_OBJECT
@@ -57,5 +60,7 @@ private:
     QString m_text {};
     QString m_inReplyTo {};
 };
+
+}
 
 #endif // STATUSUPDATEQUERYITEM_H

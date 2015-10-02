@@ -35,12 +35,17 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QLocale>
 
+namespace private_util
+{
+
 static QDateTime fromUtc(const QString &timeUtc)
 {
     QLocale locale (QLocale::English, QLocale::UnitedStates);
     QDateTime utc {locale.toDateTime(timeUtc, QLatin1String("ddd MMM dd HH:mm:ss +0000 yyyy"))};
     utc.setTimeSpec(Qt::UTC);
     return utc.toLocalTime();
+}
+
 }
 
 

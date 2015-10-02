@@ -40,6 +40,10 @@ class MediaEntity;
 class UrlEntity;
 class UserMentionEntity;
 class HashtagEntity;
+
+namespace qml
+{
+
 class EntitiesFormatter : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
@@ -63,5 +67,7 @@ private:
     bool m_complete {false};
     QString m_text {};
 };
+
+}
 
 #endif // ENTITIESFORMATTER_H

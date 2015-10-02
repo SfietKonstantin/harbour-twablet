@@ -39,6 +39,9 @@
 #include "tweetcentralrepository.h"
 #include "usercentralrepository.h"
 
+namespace qml
+{
+
 class AccountObject;
 class DataRepositoryObject : public QObject
 {
@@ -73,12 +76,12 @@ public slots:
     void refresh();
     void loadMore(int layoutIndex);
     // Temporary layout
-    int addTemporaryLayout(AccountObject *account, int queryType, const QVariantMap &arguments);
+    int addTemporaryLayout(qml::AccountObject *account, int queryType, const QVariantMap &arguments);
     void removeTemporaryLayout(int index);
     void clearTemporary();
     void refreshTemporary(int index);
     // Users
-    int addUser(AccountObject *account, int queryType, const QVariantMap &arguments);
+    int addUser(qml::AccountObject *account, int queryType, const QVariantMap &arguments);
     void removeUser(int index);
     void userLoadMore(int index);
     // Action on tweets
@@ -107,5 +110,7 @@ private:
     UserCentralRepository m_userCentralRepository {};
     int m_temporaryLayoutsIndex {0};
 };
+
+}
 
 #endif // DATAREPOSITORYOBJECT_H

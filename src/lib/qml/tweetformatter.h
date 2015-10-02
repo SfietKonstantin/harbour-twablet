@@ -34,11 +34,14 @@
 
 #include "entitiesformatter.h"
 
+namespace qml
+{
+
 class TweetObject;
 class TweetFormatter: public EntitiesFormatter
 {
     Q_OBJECT
-    Q_PROPERTY(TweetObject * tweet READ tweet WRITE setTweet NOTIFY tweetChanged)
+    Q_PROPERTY(qml::TweetObject * tweet READ tweet WRITE setTweet NOTIFY tweetChanged)
 public:
     explicit TweetFormatter(QObject *parent = 0);
     TweetObject * tweet() const;
@@ -49,5 +52,7 @@ private:
     void format() override;
     TweetObject *m_tweet {nullptr};
 };
+
+}
 
 #endif // TWEETFORMATTER_H

@@ -35,11 +35,14 @@
 #include "entitiesformatter.h"
 #include <QtQml/QQmlParserStatus>
 
+namespace qml
+{
+
 class UserObject;
 class DescriptionFormatter : public EntitiesFormatter
 {
     Q_OBJECT
-    Q_PROPERTY(UserObject * user READ user WRITE setUser NOTIFY userChanged)
+    Q_PROPERTY(qml::UserObject * user READ user WRITE setUser NOTIFY userChanged)
 public:
     explicit DescriptionFormatter(QObject *parent = 0);
     UserObject * user() const;
@@ -50,5 +53,7 @@ private:
     void format() override;
     UserObject *m_user {nullptr};
 };
+
+}
 
 #endif // DESCRIPTIONFORMATTER_H

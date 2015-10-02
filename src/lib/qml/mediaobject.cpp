@@ -31,6 +31,9 @@
 
 #include "mediaobject.h"
 
+namespace qml
+{
+
 MediaObject::MediaObject(const MediaEntity &data, QObject *parent)
     : QObject(parent), m_data{data}
 {
@@ -65,4 +68,6 @@ QSize MediaObject::size() const
 int MediaObject::duration() const
 {
     return m_data.duration();
+}
+
 }

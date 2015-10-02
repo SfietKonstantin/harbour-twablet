@@ -36,6 +36,9 @@
 #include "account.h"
 #include "model.h"
 
+namespace qml
+{
+
 class AccountObject : public QObject
 {
     Q_OBJECT
@@ -59,5 +62,7 @@ private:
     Account m_data {};
     friend class Model<Account, AccountObject>;
 };
+
+}
 
 #endif // ACCOUNTOBJECT_H

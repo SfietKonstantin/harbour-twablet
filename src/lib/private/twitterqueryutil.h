@@ -38,6 +38,10 @@
 
 class QNetworkAccessManager;
 class QNetworkReply;
+
+namespace private_util
+{
+
 class TwitterQueryUtil
 {
 public:
@@ -61,5 +65,7 @@ private:
                                              const std::map<QByteArray, QByteArray> &postData,
                                              const Account &account);
 };
+
+}
 
 #endif // TWITTERQUERYUTIL_H

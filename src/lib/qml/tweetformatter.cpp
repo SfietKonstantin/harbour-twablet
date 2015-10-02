@@ -32,6 +32,9 @@
 #include "tweetformatter.h"
 #include "tweetobject.h"
 
+namespace qml
+{
+
 TweetFormatter::TweetFormatter(QObject *parent)
     : EntitiesFormatter(parent)
 {
@@ -58,5 +61,7 @@ void TweetFormatter::format()
         return;
     }
     doFormat(m_tweet->text(), m_tweet->data().entities());
+}
+
 }
 

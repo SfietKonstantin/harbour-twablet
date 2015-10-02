@@ -37,6 +37,9 @@
 #include "globals.h"
 #include "qobjectutils.h"
 
+namespace qml
+{
+
 class TwitterAuthentification : public QObject
 {
     Q_OBJECT
@@ -77,4 +80,7 @@ private:
     QString m_userId {};
     QString m_screenName {};
 };
+
+}
+
 #endif // TWITTERAUTHENTIFICATION_H

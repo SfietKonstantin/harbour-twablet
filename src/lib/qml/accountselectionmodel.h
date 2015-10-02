@@ -34,11 +34,14 @@
 
 #include "accountmodel.h"
 
+namespace qml
+{
+
 class AccountSelectionModel : public AccountModel
 {
     Q_OBJECT
     Q_PROPERTY(int index READ index WRITE setIndex NOTIFY indexChanged)
-    Q_PROPERTY(AccountObject * selection READ selection NOTIFY selectionChanged)
+    Q_PROPERTY(qml::AccountObject * selection READ selection NOTIFY selectionChanged)
 public:
     explicit AccountSelectionModel(QObject *parent = 0);
     int index() const;
@@ -52,5 +55,7 @@ private:
     int m_index {-1};
     AccountObject * m_selection {nullptr};
 };
+
+}
 
 #endif // ACCOUNTSELECTIONMODEL_H

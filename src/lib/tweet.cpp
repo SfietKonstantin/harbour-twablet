@@ -57,7 +57,7 @@ Tweet::Tweet(const QJsonObject &json)
     m_retweeted = displayedTweet.value(QLatin1String("retweeted")).toBool();
     m_inReplyTo = std::move(displayedTweet.value(QLatin1String("in_reply_to_status_id")).toString());
     m_source = std::move(tweet.value(QLatin1String("source")).toString());
-    m_timestamp = std::move(fromUtc(displayedTweet.value(QLatin1String("created_at")).toString()));
+    m_timestamp = std::move(private_util::fromUtc(displayedTweet.value(QLatin1String("created_at")).toString()));
     m_user = std::move(User(displayedTweet.value(QLatin1String("user")).toObject()));
 
     QJsonObject entities {displayedTweet.value(QLatin1String("entities")).toObject()};

@@ -33,6 +33,9 @@
 #include "private/twitterqueryutil.h"
 #include "accountobject.h"
 
+namespace qml
+{
+
 StatusUpdateQueryItem::StatusUpdateQueryItem(QObject *parent)
     : AbstractQueryItem(parent)
 {
@@ -77,7 +80,7 @@ QNetworkReply * StatusUpdateQueryItem::createQuery() const
         parameters.insert({"in_reply_to_status_id", QUrl::toPercentEncoding(m_inReplyTo)});
     }
 
-    return TwitterQueryUtil::post(network(), path, {}, parameters, account()->data());
+    return private_util::TwitterQueryUtil::post(network(), path, {}, parameters, account()->data());
 }
 
 void StatusUpdateQueryItem::handleReply(const QByteArray &reply,
@@ -91,4 +94,6 @@ void StatusUpdateQueryItem::handleReply(const QByteArray &reply,
             setStatusAndErrorMessage(Error, tr("Sending the same tweet twice is not allowed."));
         }
     }
+}
+
 }

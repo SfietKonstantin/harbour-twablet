@@ -36,6 +36,9 @@
 #include <QtCore/QUrlQuery>
 #include <QtNetwork/QNetworkAccessManager>
 
+namespace private_util
+{
+
 #ifndef USE_MOCK_SERVER
 static const char *TWITTER_API_URL = "https://api.twitter.com/1.1/";
 #else
@@ -103,4 +106,6 @@ QNetworkRequest TwitterQueryUtil::createPostRequest(const QString &path,
     QNetworkRequest request {createRequest("POST", path, parameters, postData, account)};
     request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("application/x-www-form-urlencoded"));
     return request;
+}
+
 }
