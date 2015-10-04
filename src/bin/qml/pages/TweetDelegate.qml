@@ -57,7 +57,7 @@ MouseArea {
 
         BackgroundItem {
             id: retweet
-            property bool isRetweet: tweet.retweetingUser !== null
+            property bool isRetweet: tweet ? tweet.retweetingUser !== null : false
             anchors.left: parent.left
             anchors.right: parent.right
             visible: isRetweet
@@ -101,7 +101,7 @@ MouseArea {
                 anchors.left: parent.left; anchors.leftMargin: header.padding
                 width: Theme.itemSizeSmall
                 height: Theme.itemSizeSmall
-                source: container.tweet.user.imageUrl
+                source: container.tweet ? container.tweet.user.imageUrl : ""
             }
 
             Column {
@@ -113,7 +113,7 @@ MouseArea {
                 Label {
                     color: header.down ? Theme.highlightColor : Theme.primaryColor
                     anchors.left: parent.left; anchors.right: parent.right
-                    text: container.tweet.user.name
+                    text: container.tweet ? container.tweet.user.name : ""
                 }
 
                 Label {
@@ -121,13 +121,13 @@ MouseArea {
                     color: header.down ? Theme.secondaryHighlightColor : Theme.secondaryColor
                     font.pixelSize: Theme.fontSizeSmall
                     anchors.left: parent.left; anchors.right: parent.right
-                    text: "@" + container.tweet.user.screenName
+                    text: "@" + (container.tweet ? container.tweet.user.screenName : "")
                 }
             }
 
             Column {
                 id: indicators
-                visible: container.tweet.favorited || container.tweet.retweeted
+                visible: container.tweet ? (container.tweet.favorited || container.tweet.retweeted) : false
                 width: visible ? Theme.iconSizeSmall + Theme.paddingSmall : 0
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.paddingMedium + header.padding
@@ -136,13 +136,13 @@ MouseArea {
                     width: Theme.iconThemeSmall
                     height: Theme.iconThemeSmall
                     source: "image://theme/icon-s-retweet?" + Theme.highlightColor
-                    visible: container.tweet.retweeted
+                    visible: container.tweet ? container.tweet.retweeted : false
                 }
                 Image {
                     width: Theme.iconThemeSmall
                     height: Theme.iconThemeSmall
                     source: "image://theme/icon-s-favorite?" + Theme.highlightColor
-                    visible: container.tweet.favorited
+                    visible: container.tweet ? container.tweet.favorited : false
                 }
             }
         }
@@ -176,7 +176,7 @@ MouseArea {
 
             Grid {
                 id: mediaGrid
-                visible: container.tweet.media.count > 0
+                visible: container.tweet ? container.tweet.media.count > 0 : false
                 property real smallSize: mediaGrid.width * 2 / 3
                 property real largeSize: mediaGrid.width * 2 / 3
                 anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
@@ -185,7 +185,7 @@ MouseArea {
                 rows: 2
 
                 Repeater {
-                    model: container.tweet.media
+                    model: container.tweet ? container.tweet.media : null
                     delegate: TwitterImage {
                         property bool isFirst: index === 0
                         property bool isSingle: index === 0 && container.tweet.media.count === 1
@@ -201,12 +201,14 @@ MouseArea {
 
 
         Label {
+            property string source: container.tweet ? container.tweet.sourceName : ""
+            property var timestamp: container.tweet ? container.tweet.timestamp : null
             anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
             anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
             color: Theme.secondaryHighlightColor
             font.pixelSize: Theme.fontSizeSmall
             wrapMode: Text.Wrap
-            text: container.tweet.sourceName + " | " + Format.formatDate(container.tweet.timestamp, Formatter.DurationElapsed)
+            text: source + " | " + Format.formatDate(timestamp, Formatter.DurationElapsed)
         }
     }
 }

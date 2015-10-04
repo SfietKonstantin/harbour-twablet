@@ -107,14 +107,14 @@ Page {
                ProgressIconButton {
                    source: "image://theme/icon-s-retweet"
                    enabled: query.data ? !query.data.retweeted && container.account.userId !== query.data.user.id: false
-                   highlighted: down || query.data.retweeted
+                   highlighted: down || (query.data ? query.data.retweeted : false)
                    busy: retweetQuery.status === QueryItem.Loading
                    error: retweetQuery.status === QueryItem.Error
                    onClicked: retweetQuery.load()
                }
                ProgressIconButton {
                    source: "image://theme/icon-s-favorite"
-                   highlighted: down || query.data.favorited
+                   highlighted: down || (query.data ? query.data.favorited : false)
                    busy: favoriteQuery.status === QueryItem.Loading
                    error: favoriteQuery.status === QueryItem.Error
                    onClicked: favoriteQuery.load()
