@@ -41,6 +41,7 @@ public:
     explicit Layout() = default;
     explicit Layout(const QString &name, const QString &userId, Query &&query);
     DEFAULT_COPY_DEFAULT_MOVE(Layout);
+    bool isNull() const;
     QString name() const;
     void setName(const QString &name);
     QString userId() const;

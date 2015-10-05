@@ -32,41 +32,65 @@
 #include <QtTest/QtTest>
 #include <QtTest/QSignalSpy>
 #include <qml/datarepositoryobject.h>
-#include <qml/accountmodel.h>
+#include <qml/layoutmodel.h>
+#include <QtCore/QDebug>
 
-class TstAccount: public QObject
+class TstLayout: public QObject
 {
     Q_OBJECT
 private Q_SLOTS:
-    void testAccount()
+    void testLayout()
     {
-        Account account {
-            QLatin1String("Test Account"),
-            QLatin1String("1"),
-            QLatin1String("account"),
-            QByteArray("token"),
-            QByteArray("tokenSecret")
+        Query::Arguments arguments {
+            {QLatin1String("test1"), QLatin1String("value1")},
+            {QLatin1String("test2"), QLatin1String("value2")}
+        };
+        Query query {Query::Mentions, std::move(Query::Arguments(arguments))}; // Copy arguments
+        Layout layout {
+            QLatin1String("Layout name"),
+            QLatin1String("userId"),
+            std::move(query)
         };
 
-        Account movedAccount {std::move(account)};
-        QVERIFY(account.isNull());
-        QVERIFY(!movedAccount.isNull());
-        QCOMPARE(movedAccount.name(), QLatin1String("Test Account"));
-        QCOMPARE(movedAccount.userId(), QLatin1String("1"));
-        QCOMPARE(movedAccount.screenName(), QLatin1String("account"));
-        QCOMPARE(movedAccount.token(), QByteArray("token"));
-        QCOMPARE(movedAccount.tokenSecret(), QByteArray("tokenSecret"));
+        QVERIFY(!layout.query().isNull());
+        QCOMPARE(layout.query().type(), Query::Mentions);
+        QCOMPARE(layout.query().arguments(), arguments);
+        QCOMPARE(layout.unread(), 0);
 
-        movedAccount.setName(QLatin1String("New Account"));
-        QCOMPARE(movedAccount.name(), QLatin1String("New Account"));
+        Layout movedLayout {std::move(layout)};
+        QVERIFY(layout.isNull());
+        QVERIFY(!movedLayout.isNull());
+        QVERIFY(!movedLayout.query().isNull());
+        QCOMPARE(movedLayout.name(), QLatin1String("Layout name"));
+        QCOMPARE(movedLayout.userId(), QLatin1String("userId"));
+        QCOMPARE(movedLayout.query().type(), Query::Mentions);
+        QCOMPARE(movedLayout.query().arguments(), arguments);
+        QCOMPARE(movedLayout.unread(), 0);
+
+        movedLayout.setName(QLatin1String("New layout"));
+        QCOMPARE(movedLayout.name(), QLatin1String("New layout"));
+        movedLayout.setUserId(QLatin1String("1"));
+        QCOMPARE(movedLayout.userId(), QLatin1String("1"));
+
+        Query::Arguments newArguments {
+            {QLatin1String("newTest1"), QLatin1String("newValue1")},
+            {QLatin1String("newTest2"), QLatin1String("newValue2")}
+        };
+        Query newQuery {Query::Friends, std::move(Query::Arguments(newArguments))}; // Copy arguments
+        movedLayout.setQuery(std::move(newQuery));
+        QCOMPARE(movedLayout.query().type(), Query::Friends);
+        QCOMPARE(movedLayout.query().arguments(), newArguments);
+        movedLayout.setUnread(123);
+        QCOMPARE(movedLayout.unread(), 123);
+
     }
 
     void testRepo()
     {
-        AccountRepository repository {};
+        LayoutRepository repository {};
         for (int i = 0; i < 4; ++i) {
-            repository.append(Account(QString::number(i + 1), QString(), QString(),
-                                      QByteArray(), QByteArray()));
+            Query query {Query::Home, std::move(Query::Arguments())};
+            repository.append(Layout(QString::number(i + 1), QString(), std::move(query)));
         }
         QCOMPARE((std::begin(repository) + 0)->name(), QString::number(1));
         QCOMPARE((std::begin(repository) + 1)->name(), QString::number(2));
@@ -83,14 +107,14 @@ private Q_SLOTS:
     void testModel()
     {
         qml::DataRepositoryObject repositoryObject {};
-        AccountRepository &repository (repositoryObject.accounts());
+        LayoutRepository &repository (repositoryObject.layouts());
 
         for (int i = 0; i < 3; ++i) {
-            repository.append(Account(QString::number(i + 1), QString(), QString(),
-                                             QByteArray(), QByteArray()));
+            Query query {Query::Home, std::move(Query::Arguments())};
+            repository.append(Layout(QString::number(i + 1), QString(), std::move(query)));
         }
 
-        qml::AccountModel model {};
+        qml::LayoutModel model {};
         model.classBegin();
         model.setRepository(&repositoryObject);
         model.componentComplete();
@@ -100,8 +124,10 @@ private Q_SLOTS:
         QCOMPARE(getObject(model, 1)->name(), QString::number(2));
         QCOMPARE(getObject(model, 2)->name(), QString::number(3));
 
-        repository.append(Account(QString::number(4), QString(), QString(),
-                                  QByteArray(), QByteArray()));
+        {
+            Query query {Query::Home, std::move(Query::Arguments())};
+            repository.append(Layout(QString::number(4), QString(), std::move(query)));
+        }
 
         QCOMPARE(model.count(), 4);
         QCOMPARE(getObject(model, 0)->name(), QString::number(1));
@@ -116,14 +142,14 @@ private Q_SLOTS:
         QCOMPARE(getObject(model, 2)->name(), QString::number(4));
     }
 private:
-    static qml::AccountObject * getObject(qml::AccountModel &model, int index)
+    static qml::LayoutObject * getObject(qml::LayoutModel &model, int index)
     {
-        return model.data(model.index(index), qml::AccountModel::AccountRole).value<qml::AccountObject *>();
+        return model.data(model.index(index), qml::LayoutModel::LayoutRole).value<qml::LayoutObject *>();
     }
 };
 
 
-QTEST_MAIN(TstAccount)
+QTEST_MAIN(TstLayout)
 
-#include "tst_account.moc"
+#include "tst_layout.moc"
 

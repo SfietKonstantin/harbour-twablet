@@ -36,6 +36,11 @@ Query::Query(Type type, Arguments &&arguments)
 {
 }
 
+bool Query::isNull() const
+{
+    return (m_type == Invalid);
+}
+
 Query::Type Query::type() const
 {
     return m_type;

@@ -54,6 +54,7 @@ public:
     explicit Query() = default;
     explicit Query(Type type, Arguments &&arguments);
     DEFAULT_COPY_DEFAULT_MOVE(Query);
+    bool isNull() const;
     Type type() const;
     Arguments arguments() const;
     bool operator==(const Query &other) const;
