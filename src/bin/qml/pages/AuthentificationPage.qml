@@ -85,6 +85,10 @@ Dialog {
                 id: drawer
                 height: flickable.height - header.height
                 anchors.left: parent.left; anchors.right: parent.right
+                function continueAuthentification() {
+                    container.state = "continueRequest"
+                    authentification.continueRequest()
+                }
 
                 Drawer {
                     anchors.fill: parent
@@ -113,15 +117,15 @@ Dialog {
                             anchors.left: parent.left; anchors.right: parent.right
                             placeholderText: qsTr("Enter PIN code here")
                             inputMethodHints: Qt.ImhDigitsOnly
+                            EnterKey.enabled: text.length > 0
+                            EnterKey.iconSource: "icon-m-enter-accept"
+                            EnterKey.onClicked: drawer.continueAuthentification()
                         }
 
                         Button {
                             text: qsTr("Log in")
                             anchors.horizontalCenter: parent.horizontalCenter
-                            onClicked: {
-                                container.state = "continueRequest"
-                                authentification.continueRequest()
-                            }
+                            onClicked: drawer.continueAuthentification()
                             enabled: pinField.text.length > 0
                         }
                     }
