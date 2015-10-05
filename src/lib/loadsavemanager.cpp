@@ -39,7 +39,6 @@
 #include <QtCore/QLoggingCategory>
 
 LoadSaveManager::LoadSaveManager()
-    : m_configFilePath{configFilePath()}
 {
 }
 
@@ -71,16 +70,22 @@ QString LoadSaveManager::configFilePath()
 
 bool LoadSaveManager::load(ILoadSave &loadSave)
 {
-    QFile file {m_configFilePath};
+    const QString &path {configFilePath()};
+    if (path.isEmpty()) {
+        qCDebug(QLoggingCategory("load-save-manager")) << "Failed to find config file";
+        return false;
+    }
+
+    QFile file {path};
     if (!file.exists()) {
         qCDebug(QLoggingCategory("load-save-manager")) << "Failed to find config file"
-                                                       << m_configFilePath;
+                                                       << path;
         return true; // No file, so no config to load
     }
 
     if (!file.open(QIODevice::ReadOnly)) {
         qCWarning(QLoggingCategory("load-save-manager")) << "Failed to open config file"
-                                                         << m_configFilePath;
+                                                         << path;
         return false;
     }
     QJsonParseError error {-1, QJsonParseError::NoError};
@@ -99,10 +104,16 @@ bool LoadSaveManager::load(ILoadSave &loadSave)
 
 bool LoadSaveManager::save(const ILoadSave &loadSave)
 {
-    QFile file {m_configFilePath};
+    const QString &path {configFilePath()};
+    if (path.isEmpty()) {
+        qCDebug(QLoggingCategory("load-save-manager")) << "Failed to find config file";
+        return false;
+    }
+
+    QFile file {path};
     if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
         qCWarning(QLoggingCategory("load-save-manager")) << "Failed to open config file"
-                                                         << m_configFilePath;
+                                                         << path;
         return false;
     }
     QJsonParseError error {-1, QJsonParseError::NoError};
@@ -114,20 +125,6 @@ bool LoadSaveManager::save(const ILoadSave &loadSave)
     file.resize(0);
     file.write(document.toJson(QJsonDocument::Indented));
     file.close();
-    return true;
-}
-
-bool LoadSaveManager::clear()
-{
-    QFile configFile {m_configFilePath};
-    if (!configFile.exists()) {
-        return true;
-    }
-    if (!configFile.remove()) {
-        qCWarning(QLoggingCategory("load-save-manager")) << "Failed to remove config file"
-                                                         << m_configFilePath;
-        return false;
-    }
     return true;
 }
 

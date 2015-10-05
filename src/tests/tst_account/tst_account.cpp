@@ -31,7 +31,6 @@
 
 #include <QtTest/QtTest>
 #include <QtTest/QSignalSpy>
-#include <loadsavemanager.h>
 #include <qml/datarepositoryobject.h>
 #include <qml/accountmodel.h>
 
@@ -41,7 +40,29 @@ class TstAccount: public QObject
 private Q_SLOTS:
     void initTestCase()
     {
-        QVERIFY(LoadSaveManager().clear());
+    }
+
+    void testAccount()
+    {
+        Account account {
+            QLatin1String("Test Account"),
+            QLatin1String("1"),
+            QLatin1String("account"),
+            QByteArray("token"),
+            QByteArray("tokenSecret")
+        };
+
+        Account movedAccount {std::move(account)};
+        QVERIFY(account.isNull());
+        QVERIFY(!movedAccount.isNull());
+        QCOMPARE(movedAccount.name(), QLatin1String("Test Account"));
+        QCOMPARE(movedAccount.userId(), QLatin1String("1"));
+        QCOMPARE(movedAccount.screenName(), QLatin1String("account"));
+        QCOMPARE(movedAccount.token(), QByteArray("token"));
+        QCOMPARE(movedAccount.tokenSecret(), QByteArray("tokenSecret"));
+
+        movedAccount.setName(QLatin1String("New Account"));
+        QCOMPARE(movedAccount.name(), QLatin1String("New Account"));
     }
 
     void testRepo()

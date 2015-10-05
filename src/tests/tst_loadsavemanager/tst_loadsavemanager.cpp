@@ -29,8 +29,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
+#include <QtCore/QStandardPaths>
+#include <QtCore/QFileInfo>
 #include <QtTest/QtTest>
-#include <QtTest/QSignalSpy>
+#include <memory>
 #include <loadsavemanager.h>
 
 class SimpleLoadSave: public ILoadSave
@@ -77,7 +79,9 @@ class TstLoadSaveManager: public QObject
 private Q_SLOTS:
     void initTestCase()
     {
-        QVERIFY(m_loadSaveManager.clear());
+        QStandardPaths::setTestModeEnabled(true);
+        m_loadSaveManager.reset(new LoadSaveManager());
+        resetTestCase();
     }
 
     void testSimple()
@@ -85,24 +89,122 @@ private Q_SLOTS:
         SimpleLoadSave save {};
         save.setString(QLatin1String("test"));
         save.setDouble(12.34);
-        QVERIFY(m_loadSaveManager.load(save));
-        QVERIFY(m_loadSaveManager.save(save));
+        QVERIFY(m_loadSaveManager->load(save));
+        QVERIFY(m_loadSaveManager->save(save));
 
         SimpleLoadSave load {};
-        QVERIFY(m_loadSaveManager.load(load));
+        QVERIFY(m_loadSaveManager->load(load));
         QCOMPARE(save.getString(), load.getString());
         QCOMPARE(save.getDouble(), load.getDouble());
     }
 
+    void testFailureRoot()
+    {
+        // Prevent root to be written
+        resetTestCase();
+        QFile file (rootPath());
+        QVERIFY(file.open(QIODevice::WriteOnly));
+        file.write("test");
+        file.close();
+
+        SimpleLoadSave save {};
+        save.setString(QLatin1String("test"));
+        save.setDouble(12.34);
+        QVERIFY(!m_loadSaveManager->load(save));
+        QVERIFY(!m_loadSaveManager->save(save));
+    }
+
+    void testFailureRead1()
+    {
+        resetTestCase();
+        SimpleLoadSave save {};
+        save.setString(QLatin1String("test"));
+        save.setDouble(12.34);
+        QVERIFY(m_loadSaveManager->save(save));
+
+        // Prevent save file to be read
+        QFile file (LoadSaveManager::configFilePath());
+        file.setPermissions(QFile::Permission());
+
+        QVERIFY(!m_loadSaveManager->load(save));
+        QVERIFY(!m_loadSaveManager->save(save));
+    }
+
+    void testFailureRead2()
+    {
+        resetTestCase();
+        SimpleLoadSave save {};
+        save.setString(QLatin1String("test"));
+        save.setDouble(12.34);
+        QVERIFY(m_loadSaveManager->save(save));
+
+        // Prevent save file to be read
+        QFile file (LoadSaveManager::configFilePath());
+        QVERIFY(file.open(QIODevice::WriteOnly));
+        file.write("test");
+        file.close();
+
+        QVERIFY(!m_loadSaveManager->load(save));
+    }
+
+    void testFailureAppDir()
+    {
+        // Prevent appdir to be written
+        resetTestCase();
+        QDir::root().mkpath(rootPath());
+        QDir root {rootPath()};
+        QFile file (root.absoluteFilePath(QCoreApplication::instance()->applicationName()));
+        QVERIFY(file.open(QIODevice::WriteOnly));
+        file.write("test");
+        file.close();
+
+        SimpleLoadSave save {};
+        save.setString(QLatin1String("test"));
+        save.setDouble(12.34);
+        QVERIFY(!m_loadSaveManager->load(save));
+        QVERIFY(!m_loadSaveManager->save(save));
+    }
+
     void cleanupTestCase()
     {
-        QVERIFY(m_loadSaveManager.clear());
+        resetTestCase();
     }
 private:
-    LoadSaveManager m_loadSaveManager {};
+    QString rootPath() const
+    {
+        return QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
+    }
+    void resetTestCase()
+    {
+        QFileInfo root {rootPath()};
+        if (root.exists()) {
+            if (root.isFile()) {
+                QFile file {root.absoluteFilePath()};
+                if (!file.isWritable()) {
+                    if (!file.setPermissions(QFile::ReadUser | QFile::WriteUser)) {
+                        QFAIL("Something wrong happened when resetting the test-case");
+                    }
+                }
+                file.remove();
+            } else if (root.isDir()) {
+                QDir dir {root.absoluteFilePath()};
+                if (!dir.removeRecursively()) {
+                    QFAIL("Something wrong happened when resetting the test-case");
+                }
+            } else {
+                QFAIL("Something wrong happened when resetting the test-case");
+            }
+        }
+
+        // Recreate the folder that will contain "root"
+        if (!QDir::root().mkpath(root.absolutePath())) {
+            QFAIL("Something wrong happened when resetting the test-case");
+        }
+    }
+
+    std::unique_ptr<LoadSaveManager> m_loadSaveManager {};
 };
 
 QTEST_MAIN(TstLoadSaveManager)
 
 #include "tst_loadsavemanager.moc"
-

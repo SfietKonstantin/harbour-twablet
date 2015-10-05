@@ -43,9 +43,6 @@ public:
     static QString configFilePath();
     bool load(ILoadSave &loadSave);
     bool save(const ILoadSave &loadSave);
-    bool clear();
-private:
-    QString m_configFilePath {};
 };
 
 #endif // LOADSAVEMANAGER_H
