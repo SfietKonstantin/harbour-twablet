@@ -80,8 +80,11 @@ Page {
         visible: accountModel.count > 0
         contentWidth: width
         contentHeight: height
+        pressDelay: 100
+        interactive: !panel.open
 
         PushUpMenu {
+            visible: !panel.open
             MenuItem {
                 text: qsTr("Refresh")
                 enabled: layoutModel.count > 0
