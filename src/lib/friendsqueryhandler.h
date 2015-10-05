@@ -38,7 +38,7 @@
 class FriendsQueryHandler: public AbstractUserQueryHandler
 {
 public:
-    explicit FriendsQueryHandler(const Query::Arguments &arguments);
+    explicit FriendsQueryHandler(const Query::Parameters &parameters);
     DISABLE_COPY_DISABLE_MOVE(FriendsQueryHandler);
 private:
     QByteArray m_userId;

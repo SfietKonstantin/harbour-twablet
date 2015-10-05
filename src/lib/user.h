@@ -38,30 +38,124 @@
 #include "globals.h"
 #include "entity.h"
 
+/**
+ * @brief An user
+ *
+ * This class represents an user from Twitter API.
+ *
+ * See https://dev.twitter.com/overview/api/users.
+ */
 class User
 {
 public:
     explicit User() = default;
+    /**
+     * @brief Constructs a User from a JSON object
+     *
+     * This constructor parses the input JSON object
+     * that is retrieved from Twitter to create a User.
+     *
+     * @param json JSON object to parse.
+     */
     explicit User(const QJsonObject &json);
     DEFAULT_COPY_DEFAULT_MOVE(User);
+    /**
+     * @brief If the User instance is valid
+     *
+     * An instance of a User is valid if it contains an id.
+     *
+     * @return if the User instance is valid.
+     */
     bool isValid() const;
+    /**
+     * @brief Id of the user
+     * @return id of the user.
+     */
     QString id() const;
+    /**
+     * @brief Name of the user
+     * @return name of the user.
+     */
     QString name() const;
+    /**
+     * @brief Screen-name of the user
+     * @return screen-name of the user.
+     */
     QString screenName() const;
+    /**
+     * @brief Description of the user
+     * @return description of the user.
+     */
     QString description() const;
+    /**
+     * @brief Entities present in the description of the user
+     * @return entities present in the description of the user.
+     */
     std::vector<Entity::Ptr> descriptionEntities() const;
+    /**
+     * @brief Location of the user
+     * @return location of the user.
+     */
     QString location() const;
+    /**
+     * @brief Url of the user
+     * @return url of the user.
+     */
     QString url() const;
+    /**
+     * @brief Entities present in the url of the user
+     * @return entities present in the url of the user.
+     */
     std::vector<Entity::Ptr> urlEntities() const;
+    /**
+     * @brief If the user account is protected
+     * @return if the user account is protected.
+     */
     bool isProtected() const;
+    /**
+     * @brief If the user is following the current account
+     * @return if the user is following the current account.
+     */
     bool isFollowing() const;
+    /**
+     * @brief Number of status updates sent by the user
+     * @return number of status updates sent by the user.
+     */
     int statusesCount() const;
+    /**
+     * @brief Number of users following the user
+     * @return number of users following the user.
+     */
     int followersCount() const;
+    /**
+     * @brief Numbers of users the user is following
+     * @return numbers of users the user is following.
+     */
     int friendsCount() const;
+    /**
+     * @brief Number of lists in which the user is
+     * @return number of lists in which the user is.
+     */
     int listedCount() const;
+    /**
+     * @brief Number of tweets the user has marked as favourite
+     * @return number of tweets the user has marked as favourite.
+     */
     int favouritesCount() const;
+    /**
+     * @brief Url of the user's profile picture
+     * @return url of the user's profile picture.
+     */
     QString imageUrl() const;
+    /**
+     * @brief Url of the user's banner
+     * @return url of the user's banner.
+     */
     QString bannerUrl() const;
+    /**
+     * @brief When the user created his/her account
+     * @return when the user created his/her account.
+     */
     QDateTime createdAt() const;
 private:
     QString m_id {};

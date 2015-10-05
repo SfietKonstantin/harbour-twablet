@@ -31,14 +31,14 @@
 
 #include "query.h"
 
-Query::Query(Type type, Arguments &&arguments)
-    : m_type{type}, m_arguments{std::move(arguments)}
+Query::Query(Type type, Parameters &&parameters)
+    : m_type{type}, m_parameters{std::move(parameters)}
 {
 }
 
-bool Query::isNull() const
+bool Query::isValid() const
 {
-    return (m_type == Invalid);
+    return (m_type != Invalid);
 }
 
 Query::Type Query::type() const
@@ -46,14 +46,14 @@ Query::Type Query::type() const
     return m_type;
 }
 
-Query::Arguments Query::arguments() const
+Query::Parameters Query::parameters() const
 {
-    return m_arguments;
+    return m_parameters;
 }
 
 bool Query::operator==(const Query &other) const
 {
-    return m_type == other.m_type && m_arguments == other.m_arguments;
+    return m_type == other.m_type && m_parameters == other.m_parameters;
 }
 
 bool Query::operator!=(const Query &other) const

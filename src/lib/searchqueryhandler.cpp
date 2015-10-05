@@ -37,15 +37,15 @@
 #include <QtCore/QLoggingCategory>
 #include "tweet.h"
 
-SearchQueryHandler::SearchQueryHandler(const Query::Arguments &arguments)
+SearchQueryHandler::SearchQueryHandler(const Query::Parameters &parameters)
     : AbstractTweetQueryHandler()
 {
-    auto qIt = arguments.find(QLatin1String("q"));
-    if (qIt != std::end(arguments)) {
+    auto qIt = parameters.find(QLatin1String("q"));
+    if (qIt != std::end(parameters)) {
         m_query = qIt->second;
     }
-    auto resultTypeIt = arguments.find(QLatin1String("result_type"));
-    if (resultTypeIt != std::end(arguments)) {
+    auto resultTypeIt = parameters.find(QLatin1String("result_type"));
+    if (resultTypeIt != std::end(parameters)) {
         const QString &resultType = resultTypeIt->second;
         if (resultType == QLatin1String("mixed")) {
             m_resultType = "mixed";

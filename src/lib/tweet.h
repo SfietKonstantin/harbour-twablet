@@ -37,27 +37,140 @@
 #include "globals.h"
 #include "user.h"
 
+/**
+ * @brief A tweet
+ *
+ * This class represents an tweet from Twitter API.
+ *
+ * See https://dev.twitter.com/overview/api/tweets.
+ */
 class Tweet
 {
 public:
     explicit Tweet() = default;
+    /**
+     * @brief Constructs a Tweet from a JSON object
+     *
+     * This constructor parses the input JSON object
+     * that is retrieved from Twitter to create a Tweet.
+     *
+     * It also performs some adaptations to make the
+     * data more display friendly. All fields except id()
+     * and source() will be parsed from the retweeted tweet
+     * (if there is one). Id of the retweeted tweet can be
+     * accessed with originalId(). The user who sent the
+     * retweet can be accessed with retweetingUser().
+     *
+     * @param json JSON object to parse.
+     */
     explicit Tweet(const QJsonObject &json);
     DEFAULT_COPY_DEFAULT_MOVE(Tweet);
+    /**
+     * @brief If the Tweet instance is valid
+     *
+     * An instance of a Tweet is valid if it contains an id.
+     *
+     * @return if the Tweet instance is valid.
+     */
     bool isValid() const;
+    /**
+     * @brief Id of the tweet
+     * @return id of the tweet.
+     */
     QString id() const;
+    /**
+     * @brief Id of the retweet
+     *
+     * This method will return the id of the
+     * retweet that is contained in the tweet,
+     * if there is any retweet.
+     *
+     * If there is no retweet, this method will
+     * return a null QString().
+     *
+     * @return id of the retweet.
+     */
     QString originalId() const;
+    /**
+     * @brief Text of the tweet
+     * @return text of the tweet.
+     */
     QString text() const;
+    /**
+     * @brief User who sent the tweet
+     *
+     * If this tweet is a retweet, this
+     * method will return the user who
+     * sent the original tweet.
+     *
+     * To get the user who sent the retweet,
+     * use retweetingUser().
+     *
+     * @return user who sent the tweet.
+     */
     User user() const;
+    /**
+     * @brief User who sent the tweet, or retweet
+     *
+     * If this tweet is a retweet, this
+     * method will return the user who
+     * sent the retweet.
+     *
+     * To get the user who sent the original tweet,
+     * use user().
+     *
+     * @return user who sent the tweet or retweet.
+     */
     User retweetingUser() const;
+    /**
+     * @brief When the tweet has been sent
+     * @return when the tweet has been sent.
+     */
     QDateTime timestamp() const;
+    /**
+     * @brief The number of times this tweet has been favorited
+     * @return the number of times this tweet has been favorited.
+     */
     int favoriteCount() const;
+    /**
+     * @brief If the current account favorited this tweet
+     * @return if the current account favorited this tweet.
+     */
     bool isFavorited() const;
-    void setFavorited(bool faviroted);
+    /**
+     * @brief Set if the current account favorited this tweet
+     * @param favorited if the current account favorited this tweet.
+     */
+    void setFavorited(bool favorited);
+    /**
+     * @brief The number of times this tweet has been retweeted
+     * @return the number of times this tweet has been retweeted.
+     */
     int retweetCount() const;
+    /**
+     * @brief If the current account retweeted this tweet
+     * @return if the current account retweeted this tweet.
+     */
     bool isRetweeted() const;
+    /**
+     * @brief Set if the current account retweeted this tweet
+     * @param favorited if the current account retweeted this tweet.
+     */
     void setRetweeted(bool retweeted);
+    /**
+     * @brief Id of the tweet that this tweet replies to
+     * @return id of the tweet that this tweet replies to.
+     */
     QString inReplyTo() const;
+    /**
+     * @brief What that was used to post this tweet
+     * @return what that was used to post this tweet.
+     */
     QString source() const;
+    /**
+     * @brief Entities contained in this tweet
+     * @return entities contained in this tweet.
+     */
     std::vector<Entity::Ptr> entities() const;
 private:
     QString m_id {};

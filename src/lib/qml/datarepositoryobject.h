@@ -66,8 +66,10 @@ public slots:
     void updateAccountName(int index, const QString &name);
     void removeAccount(int index);
     // Layouts
-    void addLayout(const QString &name, int accountIndex, int queryType, const QVariantMap &arguments);
-    void addLayout(const QString &name, AccountObject *account, int queryType, const QVariantMap &arguments);
+    void addLayout(const QString &name, int accountIndex, int queryType,
+                   const QVariantMap &parameters);
+    void addLayout(const QString &name, AccountObject *account, int queryType,
+                   const QVariantMap &parameters);
     void addDefaultLayouts(int accountIndex, const QString &homeName, bool enableHomeTimeline,
                            const QString &mentionsName, bool enableMentionsTimeline);
     void updateLayoutName(int index, const QString &name);
@@ -76,12 +78,12 @@ public slots:
     void refresh();
     void loadMore(int layoutIndex);
     // Temporary layout
-    int addTemporaryLayout(qml::AccountObject *account, int queryType, const QVariantMap &arguments);
+    int addTemporaryLayout(qml::AccountObject *account, int queryType, const QVariantMap &paramters);
     void removeTemporaryLayout(int index);
     void clearTemporary();
     void refreshTemporary(int index);
     // Users
-    int addUser(qml::AccountObject *account, int queryType, const QVariantMap &arguments);
+    int addUser(qml::AccountObject *account, int queryType, const QVariantMap &parameters);
     void removeUser(int index);
     void userLoadMore(int index);
     // Action on tweets
@@ -90,12 +92,13 @@ public slots:
 private:
     Account accountFromId(const QString &userId) const;
     void refresh(const Layout &layout);
-    void addLayout(const QString &name, const QString &userId, int queryType, const QVariantMap &arguments);
+    void addLayout(const QString &name, const QString &userId, int queryType,
+                   const QVariantMap &parameters);
     bool addLayoutCheckAccount(int accountIndex, QString &userId);
-    bool addLayoutCheckQuery(int queryType, const QVariantMap &arguments,
-                             Query::Arguments &queryArguments) const;
-    bool addUserCheckQuery(int queryType, const QVariantMap &arguments,
-                           Query::Arguments &queryArguments) const;
+    bool addLayoutCheckQuery(int queryType, const QVariantMap &parameters,
+                             Query::Parameters &queryParametrs) const;
+    bool addUserCheckQuery(int queryType, const QVariantMap &parameters,
+                           Query::Parameters &queryParameters) const;
     void insertRepository(const Layout &layout);
     void insertRepository();
     void removeLayoutFromRepositories(const Layout &layout);

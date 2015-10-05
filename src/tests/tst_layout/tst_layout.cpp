@@ -35,36 +35,39 @@
 #include <qml/layoutmodel.h>
 #include <QtCore/QDebug>
 
+namespace tst
+{
+
 class TstLayout: public QObject
 {
     Q_OBJECT
 private Q_SLOTS:
     void testLayout()
     {
-        Query::Arguments arguments {
+        Query::Parameters parameters {
             {QLatin1String("test1"), QLatin1String("value1")},
             {QLatin1String("test2"), QLatin1String("value2")}
         };
-        Query query {Query::Mentions, std::move(Query::Arguments(arguments))}; // Copy arguments
+        Query query {Query::Mentions, std::move(Query::Parameters(parameters))}; // Copy parameters
         Layout layout {
             QLatin1String("Layout name"),
             QLatin1String("userId"),
             std::move(query)
         };
 
-        QVERIFY(!layout.query().isNull());
+        QVERIFY(layout.query().isValid());
         QCOMPARE(layout.query().type(), Query::Mentions);
-        QCOMPARE(layout.query().arguments(), arguments);
+        QCOMPARE(layout.query().parameters(), parameters);
         QCOMPARE(layout.unread(), 0);
 
         Layout movedLayout {std::move(layout)};
         QVERIFY(layout.isNull());
         QVERIFY(!movedLayout.isNull());
-        QVERIFY(!movedLayout.query().isNull());
+        QVERIFY(movedLayout.query().isValid());
         QCOMPARE(movedLayout.name(), QLatin1String("Layout name"));
         QCOMPARE(movedLayout.userId(), QLatin1String("userId"));
         QCOMPARE(movedLayout.query().type(), Query::Mentions);
-        QCOMPARE(movedLayout.query().arguments(), arguments);
+        QCOMPARE(movedLayout.query().parameters(), parameters);
         QCOMPARE(movedLayout.unread(), 0);
 
         movedLayout.setName(QLatin1String("New layout"));
@@ -72,14 +75,14 @@ private Q_SLOTS:
         movedLayout.setUserId(QLatin1String("1"));
         QCOMPARE(movedLayout.userId(), QLatin1String("1"));
 
-        Query::Arguments newArguments {
+        Query::Parameters newParameters {
             {QLatin1String("newTest1"), QLatin1String("newValue1")},
             {QLatin1String("newTest2"), QLatin1String("newValue2")}
         };
-        Query newQuery {Query::Friends, std::move(Query::Arguments(newArguments))}; // Copy arguments
+        Query newQuery {Query::Friends, std::move(Query::Parameters(newParameters))}; // Copy parameters
         movedLayout.setQuery(std::move(newQuery));
         QCOMPARE(movedLayout.query().type(), Query::Friends);
-        QCOMPARE(movedLayout.query().arguments(), newArguments);
+        QCOMPARE(movedLayout.query().parameters(), newParameters);
         movedLayout.setUnread(123);
         QCOMPARE(movedLayout.unread(), 123);
 
@@ -89,7 +92,7 @@ private Q_SLOTS:
     {
         LayoutRepository repository {};
         for (int i = 0; i < 4; ++i) {
-            Query query {Query::Home, std::move(Query::Arguments())};
+            Query query {Query::Home, std::move(Query::Parameters())};
             repository.append(Layout(QString::number(i + 1), QString(), std::move(query)));
         }
         QCOMPARE((std::begin(repository) + 0)->name(), QString::number(1));
@@ -110,7 +113,7 @@ private Q_SLOTS:
         LayoutRepository &repository (repositoryObject.layouts());
 
         for (int i = 0; i < 3; ++i) {
-            Query query {Query::Home, std::move(Query::Arguments())};
+            Query query {Query::Home, std::move(Query::Parameters())};
             repository.append(Layout(QString::number(i + 1), QString(), std::move(query)));
         }
 
@@ -125,7 +128,7 @@ private Q_SLOTS:
         QCOMPARE(getObject(model, 2)->name(), QString::number(3));
 
         {
-            Query query {Query::Home, std::move(Query::Arguments())};
+            Query query {Query::Home, std::move(Query::Parameters())};
             repository.append(Layout(QString::number(4), QString(), std::move(query)));
         }
 
@@ -148,8 +151,9 @@ private:
     }
 };
 
+}
 
-QTEST_MAIN(TstLayout)
+QTEST_MAIN(tst::TstLayout)
 
 #include "tst_layout.moc"
 

@@ -38,7 +38,7 @@
 class FollowersQueryHandler: public AbstractUserQueryHandler
 {
 public:
-    explicit FollowersQueryHandler(const Query::Arguments &arguments);
+    explicit FollowersQueryHandler(const Query::Parameters &parameters);
     DISABLE_COPY_DISABLE_MOVE(FollowersQueryHandler);
 private:
     QByteArray m_userId;

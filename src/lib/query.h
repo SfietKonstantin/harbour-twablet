@@ -36,32 +36,94 @@
 #include <QtCore/QVariantMap>
 #include "globals.h"
 
+/**
+ * @brief Information about the query used to load a Layout
+ *
+ * This class contains information about the query that is
+ * used to load a Layout.
+ *
+ * A query is described by a Type and a list of parameters,
+ * that can be stored in Parameters.
+ */
 class Query
 {
 public:
+    /**
+     * @brief Query type
+     */
     enum Type
     {
+        /**
+         * @brief Invalid query
+         */
         Invalid = 0,
+        /**
+         * @brief Query the home timeline
+         */
         Home,
+        /**
+         * @brief Query the mentions timeline
+         */
         Mentions,
+        /**
+         * @brief Search for Tweets
+         */
         Search,
+        /**
+         * @brief Query the list of favourites for a user
+         */
         Favorites,
+        /**
+         * @brief Query the timeline of an user
+         */
         UserTimeline,
+        /**
+         * @brief Query the list of friends of an user (following)
+         */
         Friends,
+        /**
+         * @brief Query the list of followers of an user
+         */
         Followers
     };
-    using Arguments = std::map<QString, QString>;
+    /**
+     * @brief Additional parameters for the query
+     *
+     * The additional parameters are passed as a std::map that
+     * maps a QString key to a QString value.
+     */
+    using Parameters = std::map<QString, QString>;
     explicit Query() = default;
-    explicit Query(Type type, Arguments &&arguments);
+    /**
+     * @brief Constructor
+     * @param type query type.
+     * @param parameters query parameters.
+     */
+    explicit Query(Type type, Parameters &&parameters);
     DEFAULT_COPY_DEFAULT_MOVE(Query);
-    bool isNull() const;
+    /**
+     * @brief If the Query instance is valid
+     *
+     * An instance of a Query is valid if it's type is not Invalid.
+     *
+     * @return if the Query instance is valid.
+     */
+    bool isValid() const;
+    /**
+     * @brief Type of the query
+     * @return type of the query.
+     */
     Type type() const;
-    Arguments arguments() const;
+    /**
+     * @brief Parameters used for this query
+     * @return parameters used for this query.
+     */
+    Parameters parameters() const;
     bool operator==(const Query &other) const;
     bool operator!=(const Query &other) const;
 private:
     Type m_type {Invalid};
-    Arguments m_arguments {};
+    Parameters m_parameters {};
 };
 
 #endif // QUERY_H

@@ -38,7 +38,7 @@
 class SearchQueryHandler: public AbstractTweetQueryHandler
 {
 public:
-    explicit SearchQueryHandler(const Query::Arguments &arguments);
+    explicit SearchQueryHandler(const Query::Parameters &parameters);
     DISABLE_COPY_DISABLE_MOVE(SearchQueryHandler);
 private:
     QString path() const override;

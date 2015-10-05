@@ -224,19 +224,19 @@ TweetCentralRepository::MappingData * TweetCentralRepository::getMappingData(con
     }
     case Query::Search:
     {
-        std::unique_ptr<IQueryHandler<Tweet>> handler {new SearchQueryHandler(query.arguments())};
+        std::unique_ptr<IQueryHandler<Tweet>> handler {new SearchQueryHandler(query.parameters())};
         return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
         break;
     }
     case Query::Favorites:
     {
-        std::unique_ptr<IQueryHandler<Tweet>> handler {new FavoritesQueryHandler(query.arguments())};
+        std::unique_ptr<IQueryHandler<Tweet>> handler {new FavoritesQueryHandler(query.parameters())};
         return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
         break;
     }
     case Query::UserTimeline:
     {
-        std::unique_ptr<IQueryHandler<Tweet>> handler {new UserTimelineQueryHandler(query.arguments())};
+        std::unique_ptr<IQueryHandler<Tweet>> handler {new UserTimelineQueryHandler(query.parameters())};
         return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
         break;
     }
@@ -263,7 +263,7 @@ bool TweetCentralRepository::MappingKeyComparator::operator()(const MappingKey &
     if (first.query.type() > second.query.type()) {
         return false;
     }
-    return first.query.arguments() < second.query.arguments();
+    return first.query.parameters() < second.query.parameters();
 }
 
 TweetCentralRepository::MappingData::MappingData(std::unique_ptr<IQueryHandler<Tweet>> &&inputHandler)

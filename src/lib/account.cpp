@@ -38,9 +38,10 @@ Account::Account(const QString &name, const QString &userId, const QString &scre
 {
 }
 
-bool Account::isNull() const
+bool Account::isValid() const
 {
-    return (m_name.isEmpty() || m_userId.isEmpty() || m_token.isEmpty() || m_tokenSecret.isEmpty());
+    return (!m_name.isEmpty() && !m_userId.isEmpty() && !m_screenName.isEmpty()
+            && !m_token.isEmpty() && !m_tokenSecret.isEmpty());
 }
 
 QString Account::name() const

@@ -32,11 +32,11 @@
 #include "favoritesqueryhandler.h"
 #include <QtCore/QUrl>
 
-FavoritesQueryHandler::FavoritesQueryHandler(const Query::Arguments &arguments)
+FavoritesQueryHandler::FavoritesQueryHandler(const Query::Parameters &parameters)
     : AbstractTweetQueryHandler()
 {
-    auto userIdIt = arguments.find(QLatin1String("user_id"));
-    if (userIdIt != std::end(arguments)) {
+    auto userIdIt = parameters.find(QLatin1String("user_id"));
+    if (userIdIt != std::end(parameters)) {
         m_userId = userIdIt->second;
     }
 }

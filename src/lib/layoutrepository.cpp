@@ -48,17 +48,17 @@ void LayoutRepository::load(const QJsonObject &json)
         const QString &userId {layout.value(QLatin1String("userId")).toString()};
         int queryType {layout.value(QLatin1String("queryType")).toInt()};
 
-        Query::Arguments arguments {};
-        const QJsonArray &queryArguments {layout.value(QLatin1String("queryArguments")).toArray()};
-        for (const QJsonValue &argumentValue : queryArguments) {
-            const QJsonObject &argumentObject {argumentValue.toObject()};
-            QString key {argumentObject.value(QLatin1String("key")).toString()};
-            QString value {argumentObject.value(QLatin1String("value")).toString()};
-            arguments.emplace(key, value);
+        Query::Parameters parameters {};
+        const QJsonArray &queryParameters {layout.value(QLatin1String("queryArguments")).toArray()};
+        for (const QJsonValue &parameterValue : queryParameters) {
+            const QJsonObject &parameterObject {parameterValue.toObject()};
+            QString key {parameterObject.value(QLatin1String("key")).toString()};
+            QString value {parameterObject.value(QLatin1String("value")).toString()};
+            parameters.emplace(key, value);
         }
 
         if (!userId.isEmpty() && queryType != Query::Invalid) {
-            Query query {static_cast<Query::Type>(queryType), std::move(arguments)};
+            Query query {static_cast<Query::Type>(queryType), std::move(parameters)};
             data.emplace_back(name, userId, std::move(query));
         }
     }
@@ -73,14 +73,14 @@ void LayoutRepository::save(QJsonObject &json) const
         layoutObject.insert(QLatin1String("name"), layout.name());
         layoutObject.insert(QLatin1String("userId"), layout.userId());
         layoutObject.insert(QLatin1String("queryType"), layout.query().type());
-        QJsonArray arguments {};
-        for (const std::pair<QString, QString> &argument : layout.query().arguments()) {
-            QJsonObject argumentObject {};
-            argumentObject.insert(QLatin1String("key"), argument.first);
-            argumentObject.insert(QLatin1String("value"), argument.second);
-            arguments.append(argumentObject);
+        QJsonArray parameters {};
+        for (const std::pair<QString, QString> &parameter : layout.query().parameters()) {
+            QJsonObject parameterObject {};
+            parameterObject.insert(QLatin1String("key"), parameter.first);
+            parameterObject.insert(QLatin1String("value"), parameter.second);
+            parameters.append(parameterObject);
         }
-        layoutObject.insert(QLatin1String("queryArguments"), arguments);
+        layoutObject.insert(QLatin1String("queryArguments"), parameters);
         layouts.append(layoutObject);
     }
     json.insert(QLatin1String("layouts"), layouts);

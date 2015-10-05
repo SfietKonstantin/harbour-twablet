@@ -32,21 +32,21 @@
 #include "usertimelinequeryhandler.h"
 #include <QtCore/QUrl>
 
-UserTimelineQueryHandler::UserTimelineQueryHandler(const Query::Arguments &arguments)
+UserTimelineQueryHandler::UserTimelineQueryHandler(const Query::Parameters &parameters)
     : AbstractTweetQueryHandler()
 {
-    auto userIdIt = arguments.find(QLatin1String("user_id"));
-    if (userIdIt != std::end(arguments)) {
+    auto userIdIt = parameters.find(QLatin1String("user_id"));
+    if (userIdIt != std::end(parameters)) {
         m_userId = userIdIt->second;
     }
 
-    auto excludeRepliesIt = arguments.find(QLatin1String("exclude_replies"));
-    if (excludeRepliesIt != std::end(arguments)) {
+    auto excludeRepliesIt = parameters.find(QLatin1String("exclude_replies"));
+    if (excludeRepliesIt != std::end(parameters)) {
         m_excludeReplies = excludeRepliesIt->second;
     }
 
-    auto includeRtsIt = arguments.find(QLatin1String("include_rts"));
-    if (includeRtsIt != std::end(arguments)) {
+    auto includeRtsIt = parameters.find(QLatin1String("include_rts"));
+    if (includeRtsIt != std::end(parameters)) {
         m_includeRts = includeRtsIt->second;
     }
 }

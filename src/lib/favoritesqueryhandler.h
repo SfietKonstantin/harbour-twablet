@@ -38,7 +38,7 @@
 class FavoritesQueryHandler: public AbstractTweetQueryHandler
 {
 public:
-    explicit FavoritesQueryHandler(const Query::Arguments &arguments);
+    explicit FavoritesQueryHandler(const Query::Parameters &parameters);
     DISABLE_COPY_DISABLE_MOVE(FavoritesQueryHandler);
 private:
     QString path() const override;

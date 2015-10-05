@@ -31,11 +31,11 @@
 
 #include "followersqueryhandler.h"
 
-FollowersQueryHandler::FollowersQueryHandler(const Query::Arguments &arguments)
+FollowersQueryHandler::FollowersQueryHandler(const Query::Parameters &parameters)
     : AbstractUserQueryHandler()
 {
-    auto userIdIt = arguments.find(QLatin1String("user_id"));
-    if (userIdIt != std::end(arguments)) {
+    auto userIdIt = parameters.find(QLatin1String("user_id"));
+    if (userIdIt != std::end(parameters)) {
         m_userId = userIdIt->second.toLocal8Bit();
     }
 }

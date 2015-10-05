@@ -109,9 +109,9 @@ bool Tweet::isFavorited() const
     return m_favorited;
 }
 
-void Tweet::setFavorited(bool faviroted)
+void Tweet::setFavorited(bool favorited)
 {
-    m_favorited = faviroted;
+    m_favorited = favorited;
 }
 
 int Tweet::retweetCount() const

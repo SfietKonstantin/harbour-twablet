@@ -34,6 +34,9 @@
 #include <qml/datarepositoryobject.h>
 #include <qml/accountmodel.h>
 
+namespace tst
+{
+
 class TstAccount: public QObject
 {
     Q_OBJECT
@@ -49,8 +52,8 @@ private Q_SLOTS:
         };
 
         Account movedAccount {std::move(account)};
-        QVERIFY(account.isNull());
-        QVERIFY(!movedAccount.isNull());
+        QVERIFY(!account.isValid());
+        QVERIFY(movedAccount.isValid());
         QCOMPARE(movedAccount.name(), QLatin1String("Test Account"));
         QCOMPARE(movedAccount.userId(), QLatin1String("1"));
         QCOMPARE(movedAccount.screenName(), QLatin1String("account"));
@@ -122,8 +125,9 @@ private:
     }
 };
 
+}
 
-QTEST_MAIN(TstAccount)
+QTEST_MAIN(tst::TstAccount)
 
 #include "tst_account.moc"
 

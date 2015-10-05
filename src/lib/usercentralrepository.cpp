@@ -163,13 +163,13 @@ UserCentralRepository::MappingData * UserCentralRepository::getMappingData(int i
     switch (query.type()) {
     case Query::Friends:
     {
-        std::unique_ptr<IQueryHandler<User>> handler {new FriendsQueryHandler(query.arguments())};
+        std::unique_ptr<IQueryHandler<User>> handler {new FriendsQueryHandler(query.parameters())};
         return &(m_mapping.emplace(index, MappingData{account, query, std::move(handler)}).first->second);
         break;
     }
     case Query::Followers:
     {
-        std::unique_ptr<IQueryHandler<User>> handler {new FollowersQueryHandler(query.arguments())};
+        std::unique_ptr<IQueryHandler<User>> handler {new FollowersQueryHandler(query.parameters())};
         return &(m_mapping.emplace(index, MappingData{account, query, std::move(handler)}).first->second);
         break;
     }

@@ -35,6 +35,9 @@
 #include <memory>
 #include <loadsavemanager.h>
 
+namespace tst
+{
+
 class SimpleLoadSave: public ILoadSave
 {
 public:
@@ -205,6 +208,8 @@ private:
     std::unique_ptr<LoadSaveManager> m_loadSaveManager {};
 };
 
-QTEST_MAIN(TstLoadSaveManager)
+}
+
+QTEST_MAIN(tst::TstLoadSaveManager)
 
 #include "tst_loadsavemanager.moc"

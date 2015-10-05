@@ -38,7 +38,7 @@
 class UserTimelineQueryHandler: public AbstractTweetQueryHandler
 {
 public:
-    explicit UserTimelineQueryHandler(const Query::Arguments &arguments);
+    explicit UserTimelineQueryHandler(const Query::Parameters &parameters);
     DISABLE_COPY_DISABLE_MOVE(UserTimelineQueryHandler);
 private:
     QString path() const override;

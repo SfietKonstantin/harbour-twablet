@@ -38,7 +38,7 @@ Layout::Layout(const QString &name, const QString &userId, Query &&query)
 
 bool Layout::isNull() const
 {
-    return (m_name.isEmpty() || m_userId.isEmpty() || m_query.isNull());
+    return (m_name.isEmpty() || m_userId.isEmpty() || !m_query.isValid());
 }
 
 QString Layout::name() const
