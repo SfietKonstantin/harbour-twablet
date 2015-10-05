@@ -35,6 +35,9 @@
 #include <memory>
 #include <QtCore/QObject>
 
+/**
+ * @brief A deleter for QObjects
+ */
 template<class T>
 class QObjectDeleter
 {
@@ -45,6 +48,9 @@ public:
     }
 };
 
+/**
+ * QObject based std::unique_ptr
+ */
 template<class T>
 using QObjectPtr = std::unique_ptr<T, QObjectDeleter<T>>;
 

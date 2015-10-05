@@ -45,7 +45,7 @@ QVariant TweetModel::data(const QModelIndex &index, int role) const
     if (row < 0 || row >= rowCount()) {
         return QVariant();
     }
-    const QObjectPtr<TweetObject> &tweet = m_data[row];
+    const QObjectPtr<TweetObject> &tweet = m_items[row];
     switch (role) {
     case IdRole:
         return tweet->id();

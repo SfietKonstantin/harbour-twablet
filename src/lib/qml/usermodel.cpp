@@ -45,7 +45,7 @@ QVariant UserModel::data(const QModelIndex &index, int role) const
     if (row < 0 || row >= rowCount()) {
         return QVariant();
     }
-    const QObjectPtr<UserObject> &user = m_data[row];
+    const QObjectPtr<UserObject> &user = m_items[row];
     switch (role) {
     case IdRole:
         return user->id();

@@ -45,7 +45,7 @@ QVariant AccountModel::data(const QModelIndex &index, int role) const
     if (row < 0 || row >= rowCount()) {
         return QVariant();
     }
-    const QObjectPtr<AccountObject> &account = m_data[row];
+    const QObjectPtr<AccountObject> &account = m_items[row];
     switch (role) {
     case NameRole:
         return account->name();
@@ -64,10 +64,10 @@ QVariant AccountModel::data(const QModelIndex &index, int role) const
 
 AccountObject * AccountModel::get(const QString &userId) const
 {
-    auto it = std::find_if(std::begin(m_data), std::end(m_data), [userId](const QObjectPtr<AccountObject> &object) {
+    auto it = std::find_if(std::begin(m_items), std::end(m_items), [userId](const QObjectPtr<AccountObject> &object) {
         return object->userId() == userId;
     });
-    return it == std::end(m_data) ? nullptr : it->get();
+    return it == std::end(m_items) ? nullptr : it->get();
 }
 
 QHash<int, QByteArray> AccountModel::roleNames() const

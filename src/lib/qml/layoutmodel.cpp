@@ -45,7 +45,7 @@ QVariant LayoutModel::data(const QModelIndex &index, int role) const
     if (row < 0 || row >= rowCount()) {
         return QVariant();
     }
-    const QObjectPtr<LayoutObject> &layout = m_data[row];
+    const QObjectPtr<LayoutObject> &layout = m_items[row];
     switch (role) {
     case NameRole:
         return layout->name();

@@ -38,6 +38,9 @@
 #include "globals.h"
 #include "ilistener.h"
 
+/**
+ * @brief A generic container
+ */
 template<class T>
 class Repository
 {

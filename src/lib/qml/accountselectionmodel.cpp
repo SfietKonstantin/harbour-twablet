@@ -51,7 +51,7 @@ void AccountSelectionModel::setIndex(int index)
         emit indexChanged();
 
         if (m_index >= 0 && m_index < rowCount()) {
-            setSelection(m_data.at(m_index).get());
+            setSelection(m_items.at(m_index).get());
         } else {
             setSelection(nullptr);
         }

@@ -62,7 +62,7 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override final
     {
         Q_UNUSED(parent)
-        return m_data.size();
+        return m_items.size();
     }
     int count() const override
     {
@@ -144,41 +144,41 @@ protected:
         : IModel(parent) , IListener<T>()
     {
     }
-    std::deque<QObjectPtr<O>> m_data {};
+    std::deque<QObjectPtr<O>> m_items {};
 private:
-    void doAppend(const T &data) override
+    void doAppend(const T &item) override
     {
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
-        m_data.emplace_back(O::create(data, this));
+        m_items.emplace_back(O::create(item, this));
         emit countChanged();
         endInsertRows();
     }
-    void doAppend(const std::vector<T> &data) override
+    void doAppend(const std::vector<T> &items) override
     {
-        beginInsertRows(QModelIndex(), rowCount(), rowCount() + data.size() - 1);
-        for (const T &entry : data) {
-            m_data.emplace_back(O::create(entry, this));
+        beginInsertRows(QModelIndex(), rowCount(), rowCount() + items.size() - 1);
+        for (const T &entry : items) {
+            m_items.emplace_back(O::create(entry, this));
         }
         emit countChanged();
         endInsertRows();
     }
-    void doPrepend(const std::vector<T> &data) override
+    void doPrepend(const std::vector<T> &items) override
     {
         emit prependPre();
-        beginInsertRows(QModelIndex(), 0, data.size() - 1);
-        for (auto it = data.rbegin(); it != data.rend(); ++it) {
-            m_data.emplace_front(O::create(*it, this));
+        beginInsertRows(QModelIndex(), 0, items.size() - 1);
+        for (auto it = items.rbegin(); it != items.rend(); ++it) {
+            m_items.emplace_front(O::create(*it, this));
         }
         emit countChanged();
         endInsertRows();
-        emit prependPost(data.size());
+        emit prependPost(items.size());
     }
-    void doUpdate(int index, const T &data) override
+    void doUpdate(int index, const T &item) override
     {
         if (index < 0 || index >= rowCount()) {
             return;
         }
-        m_data[index]->update(data);
+        m_items[index]->update(item);
         emit dataChanged(this->index(index), this->index(index));
     }
 
@@ -189,7 +189,7 @@ private:
         }
 
         beginRemoveRows(QModelIndex(), index, index);
-        m_data.erase(std::begin(m_data) + index);
+        m_items.erase(std::begin(m_items) + index);
         emit countChanged();
         endRemoveRows();
     }
@@ -217,15 +217,15 @@ private:
         if (!m_complete) {
             return;
         }
-        std::deque<QObjectPtr<O>> newData;
+        std::deque<QObjectPtr<O>> newItems;
         if (m_internalRepository != nullptr) {
-            for (const T &data : *m_internalRepository) {
-                newData.emplace_back(O::create(data, this));
+            for (const T &item : *m_internalRepository) {
+                newItems.emplace_back(O::create(item, this));
             }
         }
 
-        int oldSize = m_data.size();
-        int newSize = newData.size();
+        int oldSize = m_items.size();
+        int newSize = newItems.size();
         int delta = newSize - oldSize;
         if (delta < 0) {
             beginRemoveRows(QModelIndex(), newSize, oldSize - 1);
@@ -233,7 +233,7 @@ private:
             beginInsertRows(QModelIndex(), oldSize, newSize - 1);
         }
 
-        m_data = std::move(newData);
+        m_items = std::move(newItems);
 
         if (delta != 0) {
             emit countChanged();

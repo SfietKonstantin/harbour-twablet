@@ -37,7 +37,7 @@
 
 class QJsonObject;
 /**
- * @brief An Entity
+ * @brief An entity
  *
  * This class represents an entity from Twitter API.
  *

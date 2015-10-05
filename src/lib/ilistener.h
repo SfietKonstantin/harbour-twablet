@@ -35,20 +35,71 @@
 #include <vector>
 class QString;
 
+/**
+ * @brief An interface for a Repository listener
+ *
+ * This interface is used to implement models-like classes, that listens to a
+ * Repository and want to be notified when the Repository changes.
+ *
+ * This listener can be used to get notifications when some items are inserted,
+ * removed, or updated. This is done via doAppend(), doPrepend(), doUpdate() and
+ * doRemove().
+ *
+ * This interface also handle the status of the asynchronous loading operation
+ * that takes places in the Repository. This is done via doStart(), doError() and
+ * doFinished().
+ */
 template<class T>
 class IListener
 {
 public:
     virtual ~IListener() {}
 private:
-    virtual void doAppend(const T &data) = 0;
-    virtual void doAppend(const std::vector<T> &data) = 0;
-    virtual void doPrepend(const std::vector<T> &data) = 0;
-    virtual void doUpdate(int index, const T &data) = 0;
+    /**
+     * @brief Notify that a new item is appended
+     * @param item item to be appended.
+     */
+    virtual void doAppend(const T &item) = 0;
+    /**
+     * @brief Notify that new items are appended
+     * @param items items to be appended.
+     */
+    virtual void doAppend(const std::vector<T> &items) = 0;
+    /**
+     * @brief Notify that new items are prepended
+     * @param items items to be prepended.
+     */
+    virtual void doPrepend(const std::vector<T> &items) = 0;
+    /**
+     * @brief Notify that an item is updated
+     * @param index index of the item that is updated.
+     * @param item the new value of the item.
+     */
+    virtual void doUpdate(int index, const T &item) = 0;
+    /**
+     * @brief Notify that an item is removed
+     * @param index index of the item that is removed.
+     */
     virtual void doRemove(int index) = 0;
+    /**
+     * @brief Notify that the listened object is now invalid
+     *
+     * When called on this method, the listener should stop
+     * listening.
+     */
     virtual void doInvalidate() = 0;
+    /**
+     * @brief Notify that an asynchronous operation has started
+     */
     virtual void doStart() = 0;
+    /**
+     * @brief Notify that an asynchronous operation has failed
+     * @param error error message.
+     */
     virtual void doError(const QString &error) = 0;
+    /**
+     * @brief Notify that an asynchronous operation has finished
+     */
     virtual void doFinish() = 0;
     template<class C> friend class Repository;
 };
