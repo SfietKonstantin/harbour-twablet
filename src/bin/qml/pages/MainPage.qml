@@ -139,7 +139,7 @@ Page {
                 cacheBuffer: columnWidth * layoutModel.count
                 orientation: Qt.Horizontal
                 model: layoutModel
-                snapMode: view.columnCount > 1 ? ListView.NoSnap : ListView.SnapOneItem
+                snapMode: view.columnCount > 1 ? ListView.SnapToItem : ListView.SnapOneItem
                 delegate: ColumnLayout {
                     id: delegate
                     width: view.columnWidth
