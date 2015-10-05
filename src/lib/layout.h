@@ -35,20 +35,79 @@
 #include <QtCore/QString>
 #include "query.h"
 
+/**
+ * @brief A layout
+ *
+ * A layout describes the content to display in a
+ * column. It consists of a name, the user id
+ * of the account to use and the Query to use.
+ * These properties can be accessed via name(),
+ * userId() and query().
+ *
+ * This class also manage the number of unread entries in
+ * the column. This can be accessed via unread() and set
+ * via setUnread().
+ */
 class Layout
 {
 public:
     explicit Layout() = default;
+    /**
+     * @brief Constructor
+     * @param name name of the layout.
+     * @param userId user id of the account.
+     * @param query query.
+     */
     explicit Layout(const QString &name, const QString &userId, Query &&query);
     DEFAULT_COPY_DEFAULT_MOVE(Layout);
-    bool isNull() const;
+    /**
+     * @brief If the Layout instance is valid
+     *
+     * An instance of a Layout is valid if it has a name,
+     * an user id and a valid Query.
+     *
+     * @return if the Layout instance is valid.
+     */
+    bool isValid() const;
+    /**
+     * @brief Name of the layout
+     * @return name of the layout.
+     */
     QString name() const;
+    /**
+     * @brief Set the name of the layout
+     * @param name name of the layout.
+     */
     void setName(const QString &name);
+    /**
+     * @brief User id of the account to use
+     * @return user id of the account to use.
+     */
     QString userId() const;
+    /**
+     * @brief Set the user id of the account to use
+     * @param userId user id of the account to use.
+     */
     void setUserId(const QString &userId);
+    /**
+     * @brief Query to use
+     * @return query to use.
+     */
     Query query() const;
+    /**
+     * @brief Set the query to use
+     * @param query query to use.
+     */
     void setQuery(Query &&query);
+    /**
+     * @brief The number of unread entries
+     * @return number of unread entries.
+     */
     int unread() const;
+    /**
+     * @brief Set the number of unread entries
+     * @param unread number of unread entries.
+     */
     void setUnread(int unread);
 private:
     QString m_name {};

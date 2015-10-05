@@ -36,23 +36,76 @@
 #include <memory>
 
 class QJsonObject;
+/**
+ * @brief An Entity
+ *
+ * This class represents an entity from Twitter API.
+ *
+ * An entity is described with a Type. Each type
+ * is available as a subclass of this class.
+ *
+ * See https://dev.twitter.com/overview/api/entities-in-twitter-objects.
+ */
 class Entity
 {
 public:
     using Ptr = std::shared_ptr<Entity>;
+    /**
+     * @brief Entity type
+     */
     enum Type
     {
+        /**
+         * @brief Invalid entity
+         */
         Invalid,
+        /**
+         * @brief An entity that represents a media
+         */
         Media,
+        /**
+         * @brief An entity that represents an url
+         */
         Url,
+        /**
+         * @brief An entity that represents a user mention
+         */
         UserMention,
+        /**
+         * @brief An entity that represents a hashtag
+         */
         Hashtag,
+        /**
+         * @brief An entity that represents a symbol
+         */
         Symbol
     };
     virtual ~Entity() {}
+    /**
+     * @brief Type of the entity
+     * @return type of the entity.
+     */
     virtual Type type() const = 0;
+    /**
+     * @brief If the entity instance is valid
+     * @return if the entity instance is valid.
+     */
     virtual bool isValid() const = 0;
+    /**
+     * @brief Text captured by the entity
+     * @return text captured by the entity.
+     */
     virtual QString text() const = 0;
+    /**
+     * @brief Creates a User from a JSON object
+     *
+     * This factory method parses the input JSON object
+     * that is retrieved from Twitter to create a list of
+     * of Entity subclasses that corresponds to the parsed entity.
+     *
+     * @param json JSON object to parse.
+     * @return an list of entities.
+     */
     static std::vector<Entity::Ptr> create(const QJsonObject &json);
 };
 

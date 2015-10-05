@@ -61,8 +61,8 @@ private Q_SLOTS:
         QCOMPARE(layout.unread(), 0);
 
         Layout movedLayout {std::move(layout)};
-        QVERIFY(layout.isNull());
-        QVERIFY(!movedLayout.isNull());
+        QVERIFY(!layout.isValid());
+        QVERIFY(movedLayout.isValid());
         QVERIFY(movedLayout.query().isValid());
         QCOMPARE(movedLayout.name(), QLatin1String("Layout name"));
         QCOMPARE(movedLayout.userId(), QLatin1String("userId"));

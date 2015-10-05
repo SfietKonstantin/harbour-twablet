@@ -43,7 +43,7 @@
  *
  * This class represents an user from Twitter API.
  *
- * See https://dev.twitter.com/overview/api/users.
+ * See https://dev.twitter.com/overview/api/entities-in-twitter-objects.
  */
 class User
 {
