@@ -125,10 +125,10 @@ MouseArea {
                 }
             }
 
-            Column {
+            Row {
                 id: indicators
                 visible: container.tweet ? (container.tweet.favorited || container.tweet.retweeted) : false
-                width: visible ? Theme.iconSizeSmall + Theme.paddingSmall : 0
+                anchors.top: parent.top; anchors.topMargin: Theme.paddingSmall
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.paddingMedium + header.padding
 
@@ -189,7 +189,8 @@ MouseArea {
                     delegate: TwitterImage {
                         property bool isFirst: index === 0
                         property bool isSingle: index === 0 && container.tweet.media.count === 1
-                        property real mediaHeight: width / 3 * 2
+                        property real ratio: media.size.height / media.size.width
+                        property real mediaHeight: container.enabled ? width / 3 * 2 : width * ratio
                         width: isSingle ? mediaGrid.width : (isFirst ? mediaGrid.largeSize : mediaGrid.smallSize)
                         height: isSingle ? mediaHeight : (isFirst ? mediaGrid.largeSize : mediaGrid.smallSize)
                         source: media.url
