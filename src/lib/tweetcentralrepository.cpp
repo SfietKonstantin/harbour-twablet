@@ -136,6 +136,27 @@ void TweetCentralRepository::updateTweet(const Tweet &tweet)
 void TweetCentralRepository::load(const MappingKey &key, MappingData &mappingData,
                                   IQueryHandler<Tweet>::RequestType requestType)
 {
+    class LoadingLock
+    {
+    public:
+        explicit LoadingLock(MappingData &mappingData)
+            : m_mappingData{mappingData}
+        {
+        }
+        ~LoadingLock()
+        {
+            m_mappingData.loading = false;
+        }
+    private:
+        MappingData &m_mappingData;
+    };
+
+    if (mappingData.loading) {
+        return;
+    }
+
+    mappingData.loading = true;
+
     QString path {};
     std::map<QByteArray, QByteArray> parameters {};
     mappingData.handler->createRequest(requestType, path, parameters);
@@ -146,6 +167,7 @@ void TweetCentralRepository::load(const MappingKey &key, MappingData &mappingDat
 
     QObject::connect(reply, &QNetworkReply::finished, [this, &key, &mappingData, reply, requestType]() {
         QObjectPtr<QNetworkReply> replyPtr {reply};
+        LoadingLock loadingLock {mappingData};
 
         if (replyPtr->error() != QNetworkReply::NoError) {
             qCWarning(QLoggingCategory("tweet-central-repository")) << "Error happened during request for layout" << key.account.userId() << key.query.type();

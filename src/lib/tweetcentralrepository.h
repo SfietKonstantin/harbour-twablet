@@ -65,6 +65,7 @@ private:
     struct MappingData
     {
         explicit MappingData(std::unique_ptr<IQueryHandler<Tweet> > &&inputHandler);
+        bool loading {false};
         TweetRepository repository {};
         int refcount {0};
         std::unique_ptr<IQueryHandler<Tweet>> handler {};

@@ -65,7 +65,7 @@ QString AbstractQueryItem::errorMessage() const
 
 bool AbstractQueryItem::load()
 {
-    if (m_account == nullptr || !isQueryValid()) {
+    if (m_account == nullptr || !isQueryValid() || m_status == Loading) {
         return false;
     }
 
