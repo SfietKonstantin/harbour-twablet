@@ -29,54 +29,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "layout.h"
+#include <gtest/gtest.h>
+#include <QtCore/QCoreApplication>
+#include <QtCore/QStandardPaths>
 
-Layout::Layout(const QString &name, const QString &userId, Query &&query)
-    : m_name{name}, m_userId{userId}, m_query{std::move(query)}
+class WrapperObject: public QObject
 {
-}
+public:
+    explicit WrapperObject(int &argc, char **argv)
+        : m_argc(argc), m_argv(argv)
+    {
+    }
+    void run()
+    {
+        QStandardPaths::enableTestMode(true);
+        testing::InitGoogleTest(&m_argc, m_argv);
+        m_returnCode = RUN_ALL_TESTS();
+        QCoreApplication::instance()->postEvent(this, new QEvent(QEvent::User));
+    }
+protected:
+    bool event(QEvent *e) override
+    {
+        if (e->type() == QEvent::User) {
+            QCoreApplication::exit(m_returnCode);
+            return true;
+        } else {
+            return QObject::event(e);
+        }
+    }
+private:
+    int &m_argc;
+    char **m_argv {nullptr};
+    int m_returnCode {0};
+};
 
-bool Layout::isValid() const
+int main(int argc, char **argv)
 {
-    return (!m_name.isEmpty() && !m_userId.isEmpty() && m_query.isValid());
-}
-
-QString Layout::name() const
-{
-    return m_name;
-}
-
-void Layout::setName(const QString &name)
-{
-    m_name = name;
-}
-
-QString Layout::userId() const
-{
-    return m_userId;
-}
-
-void Layout::setUserId(const QString &userId)
-{
-    m_userId = userId;
-}
-
-Query Layout::query() const
-{
-    return m_query;
-}
-
-void Layout::setQuery(Query &&query)
-{
-    m_query = std::move(query);
-}
-
-int Layout::unread() const
-{
-    return m_unread;
-}
-
-void Layout::setUnread(int unread)
-{
-    m_unread = unread;
+    QCoreApplication app (argc, argv);
+    WrapperObject object {argc, argv};
+    object.run();
+    return app.exec();
 }
