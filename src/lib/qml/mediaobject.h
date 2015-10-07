@@ -44,6 +44,7 @@ class MediaObject : public QObject
     Q_OBJECT
     Q_PROPERTY(QString id READ id CONSTANT)
     Q_PROPERTY(QString url READ url CONSTANT)
+    Q_PROPERTY(QString urlLarge READ urlLarge CONSTANT)
     Q_PROPERTY(Type type READ type CONSTANT)
     Q_PROPERTY(int duration READ duration CONSTANT)
     Q_PROPERTY(QSize size READ size CONSTANT)
@@ -60,6 +61,7 @@ public:
     static MediaObject * create(const MediaEntity &data, QObject *parent = 0);
     QString id() const;
     QString url() const;
+    QString urlLarge() const;
     Type type() const;
     QSize size() const;
     int duration() const;

@@ -101,7 +101,7 @@ MouseArea {
                 anchors.left: parent.left; anchors.leftMargin: header.padding
                 width: Theme.itemSizeSmall
                 height: Theme.itemSizeSmall
-                source: container.tweet ? container.tweet.user.imageUrl : ""
+                source: container.tweet ? (Screen.sizeCategory === Screen.Large ? container.tweet.user.imageUrlLarge : container.tweet.user.imageUrl) : ""
             }
 
             Column {

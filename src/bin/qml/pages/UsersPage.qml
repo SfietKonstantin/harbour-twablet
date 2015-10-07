@@ -74,7 +74,7 @@ Page {
                 anchors.verticalCenter: parent.verticalCenter
                 width: Theme.itemSizeSmall
                 height: Theme.itemSizeSmall
-                source: model.item.imageUrl
+                source: Screen.sizeCategory === Screen.Large ? model.item.imageUrlLarge : model.item.imageUrl
             }
 
             Column {

@@ -55,6 +55,11 @@ QString MediaObject::url() const
     return m_data.mediaUrl();
 }
 
+QString MediaObject::urlLarge() const
+{
+    return m_data.mediaUrlLarge();
+}
+
 MediaObject::Type MediaObject::type() const
 {
     return static_cast<Type>(m_data.mediaType());

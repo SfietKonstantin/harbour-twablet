@@ -141,9 +141,20 @@ QString User::imageUrl() const
     return m_imageUrl;
 }
 
+QString User::imageUrlLarge() const
+{
+    QString returned {m_imageUrl};
+    return returned.replace(QLatin1String("_normal"), QLatin1String("_bigger"));
+}
+
 QString User::bannerUrl() const
 {
-    return m_bannerUrl;
+    return m_bannerUrl + QLatin1String("/mobile_retina");
+}
+
+QString User::bannerUrlLarge() const
+{
+    return m_bannerUrl + QLatin1String("/ipad_retina");
 }
 
 QDateTime User::createdAt() const

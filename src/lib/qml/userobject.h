@@ -58,7 +58,9 @@ class UserObject : public QObject
     Q_PROPERTY(int listedCount READ listedCount CONSTANT)
     Q_PROPERTY(int favouritesCount READ favouritesCount CONSTANT)
     Q_PROPERTY(QString imageUrl READ imageUrl CONSTANT)
+    Q_PROPERTY(QString imageUrlLarge READ imageUrlLarge CONSTANT)
     Q_PROPERTY(QString bannerUrl READ bannerUrl CONSTANT)
+    Q_PROPERTY(QString bannerUrlLarge READ bannerUrlLarge CONSTANT)
     Q_PROPERTY(int tweetsPerDay READ tweetsPerDay CONSTANT)
 public:
     DISABLE_COPY_DISABLE_MOVE(UserObject);
@@ -79,7 +81,9 @@ public:
     int listedCount() const;
     int favouritesCount() const;
     QString imageUrl() const;
+    QString imageUrlLarge() const;
     QString bannerUrl() const;
+    QString bannerUrlLarge() const;
     int tweetsPerDay() const;
     User data() const;
 private:

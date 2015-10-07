@@ -148,10 +148,29 @@ public:
      */
     QString imageUrl() const;
     /**
+     * @brief Url of the user's profile picture
+     *
+     * This method will return the bigger variant.
+     *
+     * @return url of the user's profile picture.
+     */
+    QString imageUrlLarge() const;
+    /**
      * @brief Url of the user's banner
+     *
+     * This method will return the mobile_retina variant.
+     *
      * @return url of the user's banner.
      */
     QString bannerUrl() const;
+    /**
+     * @brief Url of the user's banner
+     *
+     * This method will return the ipad_retina variant.
+     *
+     * @return url of the user's banner.
+     */
+    QString bannerUrlLarge() const;
     /**
      * @brief When the user created his/her account
      * @return when the user created his/her account.

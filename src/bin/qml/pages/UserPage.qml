@@ -59,7 +59,7 @@ Page {
                 id: image
                 anchors.left: parent.left; anchors.right: parent.right
                 height: 3 * Theme.itemSizeLarge
-                source: query.user ? query.user.bannerUrl : ""
+                source: query.user ? (Screen.sizeCategory === Screen.Large ? query.user.bannerUrlLarge : query.user.bannerUrl) : ""
 
                 ShaderEffect {
                     id: gradient
@@ -89,7 +89,7 @@ Page {
                     anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
                     width: Theme.itemSizeMedium
                     height: Theme.itemSizeMedium
-                    source: query.user.imageUrl
+                    source: query.user ? (Screen.sizeCategory === Screen.Large ? query.user.imageUrlLarge : query.user.imageUrl) : ""
                 }
 
                 Label {

@@ -32,21 +32,6 @@ set(${PROJECT_NAME}_SRCS
     main.cpp
 )
 
-add_executable(${PROJECT_NAME}
-    ${${PROJECT_NAME}_SRCS}
-    ${${PROJECT_NAME}_Res_SRCS}
-)
-target_link_libraries(${PROJECT_NAME}
-    Qt5::Core
-    Qt5::Gui
-    Qt5::Network
-    Qt5::Quick
-    ${SAILFISHAPP_LIBRARIES}
-    twablet
-)
-qt5_use_modules(${PROJECT_NAME} Core Gui Network Quick)
-
-# Deployment
 set(${PROJECT_NAME}_Qml_SRCS
     qml/harbour-twablet.qml
     qml/pages/MainPage.qml
@@ -80,6 +65,23 @@ set(${PROJECT_NAME}_Data_SRCS
     data/background.png
 )
 
+add_executable(${PROJECT_NAME}
+    ${${PROJECT_NAME}_SRCS}
+    ${${PROJECT_NAME}_Res_SRCS}
+    ${${PROJECT_NAME}_Qml_SRCS}
+    ${${PROJECT_NAME}_Data_SRCS}
+)
+target_link_libraries(${PROJECT_NAME}
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Network
+    Qt5::Quick
+    ${SAILFISHAPP_LIBRARIES}
+    twablet
+)
+qt5_use_modules(${PROJECT_NAME} Core Gui Network Quick)
+
+# Deployment
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install(FILES ${PROJECT_NAME}.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
 install(FILES ${PROJECT_NAME}.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/86x86/apps)

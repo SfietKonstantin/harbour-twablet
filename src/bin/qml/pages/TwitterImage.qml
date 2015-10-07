@@ -56,6 +56,8 @@ Item {
         fillMode: Image.PreserveAspectCrop
         clip: true
         opacity: 0
+        sourceSize.width: width
+        sourceSize.height: height
 
         states: State {
             name: "visible"; when: image.status === Image.Ready

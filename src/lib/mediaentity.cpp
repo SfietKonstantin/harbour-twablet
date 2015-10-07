@@ -97,6 +97,11 @@ QString MediaEntity::mediaUrl() const
     return m_mediaUrl;
 }
 
+QString MediaEntity::mediaUrlLarge() const
+{
+    return m_mediaUrl + QLatin1String(":large");
+}
+
 MediaEntity::MediaType MediaEntity::mediaType() const
 {
     return m_mediaType;

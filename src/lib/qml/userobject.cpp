@@ -127,9 +127,19 @@ QString UserObject::imageUrl() const
     return m_data.imageUrl();
 }
 
+QString UserObject::imageUrlLarge() const
+{
+    return m_data.imageUrlLarge();
+}
+
 QString UserObject::bannerUrl() const
 {
     return m_data.bannerUrl();
+}
+
+QString UserObject::bannerUrlLarge() const
+{
+    return m_data.bannerUrlLarge();
 }
 
 int UserObject::tweetsPerDay() const

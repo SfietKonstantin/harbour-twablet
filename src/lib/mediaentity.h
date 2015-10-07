@@ -56,6 +56,7 @@ public:
     QString displayUrl() const;
     QString expandedUrl() const;
     QString mediaUrl() const;
+    QString mediaUrlLarge() const;
     MediaType mediaType() const;
     int width() const;
     int height() const;
