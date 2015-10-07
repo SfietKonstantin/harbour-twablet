@@ -235,6 +235,8 @@ private:
 
         m_items = std::move(newItems);
 
+        emit dataChanged(index(0), index(rowCount() - 1));
+
         if (delta != 0) {
             emit countChanged();
         }
