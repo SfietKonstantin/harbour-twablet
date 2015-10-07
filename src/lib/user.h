@@ -91,7 +91,7 @@ public:
      * @brief Entities present in the description of the user
      * @return entities present in the description of the user.
      */
-    std::vector<Entity::Ptr> descriptionEntities() const;
+    Entity::List descriptionEntities() const;
     /**
      * @brief Location of the user
      * @return location of the user.
@@ -106,7 +106,7 @@ public:
      * @brief Entities present in the url of the user
      * @return entities present in the url of the user.
      */
-    std::vector<Entity::Ptr> urlEntities() const;
+    Entity::List urlEntities() const;
     /**
      * @brief If the user account is protected
      * @return if the user account is protected.
@@ -162,10 +162,10 @@ private:
     QString m_name {};
     QString m_screenName {};
     QString m_description {};
-    std::vector<Entity::Ptr> m_descriptionEntities {};
+    Entity::List m_descriptionEntities {};
     QString m_location {};
     QString m_url {};
-    std::vector<Entity::Ptr> m_urlEntities {};
+    Entity::List m_urlEntities {};
     bool m_protected {false};
     bool m_following {false};
     int m_statusesCount {0};

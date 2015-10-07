@@ -136,7 +136,7 @@ void UserCentralRepository::load(UserCentralRepository::MappingData &mappingData
             mappingData.repository.error(QObject::tr("Internal error"));
             return;
         } else {
-            qDebug(QLoggingCategory("user-central-repository")) << "New data available for users" << mappingData.account.userId() << mappingData.query.type() << ". Count:" << items.size();
+            qCDebug(QLoggingCategory("user-central-repository")) << "New data available for users" << mappingData.account.userId() << mappingData.query.type() << ". Count:" << items.size();
             switch (placement) {
             case IQueryHandler<User>::Append:
                 mappingData.repository.append(items);

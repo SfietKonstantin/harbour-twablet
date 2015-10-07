@@ -34,6 +34,7 @@
 #include <set>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
+#include <QtCore/QJsonDocument>
 
 Tweet::Tweet(const QJsonObject &json)
 {
@@ -61,7 +62,8 @@ Tweet::Tweet(const QJsonObject &json)
     m_user = std::move(User(displayedTweet.value(QLatin1String("user")).toObject()));
 
     QJsonObject entities {displayedTweet.value(QLatin1String("entities")).toObject()};
-    m_entities = Entity::create(entities);
+    QJsonObject extendedEntities {displayedTweet.value(QLatin1String("extended_entities")).toObject()};
+    m_entities = Entity::create(entities, extendedEntities);
 }
 
 bool Tweet::isValid() const
@@ -139,7 +141,7 @@ QString Tweet::source() const
     return m_source;
 }
 
-std::vector<Entity::Ptr> Tweet::entities() const
+Entity::List Tweet::entities() const
 {
     return m_entities;
 }

@@ -32,10 +32,9 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include <QtCore/QString>
+#include <QtCore/QJsonObject>
 #include <memory>
 
-class QJsonObject;
 /**
  * @brief An entity
  *
@@ -50,6 +49,7 @@ class Entity
 {
 public:
     using Ptr = std::shared_ptr<Entity>;
+    using List = std::vector<Ptr>;
     /**
      * @brief Entity type
      */
@@ -97,16 +97,19 @@ public:
      */
     virtual QString text() const = 0;
     /**
-     * @brief Creates a User from a JSON object
+     * @brief Creates a list of Entity from a JSON object
      *
-     * This factory method parses the input JSON object
+     * This factory method parses the input JSON objects
      * that is retrieved from Twitter to create a list of
      * of Entity subclasses that corresponds to the parsed entity.
      *
+     * This method parses entities and extended_entities.
+     *
      * @param json JSON object to parse.
+     * @param extendedJson JSON object to parse (extended_entities).
      * @return an list of entities.
      */
-    static std::vector<Entity::Ptr> create(const QJsonObject &json);
+    static List create(const QJsonObject &json, const QJsonObject &extendedJson = QJsonObject());
 };
 
 #endif // ENTITY_H

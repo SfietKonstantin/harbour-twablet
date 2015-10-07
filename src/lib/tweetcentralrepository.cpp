@@ -208,7 +208,7 @@ void TweetCentralRepository::load(const MappingKey &key, MappingData &mappingDat
                 m_data.emplace(tweet.id(), tweet);
                 qCDebug(QLoggingCategory("tweet-central-repository")) << "Adding tweet with id" << tweet.id();
             }
-            qDebug(QLoggingCategory("tweet-central-repository")) << "New data available for layout" << key.account.userId() << key.query.type() << ". Count:" << items.size();
+            qCDebug(QLoggingCategory("tweet-central-repository")) << "New data available for layout" << key.account.userId() << key.query.type() << ". Count:" << items.size();
             switch (placement) {
             case IQueryHandler<Tweet>::Append:
                 mappingData.repository.append(items);

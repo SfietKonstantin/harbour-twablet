@@ -171,7 +171,7 @@ public:
      * @brief Entities contained in this tweet
      * @return entities contained in this tweet.
      */
-    std::vector<Entity::Ptr> entities() const;
+    Entity::List entities() const;
 private:
     QString m_id {};
     QString m_originalId {};
@@ -185,7 +185,7 @@ private:
     bool m_retweeted {};
     QString m_inReplyTo {};
     QString m_source {};
-    std::vector<Entity::Ptr> m_entities;
+    Entity::List m_entities;
 };
 
 #endif // TWEET_H

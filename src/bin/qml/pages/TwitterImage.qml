@@ -32,11 +32,21 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-Rectangle {
+Item {
     id: container
     property alias source: image.source
-    color: Theme.secondaryHighlightColor
     property alias image: image
+
+    Rectangle {
+        id: background
+        anchors.fill: parent
+        color: Theme.secondaryHighlightColor
+        opacity: 1
+
+        Behavior on opacity {
+            FadeAnimation {}
+        }
+    }
 
     Image {
         id: image
@@ -52,6 +62,10 @@ Rectangle {
             PropertyChanges {
                 target: image
                 opacity: 1
+            }
+            PropertyChanges {
+                target: background
+                opacity: 0
             }
         }
 

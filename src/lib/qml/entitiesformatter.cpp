@@ -58,7 +58,7 @@ QString EntitiesFormatter::text() const
     return m_text;
 }
 
-void EntitiesFormatter::doFormat(const QString &input, const std::vector<Entity::Ptr> &entities)
+void EntitiesFormatter::doFormat(const QString &input, const Entity::List &entities)
 {
     if (!m_complete) {
         return;

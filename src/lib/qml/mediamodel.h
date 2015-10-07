@@ -48,14 +48,14 @@ public:
     {
         MediaRole = Qt::UserRole + 1
     };
-    static MediaModel * create(const std::vector<Entity::Ptr> &entities, QObject *parent = 0);
+    static MediaModel * create(const Entity::List &entities, QObject *parent = 0);
     int rowCount(const QModelIndex &parent = QModelIndex()) const override final;
     QVariant data(const QModelIndex &index, int role) const override final;
     int count() const;
 signals:
     void countChanged();
 private:
-    explicit MediaModel(const std::vector<Entity::Ptr> &entities, QObject *parent = 0);
+    explicit MediaModel(const Entity::List &entities, QObject *parent = 0);
     QHash<int, QByteArray> roleNames() const override final;
     std::vector<QObjectPtr<MediaObject>> m_data {};
 };

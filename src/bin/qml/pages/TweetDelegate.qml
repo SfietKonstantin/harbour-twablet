@@ -177,12 +177,13 @@ MouseArea {
             Grid {
                 id: mediaGrid
                 visible: container.tweet ? container.tweet.media.count > 0 : false
-                property real smallSize: mediaGrid.width * 2 / 3
+                property real smallSize: mediaGrid.width / 3
                 property real largeSize: mediaGrid.width * 2 / 3
                 anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
                 anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
-                columns: 3
+                columns: 2
                 rows: 2
+                clip: true
 
                 Repeater {
                     model: container.tweet ? container.tweet.media : null

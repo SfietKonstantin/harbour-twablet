@@ -35,47 +35,68 @@
 #include "usermentionentity.h"
 #include "hashtagentity.h"
 #include <set>
+#include <map>
 #include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
 
 template <class T>
-static void checkAndInsert(const QJsonValue &value, std::vector<Entity::Ptr> &returned,
-                           std::set<QString> &inserted)
+static void insertEntity(const QJsonValue &value, std::map<QString, Entity::Ptr> &map,
+                         std::vector<QString> &texts)
 {
     Entity::Ptr entity {new T(value.toObject())};
-    if (inserted.find(entity->text()) == std::end(inserted)) {
-        returned.push_back(entity);
-        inserted.insert(entity->text());
+    if (map.find(entity->text()) == std::end(map)) {
+        texts.push_back(entity->text());
     }
+    map.emplace(entity->text(), entity);
 }
 
-std::vector<Entity::Ptr> Entity::create(const QJsonObject &json)
+template <class T>
+static void overrideEntity(const QJsonValue &value, std::map<QString, Entity::Ptr> &map,
+                           Entity::List &extended)
 {
-    std::vector<Entity::Ptr> returned {};
-    std::set<QString> inserted {};
+    Entity::Ptr entity {new T(value.toObject())};
+    map.erase(entity->text());
+    extended.push_back(entity);
+}
+
+Entity::List Entity::create(const QJsonObject &json, const QJsonObject &extendedJson)
+{
+    List extended {};
+    List returned {};
+    std::vector<QString> texts {};
+    std::map<QString, Entity::Ptr> map {};
     const QJsonArray &media (json.value(QLatin1String("media")).toArray());
     for (const QJsonValue &value : media) {
-        checkAndInsert<MediaEntity>(value, returned, inserted);
+        insertEntity<MediaEntity>(value, map, texts);
     }
 
     const QJsonArray &urls (json.value(QLatin1String("urls")).toArray());
     for (const QJsonValue &value : urls) {
-        checkAndInsert<UrlEntity>(value, returned, inserted);
+        insertEntity<UrlEntity>(value, map, texts);
     }
 
     const QJsonArray &users (json.value(QLatin1String("user_mentions")).toArray());
     for (const QJsonValue &value : users) {
-        checkAndInsert<UserMentionEntity>(value, returned, inserted);
+        insertEntity<UserMentionEntity>(value, map, texts);
     }
 
     const QJsonArray &hashtags (json.value(QLatin1String("hashtags")).toArray());
     for (const QJsonValue &value : hashtags) {
-        checkAndInsert<HashtagEntity>(value, returned, inserted);
+        insertEntity<HashtagEntity>(value, map, texts);
     }
 
-    const QJsonArray &extended (json.value(QLatin1String("extended_entities")).toArray());
-    for (const QJsonValue &value : extended) {
-        checkAndInsert<MediaEntity>(value, returned, inserted);
+    const QJsonArray &extendedMedia (extendedJson.value(QLatin1String("media")).toArray());
+    for (const QJsonValue &value : extendedMedia) {
+        overrideEntity<MediaEntity>(value, map, extended);
+    }
+
+    for (const QString &text : texts) {
+        auto it = map.find(text);
+        if (it != std::end(map)) {
+            returned.push_back(it->second);
+        }
+    }
+    for (Entity::Ptr entity : extended) {
+        returned.push_back(entity);
     }
 
     return returned;

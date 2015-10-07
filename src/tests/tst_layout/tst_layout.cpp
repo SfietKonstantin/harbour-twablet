@@ -33,7 +33,6 @@
 #include <QtTest/QSignalSpy>
 #include <qml/datarepositoryobject.h>
 #include <qml/layoutmodel.h>
-#include <QtCore/QDebug>
 
 namespace tst
 {

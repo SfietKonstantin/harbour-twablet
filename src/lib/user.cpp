@@ -81,7 +81,7 @@ QString User::description() const
     return m_description;
 }
 
-std::vector<Entity::Ptr> User::descriptionEntities() const
+Entity::List User::descriptionEntities() const
 {
     return m_descriptionEntities;
 }
@@ -96,7 +96,7 @@ QString User::url() const
     return m_url;
 }
 
-std::vector<Entity::Ptr> User::urlEntities() const
+Entity::List User::urlEntities() const
 {
     return m_urlEntities;
 }

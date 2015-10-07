@@ -34,7 +34,7 @@
 namespace qml
 {
 
-MediaModel::MediaModel(const std::vector<Entity::Ptr> &entities, QObject *parent)
+MediaModel::MediaModel(const Entity::List &entities, QObject *parent)
     : QAbstractListModel(parent)
 {
     std::vector<MediaEntity> media {};
@@ -54,7 +54,7 @@ MediaModel::MediaModel(const std::vector<Entity::Ptr> &entities, QObject *parent
     endInsertRows();
 }
 
-MediaModel * MediaModel::create(const std::vector<Entity::Ptr> &entities, QObject *parent)
+MediaModel * MediaModel::create(const Entity::List &entities, QObject *parent)
 {
     return new MediaModel(entities, parent);
 }

@@ -58,7 +58,7 @@ signals:
 protected:
     explicit EntitiesFormatter(QObject *parent = 0);
     virtual void format() = 0;
-    void doFormat(const QString &input, const std::vector<Entity::Ptr> &entities);
+    void doFormat(const QString &input, const Entity::List &entities);
 private:
     void doFormatMedia(QString &text, MediaEntity *entity);
     void doFormatUrl(QString &text, UrlEntity *entity);
