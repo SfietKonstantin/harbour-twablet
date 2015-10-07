@@ -140,7 +140,7 @@ void TweetCentralRepository::load(const MappingKey &key, MappingData &mappingDat
     {
     public:
         explicit LoadingLock(MappingData &mappingData)
-            : m_mappingData{mappingData}
+            : m_mappingData(mappingData)
         {
         }
         ~LoadingLock()
