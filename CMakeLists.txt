@@ -1,6 +1,5 @@
 project(harbour-twablet)
 cmake_minimum_required(VERSION 2.8.11)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 # Options
 option(ENABLE_COVERAGE "Enable coverage via gcov" OFF)
@@ -8,6 +7,7 @@ option(ENABLE_DESKTOP_BUILD "Enable build on desktop" OFF)
 
 # Configuration
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -pie -rdynamic")
 
 if(ENABLE_TESTS)
     if(CMAKE_BUILD_TYPE MATCHES Debug)
