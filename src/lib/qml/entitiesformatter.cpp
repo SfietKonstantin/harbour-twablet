@@ -58,11 +58,16 @@ QString EntitiesFormatter::text() const
     return m_text;
 }
 
-void EntitiesFormatter::doFormat(const QString &input, const Entity::List &entities)
+void EntitiesFormatter::doFormat(const QString &input, Entity::List &&entities)
 {
     if (!m_complete) {
         return;
     }
+
+    // Be sure to render the longer entities first
+    std::sort(std::begin(entities), std::end(entities), [](const Entity::Ptr &first, const Entity::Ptr &second) {
+        return (first->text().count() > second->text().count());
+    });
 
     QString text {input};
     for (const Entity::Ptr &entity : entities) {
