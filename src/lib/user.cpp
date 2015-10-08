@@ -143,6 +143,9 @@ QString User::imageUrl() const
 
 QString User::imageUrlLarge() const
 {
+    if (m_imageUrl.isEmpty()) {
+        return QString();
+    }
     QString returned {m_imageUrl};
     return returned.replace(QLatin1String("_normal"), QLatin1String("_bigger"));
 }
@@ -154,6 +157,9 @@ QString User::bannerUrl() const
 
 QString User::bannerUrlLarge() const
 {
+    if (m_bannerUrl.isEmpty()) {
+        return QString();
+    }
     return m_bannerUrl + QLatin1String("/ipad_retina");
 }
 

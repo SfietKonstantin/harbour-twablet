@@ -29,6 +29,7 @@ include_directories(
 )
 
 set(${PROJECT_NAME}_SRCS
+    version.h
     main.cpp
 )
 
@@ -53,6 +54,7 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/pages/TweetPage.qml
     qml/pages/StatusUpdater.qml
     qml/pages/ProgressIconButton.qml
+    qml/pages/AboutPage.qml
     qml/pages/LinkHandler.js
 )
 
@@ -63,6 +65,7 @@ set(${PROJECT_NAME}_Data_SRCS
     data/search.svg
     data/me.svg
     data/background.png
+    data/logo.png
 )
 
 add_executable(${PROJECT_NAME}

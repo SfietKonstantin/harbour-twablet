@@ -36,6 +36,8 @@ Item {
     id: container
     property alias source: image.source
     property alias image: image
+    property alias progress: image.progress
+    property alias status: image.status
 
     Rectangle {
         id: background

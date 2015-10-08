@@ -2,5 +2,6 @@ build
 *.pro.*
 CMakeLists.txt.*
 src/lib/twitter-secrets.h
+src/bin/version.h
 report
 doc

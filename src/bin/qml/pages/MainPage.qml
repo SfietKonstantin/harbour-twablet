@@ -98,7 +98,7 @@ Page {
 
             MenuItem {
                 text: qsTr("About")
-                enabled: false
+                onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"), {rightPanel: panel})
             }
         }
 

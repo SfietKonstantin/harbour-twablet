@@ -57,6 +57,36 @@
 #include "qml/tweetqueryitem.h"
 #include "qml/retweetqueryitem.h"
 #include "qml/favoritequeryitem.h"
+#include "version.h"
+
+static const char *PAYPAL_DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&"
+                                   "hosted_button_id=R6AJV4U2G33XG";
+static const char *FLATTR_DONATE = "https://flattr.com/profile/sfiet_konstantin";
+
+class Info: public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QString version READ version CONSTANT)
+    Q_PROPERTY(QString paypal READ paypal CONSTANT)
+    Q_PROPERTY(QString flattr READ flattr CONSTANT)
+public:
+    explicit Info(QObject *parent = 0)
+        : QObject(parent)
+    {
+    }
+    QString version() const
+    {
+        return QLatin1String(Version);
+    }
+    QString paypal() const
+    {
+        return QLatin1String(PAYPAL_DONATE);
+    }
+    QString flattr() const
+    {
+        return QLatin1String(FLATTR_DONATE);
+    }
+};
 
 int main(int argc, char *argv[])
 {
@@ -70,6 +100,7 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<qml::MediaObject>("harbour.twablet", 1, 0, "Media", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::MediaModel>("harbour.twablet", 1, 0, "MediaModel", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::AbstractQueryItem>("harbour.twablet", 1, 0, "QueryItem", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<Info>("harbour.twablet", 1, 0, "InfoObject", QLatin1String("Uncreatable"));
     qmlRegisterType<qml::TwitterAuthentification>("harbour.twablet", 1, 0, "TwitterAuthentification");
     qmlRegisterType<qml::AccountModel>("harbour.twablet", 1, 0, "AccountModel");
     qmlRegisterType<qml::AccountSelectionModel>("harbour.twablet", 1, 0, "AccountSelectionModel");
@@ -88,6 +119,10 @@ int main(int argc, char *argv[])
                                                           [](QQmlEngine *e, QJSEngine *) -> QObject * {
         return new qml::DataRepositoryObject(e);
     });
+    qmlRegisterSingletonType<Info>("harbour.twablet", 1, 0, "Info",
+                                   [](QQmlEngine *e, QJSEngine *) -> QObject * {
+        return new Info(e);
+    });
 
 #ifndef DESKTOP
     return SailfishApp::main(argc, argv);
@@ -100,3 +135,5 @@ int main(int argc, char *argv[])
     return app.exec();
 #endif
 }
+
+#include "main.moc"

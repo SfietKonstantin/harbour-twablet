@@ -99,6 +99,9 @@ QString MediaEntity::mediaUrl() const
 
 QString MediaEntity::mediaUrlLarge() const
 {
+    if (m_mediaUrl.isEmpty()) {
+        return QString();
+    }
     return m_mediaUrl + QLatin1String(":large");
 }
 

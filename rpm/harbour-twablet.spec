@@ -22,6 +22,14 @@ A Twitter application for big screens
 %prep
 %setup -q -n %{name}-%{version}
 cp -p %{SOURCE1} src/lib
+cat > src/bin/version.h << EOL
+#ifndef VERSION_H
+#define VERSION_H
+
+static const char *Version = "${RPM_PACKAGE_VERSION}";
+
+#endif // VERSION_H
+EOL
 
 %build
 cmake -DCMAKE_INSTALL_PREFIX=/usr .
