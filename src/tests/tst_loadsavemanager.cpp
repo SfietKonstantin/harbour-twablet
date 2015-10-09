@@ -37,6 +37,7 @@
 #include <QtCore/QStandardPaths>
 #include <memory>
 #include <loadsavemanager.h>
+#include <accountrepository.h>
 
 class SimpleLoadSave: public ILoadSave
 {
@@ -199,6 +200,34 @@ TEST(loadsavemanager, FailureAppDir)
     save.setDouble(12.34);
     EXPECT_FALSE(loadSaveManager.load(save));
     EXPECT_FALSE(loadSaveManager.save(save));
+}
+
+bool operator==(const Account &account1, const Account &account2)
+{
+    return account1.name() == account2.name()
+           && account1.userId() == account2.userId()
+           && account1.screenName() == account2.screenName()
+           && account1.token() == account2.token()
+           && account1.tokenSecret() == account2.tokenSecret();
+}
+
+TEST(loadsavemanager, LoadSaveAccountRepository)
+{
+    resetTestCase();
+    AccountRepository accountRepository {};
+    Account account1 {"Test", "test_userid", "test_user", "abcdef123456", "secret-abcdef123456"};
+    Account account2 {"Account2", "account2_userid", "account2_user", "xyzt01010", "2nd-secret"};
+    accountRepository.append(std::move(Account(account1)));
+    accountRepository.append(std::move(Account(account2)));
+
+    LoadSaveManager loadSaveManager {};
+    AccountRepository newAccountRepository {};
+
+    EXPECT_TRUE(loadSaveManager.save(accountRepository));
+    EXPECT_TRUE(loadSaveManager.load(newAccountRepository));
+
+    EXPECT_EQ(*std::begin(newAccountRepository), account1);
+    EXPECT_EQ(*(std::begin(newAccountRepository) + 1), account2);
 }
 
 TEST(loadsavemanager, CleanUp)

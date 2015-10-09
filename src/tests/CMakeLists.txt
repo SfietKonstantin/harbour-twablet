@@ -9,6 +9,7 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5Qml REQUIRED)
 find_package(Qt5Test REQUIRED)
+find_program(LCOV_PATH lcov)
 
 include_directories(
     ${CMAKE_SOURCE_DIR}
@@ -19,7 +20,7 @@ include_directories(
 )
 
 set(${PROJECT_NAME}_SRCS
-    main.cpp
+    tst_main.cpp
     tst_account.cpp
     tst_layout.cpp
     tst_loadsavemanager.cpp
@@ -38,4 +39,5 @@ target_link_libraries(${PROJECT_NAME}
 )
 qt5_use_modules(${PROJECT_NAME} Core Network Qml Test)
 
+add_test(NAME pre COMMAND ${LCOV_PATH} --directory ${CMAKE_BINARY_DIR} --zerocounters)
 add_test(tests ${PROJECT_NAME})
