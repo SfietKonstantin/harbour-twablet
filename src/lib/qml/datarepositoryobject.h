@@ -33,6 +33,7 @@
 #define DATAREPOSITORYOBJECT_H
 
 #include <QtCore/QObject>
+#include "qobjectutils.h"
 #include "loadsavemanager.h"
 #include "accountrepository.h"
 #include "layoutrepository.h"
@@ -104,13 +105,14 @@ private:
     void removeLayoutFromRepositories(const Layout &layout);
     void removeLayoutFromRepositories(int index);
 
+    QObjectPtr<QNetworkAccessManager> m_network {nullptr};
     LoadSaveManager m_loadSaveManager {};
     AccountRepository m_accounts {};
     std::map<QString, const Account &> m_accountsMapping {};
     LayoutRepository m_layouts {};
-    TweetCentralRepository m_tweetsCentralRepository {};
+    TweetCentralRepository m_tweetsCentralRepository;
     std::map<int, Layout> m_temporaryLayouts {};
-    UserCentralRepository m_userCentralRepository {};
+    UserCentralRepository m_userCentralRepository;
     int m_temporaryLayoutsIndex {0};
 };
 

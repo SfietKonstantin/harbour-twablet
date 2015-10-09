@@ -29,47 +29,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef USERCENTRALREPOSITORY_H
-#define USERCENTRALREPOSITORY_H
+#ifndef IQUERYEXECUTOR_H
+#define IQUERYEXECUTOR_H
 
-#include <map>
-#include <QtNetwork/QNetworkAccessManager>
-#include "globals.h"
-#include "qobjectutils.h"
+#include <memory>
+#include <functional>
+#include <QtNetwork/QNetworkReply>
 #include "account.h"
-#include "query.h"
-#include "userrepository.h"
-#include "iqueryhandler.h"
-#include "iqueryexecutor.h"
 
-class UserCentralRepository
+class IQueryExecutor
 {
 public:
-    explicit UserCentralRepository(IQueryExecutor::Ptr queryExecutor);
-    DISABLE_COPY_DEFAULT_MOVE(UserCentralRepository);
-    bool isValid(int index) const;
-    UserRepository & repository(int index);
-    void refresh(int index);
-    void loadMore(int index);
-    int addRepository(const Account &account, const Query &query);
-    void removeRepository(int index);
-private:
-    struct MappingData
-    {
-        explicit MappingData(const Account &inputAccount, const Query &inputQuery,
-                             std::unique_ptr<IQueryHandler<User>> &&inputHandler);
-        bool loading {false};
-        Account account {};
-        Query query {};
-        UserRepository repository {};
-        std::unique_ptr<IQueryHandler<User>> handler {};
-    };
-    void load(MappingData &mappingData,
-              IQueryHandler<User>::RequestType requestType);
-    MappingData * getMappingData(int index, const Account &account, const Query &query);
-    IQueryExecutor::Ptr m_queryExecutor {nullptr};
-    std::map<int, MappingData> m_mapping {};
-    int m_index {0};
+    using Ptr = std::unique_ptr<IQueryExecutor>;
+    using Callback_t = std::function<void (QIODevice &reply, QNetworkReply::NetworkError error, const QString &errorMessage)>;
+    virtual void execute(const QString &path, const std::map<QByteArray, QByteArray> &parameters,
+                         const Account &account, const Callback_t &callback) = 0;
 };
 
-#endif // USERCENTRALREPOSITORY_H
+#endif // IQUERYEXECUTOR_H
+

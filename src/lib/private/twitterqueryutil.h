@@ -34,7 +34,7 @@
 
 #include <QtNetwork/QNetworkRequest>
 #include <map>
-#include "../account.h"
+#include "account.h"
 
 class QNetworkAccessManager;
 class QNetworkReply;

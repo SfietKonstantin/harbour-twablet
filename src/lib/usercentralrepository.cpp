@@ -30,18 +30,20 @@
  */
 
 #include "usercentralrepository.h"
-#include "private/twitterqueryutil.h"
 #include "friendsqueryhandler.h"
 #include "followersqueryhandler.h"
+#include "private/twitterqueryutil.h"
+#include "private/repositoryprocesscallback.h"
 #include <QtCore/QLoggingCategory>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
 #include <QtNetwork/QNetworkReply>
 
-UserCentralRepository::UserCentralRepository()
-    : m_network{new QNetworkAccessManager()}
+UserCentralRepository::UserCentralRepository(IQueryExecutor::Ptr queryExecutor)
+    : m_queryExecutor(std::move(queryExecutor))
 {
+    Q_ASSERT_X(m_queryExecutor, "UserCentralRepository", "NULL query executor");
 }
 
 bool UserCentralRepository::isValid(int index) const
@@ -90,65 +92,28 @@ void UserCentralRepository::removeRepository(int index)
 void UserCentralRepository::load(UserCentralRepository::MappingData &mappingData,
                                  IQueryHandler<User>::RequestType requestType)
 {
+    if (mappingData.loading) {
+        return;
+    }
+
+    mappingData.loading = true;
+
     QString path {};
     std::map<QByteArray, QByteArray> parameters {};
     mappingData.handler->createRequest(requestType, path, parameters);
     qCDebug(QLoggingCategory("user-central-repository")) << "Request:" << path << parameters;
-
-    QNetworkReply *reply {private_util::TwitterQueryUtil::get(*m_network, path, parameters, mappingData.account)};
     mappingData.repository.start();
 
-    QObject::connect(reply, &QNetworkReply::finished, [this, &mappingData, reply, requestType]() {
-        QObjectPtr<QNetworkReply> replyPtr {reply};
-
-        if (replyPtr->error() != QNetworkReply::NoError) {
-            qCWarning(QLoggingCategory("user-central-repository")) << "Error happened during request for users" << mappingData.account.userId() << mappingData.query.type();
-            qCWarning(QLoggingCategory("user-central-repository")) << "Error code:" << reply->error();
-            qCWarning(QLoggingCategory("user-central-repository")) << "Error message (Qt):" << reply->errorString();
-            const QByteArray &data {reply->readAll()};
-            qCWarning(QLoggingCategory("user-central-repository")) << "Error message (Twitter):" << data;
-
-            // Check if Twitter sent us an issue
-            QJsonDocument document {QJsonDocument::fromJson(data)};
-            if (document.isObject()) {
-                const QJsonObject &object {document.object()};
-                const QJsonArray &array {object.value(QLatin1String("errors")).toArray()};
-                if (array.count() == 1) {
-                    const QJsonObject &firstError {array.first().toObject()};
-                    if (firstError.value(QLatin1String("code")).toInt() == 88) {
-                        mappingData.repository.error(QObject::tr("Twitter rate limit exceeded. Please try again later."));
-                        return;
-                    }
-                }
-            }
-
-            mappingData.repository.error(QObject::tr("Network error. Please try again later."));
-            return;
-        }
-
+    m_queryExecutor->execute(path, parameters, mappingData.account, [this, &mappingData, requestType](QIODevice &reply, QNetworkReply::NetworkError error, const QString &errorMessage) {
         std::vector<User> items {};
-        QString errorMessage {};
-        IQueryHandler<User>::Placement placement {IQueryHandler<User>::Discard};
-        bool returned = mappingData.handler->treatReply(requestType, reply->readAll(), items, errorMessage, placement);
-        if (!returned) {
-            qCWarning(QLoggingCategory("user-central-repository")) << "Error happened during request for users" << mappingData.account.userId() << mappingData.query.type();
-            qCWarning(QLoggingCategory("user-central-repository")) << "Parsing error: " << errorMessage;
-            mappingData.repository.error(QObject::tr("Internal error"));
-            return;
-        } else {
-            qCDebug(QLoggingCategory("user-central-repository")) << "New data available for users" << mappingData.account.userId() << mappingData.query.type() << ". Count:" << items.size();
-            switch (placement) {
-            case IQueryHandler<User>::Append:
-                mappingData.repository.append(items);
-                break;
-            case IQueryHandler<User>::Prepend:
-                mappingData.repository.prepend(items);
-                break;
-            case IQueryHandler<User>::Discard:
-                break;
-            }
-            mappingData.repository.finish();
-        }
+        private_util::RepositoryProcessCallback<User> callback {
+            requestType,
+            *mappingData.handler,
+            mappingData.repository,
+            items,
+            mappingData.loading
+        };
+        callback(reply, error, errorMessage);
     });
 }
 

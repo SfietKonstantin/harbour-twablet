@@ -32,6 +32,7 @@
 #include "datarepositoryobject.h"
 #include "query.h"
 #include "accountobject.h"
+#include "private/networkqueryexecutor.h"
 #include <QtCore/QVariantMap>
 #include <QtCore/QLoggingCategory>
 
@@ -40,6 +41,9 @@ namespace qml
 
 DataRepositoryObject::DataRepositoryObject(QObject *parent)
     : QObject(parent)
+    , m_network(new QNetworkAccessManager())
+    , m_tweetsCentralRepository(private_util::NetworkQueryExecutor::create(*m_network))
+    , m_userCentralRepository(private_util::NetworkQueryExecutor::create(*m_network))
 {
     m_loadSaveManager.load(m_accounts);
     for (const Account &account : m_accounts) {

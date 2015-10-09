@@ -40,12 +40,13 @@
 #include "query.h"
 #include "tweetrepository.h"
 #include "iqueryhandler.h"
+#include "iqueryexecutor.h"
 
 class Layout;
 class TweetCentralRepository
 {
 public:
-    explicit TweetCentralRepository();
+    explicit TweetCentralRepository(IQueryExecutor::Ptr queryExecutor);
     DISABLE_COPY_DEFAULT_MOVE(TweetCentralRepository);
     TweetRepository & repository(const Account &account, const Query &query);
     void refQuery(const Account &account, const Query &query);
@@ -78,8 +79,8 @@ private:
     void load(const MappingKey &key, MappingData &mappingData,
               IQueryHandler<Tweet>::RequestType requestType);
     MappingData * getMappingData(const Account &account, const Query &query);
+    IQueryExecutor::Ptr m_queryExecutor {nullptr};
     std::map<QString, Tweet> m_data {};
-    QObjectPtr<QNetworkAccessManager> m_network {nullptr};
     std::map<MappingKey, MappingData, MappingKeyComparator> m_mapping {};
 };
 

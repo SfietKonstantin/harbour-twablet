@@ -40,6 +40,7 @@ set(${PROJECT_NAME}_Core_SRCS
     tweetcentralrepository.cpp
     usercentralrepository.cpp
     iqueryhandler.cpp
+    iqueryexecutor.h
     abstracttweetqueryhandler.cpp
     hometimelinequeryhandler.cpp
     mentionstimelinequeryhandler.cpp
@@ -54,6 +55,7 @@ set(${PROJECT_NAME}_Core_SRCS
 set(${PROJECT_NAME}_Private_SRCS
     private/twitterdatautil.cpp
     private/twitterqueryutil.cpp
+    private/networkqueryexecutor.cpp
 )
 
 set(${PROJECT_NAME}_Qml_SRCS
