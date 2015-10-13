@@ -95,6 +95,9 @@ Page {
             TweetDelegate {
                 enabled: false
                 anchors.left: parent.left; anchors.right: parent.right
+                onOpenTweet: {
+                    panel.openTweet(originalId, id, container.account)
+                }
                 tweet: query.data
                 onHandleLink: LH.handleLink(url, container.panel, container.account, false)
                 onHandleOpenImageBrowser: panel.openImageBrowser(tweet, container.account)

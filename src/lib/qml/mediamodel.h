@@ -52,6 +52,7 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override final;
     QVariant data(const QModelIndex &index, int role) const override final;
     int count() const;
+    Q_INVOKABLE qml::MediaObject * get(int index) const;
 signals:
     void countChanged();
 private:

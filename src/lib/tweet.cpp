@@ -64,6 +64,7 @@ Tweet::Tweet(const QJsonObject &json)
     QJsonObject entities {displayedTweet.value(QLatin1String("entities")).toObject()};
     QJsonObject extendedEntities {displayedTweet.value(QLatin1String("extended_entities")).toObject()};
     m_entities = Entity::create(entities, extendedEntities);
+    m_quotedStatus = std::move(QuotedTweet(displayedTweet.value(QLatin1String("quoted_status")).toObject()));
 }
 
 bool Tweet::isValid() const
@@ -144,5 +145,10 @@ QString Tweet::source() const
 Entity::List Tweet::entities() const
 {
     return m_entities;
+}
+
+QuotedTweet Tweet::quotedStatus() const
+{
+    return m_quotedStatus;
 }
 

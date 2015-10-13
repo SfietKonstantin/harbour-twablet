@@ -29,75 +29,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "mediamodel.h"
+#ifndef QUOTEDTWEETFORMATTER_H
+#define QUOTEDTWEETFORMATTER_H
+
+#include "entitiesformatter.h"
 
 namespace qml
 {
 
-MediaModel::MediaModel(const Entity::List &entities, QObject *parent)
-    : QAbstractListModel(parent)
+class QuotedTweetObject;
+class QuotedTweetFormatter: public EntitiesFormatter
 {
-    std::vector<MediaEntity> media {};
-    for (const Entity::Ptr &entity : entities) {
-        if (entity->type() == Entity::Media) {
-            MediaEntity *mediaEntity {dynamic_cast<MediaEntity *>(entity.get())};
-            media.emplace_back(*mediaEntity);
-        }
-    }
-
-
-    beginInsertRows(QModelIndex(), 0, media.size() - 1);
-    for (const MediaEntity &medium : media) {
-        m_data.emplace_back(MediaObject::create(medium, this));
-    }
-    emit countChanged();
-    endInsertRows();
-}
-
-MediaModel * MediaModel::create(const Entity::List &entities, QObject *parent)
-{
-    return new MediaModel(entities, parent);
-}
-
-int MediaModel::rowCount(const QModelIndex &parent) const
-{
-    Q_UNUSED(parent)
-    return m_data.size();
-}
-
-QVariant MediaModel::data(const QModelIndex &index, int role) const
-{
-    int row = index.row();
-    if (row < 0 || row >= rowCount()) {
-        return QVariant();
-    }
-    const QObjectPtr<MediaObject> &media = m_data[row];
-    switch (role) {
-    case MediaRole:
-        return QVariant::fromValue(media.get());
-        break;
-    default:
-        return QVariant();
-        break;
-    }
-}
-
-int MediaModel::count() const
-{
-    return rowCount();
-}
-
-MediaObject * MediaModel::get(int index) const
-{
-    if (index < 0 || index >= rowCount()) {
-        return nullptr;
-    }
-    return m_data[index].get();
-}
-
-QHash<int, QByteArray> MediaModel::roleNames() const
-{
-    return {{MediaRole, "media"}};
-}
+    Q_OBJECT
+    Q_PROPERTY(qml::QuotedTweetObject * tweet READ tweet WRITE setTweet NOTIFY tweetChanged)
+public:
+    explicit QuotedTweetFormatter(QObject *parent = 0);
+    QuotedTweetObject * tweet() const;
+    void setTweet(QuotedTweetObject *tweet);
+signals:
+    void tweetChanged();
+private:
+    void format() override;
+    QuotedTweetObject *m_tweet {nullptr};
+};
 
 }
+
+#endif // QUOTEDTWEETFORMATTER_H

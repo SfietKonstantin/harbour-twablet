@@ -58,12 +58,12 @@ signals:
 protected:
     explicit EntitiesFormatter(QObject *parent = 0);
     virtual void format() = 0;
-    void doFormat(const QString &input, Entity::List &&entities);
+    void doFormat(const QString &input, Entity::List &&entities, bool includeLinks = true);
 private:
-    void doFormatMedia(QString &text, MediaEntity *entity);
-    void doFormatUrl(QString &text, UrlEntity *entity);
-    void doFormatUserMention(QString &text, UserMentionEntity *entity);
-    void doFormatHashtag(QString &text, HashtagEntity *entity);
+    void doFormatMedia(QString &text, MediaEntity *entity, bool includeLinks);
+    void doFormatUrl(QString &text, UrlEntity *entity, bool includeLinks);
+    void doFormatUserMention(QString &text, UserMentionEntity *entit, bool includeLinksy);
+    void doFormatHashtag(QString &text, HashtagEntity *entity, bool includeLinks);
     bool m_complete {false};
     QString m_text {};
 };

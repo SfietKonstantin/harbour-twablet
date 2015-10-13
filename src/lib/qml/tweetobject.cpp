@@ -36,7 +36,7 @@ namespace qml
 {
 
 TweetObject::TweetObject(const Tweet &data, QObject *parent)
-    : QObject(parent), m_data{std::move(data)}, m_user{nullptr}
+    : QObject(parent), m_data{std::move(data)}
 {
     m_user = UserObject::create(m_data.user(), this);
     if (m_data.retweetingUser().isValid()) {
@@ -46,6 +46,9 @@ TweetObject::TweetObject(const Tweet &data, QObject *parent)
     QRegularExpressionMatch match {urlParser.match(m_data.source())};
     m_sourceName = match.captured(1);
     m_media.reset(MediaModel::create(m_data.entities(), this));
+    if (m_data.quotedStatus().isValid()) {
+        m_quotedStatus = QuotedTweetObject::create(m_data.quotedStatus(), this);
+    }
 }
 
 TweetObject * TweetObject::create(const Tweet &data, QObject *parent)
@@ -121,6 +124,11 @@ QString TweetObject::sourceName() const
 MediaModel * TweetObject::media() const
 {
     return m_media.get();
+}
+
+QuotedTweetObject * TweetObject::quotedStatus() const
+{
+    return m_quotedStatus;
 }
 
 Tweet TweetObject::data() const

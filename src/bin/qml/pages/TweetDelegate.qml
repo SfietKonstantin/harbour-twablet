@@ -36,12 +36,14 @@ import harbour.twablet 1.0
 MouseArea {
     id: container
     height: background.height
+    signal openTweet(string originalId, string id)
     property QtObject tweet
     property real itemSize: Theme.itemSizeSmall
     property real fontSize: Theme.fontSizeSmall
     property real fontSizeSmall: Theme.fontSizeExtraSmall
     signal handleLink(string url)
     signal handleOpenImageBrowser(QtObject tweet)
+    onClicked: openTweet(tweet.originalId, tweet.id)
 
     Rectangle {
         id: background
@@ -181,6 +183,74 @@ MouseArea {
                         source: media.url
                     }
                 }
+            }
+        }
+
+        Item {
+            id: quotedTweet
+            visible: container.tweet ? container.tweet.quotedStatus !== null : false
+            anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
+            anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
+            height: Math.max(quotedColumn.height + 2 * Theme.paddingSmall, quotedImage.height)
+
+            Rectangle {
+                anchors.fill: parent
+                color: Theme.secondaryHighlightColor
+                opacity: quotedTweetMouseArea.pressed ? 0.8 : 0.4
+            }
+
+            TwitterImage {
+                id: quotedImage
+                property QtObject model: container.tweet && container.tweet.quotedStatus ? container.tweet.quotedStatus.media : null
+                anchors.left: parent.left
+                visible: model && model.count > 0
+                width: visible ? quotedTweet.width / 3 : 0
+                height: visible ? quotedTweet.width / 3 : 0
+                source: visible ? model.get(0).url : ""
+            }
+
+            Column {
+                id: quotedColumn
+                anchors.top: parent.top; anchors.topMargin: Theme.paddingSmall
+                anchors.left: quotedImage.right; anchors.leftMargin: Theme.paddingSmall
+                anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
+                spacing: Theme.paddingMedium
+
+                Row {
+                    anchors.left: parent.left; anchors.right: parent.right
+                    spacing: Theme.paddingSmall
+                    clip: true
+                    Label {
+                        color: Theme.highlightColor
+                        font.pixelSize: container.fontSize
+                        text: container.tweet && container.tweet.quotedStatus ? container.tweet.quotedStatus.user.name : ""
+                    }
+
+                    Label {
+                        color: Theme.secondaryHighlightColor
+                        font.pixelSize: container.fontSize
+                        text: container.tweet && container.tweet.quotedStatus ? "@" + container.tweet.quotedStatus.user.screenName : ""
+                    }
+                }
+
+                Label {
+                    anchors.left: parent.left; anchors.right: parent.right
+                    font.pixelSize: container.fontSize
+                    color: Theme.highlightColor
+                    text: quotedTweetFormatter.text
+                    wrapMode: Text.WordWrap
+
+                    QuotedTweetFormatter {
+                        id: quotedTweetFormatter
+                        tweet: container.tweet ? container.tweet.quotedStatus : null
+                    }
+                }
+            }
+
+            MouseArea {
+                id: quotedTweetMouseArea
+                anchors.fill: parent
+                onClicked: container.openTweet(tweet.quotedStatus.id, tweet.quotedStatus.id)
             }
         }
 

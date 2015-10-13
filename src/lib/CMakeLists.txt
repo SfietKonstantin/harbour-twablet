@@ -24,6 +24,7 @@ set(${PROJECT_NAME}_Core_SRCS
     account.cpp
     layout.cpp
     tweet.cpp
+    quotedtweet.cpp
     user.cpp
     entity.cpp
     mediaentity.cpp
@@ -62,6 +63,7 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/accountobject.cpp
     qml/layoutobject.cpp
     qml/tweetobject.cpp
+    qml/quotedtweetobject.cpp
     qml/userobject.cpp
     qml/mediaobject.cpp
     qml/queryobject.cpp
@@ -80,6 +82,7 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/descriptionformatter.cpp
     qml/entitiesformatter.cpp
     qml/tweetformatter.cpp
+    qml/quotedtweetformatter.cpp
     qml/abstractqueryitem.cpp
     qml/statusupdatequeryitem.cpp
     qml/tweetqueryitem.cpp

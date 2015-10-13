@@ -176,8 +176,8 @@ SilicaListView {
 
     delegate: TweetDelegate {
         id: delegate
-        onClicked: {
-            container.openTweet(model.item.originalId, model.item.id)
+        onOpenTweet: {
+            container.openTweet(originalId, id)
         }
         width: container.width
         tweet: model.item

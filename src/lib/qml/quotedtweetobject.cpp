@@ -29,75 +29,46 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "mediamodel.h"
+#include "quotedtweetobject.h"
 
 namespace qml
 {
 
-MediaModel::MediaModel(const Entity::List &entities, QObject *parent)
-    : QAbstractListModel(parent)
+QuotedTweetObject::QuotedTweetObject(const QuotedTweet &data, QObject *parent)
+    : QObject(parent), m_data{std::move(data)}
 {
-    std::vector<MediaEntity> media {};
-    for (const Entity::Ptr &entity : entities) {
-        if (entity->type() == Entity::Media) {
-            MediaEntity *mediaEntity {dynamic_cast<MediaEntity *>(entity.get())};
-            media.emplace_back(*mediaEntity);
-        }
-    }
-
-
-    beginInsertRows(QModelIndex(), 0, media.size() - 1);
-    for (const MediaEntity &medium : media) {
-        m_data.emplace_back(MediaObject::create(medium, this));
-    }
-    emit countChanged();
-    endInsertRows();
+    m_user = UserObject::create(m_data.user(), this);
+    m_media.reset(MediaModel::create(m_data.entities(), this));
 }
 
-MediaModel * MediaModel::create(const Entity::List &entities, QObject *parent)
+QuotedTweetObject * QuotedTweetObject::create(const QuotedTweet &data, QObject *parent)
 {
-    return new MediaModel(entities, parent);
+    return new QuotedTweetObject(data, parent);
 }
 
-int MediaModel::rowCount(const QModelIndex &parent) const
+QString QuotedTweetObject::id() const
 {
-    Q_UNUSED(parent)
-    return m_data.size();
+    return m_data.id();
 }
 
-QVariant MediaModel::data(const QModelIndex &index, int role) const
+QString QuotedTweetObject::text() const
 {
-    int row = index.row();
-    if (row < 0 || row >= rowCount()) {
-        return QVariant();
-    }
-    const QObjectPtr<MediaObject> &media = m_data[row];
-    switch (role) {
-    case MediaRole:
-        return QVariant::fromValue(media.get());
-        break;
-    default:
-        return QVariant();
-        break;
-    }
+    return m_data.text();
 }
 
-int MediaModel::count() const
+UserObject * QuotedTweetObject::user() const
 {
-    return rowCount();
+    return m_user;
 }
 
-MediaObject * MediaModel::get(int index) const
+MediaModel * QuotedTweetObject::media() const
 {
-    if (index < 0 || index >= rowCount()) {
-        return nullptr;
-    }
-    return m_data[index].get();
+    return m_media.get();
 }
 
-QHash<int, QByteArray> MediaModel::roleNames() const
+QuotedTweet QuotedTweetObject::data() const
 {
-    return {{MediaRole, "media"}};
+    return m_data;
 }
 
 }

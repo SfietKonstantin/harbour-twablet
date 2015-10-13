@@ -29,75 +29,39 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
+#ifndef QUOTEDTWEETOBJECT_H
+#define QUOTEDTWEETOBJECT_H
+
+#include <QtCore/QObject>
+#include "quotedtweet.h"
+#include "userobject.h"
 #include "mediamodel.h"
 
 namespace qml
 {
 
-MediaModel::MediaModel(const Entity::List &entities, QObject *parent)
-    : QAbstractListModel(parent)
+class QuotedTweetObject: public QObject
 {
-    std::vector<MediaEntity> media {};
-    for (const Entity::Ptr &entity : entities) {
-        if (entity->type() == Entity::Media) {
-            MediaEntity *mediaEntity {dynamic_cast<MediaEntity *>(entity.get())};
-            media.emplace_back(*mediaEntity);
-        }
-    }
-
-
-    beginInsertRows(QModelIndex(), 0, media.size() - 1);
-    for (const MediaEntity &medium : media) {
-        m_data.emplace_back(MediaObject::create(medium, this));
-    }
-    emit countChanged();
-    endInsertRows();
-}
-
-MediaModel * MediaModel::create(const Entity::List &entities, QObject *parent)
-{
-    return new MediaModel(entities, parent);
-}
-
-int MediaModel::rowCount(const QModelIndex &parent) const
-{
-    Q_UNUSED(parent)
-    return m_data.size();
-}
-
-QVariant MediaModel::data(const QModelIndex &index, int role) const
-{
-    int row = index.row();
-    if (row < 0 || row >= rowCount()) {
-        return QVariant();
-    }
-    const QObjectPtr<MediaObject> &media = m_data[row];
-    switch (role) {
-    case MediaRole:
-        return QVariant::fromValue(media.get());
-        break;
-    default:
-        return QVariant();
-        break;
-    }
-}
-
-int MediaModel::count() const
-{
-    return rowCount();
-}
-
-MediaObject * MediaModel::get(int index) const
-{
-    if (index < 0 || index >= rowCount()) {
-        return nullptr;
-    }
-    return m_data[index].get();
-}
-
-QHash<int, QByteArray> MediaModel::roleNames() const
-{
-    return {{MediaRole, "media"}};
-}
+    Q_OBJECT
+    Q_PROPERTY(QString id READ id CONSTANT)
+    Q_PROPERTY(QString text READ text CONSTANT)
+    Q_PROPERTY(qml::UserObject * user READ user CONSTANT)
+    Q_PROPERTY(qml::MediaModel * media READ media CONSTANT)
+public:
+    DISABLE_COPY_DISABLE_MOVE(QuotedTweetObject);
+    static QuotedTweetObject * create(const QuotedTweet &data, QObject *parent = 0);
+    QString id() const;
+    QString text() const;
+    UserObject * user() const;
+    MediaModel * media() const;
+    QuotedTweet data() const;
+private:
+    explicit QuotedTweetObject(const QuotedTweet &data, QObject *parent = 0);
+    QuotedTweet m_data {};
+    UserObject *m_user {nullptr};
+    QObjectPtr<MediaModel> m_media {nullptr};
+};
 
 }
+
+#endif // QUOTEDTWEETOBJECT_H

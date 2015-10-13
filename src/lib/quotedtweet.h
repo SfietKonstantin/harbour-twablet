@@ -29,75 +29,70 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "mediamodel.h"
+#ifndef QUOTEDTWEET_H
+#define QUOTEDTWEET_H
 
-namespace qml
+#include <QtCore/QString>
+#include "globals.h"
+#include "user.h"
+
+/**
+ * @brief A quoted tweet
+ *
+ * This class represents an quoted tweet.
+ * A quoted tweet is a tweet, however, since
+ * most of the properties are not displayed,
+ * we only save some of the properties we are
+ * interested in.
+ */
+class QuotedTweet
 {
+public:
+    explicit QuotedTweet() = default;
+    /**
+     * @brief Constructs a quoted tweet from a JSON object
+     *
+     * This constructor parses the input JSON object
+     * that is retrieved from Twitter to create a quoted tweet.
+     *
+     * @param json JSON object to parse.
+     */
+    explicit QuotedTweet(const QJsonObject &json);
+    DEFAULT_COPY_DEFAULT_MOVE(QuotedTweet);
+    /**
+     * @brief If the quoted tweet instance is valid
+     *
+     * An instance of a quoted tweet is valid if it contains an id.
+     *
+     * @return if the quoted tweet instance is valid.
+     */
+    bool isValid() const;
+    /**
+     * @brief Id of the quoted tweet
+     * @return id of the quoted tweet.
+     */
+    QString id() const;
+    /**
+     * @brief Text of the quoted tweet
+     * @return text of the quoted tweet.
+     */
+    QString text() const;
+    /**
+     * @brief User who sent the quoted tweet
+     * @return user who sent the quoted tweet.
+     */
+    User user() const;
+    /**
+     * @brief Entities contained in this tweet
+     * @return entities contained in this tweet.
+     */
+    Entity::List entities() const;
+private:
+    QString m_id {};
+    QString m_text {};
+    User m_user {};
+    Entity::List m_entities;
+};
 
-MediaModel::MediaModel(const Entity::List &entities, QObject *parent)
-    : QAbstractListModel(parent)
-{
-    std::vector<MediaEntity> media {};
-    for (const Entity::Ptr &entity : entities) {
-        if (entity->type() == Entity::Media) {
-            MediaEntity *mediaEntity {dynamic_cast<MediaEntity *>(entity.get())};
-            media.emplace_back(*mediaEntity);
-        }
-    }
+#endif // QUOTEDTWEET_H
 
-
-    beginInsertRows(QModelIndex(), 0, media.size() - 1);
-    for (const MediaEntity &medium : media) {
-        m_data.emplace_back(MediaObject::create(medium, this));
-    }
-    emit countChanged();
-    endInsertRows();
-}
-
-MediaModel * MediaModel::create(const Entity::List &entities, QObject *parent)
-{
-    return new MediaModel(entities, parent);
-}
-
-int MediaModel::rowCount(const QModelIndex &parent) const
-{
-    Q_UNUSED(parent)
-    return m_data.size();
-}
-
-QVariant MediaModel::data(const QModelIndex &index, int role) const
-{
-    int row = index.row();
-    if (row < 0 || row >= rowCount()) {
-        return QVariant();
-    }
-    const QObjectPtr<MediaObject> &media = m_data[row];
-    switch (role) {
-    case MediaRole:
-        return QVariant::fromValue(media.get());
-        break;
-    default:
-        return QVariant();
-        break;
-    }
-}
-
-int MediaModel::count() const
-{
-    return rowCount();
-}
-
-MediaObject * MediaModel::get(int index) const
-{
-    if (index < 0 || index >= rowCount()) {
-        return nullptr;
-    }
-    return m_data[index].get();
-}
-
-QHash<int, QByteArray> MediaModel::roleNames() const
-{
-    return {{MediaRole, "media"}};
-}
-
-}

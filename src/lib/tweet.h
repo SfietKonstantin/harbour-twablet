@@ -36,6 +36,7 @@
 #include <QtCore/QDateTime>
 #include "globals.h"
 #include "user.h"
+#include "quotedtweet.h"
 
 /**
  * @brief A tweet
@@ -49,10 +50,10 @@ class Tweet
 public:
     explicit Tweet() = default;
     /**
-     * @brief Constructs a Tweet from a JSON object
+     * @brief Constructs a tweet from a JSON object
      *
      * This constructor parses the input JSON object
-     * that is retrieved from Twitter to create a Tweet.
+     * that is retrieved from Twitter to create a tweet.
      *
      * It also performs some adaptations to make the
      * data more display friendly. All fields except id()
@@ -66,11 +67,11 @@ public:
     explicit Tweet(const QJsonObject &json);
     DEFAULT_COPY_DEFAULT_MOVE(Tweet);
     /**
-     * @brief If the Tweet instance is valid
+     * @brief If the tweet instance is valid
      *
-     * An instance of a Tweet is valid if it contains an id.
+     * An instance of a tweet is valid if it contains an id.
      *
-     * @return if the Tweet instance is valid.
+     * @return if the tweet instance is valid.
      */
     bool isValid() const;
     /**
@@ -172,6 +173,11 @@ public:
      * @return entities contained in this tweet.
      */
     Entity::List entities() const;
+    /**
+     * @brief Quoted status in this tweet
+     * @return quoted status in this tweet.
+     */
+    QuotedTweet quotedStatus() const;
 private:
     QString m_id {};
     QString m_originalId {};
@@ -185,7 +191,8 @@ private:
     bool m_retweeted {};
     QString m_inReplyTo {};
     QString m_source {};
-    Entity::List m_entities;
+    Entity::List m_entities {};
+    QuotedTweet m_quotedStatus {};
 };
 
 #endif // TWEET_H

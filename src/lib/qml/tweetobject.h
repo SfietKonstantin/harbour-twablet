@@ -36,7 +36,7 @@
 #include "tweet.h"
 #include "userobject.h"
 #include "mediamodel.h"
-#include "model.h"
+#include "quotedtweetobject.h"
 
 namespace qml
 {
@@ -58,6 +58,7 @@ class TweetObject : public QObject
     Q_PROPERTY(QString source READ source CONSTANT)
     Q_PROPERTY(QString sourceName READ sourceName CONSTANT)
     Q_PROPERTY(qml::MediaModel * media READ media CONSTANT)
+    Q_PROPERTY(qml::QuotedTweetObject * quotedStatus READ quotedStatus CONSTANT)
 public:
     DISABLE_COPY_DISABLE_MOVE(TweetObject);
     static TweetObject * create(const Tweet &data, QObject *parent = 0);
@@ -75,6 +76,7 @@ public:
     QString source() const;
     QString sourceName() const;
     MediaModel * media() const;
+    QuotedTweetObject * quotedStatus() const;
     Tweet data() const;
     void update(const Tweet &other);
 signals:
@@ -87,6 +89,7 @@ private:
     UserObject *m_retweetingUser {nullptr};
     QString m_sourceName {};
     QObjectPtr<MediaModel> m_media {nullptr};
+    QuotedTweetObject *m_quotedStatus {nullptr};
 };
 
 }

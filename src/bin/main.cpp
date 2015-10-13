@@ -53,6 +53,7 @@
 #include "qml/userqueryitem.h"
 #include "qml/descriptionformatter.h"
 #include "qml/tweetformatter.h"
+#include "qml/quotedtweetformatter.h"
 #include "qml/usermodel.h"
 #include "qml/tweetqueryitem.h"
 #include "qml/retweetqueryitem.h"
@@ -104,6 +105,7 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<qml::LayoutObject>("harbour.twablet", 1, 0, "Layout", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::QueryObject>("harbour.twablet", 1, 0, "Query", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::TweetObject>("harbour.twablet", 1, 0, "Tweet", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<qml::QuotedTweetObject>("harbour.twablet", 1, 0, "QuotedTweet", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::UserObject>("harbour.twablet", 1, 0, "User", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::MediaObject>("harbour.twablet", 1, 0, "Media", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::MediaModel>("harbour.twablet", 1, 0, "MediaModel", QLatin1String("Uncreatable"));
@@ -119,6 +121,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<qml::UserQueryItem>("harbour.twablet", 1, 0, "UserQueryItem");
     qmlRegisterType<qml::DescriptionFormatter>("harbour.twablet", 1, 0, "DescriptionFormatter");
     qmlRegisterType<qml::TweetFormatter>("harbour.twablet", 1, 0, "TweetFormatter");
+    qmlRegisterType<qml::QuotedTweetFormatter>("harbour.twablet", 1, 0, "QuotedTweetFormatter");
     qmlRegisterType<qml::UserModel>("harbour.twablet", 1, 0, "UserModel");
     qmlRegisterType<qml::TweetQueryItem>("harbour.twablet", 1, 0, "TweetQueryItem");
     qmlRegisterType<qml::RetweetQueryItem>("harbour.twablet", 1, 0, "RetweetQueryItem");

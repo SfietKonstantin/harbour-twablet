@@ -29,75 +29,46 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "mediamodel.h"
+#include "quotedtweet.h"
 
-namespace qml
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonDocument>
+
+QuotedTweet::QuotedTweet(const QJsonObject &json)
 {
+    m_id = std::move(json.value(QLatin1String("id_str")).toString());
+    m_text = std::move(json.value(QLatin1String("text")).toString());
+    m_user = std::move(User(json.value(QLatin1String("user")).toObject()));
 
-MediaModel::MediaModel(const Entity::List &entities, QObject *parent)
-    : QAbstractListModel(parent)
-{
-    std::vector<MediaEntity> media {};
-    for (const Entity::Ptr &entity : entities) {
-        if (entity->type() == Entity::Media) {
-            MediaEntity *mediaEntity {dynamic_cast<MediaEntity *>(entity.get())};
-            media.emplace_back(*mediaEntity);
-        }
-    }
-
-
-    beginInsertRows(QModelIndex(), 0, media.size() - 1);
-    for (const MediaEntity &medium : media) {
-        m_data.emplace_back(MediaObject::create(medium, this));
-    }
-    emit countChanged();
-    endInsertRows();
+    QJsonObject entities {json.value(QLatin1String("entities")).toObject()};
+    QJsonObject extendedEntities {json.value(QLatin1String("extended_entities")).toObject()};
+    m_entities = Entity::create(entities, extendedEntities);
 }
 
-MediaModel * MediaModel::create(const Entity::List &entities, QObject *parent)
+bool QuotedTweet::isValid() const
 {
-    return new MediaModel(entities, parent);
+    return !m_id.isEmpty();
 }
 
-int MediaModel::rowCount(const QModelIndex &parent) const
+QString QuotedTweet::id() const
 {
-    Q_UNUSED(parent)
-    return m_data.size();
+    return m_id;
 }
 
-QVariant MediaModel::data(const QModelIndex &index, int role) const
+QString QuotedTweet::text() const
 {
-    int row = index.row();
-    if (row < 0 || row >= rowCount()) {
-        return QVariant();
-    }
-    const QObjectPtr<MediaObject> &media = m_data[row];
-    switch (role) {
-    case MediaRole:
-        return QVariant::fromValue(media.get());
-        break;
-    default:
-        return QVariant();
-        break;
-    }
+    return m_text;
 }
 
-int MediaModel::count() const
+User QuotedTweet::user() const
 {
-    return rowCount();
+    return m_user;
 }
 
-MediaObject * MediaModel::get(int index) const
+Entity::List QuotedTweet::entities() const
 {
-    if (index < 0 || index >= rowCount()) {
-        return nullptr;
-    }
-    return m_data[index].get();
+    return m_entities;
 }
 
-QHash<int, QByteArray> MediaModel::roleNames() const
-{
-    return {{MediaRole, "media"}};
-}
 
-}

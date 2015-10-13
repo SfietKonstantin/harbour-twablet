@@ -58,7 +58,7 @@ QString EntitiesFormatter::text() const
     return m_text;
 }
 
-void EntitiesFormatter::doFormat(const QString &input, Entity::List &&entities)
+void EntitiesFormatter::doFormat(const QString &input, Entity::List &&entities, bool includeLinks)
 {
     if (!m_complete) {
         return;
@@ -73,16 +73,16 @@ void EntitiesFormatter::doFormat(const QString &input, Entity::List &&entities)
     for (const Entity::Ptr &entity : entities) {
         switch (entity->type()) {
         case Entity::Media:
-            doFormatMedia(text, dynamic_cast<MediaEntity *>(entity.get()));
+            doFormatMedia(text, dynamic_cast<MediaEntity *>(entity.get()), includeLinks);
             break;
         case Entity::Url:
-            doFormatUrl(text, dynamic_cast<UrlEntity *>(entity.get()));
+            doFormatUrl(text, dynamic_cast<UrlEntity *>(entity.get()), includeLinks);
             break;
         case Entity::UserMention:
-            doFormatUserMention(text, dynamic_cast<UserMentionEntity *>(entity.get()));
+            doFormatUserMention(text, dynamic_cast<UserMentionEntity *>(entity.get()), includeLinks);
             break;
         case Entity::Hashtag:
-            doFormatHashtag(text, dynamic_cast<HashtagEntity *>(entity.get()));
+            doFormatHashtag(text, dynamic_cast<HashtagEntity *>(entity.get()), includeLinks);
             break;
         default:
             break;
@@ -95,45 +95,59 @@ void EntitiesFormatter::doFormat(const QString &input, Entity::List &&entities)
     }
 }
 
-void EntitiesFormatter::doFormatMedia(QString &text, MediaEntity *entity)
+void EntitiesFormatter::doFormatMedia(QString &text, MediaEntity *entity, bool includeLinks)
 {
     if (!entity || !entity->isValid()) {
         return;
     }
 
-    QString after {QString(QLatin1String("<a href=\"%1\">%2</a>")).arg(entity->expandedUrl(), entity->displayUrl())};
+    QString after {};
+    if (includeLinks) {
+        after = QString(QLatin1String("<a href=\"%1\">%2</a>")).arg(entity->expandedUrl(), entity->displayUrl());
+    } else {
+        after = entity->displayUrl();
+    }
     text.replace(entity->text(), after);
 }
 
-void EntitiesFormatter::doFormatUrl(QString &text, UrlEntity *entity)
+void EntitiesFormatter::doFormatUrl(QString &text, UrlEntity *entity, bool includeLinks)
 {
     if (!entity || !entity->isValid()) {
         return;
     }
 
-    QString after {QString(QLatin1String("<a href=\"%1\">%2</a>")).arg(entity->expandedUrl(), entity->displayUrl())};
+    QString after {};
+    if (includeLinks) {
+        after = QString(QLatin1String("<a href=\"%1\">%2</a>")).arg(entity->expandedUrl(), entity->displayUrl());
+    } else {
+        after = entity->displayUrl();
+    }
     text.replace(entity->text(), after);
 }
 
-void EntitiesFormatter::doFormatUserMention(QString &text, UserMentionEntity *entity)
+void EntitiesFormatter::doFormatUserMention(QString &text, UserMentionEntity *entity, bool includeLinks)
 {
     if (!entity || !entity->isValid()) {
         return;
     }
 
-    QString after {QString(QLatin1String("<a href=\"user://%1\">@%2</a>")).arg(entity->id(), entity->screenName())};
-    text.replace(entity->text(), after, Qt::CaseInsensitive);
+    if (includeLinks) {
+        QString after {QString(QLatin1String("<a href=\"user://%1\">@%2</a>")).arg(entity->id(), entity->screenName())};
+        text.replace(entity->text(), after, Qt::CaseInsensitive);
+    }
 }
 
-void EntitiesFormatter::doFormatHashtag(QString &text, HashtagEntity *entity)
+void EntitiesFormatter::doFormatHashtag(QString &text, HashtagEntity *entity, bool includeLinks)
 {
     if (!entity || !entity->isValid()) {
         return;
     }
 
-    QString before {QString(QLatin1String("#%1")).arg(entity->text())};
-    QString after {QString(QLatin1String("<a href=\"hashtag://%1\">#%1</a>")).arg(entity->text())};
-    text.replace(before, after, Qt::CaseInsensitive);
+    if (includeLinks) {
+        QString before {QString(QLatin1String("#%1")).arg(entity->text())};
+        QString after {QString(QLatin1String("<a href=\"hashtag://%1\">#%1</a>")).arg(entity->text())};
+        text.replace(before, after, Qt::CaseInsensitive);
+    }
 }
 
 }
