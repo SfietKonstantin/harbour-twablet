@@ -33,5 +33,8 @@
         <file>qml/pages/AboutPage.qml</file>
         <file>data/logo.png</file>
         <file>qml/pages/ImageBrowser.qml</file>
+        <file>qml/pages/TweetHeader.qml</file>
+        <file>qml/pages/TweetText.qml</file>
+        <file>qml/pages/TweetFooter.qml</file>
     </qresource>
 </RCC>

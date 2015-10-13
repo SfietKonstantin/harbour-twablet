@@ -36,14 +36,15 @@ import harbour.twablet 1.0
 Item {
     id: container
     property bool open: false
+    property Page mainPage
     anchors.top: parent.top; anchors.bottom: parent.bottom
     visible: false
 
-    function openUser(id, account, clear) {
-        var page = _open(Qt.resolvedUrl("UserPage.qml"), {userId: id, account: account, panel: container}, clear)
+    function openUser(id, account, pushMode) {
+        var page = _open(Qt.resolvedUrl("UserPage.qml"), {userId: id, account: account, panel: container}, pushMode)
         page.load()
     }
-    function openSearch(query, account, clear) {
+    function openSearch(query, account, pushMode) {
         var args = {q: query, result_type: "recent"}
         var params = {
             title: query,
@@ -53,9 +54,9 @@ Item {
             panel: container
         }
 
-        _open(Qt.resolvedUrl("TweetsPage.qml"), params, clear)
+        _open(Qt.resolvedUrl("TweetsPage.qml"), params, pushMode)
     }
-    function openFavorites(userId, screenName, account, clear) {
+    function openFavorites(userId, screenName, account, pushMode) {
         var args = {user_id: userId}
         var params = {
             title: qsTr("%1's favorites").arg(screenName),
@@ -65,9 +66,9 @@ Item {
             panel: container
         }
 
-        _open(Qt.resolvedUrl("TweetsPage.qml"), params, clear)
+        _open(Qt.resolvedUrl("TweetsPage.qml"), params, pushMode)
     }
-    function openUserTimeline(userId, screenName, account, clear) {
+    function openUserTimeline(userId, screenName, account, pushMode) {
         var args = {user_id: userId}
         var params = {
             title: qsTr("Tweets from %1").arg(screenName),
@@ -77,10 +78,10 @@ Item {
             panel: container
         }
 
-        _open(Qt.resolvedUrl("TweetsPage.qml"), params, clear)
+        _open(Qt.resolvedUrl("TweetsPage.qml"), params, pushMode)
     }
 
-    function openFriends(userId, screenName, account, clear) {
+    function openFriends(userId, screenName, account, pushMode) {
         var args = {"user_id": userId}
         var params = {
             title: qsTr("%1's friends").arg(screenName),
@@ -90,10 +91,10 @@ Item {
             panel: container
         }
 
-        _open(Qt.resolvedUrl("UsersPage.qml"), params, clear)
+        _open(Qt.resolvedUrl("UsersPage.qml"), params, pushMode)
     }
 
-    function openFollowers(userId, screenName, account, clear) {
+    function openFollowers(userId, screenName, account, pushMode) {
         var args = {"user_id": userId}
         var params = {
             title: qsTr("%1's followers").arg(screenName),
@@ -103,27 +104,37 @@ Item {
             panel: container
         }
 
-        _open(Qt.resolvedUrl("UsersPage.qml"), params, clear)
+        _open(Qt.resolvedUrl("UsersPage.qml"), params, pushMode)
     }
 
-    function openTweet(tweetId, retweetId, account, clear) {
+    function openTweet(tweetId, retweetId, account, pushMode) {
         var params = {
             tweetId: tweetId,
             retweetId: retweetId,
             account: account,
             panel: container
         }
-        var page = _open(Qt.resolvedUrl("TweetPage.qml"), params, clear)
+        var page = _open(Qt.resolvedUrl("TweetPage.qml"), params, pushMode)
         page.load()
     }
 
-    function openImageBrowser(tweet) {
-        pageStack.push(Qt.resolvedUrl("ImageBrowser.qml"), {tweet: tweet})
+    function openImageBrowser(tweet, account) {
+        var params = {
+            tweet: tweet,
+            account: account,
+            panel: container
+        }
+
+        pageStack.push(Qt.resolvedUrl("ImageBrowser.qml"), params)
     }
 
-    function _open(page, args, clear) {
+    function _open(page, args, pushMode) {
+        if (typeof(pushMode) === 'undefined') {
+            pushMode = Info.Push
+        }
+
         if (Screen.sizeCategory === Screen.Large) {
-            if (clear) {
+            if (pushMode === Info.Clear) {
                 panelPageStack.clear()
                 Repository.clearTemporary()
             }
@@ -132,12 +143,20 @@ Item {
             args.height = container.height
             args.orientation = Orientation.Portrait
             args.allowedOrientations = Orientation.Portrait
+            if (pushMode === Info.Replace) {
+                pageStack.pop()
+            }
             return panelPageStack.push(page, args)
         } else {
-            if (clear) {
+            if (pushMode === Info.Clear) {
                 Repository.clearTemporary()
             }
-            return pageStack.push(page, args)
+
+            if (pushMode === Info.Replace) {
+                return pageStack.replace(page, args)
+            } else {
+                return pageStack.push(page, args)
+            }
         }
     }
 

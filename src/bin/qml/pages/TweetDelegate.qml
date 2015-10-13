@@ -37,6 +37,9 @@ MouseArea {
     id: container
     height: background.height
     property QtObject tweet
+    property real itemSize: Theme.itemSizeSmall
+    property real fontSize: Theme.fontSizeSmall
+    property real fontSizeSmall: Theme.fontSizeExtraSmall
     signal handleLink(string url)
     signal handleOpenImageBrowser(QtObject tweet)
 
@@ -81,90 +84,29 @@ MouseArea {
                 anchors.left: retweetIcon.right; anchors.leftMargin: Theme.paddingMedium
                 anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: Theme.fontSizeExtraSmall
+                font.pixelSize: container.fontSize
                 color: retweet.pressed ? Theme.secondaryHighlightColor : Theme.secondaryColor
                 text: retweet.isRetweet ? qsTr("Retweeted by %1").arg(tweet.retweetingUser.name) : ""
                 wrapMode: Text.Wrap
             }
         }
 
-        BackgroundItem {
-            id: header
-            property real padding: container.enabled ? 0 : Theme.paddingMedium
-            anchors.left: parent.left; anchors.leftMargin: -padding
-            anchors.right: parent.right; anchors.rightMargin: -padding
-            height: Theme.itemSizeExtraSmall
-            onClicked: container.handleLink("user://" + container.tweet.user.id)
-
-            TwitterImage {
-                id: profilePicture
-                anchors.top: parent.top;
-                anchors.left: parent.left; anchors.leftMargin: header.padding
-                width: Theme.itemSizeExtraSmall
-                height: Theme.itemSizeExtraSmall
-                source: container.tweet ? (Screen.sizeCategory === Screen.Large ? container.tweet.user.imageUrlLarge : container.tweet.user.imageUrl) : ""
-            }
-
-            Column {
-                id: headerColumn
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: profilePicture.right; anchors.leftMargin: Theme.paddingMedium
-                anchors.right: indicators.right
-
-                Label {
-                    anchors.left: parent.left; anchors.right: parent.right
-                    color: header.down ? Theme.highlightColor : Theme.primaryColor
-                    font.pixelSize: Theme.fontSizeSmall
-                    text: container.tweet ? container.tweet.user.name : ""
-                }
-
-                Label {
-                    id: screenName
-                    anchors.left: parent.left; anchors.right: parent.right
-                    color: header.down ? Theme.secondaryHighlightColor : Theme.secondaryColor
-                    font.pixelSize: Theme.fontSizeExtraSmall
-                    text: "@" + (container.tweet ? container.tweet.user.screenName : "")
-                }
-            }
-
-            Row {
-                id: indicators
-                visible: container.tweet ? (container.tweet.favorited || container.tweet.retweeted) : false
-                anchors.top: parent.top; anchors.topMargin: Theme.paddingSmall
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.paddingMedium + header.padding
-
-                Image {
-                    width: Theme.iconThemeSmall
-                    height: Theme.iconThemeSmall
-                    source: "image://theme/icon-s-retweet?" + Theme.highlightColor
-                    visible: container.tweet ? container.tweet.retweeted : false
-                }
-                Image {
-                    width: Theme.iconThemeSmall
-                    height: Theme.iconThemeSmall
-                    source: "image://theme/icon-s-favorite?" + Theme.highlightColor
-                    visible: container.tweet ? container.tweet.favorited : false
-                }
-            }
+        TweetHeader {
+            id: tweetHeader
+            tweet: container.tweet
+            padding: container.enabled ? 0 : Theme.paddingMedium
+            height: container.itemSize
+            fontSize: container.fontSize
+            fontSizeSmall: container.fontSizeSmall
+            onHandleLink: container.handleLink(url)
         }
 
-        Label {
-            id: text
+        TweetText {
+            tweet: container.tweet
             anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
             anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
-            font.pixelSize: Theme.fontSizeExtraSmall
-            wrapMode: Text.Wrap
-            color: Theme.highlightColor
-            linkColor: Theme.primaryColor
-            text: tweetFormatter.text
-            textFormat: Text.StyledText
-            onLinkActivated: container.handleLink(link)
-        }
-
-        TweetFormatter {
-            id: tweetFormatter
-            tweet: container.tweet
+            font.pixelSize: container.fontSize
+            onHandleLink: container.handleLink(url)
         }
 
         Item {
@@ -179,7 +121,7 @@ MouseArea {
             MouseArea {
                 anchors.fill: mediaGrid
                 enabled: !container.enabled
-                onClicked: container.handleOpenImageBrowser(container.tweet)
+                onClicked: container.handleOpenImageBrowser(container.tweet, container.account)
             }
 
             Grid {
@@ -242,15 +184,11 @@ MouseArea {
             }
         }
 
-        Label {
-            property string source: container.tweet ? container.tweet.sourceName : ""
-            property var timestamp: container.tweet ? container.tweet.timestamp : null
+        TweetFooter {
+            tweet: container.tweet
             anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
             anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
-            color: Theme.secondaryHighlightColor
-            font.pixelSize: Theme.fontSizeExtraSmall
-            wrapMode: Text.Wrap
-            text: source + " | " + Format.formatDate(timestamp, Formatter.DurationElapsed)
+            font.pixelSize: container.fontSize
         }
     }
 }

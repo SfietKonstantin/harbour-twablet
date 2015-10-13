@@ -69,7 +69,14 @@ class Info: public QObject
     Q_PROPERTY(QString version READ version CONSTANT)
     Q_PROPERTY(QString paypal READ paypal CONSTANT)
     Q_PROPERTY(QString flattr READ flattr CONSTANT)
+    Q_ENUMS(PushType)
 public:
+    enum PushType
+    {
+        Push = 0,
+        Clear = 1,
+        Replace = 2
+    };
     explicit Info(QObject *parent = 0)
         : QObject(parent)
     {
@@ -100,7 +107,7 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<qml::MediaObject>("harbour.twablet", 1, 0, "Media", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::MediaModel>("harbour.twablet", 1, 0, "MediaModel", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::AbstractQueryItem>("harbour.twablet", 1, 0, "QueryItem", QLatin1String("Uncreatable"));
-    qmlRegisterUncreatableType<Info>("harbour.twablet", 1, 0, "InfoObject", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<Info>("harbour.twablet", 1, 0, "Info", QLatin1String("Uncreatable"));
     qmlRegisterType<qml::TwitterAuthentification>("harbour.twablet", 1, 0, "TwitterAuthentification");
     qmlRegisterType<qml::AccountModel>("harbour.twablet", 1, 0, "AccountModel");
     qmlRegisterType<qml::AccountSelectionModel>("harbour.twablet", 1, 0, "AccountSelectionModel");
@@ -119,7 +126,7 @@ int main(int argc, char *argv[])
                                                           [](QQmlEngine *e, QJSEngine *) -> QObject * {
         return new qml::DataRepositoryObject(e);
     });
-    qmlRegisterSingletonType<Info>("harbour.twablet", 1, 0, "Info",
+    qmlRegisterSingletonType<Info>("harbour.twablet", 1, 0, "INFO",
                                    [](QQmlEngine *e, QJSEngine *) -> QObject * {
         return new Info(e);
     });

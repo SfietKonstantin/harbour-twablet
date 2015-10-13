@@ -32,10 +32,13 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.twablet 1.0
+import "LinkHandler.js" as LH
 
 Page {
     id: container
+    property RightPanel panel
     property QtObject tweet
+    property QtObject account
     allowedOrientations: app.defaultAllowedOrientations
 
     Drawer {
@@ -49,9 +52,35 @@ Page {
 
             Column {
                 id: tweetColumn
-                anchors.left: parent.left; anchors.right: parent.right
+                anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
+                anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
+                spacing: Theme.paddingMedium
 
+                PageHeader {
+                    title: qsTr("Tweet")
+                }
 
+                TweetHeader {
+                    tweet: container.tweet
+                    padding: Theme.paddingMedium
+                    anchors.left: parent.left; anchors.right: parent.right
+                    onHandleLink: LH.handleLink(url, container.panel, container.account, Info.Replace)
+                }
+
+                TweetText {
+                    tweet: container.tweet
+                    anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
+                    anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
+                    font.pixelSize: Theme.fontSizeSmall
+                    onHandleLink: LH.handleLink(url, container.panel, container.account, Info.Replace)
+                }
+
+                TweetFooter {
+                    tweet: container.tweet
+                    anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
+                    anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
+                    font.pixelSize: Theme.fontSizeSmall
+                }
             }
 
             VerticalScrollDecorator {}

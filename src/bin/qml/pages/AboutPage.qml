@@ -79,7 +79,7 @@ Page {
                     font.pixelSize: Theme.fontSizeExtraSmall
                     color: Theme.secondaryHighlightColor
                     wrapMode: Text.WordWrap
-                    text: qsTr("Version %1").arg(Info.version)
+                    text: qsTr("Version %1").arg(INFO.version)
                 }
             }
 
@@ -99,12 +99,12 @@ Page {
             MiniButton {
                 anchors.left: parent.left; anchors.right: parent.right
                 text: qsTr("Donate via Paypal")
-                onClicked: Qt.openUrlExternally(Info.paypal)
+                onClicked: Qt.openUrlExternally(INFO.paypal)
             }
             MiniButton {
                 anchors.left: parent.left; anchors.right: parent.right
                 text: qsTr("Flattr me")
-                onClicked: Qt.openUrlExternally(Info.flattr)
+                onClicked: Qt.openUrlExternally(INFO.flattr)
             }
             MiniButton {
                 AccountSelectionModel {
@@ -118,8 +118,7 @@ Page {
                 anchors.left: parent.left; anchors.right: parent.right
                 text: qsTr("Follow me on Twitter")
                 onClicked: {
-                    pageStack.pop()
-                    container.rightPanel.openUser("361931860", accountSelectionModel.selection, false)
+                    container.rightPanel.openUser("361931860", accountSelectionModel.selection, Info.Replace)
                 }
             }
         }

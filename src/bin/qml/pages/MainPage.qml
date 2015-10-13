@@ -149,13 +149,13 @@ Page {
                     onHandleLink: {
                         var account = accountModel.get(layout.userId)
                         if (account !== null) {
-                            LH.handleLink(url, panel, account, true)
+                            LH.handleLink(url, panel, account, Info.Clear)
                         }
                     }
                     onOpenTweet: {
                         var account = accountModel.get(layout.userId)
                         if (account !== null) {
-                            panel.openTweet(tweetId, retweetId, account, true)
+                            panel.openTweet(tweetId, retweetId, account, Info.Clear)
                         }
                     }
 
@@ -201,6 +201,7 @@ Page {
                 id: panel
                 anchors.top: parent.top; anchors.bottom: toolbar.top
                 width: view.columnWidth
+                mainPage: container
             }
         }
     }

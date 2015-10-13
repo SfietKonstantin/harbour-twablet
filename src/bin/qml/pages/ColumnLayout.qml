@@ -183,6 +183,9 @@ SilicaListView {
         tweet: model.item
         onHandleLink: container.handleLink(url)
         opacity: internal.opacity
+        itemSize: Theme.itemSizeExtraSmall
+        fontSize: Theme.fontSizeExtraSmall
+        fontSizeSmall: Theme.fontSizeTiny
     }
 
     footer: LoadMoreButton {
