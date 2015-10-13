@@ -31,19 +31,27 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.twablet 1.0
 
 Item {
     id: container
-    property alias source: image.source
+    property string source
     property alias image: image
     property alias progress: image.progress
     property alias status: image.status
+
+    onSourceChanged: image.setSource()
+
+    Connections {
+        target: NetworkMonitor
+        onOnlineChanged: image.setSource()
+    }
 
     Rectangle {
         id: background
         anchors.fill: parent
         color: Theme.secondaryHighlightColor
-        opacity: 1
+        opacity: 0.5
 
         Behavior on opacity {
             FadeAnimation {}
@@ -52,6 +60,18 @@ Item {
 
     Image {
         id: image
+        function setSource() {
+            if (!NetworkMonitor.online) {
+                if (image.status != Image.Ready) {
+                    image.source = ""
+                }
+            } else {
+                if (image.source == "") {
+                    image.source = container.source
+                }
+            }
+        }
+
         anchors.fill: parent
         smooth: true
         asynchronous: true
@@ -76,6 +96,14 @@ Item {
         Behavior on opacity {
             FadeAnimation {}
         }
+    }
+
+    Image {
+        anchors.centerIn: parent
+        width: Theme.iconSizeSmall
+        height: Theme.iconSizeSmall
+        source: "image://theme/icon-s-high-importance?" + Theme.highlightColor
+        visible: image.status === Image.Error
     }
 }
 

@@ -58,6 +58,7 @@
 #include "qml/retweetqueryitem.h"
 #include "qml/favoritequeryitem.h"
 #include "version.h"
+#include "networkmonitor.h"
 
 static const char *PAYPAL_DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&"
                                    "hosted_button_id=R6AJV4U2G33XG";
@@ -129,6 +130,10 @@ int main(int argc, char *argv[])
     qmlRegisterSingletonType<Info>("harbour.twablet", 1, 0, "INFO",
                                    [](QQmlEngine *e, QJSEngine *) -> QObject * {
         return new Info(e);
+    });
+    qmlRegisterSingletonType<NetworkMonitor>("harbour.twablet", 1, 0, "NetworkMonitor",
+                                             [](QQmlEngine *e, QJSEngine *) -> QObject * {
+        return new NetworkMonitor(e);
     });
 
 #ifndef DESKTOP

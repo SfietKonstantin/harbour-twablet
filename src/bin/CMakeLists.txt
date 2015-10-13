@@ -31,6 +31,7 @@ include_directories(
 set(${PROJECT_NAME}_SRCS
     version.h
     main.cpp
+    networkmonitor.cpp
 )
 
 set(${PROJECT_NAME}_Qml_SRCS

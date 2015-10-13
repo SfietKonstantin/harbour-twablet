@@ -100,6 +100,7 @@ Page {
                 height: view.height
 
                 TwitterImage {
+                    id: image
                     anchors.fill: parent
                     image.sourceSize.width: view.imageWidth
                     image.sourceSize.height: view.imageWidth
