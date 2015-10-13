@@ -80,7 +80,7 @@ MouseArea {
                 anchors.left: retweetIcon.right; anchors.leftMargin: Theme.paddingMedium
                 anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: Theme.fontSizeExtraSmall
                 color: retweet.pressed ? Theme.secondaryHighlightColor : Theme.secondaryColor
                 text: retweet.isRetweet ? qsTr("Retweeted by %1").arg(tweet.retweetingUser.name) : ""
                 wrapMode: Text.Wrap
@@ -111,16 +111,17 @@ MouseArea {
                 anchors.right: indicators.right
 
                 Label {
-                    color: header.down ? Theme.highlightColor : Theme.primaryColor
                     anchors.left: parent.left; anchors.right: parent.right
+                    color: header.down ? Theme.highlightColor : Theme.primaryColor
+                    font.pixelSize: Theme.fontSizeSmall
                     text: container.tweet ? container.tweet.user.name : ""
                 }
 
                 Label {
                     id: screenName
-                    color: header.down ? Theme.secondaryHighlightColor : Theme.secondaryColor
-                    font.pixelSize: Theme.fontSizeSmall
                     anchors.left: parent.left; anchors.right: parent.right
+                    color: header.down ? Theme.secondaryHighlightColor : Theme.secondaryColor
+                    font.pixelSize: Theme.fontSizeExtraSmall
                     text: "@" + (container.tweet ? container.tweet.user.screenName : "")
                 }
             }
@@ -151,7 +152,7 @@ MouseArea {
             id: text
             anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
             anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
-            font.pixelSize: Theme.fontSizeSmall
+            font.pixelSize: Theme.fontSizeExtraSmall
             wrapMode: Text.Wrap
             color: Theme.highlightColor
             linkColor: Theme.primaryColor
@@ -235,7 +236,7 @@ MouseArea {
             anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
             anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
             color: Theme.secondaryHighlightColor
-            font.pixelSize: Theme.fontSizeSmall
+            font.pixelSize: Theme.fontSizeExtraSmall
             wrapMode: Text.Wrap
             text: source + " | " + Format.formatDate(timestamp, Formatter.DurationElapsed)
         }
