@@ -169,38 +169,65 @@ MouseArea {
             anchors.left: parent.left; anchors.right: parent.right
             height: mediaGrid.height
 
-            Rectangle {
-                anchors.fill: mediaGrid
-                color: Theme.secondaryHighlightColor
+            Connections {
+                target: container
+                onTweetChanged: mediaGrid.computeSizes()
             }
 
             Grid {
                 id: mediaGrid
                 visible: container.tweet ? container.tweet.media.count > 0 : false
-                property real smallSize: mediaGrid.width / 3
-                property real largeSize: mediaGrid.width * 2 / 3
+                property real imageWidth: mediaGrid.width
+                property real imageHeight: mediaGrid.width * 2 / 3
+                property bool isSingle: container.tweet.media.count === 1
+                function computeSizes() {
+                    switch (container.tweet.media.count) {
+                    case 2:
+                        mediaGrid.columns = 2
+                        mediaGrid.rows = 1
+                        mediaGrid.imageWidth = mediaGrid.width / 2
+                        mediaGrid.imageHeight = mediaGrid.width / 2
+                        break
+                    case 3:
+                        mediaGrid.columns = 3
+                        mediaGrid.rows = 1
+                        mediaGrid.imageWidth = mediaGrid.width / 3
+                        mediaGrid.imageHeight = mediaGrid.width / 3
+                        break
+                    case 4:
+                        mediaGrid.columns = 2
+                        mediaGrid.rows = 2
+                        mediaGrid.imageWidth = mediaGrid.width / 2
+                        mediaGrid.imageHeight = mediaGrid.width / 2
+                        break
+                    default:
+                        mediaGrid.columns = 1
+                        mediaGrid.rows = 1
+                        mediaGrid.imageWidth = mediaGrid.width
+                        mediaGrid.imageHeight = mediaGrid.width * 2 / 3
+                        break
+                    }
+                }
                 anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
                 anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
-                columns: 2
-                rows: 2
+                columns: 1
+                rows: 1
                 clip: true
+
+                Component.onCompleted: computeSizes()
 
                 Repeater {
                     model: container.tweet ? container.tweet.media : null
                     delegate: TwitterImage {
-                        property bool isFirst: index === 0
-                        property bool isSingle: index === 0 && container.tweet.media.count === 1
                         property real ratio: media.size.height / media.size.width
-                        property real mediaHeight: container.enabled ? width / 3 * 2 : width * ratio
-                        width: isSingle ? mediaGrid.width : (isFirst ? mediaGrid.largeSize : mediaGrid.smallSize)
-                        height: isSingle ? mediaHeight : (isFirst ? mediaGrid.largeSize : mediaGrid.smallSize)
+                        property real mediaHeight: container.enabled ? mediaGrid.imageHeight : width * ratio
+                        width: mediaGrid.imageWidth
+                        height: mediaGrid.isSingle ? mediaHeight : mediaGrid.imageHeight
                         source: media.url
                     }
                 }
             }
         }
-
-
 
         Label {
             property string source: container.tweet ? container.tweet.sourceName : ""
