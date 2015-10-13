@@ -93,15 +93,15 @@ MouseArea {
             property real padding: container.enabled ? 0 : Theme.paddingMedium
             anchors.left: parent.left; anchors.leftMargin: -padding
             anchors.right: parent.right; anchors.rightMargin: -padding
-            height: Theme.itemSizeSmall
+            height: Theme.itemSizeExtraSmall
             onClicked: container.handleLink("user://" + container.tweet.user.id)
 
             TwitterImage {
                 id: profilePicture
                 anchors.top: parent.top;
                 anchors.left: parent.left; anchors.leftMargin: header.padding
-                width: Theme.itemSizeSmall
-                height: Theme.itemSizeSmall
+                width: Theme.itemSizeExtraSmall
+                height: Theme.itemSizeExtraSmall
                 source: container.tweet ? (Screen.sizeCategory === Screen.Large ? container.tweet.user.imageUrlLarge : container.tweet.user.imageUrl) : ""
             }
 

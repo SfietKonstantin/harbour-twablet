@@ -36,13 +36,27 @@ import harbour.twablet 1.0
 Page {
     id: container
     property QtObject tweet
+    allowedOrientations: app.defaultAllowedOrientations
 
     Drawer {
         id: drawer
         anchors.fill: parent
         dock: container.isPortrait ? Dock.Top: Dock.Left
 
-        background: Item {}
+        background: SilicaFlickable {
+            anchors.fill: parent
+            contentHeight: tweetColumn.height
+
+            Column {
+                id: tweetColumn
+                anchors.left: parent.left; anchors.right: parent.right
+
+
+            }
+
+            VerticalScrollDecorator {}
+
+        }
         foreground: SilicaListView {
             id: view
             property real imageWidth: Math.max(container.width, container.height)
