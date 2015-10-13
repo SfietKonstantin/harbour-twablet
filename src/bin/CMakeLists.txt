@@ -55,6 +55,7 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/pages/StatusUpdater.qml
     qml/pages/ProgressIconButton.qml
     qml/pages/AboutPage.qml
+    qml/pages/ImageBrowser.qml
     qml/pages/LinkHandler.js
 )
 

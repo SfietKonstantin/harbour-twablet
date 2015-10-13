@@ -32,5 +32,6 @@
         <file>qml/pages/ProgressIconButton.qml</file>
         <file>qml/pages/AboutPage.qml</file>
         <file>data/logo.png</file>
+        <file>qml/pages/ImageBrowser.qml</file>
     </qresource>
 </RCC>

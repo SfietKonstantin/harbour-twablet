@@ -38,6 +38,7 @@ MouseArea {
     height: background.height
     property QtObject tweet
     signal handleLink(string url)
+    signal handleOpenImageBrowser(QtObject tweet)
 
     Rectangle {
         id: background
@@ -175,6 +176,12 @@ MouseArea {
                 onTweetChanged: mediaGrid.computeSizes()
             }
 
+            MouseArea {
+                anchors.fill: mediaGrid
+                enabled: !container.enabled
+                onClicked: container.handleOpenImageBrowser(container.tweet)
+            }
+
             Grid {
                 id: mediaGrid
                 visible: container.tweet ? container.tweet.media.count > 0 : false
@@ -182,6 +189,10 @@ MouseArea {
                 property real imageHeight: mediaGrid.width * 2 / 3
                 property bool isSingle: container.tweet.media.count === 1
                 function computeSizes() {
+                    if (container.tweet == null) {
+                        return
+                    }
+
                     switch (container.tweet.media.count) {
                     case 2:
                         mediaGrid.columns = 2

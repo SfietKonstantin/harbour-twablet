@@ -117,6 +117,10 @@ Item {
         page.load()
     }
 
+    function openImageBrowser(tweet) {
+        pageStack.push(Qt.resolvedUrl("ImageBrowser.qml"), {tweet: tweet})
+    }
+
     function _open(page, args, clear) {
         if (Screen.sizeCategory === Screen.Large) {
             if (clear) {
