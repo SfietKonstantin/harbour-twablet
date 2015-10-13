@@ -227,6 +227,7 @@ MouseArea {
                 clip: true
 
                 Component.onCompleted: computeSizes()
+                onWidthChanged: computeSizes()
 
                 Repeater {
                     model: container.tweet ? container.tweet.media : null

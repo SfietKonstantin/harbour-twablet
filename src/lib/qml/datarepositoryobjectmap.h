@@ -52,12 +52,6 @@ template<class T> class DataRepositoryObjectMap;
 template<> class DataRepositoryObjectMap<Account>
 {
 public:
-    static bool isValid(DataRepositoryObject *repository, int layoutIndex, bool temporary)
-    {
-        Q_UNUSED(layoutIndex)
-        Q_UNUSED(temporary)
-        return repository != nullptr;
-    }
     static AccountRepository * get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
     {
         Q_UNUSED(layoutIndex)
@@ -68,12 +62,6 @@ public:
 template<> class DataRepositoryObjectMap<Layout>
 {
 public:
-    static bool isValid(DataRepositoryObject *repository, int layoutIndex, bool temporary)
-    {
-        Q_UNUSED(layoutIndex)
-        Q_UNUSED(temporary)
-        return repository != nullptr;
-    }
     static LayoutRepository * get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
     {
         Q_UNUSED(layoutIndex)
@@ -85,43 +73,25 @@ public:
 template<> class DataRepositoryObjectMap<Tweet>
 {
 public:
-    static bool isValid(DataRepositoryObject *repository, int layoutIndex, bool temporary)
-    {
-        if (repository == nullptr) {
-            return false;
-        }
-
-        if (temporary) {
-            return repository->isTemporaryLayoutValid(layoutIndex);
-        }
-
-        return (layoutIndex >= 0 && layoutIndex < repository->layouts().size());
-    }
     static TweetRepository * get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
     {
-        Layout layout {};
+        const Layout *layout {nullptr};
         if (temporary) {
-            layout = *repository.temporaryLayout(layoutIndex);
+            layout = repository.temporaryLayout(layoutIndex);
         } else {
-            layout = *(std::begin(repository.layouts()) + layoutIndex);
+            const LayoutRepository &layoutRepository {repository.layouts()};
+            if (layoutIndex >= 0 && layoutIndex < layoutRepository.size()) {
+                layout = &(*(std::begin(layoutRepository) + layoutIndex));
+            }
         }
 
-        return repository.tweets(layout);
+        return layout ? repository.tweets(*layout) : nullptr;
     }
 };
 
 template<> class DataRepositoryObjectMap<User>
 {
 public:
-    static bool isValid(DataRepositoryObject *repository, int layoutIndex, bool temporary)
-    {
-        Q_UNUSED(temporary)
-        if (repository == nullptr) {
-            return false;
-        }
-
-        return repository->isUserRepositoryValid(layoutIndex);
-    }
     static UserRepository * get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
     {
         Q_UNUSED(temporary)
