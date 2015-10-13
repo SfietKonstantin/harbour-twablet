@@ -70,7 +70,7 @@ LayoutRepository & DataRepositoryObject::layouts()
     return m_layouts;
 }
 
-TweetRepository & DataRepositoryObject::tweets(const Layout &layout)
+TweetRepository * DataRepositoryObject::tweets(const Layout &layout)
 {
     return m_tweetsCentralRepository.repository(accountFromId(layout.userId()), layout.query());
 }
@@ -95,7 +95,7 @@ bool DataRepositoryObject::isUserRepositoryValid(int index) const
     return m_userCentralRepository.isValid(index);
 }
 
-UserRepository & DataRepositoryObject::user(int index)
+UserRepository * DataRepositoryObject::user(int index)
 {
     return m_userCentralRepository.repository(index);
 }
@@ -426,7 +426,7 @@ bool DataRepositoryObject::addUserCheckQuery(int queryType, const QVariantMap &p
 
 void DataRepositoryObject::insertRepository(const Layout &layout)
 {
-    m_tweetsCentralRepository.refQuery(accountFromId(layout.userId()), layout.query());
+    m_tweetsCentralRepository.referenceQuery(accountFromId(layout.userId()), layout.query());
 }
 
 void DataRepositoryObject::insertRepository()
@@ -436,7 +436,7 @@ void DataRepositoryObject::insertRepository()
 
 void DataRepositoryObject::removeLayoutFromRepositories(const Layout &layout)
 {
-    m_tweetsCentralRepository.derefQuery(accountFromId(layout.userId()), layout.query());
+    m_tweetsCentralRepository.dereferenceQuery(accountFromId(layout.userId()), layout.query());
 }
 
 void DataRepositoryObject::removeLayoutFromRepositories(int index)

@@ -53,11 +53,11 @@ public:
     bool hasAccounts() const;
     AccountRepository & accounts();
     LayoutRepository & layouts();
-    TweetRepository & tweets(const Layout &layout);
+    TweetRepository * tweets(const Layout &layout);
     const Layout * temporaryLayout(int index) const;
     bool isTemporaryLayoutValid(int index) const;
     bool isUserRepositoryValid(int index) const;
-    UserRepository & user(int index);
+    UserRepository * user(int index);
 signals:
     void hasAccountsChanged();
 public slots:

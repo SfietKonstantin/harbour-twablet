@@ -9,6 +9,7 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5Qml REQUIRED)
 find_package(Qt5Test REQUIRED)
+find_package(Threads)
 find_program(LCOV_PATH lcov)
 
 include_directories(
@@ -19,15 +20,24 @@ include_directories(
     ${twablet_INCLUDE_DIRS}
 )
 
+# Compiling gmock from source
+set(gmock_SRCS
+    /usr/src/gmock/gmock-all.cc
+)
+
 set(${PROJECT_NAME}_SRCS
+    testlistener.h
     tst_main.cpp
     tst_account.cpp
     tst_layout.cpp
     tst_loadsavemanager.cpp
+    mockqueryexecutor.h
+    tst_tweetrepository.cpp
 )
 
 add_executable(${PROJECT_NAME}
     ${${PROJECT_NAME}_SRCS}
+    ${gmock_SRCS}
 )
 target_link_libraries(${PROJECT_NAME}
     Qt5::Core
@@ -35,6 +45,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::Qml
     Qt5::Test
     ${GTEST_BOTH_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
     twablet
 )
 qt5_use_modules(${PROJECT_NAME} Core Network Qml Test)

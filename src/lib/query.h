@@ -121,6 +121,7 @@ public:
     Parameters parameters() const;
     bool operator==(const Query &other) const;
     bool operator!=(const Query &other) const;
+    bool operator<(const Query &other) const;
 private:
     Type m_type {Invalid};
     Parameters m_parameters {};

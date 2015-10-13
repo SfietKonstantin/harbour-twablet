@@ -51,9 +51,13 @@ bool UserCentralRepository::isValid(int index) const
     return m_mapping.find(index) != std::end(m_mapping);
 }
 
-UserRepository &UserCentralRepository::repository(int index)
+UserRepository * UserCentralRepository::repository(int index)
 {
-    return m_mapping.at(index).repository;
+    auto it = m_mapping.find(index);
+    if (it == std::end(m_mapping)) {
+        return nullptr;
+    }
+    return &(it->second.repository);
 }
 
 void UserCentralRepository::refresh(int index)

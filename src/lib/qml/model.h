@@ -83,17 +83,8 @@ public:
     void setLayoutIndex(int layoutIndex) override
     {
         if (m_layoutIndex != layoutIndex) {
-            if (m_internalRepository != nullptr) {
-                m_internalRepository->removeListener(*this);
-            }
             m_layoutIndex = layoutIndex;
-            if (DataRepositoryObjectMap<T>::isValid(m_repository, m_layoutIndex, m_temporary)) {
-                m_internalRepository = &DataRepositoryObjectMap<T>::get(*m_repository, m_layoutIndex, m_temporary);
-                m_internalRepository->addListener(*this);
-            } else {
-                m_internalRepository = nullptr;
-            }
-            refreshData();
+            updateInternalRepository();
             emit layoutIndexChanged();
         }
     }
@@ -104,17 +95,8 @@ public:
     void setRepository(DataRepositoryObject *repository) override
     {
         if (m_repository != repository) {
-            if (m_internalRepository != nullptr) {
-                m_internalRepository->removeListener(*this);
-            }
             m_repository = repository;
-            if (DataRepositoryObjectMap<T>::isValid(m_repository, m_layoutIndex, m_temporary)) {
-                m_internalRepository = &DataRepositoryObjectMap<T>::get(*m_repository, m_layoutIndex, m_temporary);
-                m_internalRepository->addListener(*this);
-            } else {
-                m_internalRepository = nullptr;
-            }
-            refreshData();
+            updateInternalRepository();
             emit repositoryChanged();
         }
     }
@@ -125,17 +107,8 @@ public:
     void setTemporary(bool temporary) override
     {
         if (m_temporary != temporary) {
-            if (m_internalRepository != nullptr) {
-                m_internalRepository->removeListener(*this);
-            }
             m_temporary = temporary;
-            if (DataRepositoryObjectMap<T>::isValid(m_repository, m_layoutIndex, m_temporary)) {
-                m_internalRepository = &DataRepositoryObjectMap<T>::get(*m_repository, m_layoutIndex, m_temporary);
-                m_internalRepository->addListener(*this);
-            } else {
-                m_internalRepository = nullptr;
-            }
-            refreshData();
+            updateInternalRepository();
             emit temporaryChanged();
         }
     }
@@ -269,6 +242,21 @@ private:
             emit errorMessageChanged();
         }
     }
+    void updateInternalRepository()
+    {
+        Repository<T> *internalRepository = m_repository != nullptr ? DataRepositoryObjectMap<T>::get(*m_repository, m_layoutIndex, m_temporary) : nullptr;
+        if (m_internalRepository != internalRepository) {
+            if (m_internalRepository) {
+                m_internalRepository->removeListener(*this);
+            }
+            m_internalRepository = internalRepository;
+            if (m_internalRepository) {
+                m_internalRepository->addListener(*this);
+            }
+            refreshData();
+        }
+    }
+
     bool m_complete {false};
     Status m_status {Idle};
     QString m_errorMessage {};

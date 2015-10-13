@@ -48,7 +48,7 @@ public:
     explicit UserCentralRepository(IQueryExecutor::Ptr queryExecutor);
     DISABLE_COPY_DEFAULT_MOVE(UserCentralRepository);
     bool isValid(int index) const;
-    UserRepository & repository(int index);
+    UserRepository * repository(int index);
     void refresh(int index);
     void loadMore(int index);
     int addRepository(const Account &account, const Query &query);

@@ -29,40 +29,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "query.h"
+#ifndef MOCKQUERYEXECUTOR_H
+#define MOCKQUERYEXECUTOR_H
 
-Query::Query(Type type, Parameters &&parameters)
-    : m_type{type}, m_parameters{std::move(parameters)}
-{
-}
+#include <gmock/gmock.h>
+#include <iqueryexecutor.h>
+#include <QtCore/QBuffer>
 
-bool Query::isValid() const
+class MockQueryExecutor: public IQueryExecutor
 {
-    return (m_type != Invalid);
-}
+public:
+    void execute(const QString &path, const std::map<QByteArray, QByteArray> &parameters,
+                 const Account &account, const Callback_t &callback) override
+    {
+        QBuffer reply {};
+        reply.setData(makeReply(path, parameters, account));
+        reply.open(QIODevice::ReadOnly);
+        QNetworkReply::NetworkError error {makeError(path, parameters, account)};
+        QString errorMessage {makeErrorMessage(path, parameters, account)};
+        return callback(reply, error, errorMessage);
+    }
+    MOCK_METHOD3(makeReply, QByteArray (const QString &, const std::map<QByteArray, QByteArray> &, const Account &));
+    MOCK_METHOD3(makeError, QNetworkReply::NetworkError (const QString &, const std::map<QByteArray, QByteArray> &, const Account &));
+    MOCK_METHOD3(makeErrorMessage, QString (const QString &, const std::map<QByteArray, QByteArray> &, const Account &));
+};
 
-Query::Type Query::type() const
-{
-    return m_type;
-}
-
-Query::Parameters Query::parameters() const
-{
-    return m_parameters;
-}
-
-bool Query::operator==(const Query &other) const
-{
-    return m_type == other.m_type && m_parameters == other.m_parameters;
-}
-
-bool Query::operator!=(const Query &other) const
-{
-    return !(*this == other);
-}
-
-bool Query::operator<(const Query &other) const
-{
-    return m_type == other.m_type ? (m_parameters < other.parameters()) : (m_type < other.m_type);
-}
+#endif // MOCKQUERYEXECUTOR_H
 

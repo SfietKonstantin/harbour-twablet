@@ -57,7 +57,7 @@ public:
      * @param tokenSecret token secret for this account.
      */
     explicit Account(const QString &name, const QString &userId, const QString &screenName,
-                            const QByteArray &token, const QByteArray &tokenSecret);
+                     const QByteArray &token, const QByteArray &tokenSecret);
     DEFAULT_COPY_DEFAULT_MOVE(Account);
     /**
      * @brief If the Account instance is valid

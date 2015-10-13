@@ -58,11 +58,11 @@ public:
         Q_UNUSED(temporary)
         return repository != nullptr;
     }
-    static AccountRepository & get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
+    static AccountRepository * get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
     {
         Q_UNUSED(layoutIndex)
         Q_UNUSED(temporary)
-        return repository.accounts();
+        return &(repository.accounts());
     }
 };
 template<> class DataRepositoryObjectMap<Layout>
@@ -74,11 +74,11 @@ public:
         Q_UNUSED(temporary)
         return repository != nullptr;
     }
-    static LayoutRepository & get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
+    static LayoutRepository * get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
     {
         Q_UNUSED(layoutIndex)
         Q_UNUSED(temporary)
-        return repository.layouts();
+        return &(repository.layouts());
     }
 };
 
@@ -97,7 +97,7 @@ public:
 
         return (layoutIndex >= 0 && layoutIndex < repository->layouts().size());
     }
-    static TweetRepository & get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
+    static TweetRepository * get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
     {
         Layout layout {};
         if (temporary) {
@@ -122,7 +122,7 @@ public:
 
         return repository->isUserRepositoryValid(layoutIndex);
     }
-    static UserRepository & get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
+    static UserRepository * get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
     {
         Q_UNUSED(temporary)
         return repository.user(layoutIndex);

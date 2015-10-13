@@ -48,9 +48,10 @@ class TweetCentralRepository
 public:
     explicit TweetCentralRepository(IQueryExecutor::Ptr queryExecutor);
     DISABLE_COPY_DEFAULT_MOVE(TweetCentralRepository);
-    TweetRepository & repository(const Account &account, const Query &query);
-    void refQuery(const Account &account, const Query &query);
-    void derefQuery(const Account &account, const Query &query);
+    TweetRepository * repository(const Account &account, const Query &query);
+    void referenceQuery(const Account &account, const Query &query);
+    void dereferenceQuery(const Account &account, const Query &query);
+    std::set<Query> referencedQueries(const Account &account) const;
     void refresh();
     void refresh(const Account &account, const Query &query);
     void loadMore(const Account &account, const Query &query);

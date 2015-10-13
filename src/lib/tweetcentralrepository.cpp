@@ -49,12 +49,16 @@ TweetCentralRepository::TweetCentralRepository(IQueryExecutor::Ptr queryExecutor
     Q_ASSERT_X(m_queryExecutor, "TweetCentralRepository", "NULL query executor");
 }
 
-TweetRepository & TweetCentralRepository::repository(const Account &account, const Query &query)
+TweetRepository * TweetCentralRepository::repository(const Account &account, const Query &query)
 {
-    return m_mapping.at(MappingKey{account, query}).repository;
+    auto it = m_mapping.find(MappingKey{account, query});
+    if (it == std::end(m_mapping)) {
+        return nullptr;
+    }
+    return &(it->second.repository);
 }
 
-void TweetCentralRepository::refQuery(const Account &account, const Query &query)
+void TweetCentralRepository::referenceQuery(const Account &account, const Query &query)
 {
     MappingData *data {getMappingData(account, query)};
     if (data == nullptr) {
@@ -68,7 +72,7 @@ void TweetCentralRepository::refQuery(const Account &account, const Query &query
     }
 }
 
-void TweetCentralRepository::derefQuery(const Account &account, const Query &query)
+void TweetCentralRepository::dereferenceQuery(const Account &account, const Query &query)
 {
     MappingData *data {getMappingData(account, query)};
     if (data == nullptr) {
@@ -83,6 +87,17 @@ void TweetCentralRepository::derefQuery(const Account &account, const Query &que
         qCDebug(QLoggingCategory("tweet-central-repository")) << "For query" << it.first.query.type()
                                                               << "Refcount:" << it.second.refcount;
     }
+}
+
+std::set<Query> TweetCentralRepository::referencedQueries(const Account &account) const
+{
+    std::set<Query> returned;
+    for (auto it = std::begin(m_mapping); it != std::end(m_mapping); ++it) {
+        if (it->first.account.userId() == account.userId()) {
+            returned.insert(it->first.query);
+        }
+    }
+    return returned;
 }
 
 void TweetCentralRepository::refresh()
@@ -214,21 +229,8 @@ TweetCentralRepository::MappingData * TweetCentralRepository::getMappingData(con
 
 bool TweetCentralRepository::MappingKeyComparator::operator()(const MappingKey &first, const MappingKey &second) const
 {
-    if (first.account.userId() < second.account.userId()) {
-        return true;
-    }
-
-    if (first.account.userId() > second.account.userId()) {
-        return false;
-    }
-
-    if (first.query.type() < second.query.type()) {
-        return true;
-    }
-    if (first.query.type() > second.query.type()) {
-        return false;
-    }
-    return first.query.parameters() < second.query.parameters();
+    return first.account.userId() == second.account.userId() ? (first.query < second.query)
+                                                             : (first.account.userId() < second.account.userId());
 }
 
 TweetCentralRepository::MappingData::MappingData(std::unique_ptr<IQueryHandler<Tweet>> &&inputHandler)
