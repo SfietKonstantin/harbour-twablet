@@ -79,7 +79,7 @@ public:
         if (temporary) {
             layout = repository.temporaryLayout(layoutIndex);
         } else {
-            const LayoutRepository &layoutRepository {repository.layouts()};
+            const LayoutRepository &layoutRepository (repository.layouts());
             if (layoutIndex >= 0 && layoutIndex < layoutRepository.size()) {
                 layout = &(*(std::begin(layoutRepository) + layoutIndex));
             }
