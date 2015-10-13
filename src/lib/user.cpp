@@ -152,6 +152,9 @@ QString User::imageUrlLarge() const
 
 QString User::bannerUrl() const
 {
+    if (m_bannerUrl.isEmpty()) {
+        return QString();
+    }
     return m_bannerUrl + QLatin1String("/mobile_retina");
 }
 
