@@ -47,6 +47,8 @@ MediaEntity::MediaEntity(const QJsonObject &json)
         m_mediaType = Photo;
     } else if (type == QLatin1String("video")) {
         m_mediaType = Video;
+    } else if (type == QLatin1String("animated_gif")) {
+        m_mediaType = Gif;
     } else {
         qCDebug(QLoggingCategory("media")) << "Unknown type" << type;
     }
