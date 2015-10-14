@@ -30,6 +30,7 @@
  */
 
 #include "networkmonitor.h"
+#include <QtCore/QLoggingCategory>
 
 NetworkMonitor::NetworkMonitor(QObject *parent) :
     QObject(parent)
@@ -38,7 +39,7 @@ NetworkMonitor::NetworkMonitor(QObject *parent) :
     connect(m_networkManager.get(), &QNetworkConfigurationManager::onlineStateChanged, [this]() {
         setOnline();
     });
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::updateCompleted, [this]{
+    connect(m_networkManager.get(), &QNetworkConfigurationManager::updateCompleted, [this]() {
         setOnline();
     });
     m_networkManager->updateConfigurations();
@@ -52,6 +53,7 @@ bool NetworkMonitor::isOnline() const
 void NetworkMonitor::setOnline()
 {
     bool online {m_networkManager->isOnline()};
+    qCDebug(QLoggingCategory("network-monitor")) << "Online:" << online;
     if (m_online != online) {
         m_online = online;
         emit onlineChanged();

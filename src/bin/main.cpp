@@ -99,6 +99,8 @@ public:
 
 int main(int argc, char *argv[])
 {
+    QLoggingCategory::setFilterRules(QLatin1String("tweet-central-repository.debug=false"));
+
     qmlRegisterUncreatableType<qml::DataRepositoryObject>("harbour.twablet", 1, 0, "DataRepository", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::IModel>("harbour.twablet", 1, 0, "Model", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::AccountObject>("harbour.twablet", 1, 0, "Account", QLatin1String("Uncreatable"));
