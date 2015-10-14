@@ -43,6 +43,7 @@ NetworkMonitor::NetworkMonitor(QObject *parent) :
         setOnline();
     });
     m_networkManager->updateConfigurations();
+    setOnline();
 }
 
 bool NetworkMonitor::isOnline() const

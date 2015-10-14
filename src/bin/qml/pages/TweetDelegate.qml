@@ -131,7 +131,7 @@ MouseArea {
                 visible: container.tweet ? container.tweet.media.count > 0 : false
                 property real imageWidth: mediaGrid.width
                 property real imageHeight: mediaGrid.width * 2 / 3
-                property bool isSingle: container.tweet.media.count === 1
+                property bool isSingle: container.tweet && container.tweet.media.count === 1
                 function computeSizes() {
                     if (container.tweet == null) {
                         return

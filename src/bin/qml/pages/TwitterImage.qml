@@ -66,7 +66,7 @@ Item {
                     image.source = ""
                 }
             } else {
-                if (image.source.length === 0) {
+                if (image.status == Image.Null) {
                     image.source = container.source
                 }
             }
