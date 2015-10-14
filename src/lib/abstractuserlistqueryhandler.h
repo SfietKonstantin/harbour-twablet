@@ -29,18 +29,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "iqueryhandler.h"
+#ifndef ABSTRACTUSERLISTQUERYHANDLER_H
+#define ABSTRACTUSERLISTQUERYHANDLER_H
 
-QDebug & operator<<(QDebug &debug, const std::map<QByteArray, QByteArray> &parameters)
+#include "ilistqueryhandler.h"
+#include "user.h"
+#include "globals.h"
+
+class AbstractUserListQueryHandler: public IListQueryHandler<User>
 {
-    QDebugStateSaver saver(debug);
-    debug.nospace() << "(";
-    for (auto it = std::begin(parameters); it != std::end(parameters); ++it) {
-        if (it != std::begin(parameters)) {
-            debug << ", ";
-        }
-        debug << it->first.data() << ":" << it->second.data();
-    }
-    debug << ")";
-    return debug;
-}
+public:
+    DISABLE_COPY_DISABLE_MOVE(AbstractUserListQueryHandler);
+protected:
+    explicit AbstractUserListQueryHandler();
+    virtual QString path() const = 0;
+    virtual Parameters commonParameters() const = 0;
+private:
+    void createRequest(RequestType requestType, QString &outPath,
+                       Parameters &outParameters) const override final;
+    bool treatReply(RequestType requestType, const QByteArray &data, std::vector<User> &items,
+                    QString &errorMessage, Placement &placement) override final;
+    QString m_nextCursor {};
+};
+
+#endif // ABSTRACTUSERLISTQUERYHANDLER_H

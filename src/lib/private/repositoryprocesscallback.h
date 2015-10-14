@@ -37,7 +37,7 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QLoggingCategory>
 #include <QtNetwork/QNetworkReply>
-#include "iqueryhandler.h"
+#include "abstracttweetlistqueryhandler.h"
 #include "repository.h"
 
 namespace private_util {
@@ -46,8 +46,8 @@ template<class T>
 class RepositoryProcessCallback
 {
 public:
-    explicit RepositoryProcessCallback(typename IQueryHandler<T>::RequestType requestType,
-                                       IQueryHandler<T> &handler, Repository<T> &repository,
+    explicit RepositoryProcessCallback(typename IListQueryHandler<T>::RequestType requestType,
+                                       IListQueryHandler<T> &handler, Repository<T> &repository,
                                        std::vector<T> &items, bool &loading)
         : m_requestType(requestType), m_handler(handler), m_repository(repository)
         , m_items(items), m_loading(loading)
@@ -98,7 +98,7 @@ public:
         }
 
         QString newErrorMessage {};
-        typename IQueryHandler<T>::Placement placement {IQueryHandler<T>::Discard};
+        typename IListQueryHandler<T>::Placement placement {IListQueryHandler<T>::Discard};
         bool returned = m_handler.treatReply(m_requestType, reply.readAll(), m_items, newErrorMessage, placement);
         if (!returned) {
             qCWarning(QLoggingCategory("repository-process-callback")) << "Error happened";
@@ -108,21 +108,21 @@ public:
         } else {
             qCDebug(QLoggingCategory("repository-process-callback")) << "New data available. Count:" << m_items.size();
             switch (placement) {
-            case IQueryHandler<T>::Append:
+            case IListQueryHandler<T>::Append:
                 m_repository.append(m_items);
                 break;
-            case IQueryHandler<T>::Prepend:
+            case IListQueryHandler<T>::Prepend:
                 m_repository.prepend(m_items);
                 break;
-            case IQueryHandler<T>::Discard:
+            case IListQueryHandler<T>::Discard:
                 break;
             }
             m_repository.finish();
         }
     }
 private:
-    typename IQueryHandler<T>::RequestType m_requestType;
-    IQueryHandler<T> &m_handler;
+    typename IListQueryHandler<T>::RequestType m_requestType;
+    IListQueryHandler<T> &m_handler;
     Repository<T> &m_repository;
     std::vector<T> &m_items;
     bool &m_loading;

@@ -64,7 +64,7 @@ void UserCentralRepository::refresh(int index)
 {
     auto it = m_mapping.find(index);
     if (it != std::end(m_mapping)) {
-        load(it->second, IQueryHandler<User>::Refresh);
+        load(it->second, IListQueryHandler<User>::Refresh);
     }
 }
 
@@ -72,7 +72,7 @@ void UserCentralRepository::loadMore(int index)
 {
     auto it = m_mapping.find(index);
     if (it != std::end(m_mapping)) {
-        load(it->second, IQueryHandler<User>::LoadMore);
+        load(it->second, IListQueryHandler<User>::LoadMore);
     }
 }
 
@@ -94,7 +94,7 @@ void UserCentralRepository::removeRepository(int index)
 }
 
 void UserCentralRepository::load(UserCentralRepository::MappingData &mappingData,
-                                 IQueryHandler<User>::RequestType requestType)
+                                 IListQueryHandler<User>::RequestType requestType)
 {
     if (mappingData.loading) {
         return;
@@ -132,13 +132,13 @@ UserCentralRepository::MappingData * UserCentralRepository::getMappingData(int i
     switch (query.type()) {
     case Query::Friends:
     {
-        std::unique_ptr<IQueryHandler<User>> handler {new FriendsQueryHandler(query.parameters())};
+        std::unique_ptr<IListQueryHandler<User>> handler {new FriendsQueryHandler(query.parameters())};
         return &(m_mapping.emplace(index, MappingData{account, query, std::move(handler)}).first->second);
         break;
     }
     case Query::Followers:
     {
-        std::unique_ptr<IQueryHandler<User>> handler {new FollowersQueryHandler(query.parameters())};
+        std::unique_ptr<IListQueryHandler<User>> handler {new FollowersQueryHandler(query.parameters())};
         return &(m_mapping.emplace(index, MappingData{account, query, std::move(handler)}).first->second);
         break;
     }
@@ -150,7 +150,7 @@ UserCentralRepository::MappingData * UserCentralRepository::getMappingData(int i
 }
 
 UserCentralRepository::MappingData::MappingData(const Account &inputAccount, const Query &inputQuery,
-                                                std::unique_ptr<IQueryHandler<User> > &&inputHandler)
+                                                std::unique_ptr<IListQueryHandler<User> > &&inputHandler)
     : account(std::move(inputAccount)), query(std::move(inputQuery)), handler(std::move(inputHandler))
 {
 }

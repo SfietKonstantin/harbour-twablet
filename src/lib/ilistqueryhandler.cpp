@@ -29,29 +29,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef ABSTRACTTWEETQUERYHANDLER_H
-#define ABSTRACTTWEETQUERYHANDLER_H
+#include "ilistqueryhandler.h"
 
-#include "iqueryhandler.h"
-#include "globals.h"
-
-class AbstractTweetQueryHandler: public IQueryHandler<Tweet>
+QDebug & operator<<(QDebug &debug, const std::map<QByteArray, QByteArray> &parameters)
 {
-public:
-    DISABLE_COPY_DISABLE_MOVE(AbstractTweetQueryHandler);
-protected:
-    explicit AbstractTweetQueryHandler();
-    virtual QString path() const = 0;
-    virtual Parameters commonParameters() const = 0;
-    void createRequest(RequestType requestType, QString &outPath,
-                       Parameters &outParameters) const override;
-    bool treatReply(RequestType requestType, const QByteArray &data, std::vector<Tweet> &items,
-                    QString &errorMessage, Placement &placement) override;
-    bool treatReply(RequestType requestType, const QJsonArray &data, std::vector<Tweet> &items,
-                    Placement &placement);
-private:
-    QString m_sinceId {};
-    QString m_maxId {};
-};
-
-#endif // ABSTRACTTWEETQUERYHANDLER_H
+    QDebugStateSaver saver(debug);
+    debug.nospace() << "(";
+    for (auto it = std::begin(parameters); it != std::end(parameters); ++it) {
+        if (it != std::begin(parameters)) {
+            debug << ", ";
+        }
+        debug << it->first.data() << ":" << it->second.data();
+    }
+    debug << ")";
+    return debug;
+}

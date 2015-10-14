@@ -39,7 +39,7 @@
 #include "account.h"
 #include "query.h"
 #include "userrepository.h"
-#include "iqueryhandler.h"
+#include "ilistqueryhandler.h"
 #include "iqueryexecutor.h"
 
 class UserCentralRepository
@@ -57,15 +57,15 @@ private:
     struct MappingData
     {
         explicit MappingData(const Account &inputAccount, const Query &inputQuery,
-                             std::unique_ptr<IQueryHandler<User>> &&inputHandler);
+                             std::unique_ptr<IListQueryHandler<User>> &&inputHandler);
         bool loading {false};
         Account account {};
         Query query {};
         UserRepository repository {};
-        std::unique_ptr<IQueryHandler<User>> handler {};
+        std::unique_ptr<IListQueryHandler<User>> handler {};
     };
     void load(MappingData &mappingData,
-              IQueryHandler<User>::RequestType requestType);
+              IListQueryHandler<User>::RequestType requestType);
     MappingData * getMappingData(int index, const Account &account, const Query &query);
     IQueryExecutor::Ptr m_queryExecutor {nullptr};
     std::map<int, MappingData> m_mapping {};

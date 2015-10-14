@@ -32,10 +32,10 @@
 #ifndef USERTIMELINEQUERYHANDLER_H
 #define USERTIMELINEQUERYHANDLER_H
 
-#include "abstracttweetqueryhandler.h"
+#include "abstracttweetlistqueryhandler.h"
 #include "query.h"
 
-class UserTimelineQueryHandler: public AbstractTweetQueryHandler
+class UserTimelineQueryHandler final : public AbstractTweetListQueryHandler
 {
 public:
     explicit UserTimelineQueryHandler(const Query::Parameters &parameters);

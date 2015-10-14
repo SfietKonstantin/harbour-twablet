@@ -32,10 +32,10 @@
 #ifndef SEARCHQUERYHANDLER_H
 #define SEARCHQUERYHANDLER_H
 
-#include "abstracttweetqueryhandler.h"
+#include "abstracttweetlistqueryhandler.h"
 #include "query.h"
 
-class SearchQueryHandler: public AbstractTweetQueryHandler
+class SearchQueryHandler final: public AbstractTweetListQueryHandler
 {
 public:
     explicit SearchQueryHandler(const Query::Parameters &parameters);

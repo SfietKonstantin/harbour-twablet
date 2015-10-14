@@ -32,7 +32,7 @@
 #include "friendsqueryhandler.h"
 
 FriendsQueryHandler::FriendsQueryHandler(const Query::Parameters &parameters)
-    : AbstractUserQueryHandler()
+    : AbstractUserListQueryHandler()
 {
     auto userIdIt = parameters.find(QLatin1String("user_id"));
     if (userIdIt != std::end(parameters)) {
@@ -45,7 +45,7 @@ QString FriendsQueryHandler::path() const
     return QLatin1String{"friends/list.json"};
 }
 
-AbstractUserQueryHandler::Parameters FriendsQueryHandler::commonParameters() const
+AbstractUserListQueryHandler::Parameters FriendsQueryHandler::commonParameters() const
 {
     return Parameters{
         {"count", QByteArray::number(200)},

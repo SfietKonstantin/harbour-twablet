@@ -29,14 +29,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TESTLISTENER_H
-#define TESTLISTENER_H
+#ifndef TESTREPOSITORYLISTENER_H
+#define TESTREPOSITORYLISTENER_H
 
-#include <ilistener.h>
+#include <irepositorylistener.h>
 #include <QtCore/QString>
 
 template<class T>
-class TestListener: public IListener<T>
+class TestRepositoryListener: public IRepositoryListener<T>
 {
 public:
     class Data
@@ -161,5 +161,5 @@ private:
     }
 };
 
-#endif // TESTLISTENER_H
+#endif // TESTREPOSITORYLISTENER_H
 

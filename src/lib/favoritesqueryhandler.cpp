@@ -33,7 +33,7 @@
 #include <QtCore/QUrl>
 
 FavoritesQueryHandler::FavoritesQueryHandler(const Query::Parameters &parameters)
-    : AbstractTweetQueryHandler()
+    : AbstractTweetListQueryHandler()
 {
     auto userIdIt = parameters.find(QLatin1String("user_id"));
     if (userIdIt != std::end(parameters)) {
@@ -46,7 +46,7 @@ QString FavoritesQueryHandler::path() const
     return QLatin1String{"favorites/list.json"};
 }
 
-AbstractTweetQueryHandler::Parameters FavoritesQueryHandler::commonParameters() const
+AbstractTweetListQueryHandler::Parameters FavoritesQueryHandler::commonParameters() const
 {
     return Parameters{
         {"count", QByteArray::number(200)},

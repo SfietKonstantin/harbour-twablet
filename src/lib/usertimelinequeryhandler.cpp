@@ -33,7 +33,7 @@
 #include <QtCore/QUrl>
 
 UserTimelineQueryHandler::UserTimelineQueryHandler(const Query::Parameters &parameters)
-    : AbstractTweetQueryHandler()
+    : AbstractTweetListQueryHandler()
 {
     auto userIdIt = parameters.find(QLatin1String("user_id"));
     if (userIdIt != std::end(parameters)) {
@@ -56,7 +56,7 @@ QString UserTimelineQueryHandler::path() const
     return QLatin1String("statuses/user_timeline.json");
 }
 
-AbstractTweetQueryHandler::Parameters UserTimelineQueryHandler::commonParameters() const
+AbstractTweetListQueryHandler::Parameters UserTimelineQueryHandler::commonParameters() const
 {
     return Parameters{
         {"count", QByteArray::number(200)},

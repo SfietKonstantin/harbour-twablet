@@ -29,26 +29,39 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef ABSTRACTUSERQUERYHANDLER_H
-#define ABSTRACTUSERQUERYHANDLER_H
+#ifndef ILISTQUERYHANDLER_H
+#define ILISTQUERYHANDLER_H
 
-#include "iqueryhandler.h"
-#include "globals.h"
+#include <QtCore/QString>
+#include <QtCore/QDebug>
+#include <map>
+#include <vector>
 
-class AbstractUserQueryHandler: public IQueryHandler<User>
+template<class T>
+class IListQueryHandler
 {
 public:
-    DISABLE_COPY_DISABLE_MOVE(AbstractUserQueryHandler);
-protected:
-    explicit AbstractUserQueryHandler();
-    virtual QString path() const = 0;
-    virtual Parameters commonParameters() const = 0;
-    void createRequest(RequestType requestType, QString &outPath,
-                       Parameters &outParameters) const override;
-    bool treatReply(RequestType requestType, const QByteArray &data, std::vector<User> &items,
-                    QString &errorMessage, Placement &placement) override;
-private:
-    QString m_nextCursor {};
+    using Parameters = std::map<QByteArray, QByteArray>;
+    enum RequestType
+    {
+        Refresh,
+        LoadMore
+    };
+    enum Placement
+    {
+        Discard,
+        Append,
+        Prepend,
+    };
+    virtual ~IListQueryHandler() {}
+    virtual void createRequest(RequestType requestType, QString &outPath,
+                               Parameters &outParameters) const = 0;
+    virtual bool treatReply(RequestType requestType, const QByteArray &data,
+                            std::vector<T> &items, QString &errorMessage,
+                            Placement &placement) = 0;
 };
 
-#endif // ABSTRACTUSERQUERYHANDLER_H
+QDebug & operator<<(QDebug &debug, const std::map<QByteArray, QByteArray> &parameters);
+
+#endif // ILISTQUERYHANDLER_H
+

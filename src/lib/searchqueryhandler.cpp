@@ -38,7 +38,7 @@
 #include "tweet.h"
 
 SearchQueryHandler::SearchQueryHandler(const Query::Parameters &parameters)
-    : AbstractTweetQueryHandler()
+    : AbstractTweetListQueryHandler()
 {
     auto qIt = parameters.find(QLatin1String("q"));
     if (qIt != std::end(parameters)) {
@@ -64,7 +64,7 @@ QString SearchQueryHandler::path() const
     return QLatin1String{"search/tweets.json"};
 }
 
-AbstractTweetQueryHandler::Parameters SearchQueryHandler::commonParameters() const
+AbstractTweetListQueryHandler::Parameters SearchQueryHandler::commonParameters() const
 {
     Parameters returned {
         {"count", QByteArray::number(100)},
@@ -79,7 +79,7 @@ AbstractTweetQueryHandler::Parameters SearchQueryHandler::commonParameters() con
 
 bool SearchQueryHandler::treatReply(RequestType requestType, const QByteArray &data,
                                     std::vector<Tweet> &items, QString &errorMessage,
-                                    IQueryHandler::Placement &placement)
+                                    IListQueryHandler::Placement &placement)
 {
     QJsonParseError error {-1, QJsonParseError::NoError};
     QJsonDocument document {QJsonDocument::fromJson(data, &error)};
@@ -91,6 +91,6 @@ bool SearchQueryHandler::treatReply(RequestType requestType, const QByteArray &d
 
     const QJsonObject &root (document.object());
     const QJsonArray tweets (root.value(QLatin1String("statuses")).toArray());
-    return AbstractTweetQueryHandler::treatReply(requestType, tweets, items, placement);
+    return AbstractTweetListQueryHandler::treatReply(requestType, tweets, items, placement);
 }
 

@@ -32,7 +32,7 @@
 #include "followersqueryhandler.h"
 
 FollowersQueryHandler::FollowersQueryHandler(const Query::Parameters &parameters)
-    : AbstractUserQueryHandler()
+    : AbstractUserListQueryHandler()
 {
     auto userIdIt = parameters.find(QLatin1String("user_id"));
     if (userIdIt != std::end(parameters)) {
@@ -45,7 +45,7 @@ QString FollowersQueryHandler::path() const
     return QLatin1String{"followers/list.json"};
 }
 
-AbstractUserQueryHandler::Parameters FollowersQueryHandler::commonParameters() const
+AbstractUserListQueryHandler::Parameters FollowersQueryHandler::commonParameters() const
 {
     return Parameters{
         {"count", QByteArray::number(200)},

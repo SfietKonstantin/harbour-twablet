@@ -32,10 +32,10 @@
 #ifndef FAVORITESQUERYHANDLER_H
 #define FAVORITESQUERYHANDLER_H
 
-#include "abstracttweetqueryhandler.h"
+#include "abstracttweetlistqueryhandler.h"
 #include "query.h"
 
-class FavoritesQueryHandler: public AbstractTweetQueryHandler
+class FavoritesQueryHandler final : public AbstractTweetListQueryHandler
 {
 public:
     explicit FavoritesQueryHandler(const Query::Parameters &parameters);

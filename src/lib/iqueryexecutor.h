@@ -47,5 +47,5 @@ public:
                          const Account &account, const Callback_t &callback) = 0;
 };
 
-#endif // IQUERYEXECUTOR_H
+#endif // ILISTQUERYEXECUTOR_H
 

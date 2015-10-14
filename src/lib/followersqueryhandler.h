@@ -32,18 +32,18 @@
 #ifndef FOLLOWERSQUERYHANDLER_H
 #define FOLLOWERSQUERYHANDLER_H
 
-#include "abstractuserqueryhandler.h"
+#include "abstractuserlistqueryhandler.h"
 #include "query.h"
 
-class FollowersQueryHandler: public AbstractUserQueryHandler
+class FollowersQueryHandler final : public AbstractUserListQueryHandler
 {
 public:
     explicit FollowersQueryHandler(const Query::Parameters &parameters);
     DISABLE_COPY_DISABLE_MOVE(FollowersQueryHandler);
 private:
-    QByteArray m_userId;
     QString path() const override;
     Parameters commonParameters() const override;
+    QByteArray m_userId;
 };
 
 #endif // FOLLOWERSQUERYHANDLER_H

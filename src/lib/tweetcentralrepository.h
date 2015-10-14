@@ -39,7 +39,7 @@
 #include "account.h"
 #include "query.h"
 #include "tweetrepository.h"
-#include "iqueryhandler.h"
+#include "ilistqueryhandler.h"
 #include "iqueryexecutor.h"
 
 class Layout;
@@ -66,11 +66,11 @@ private:
     };
     struct MappingData
     {
-        explicit MappingData(std::unique_ptr<IQueryHandler<Tweet> > &&inputHandler);
+        explicit MappingData(std::unique_ptr<IListQueryHandler<Tweet> > &&inputHandler);
         bool loading {false};
         TweetRepository repository {};
         int refcount {0};
-        std::unique_ptr<IQueryHandler<Tweet>> handler {};
+        std::unique_ptr<IListQueryHandler<Tweet>> handler {};
     };
     class MappingKeyComparator
     {
@@ -78,7 +78,7 @@ private:
         bool operator()(const MappingKey &first, const MappingKey &second) const;
     };
     void load(const MappingKey &key, MappingData &mappingData,
-              IQueryHandler<Tweet>::RequestType requestType);
+              IListQueryHandler<Tweet>::RequestType requestType);
     MappingData * getMappingData(const Account &account, const Query &query);
     IQueryExecutor::Ptr m_queryExecutor {nullptr};
     std::map<QString, Tweet> m_data {};

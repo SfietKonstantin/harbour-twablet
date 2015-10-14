@@ -32,9 +32,9 @@
 #ifndef MENTIONSTIMELINEQUERYHANDLER_H
 #define MENTIONSTIMELINEQUERYHANDLER_H
 
-#include "abstracttweetqueryhandler.h"
+#include "abstracttweetlistqueryhandler.h"
 
-class MentionsTimelineQueryHandler: public AbstractTweetQueryHandler
+class MentionsTimelineQueryHandler final : public AbstractTweetListQueryHandler
 {
 public:
     explicit MentionsTimelineQueryHandler();

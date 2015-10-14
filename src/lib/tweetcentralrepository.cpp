@@ -103,7 +103,7 @@ std::set<Query> TweetCentralRepository::referencedQueries(const Account &account
 void TweetCentralRepository::refresh()
 {
     for (auto it = std::begin(m_mapping); it != std::end(m_mapping); ++it) {
-        load(it->first, it->second, IQueryHandler<Tweet>::Refresh);
+        load(it->first, it->second, IListQueryHandler<Tweet>::Refresh);
     }
 }
 
@@ -111,7 +111,7 @@ void TweetCentralRepository::refresh(const Account &account, const Query &query)
 {
     auto it = m_mapping.find(MappingKey{account, query});
     if (it != std::end(m_mapping)) {
-        load(it->first, it->second, IQueryHandler<Tweet>::Refresh);
+        load(it->first, it->second, IListQueryHandler<Tweet>::Refresh);
     }
 }
 
@@ -119,7 +119,7 @@ void TweetCentralRepository::loadMore(const Account &account, const Query &query
 {
     auto it = m_mapping.find(MappingKey{account, query});
     if (it != std::end(m_mapping)) {
-        load(it->first, it->second, IQueryHandler<Tweet>::LoadMore);
+        load(it->first, it->second, IListQueryHandler<Tweet>::LoadMore);
     }
 }
 
@@ -151,7 +151,7 @@ void TweetCentralRepository::updateTweet(const Tweet &tweet)
 }
 
 void TweetCentralRepository::load(const MappingKey &key, MappingData &mappingData,
-                                  IQueryHandler<Tweet>::RequestType requestType)
+                                  IListQueryHandler<Tweet>::RequestType requestType)
 {
     if (mappingData.loading) {
         return;
@@ -192,31 +192,31 @@ TweetCentralRepository::MappingData * TweetCentralRepository::getMappingData(con
     switch (query.type()) {
     case Query::Home:
     {
-        std::unique_ptr<IQueryHandler<Tweet>> handler {new HomeTimelineQueryHandler()};
+        std::unique_ptr<IListQueryHandler<Tweet>> handler {new HomeTimelineQueryHandler()};
         return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
         break;
     }
     case Query::Mentions:
     {
-        std::unique_ptr<IQueryHandler<Tweet>> handler {new MentionsTimelineQueryHandler()};
+        std::unique_ptr<IListQueryHandler<Tweet>> handler {new MentionsTimelineQueryHandler()};
         return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
         break;
     }
     case Query::Search:
     {
-        std::unique_ptr<IQueryHandler<Tweet>> handler {new SearchQueryHandler(query.parameters())};
+        std::unique_ptr<IListQueryHandler<Tweet>> handler {new SearchQueryHandler(query.parameters())};
         return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
         break;
     }
     case Query::Favorites:
     {
-        std::unique_ptr<IQueryHandler<Tweet>> handler {new FavoritesQueryHandler(query.parameters())};
+        std::unique_ptr<IListQueryHandler<Tweet>> handler {new FavoritesQueryHandler(query.parameters())};
         return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
         break;
     }
     case Query::UserTimeline:
     {
-        std::unique_ptr<IQueryHandler<Tweet>> handler {new UserTimelineQueryHandler(query.parameters())};
+        std::unique_ptr<IListQueryHandler<Tweet>> handler {new UserTimelineQueryHandler(query.parameters())};
         return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
         break;
     }
@@ -233,7 +233,7 @@ bool TweetCentralRepository::MappingKeyComparator::operator()(const MappingKey &
                                                              : (first.account.userId() < second.account.userId());
 }
 
-TweetCentralRepository::MappingData::MappingData(std::unique_ptr<IQueryHandler<Tweet>> &&inputHandler)
+TweetCentralRepository::MappingData::MappingData(std::unique_ptr<IListQueryHandler<Tweet>> &&inputHandler)
     : handler(std::move(inputHandler))
 {
 }

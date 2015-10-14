@@ -19,7 +19,7 @@ include_directories(
 set(${PROJECT_NAME}_Core_SRCS
     globals.h
     qobjectutils.h
-    ilistener.h
+    irepositorylistener.h
     iloadsave.h
     account.cpp
     layout.cpp
@@ -40,15 +40,15 @@ set(${PROJECT_NAME}_Core_SRCS
     userrepository.h
     tweetcentralrepository.cpp
     usercentralrepository.cpp
-    iqueryhandler.cpp
     iqueryexecutor.h
-    abstracttweetqueryhandler.cpp
+    ilistqueryhandler.cpp
+    abstracttweetlistqueryhandler.cpp
     hometimelinequeryhandler.cpp
     mentionstimelinequeryhandler.cpp
     searchqueryhandler.cpp
     usertimelinequeryhandler.cpp
     favoritesqueryhandler.cpp
-    abstractuserqueryhandler.cpp
+    abstractuserlistqueryhandler.cpp
     friendsqueryhandler.cpp
     followersqueryhandler.cpp
 )

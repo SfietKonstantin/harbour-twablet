@@ -26,7 +26,7 @@ set(gmock_SRCS
 )
 
 set(${PROJECT_NAME}_SRCS
-    testlistener.h
+    testrepositorylistener.h
     tst_main.cpp
     tst_account.cpp
     tst_layout.cpp

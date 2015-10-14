@@ -29,40 +29,39 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "abstracttweetqueryhandler.h"
+#include "abstractuserlistqueryhandler.h"
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
 #include <QtCore/QUrl>
+#include <QtCore/QLoggingCategory>
 #include "tweet.h"
 
-AbstractTweetQueryHandler::AbstractTweetQueryHandler()
+AbstractUserListQueryHandler::AbstractUserListQueryHandler()
 {
 }
 
-void AbstractTweetQueryHandler::createRequest(RequestType requestType, QString &outPath,
-                                              Parameters &outParameters) const
+void AbstractUserListQueryHandler::createRequest(RequestType requestType, QString &outPath,
+                                             Parameters &outParameters) const
 {
     outPath = path();
     outParameters = std::move(commonParameters());
     switch (requestType) {
     case Refresh:
-        if (!m_sinceId.isEmpty()) {
-            outParameters.emplace("since_id", QUrl::toPercentEncoding(m_sinceId));
-        }
+        qCWarning(QLoggingCategory("abstract-user-query-handler")) << "Refresh is not implemented";
         break;
     case LoadMore:
-        if (!m_maxId.isEmpty()) {
-            outParameters.emplace("max_id", QUrl::toPercentEncoding(m_maxId));
+        if (!m_nextCursor.isEmpty()) {
+            outParameters.emplace("cursor", QUrl::toPercentEncoding(m_nextCursor));
         }
         break;
     }
 
 }
 
-bool AbstractTweetQueryHandler::treatReply(RequestType requestType, const QByteArray &data,
-                                           std::vector<Tweet> &items, QString &errorMessage,
-                                           IQueryHandler::Placement &placement)
+bool AbstractUserListQueryHandler::treatReply(RequestType requestType, const QByteArray &data,
+                                          std::vector<User> &items, QString &errorMessage,
+                                          IListQueryHandler::Placement &placement)
 {
     QJsonParseError error {-1, QJsonParseError::NoError};
     QJsonDocument document {QJsonDocument::fromJson(data, &error)};
@@ -72,36 +71,22 @@ bool AbstractTweetQueryHandler::treatReply(RequestType requestType, const QByteA
         return false;
     }
 
-    return treatReply(requestType, document.array(), items, placement);
-}
-
-bool AbstractTweetQueryHandler::treatReply(RequestType requestType, const QJsonArray &data,
-                                           std::vector<Tweet> &items, Placement &placement)
-{
-    items.reserve(data.size());
-    for (const QJsonValue &tweet : data) {
-        if (tweet.isObject()) {
-            items.emplace_back(tweet.toObject());
+    const QJsonObject &root (document.object());
+    const QJsonArray &users (root.value(QLatin1String("users")).toArray());
+    items.reserve(users.size());
+    for (const QJsonValue &user : users) {
+        if (user.isObject()) {
+            items.emplace_back(user.toObject());
         }
     }
 
-    QString sinceId = !items.empty() ? std::begin(items)->id() : QString();
-    quint64 maxId = items.empty() ? 0 : (std::end(items) - 1)->id().toULongLong();
-    QString maxIdStr = maxId > 0 ? QString::number(maxId - 1) : QString();
     if (!items.empty()) {
         switch (requestType) {
         case Refresh:
-            m_sinceId = std::move(sinceId);
-            if (m_maxId.isEmpty()) {
-                m_maxId = std::move(maxIdStr);
-            }
-            placement = Prepend;
+            qCWarning(QLoggingCategory("abstract-user-query-handler")) << "Refresh is not implemented";
             break;
         case LoadMore:
-            if (m_sinceId.isEmpty()) {
-                m_sinceId = std::move(sinceId);
-            }
-            m_maxId = std::move(maxIdStr);
+            m_nextCursor = QString::number(root.value(QLatin1String("next_cursor")).toInt());
             placement = Append;
             break;
         }
@@ -109,3 +94,4 @@ bool AbstractTweetQueryHandler::treatReply(RequestType requestType, const QJsonA
     }
     return true;
 }
+

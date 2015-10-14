@@ -33,7 +33,7 @@
 #define MODEL_H
 
 #include "imodel.h"
-#include "ilistener.h"
+#include "irepositorylistener.h"
 #include "qobjectutils.h"
 #include "datarepositoryobjectmap.h"
 #include <QtCore/QLoggingCategory>
@@ -42,7 +42,7 @@ namespace qml
 {
 
 template<class T, class O>
-class Model: public IModel, public IListener<T>
+class Model: public IModel, public IRepositoryListener<T>
 {
 public:
     ~Model()
@@ -114,7 +114,7 @@ public:
     }
 protected:
     explicit Model(QObject *parent = 0)
-        : IModel(parent) , IListener<T>()
+        : IModel(parent) , IRepositoryListener<T>()
     {
     }
     std::deque<QObjectPtr<O>> m_items {};

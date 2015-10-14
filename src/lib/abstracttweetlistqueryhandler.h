@@ -29,40 +29,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef IQUERYHANDLER_H
-#define IQUERYHANDLER_H
+#ifndef ABSTRACTTWEETLISTQUERYHANDLER_H
+#define ABSTRACTTWEETLISTQUERYHANDLER_H
 
-#include <QtCore/QString>
-#include <QtCore/QDebug>
-#include <map>
-#include <vector>
+#include "ilistqueryhandler.h"
 #include "tweet.h"
+#include "globals.h"
 
-template<class T>
-class IQueryHandler
+class AbstractTweetListQueryHandler: public IListQueryHandler<Tweet>
 {
 public:
-    using Parameters = std::map<QByteArray, QByteArray>;
-    enum RequestType
-    {
-        Refresh,
-        LoadMore
-    };
-    enum Placement
-    {
-        Discard,
-        Append,
-        Prepend,
-    };
-    virtual ~IQueryHandler() {}
-    virtual void createRequest(RequestType requestType, QString &outPath,
-                               Parameters &outParameters) const = 0;
-    virtual bool treatReply(RequestType requestType, const QByteArray &data,
-                            std::vector<T> &items, QString &errorMessage,
-                            Placement &placement) = 0;
+    DISABLE_COPY_DISABLE_MOVE(AbstractTweetListQueryHandler);
+protected:
+    explicit AbstractTweetListQueryHandler();
+    virtual QString path() const = 0;
+    virtual Parameters commonParameters() const = 0;
+    bool treatReply(RequestType requestType, const QJsonArray &data, std::vector<Tweet> &items,
+                    Placement &placement);
+private:
+    void createRequest(RequestType requestType, QString &outPath,
+                       Parameters &outParameters) const override final;
+    bool treatReply(RequestType requestType, const QByteArray &data, std::vector<Tweet> &items,
+                    QString &errorMessage, Placement &placement) override;
+    QString m_sinceId {};
+    QString m_maxId {};
 };
 
-QDebug & operator<<(QDebug &debug, const std::map<QByteArray, QByteArray> &parameters);
-
-#endif // IQUERYHANDLER_H
-
+#endif // ABSTRACTTWEETLISTQUERYHANDLER_H

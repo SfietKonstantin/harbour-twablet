@@ -37,7 +37,7 @@
 #include "tweet.h"
 
 MentionsTimelineQueryHandler::MentionsTimelineQueryHandler()
-    : AbstractTweetQueryHandler()
+    : AbstractTweetListQueryHandler()
 {
 }
 
@@ -46,7 +46,7 @@ QString MentionsTimelineQueryHandler::path() const
     return QLatin1String{"statuses/mentions_timeline.json"};
 }
 
-AbstractTweetQueryHandler::Parameters MentionsTimelineQueryHandler::commonParameters() const
+AbstractTweetListQueryHandler::Parameters MentionsTimelineQueryHandler::commonParameters() const
 {
     return Parameters{
         {"count", QByteArray::number(200)},

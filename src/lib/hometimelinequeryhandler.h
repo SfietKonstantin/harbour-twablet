@@ -32,9 +32,9 @@
 #ifndef HOMETIMELINEQUERYHANDLER_H
 #define HOMETIMELINEQUERYHANDLER_H
 
-#include "abstracttweetqueryhandler.h"
+#include "abstracttweetlistqueryhandler.h"
 
-class HomeTimelineQueryHandler: public AbstractTweetQueryHandler
+class HomeTimelineQueryHandler final : public AbstractTweetListQueryHandler
 {
 public:
     explicit HomeTimelineQueryHandler();

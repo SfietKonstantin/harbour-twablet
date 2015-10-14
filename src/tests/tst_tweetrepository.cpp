@@ -36,12 +36,12 @@
 #include <QtCore/QJsonObject>
 #include <tweetcentralrepository.h>
 #include "mockqueryexecutor.h"
-#include "testlistener.h"
+#include "testrepositorylistener.h"
 
 using testing::Return;
 using testing::_;
 
-static std::ostream & operator<<(std::ostream &os, const TestListener<Tweet>::Data &data)
+static std::ostream & operator<<(std::ostream &os, const TestRepositoryListener<Tweet>::Data &data)
 {
     std::stringstream insertedIds {};
     for (auto it = std::begin(data.insertedIds); it != std::end(data.insertedIds); ++it) {
@@ -57,7 +57,7 @@ static std::ostream & operator<<(std::ostream &os, const TestListener<Tweet>::Da
     return os;
 }
 
-class tweetrepository: public testing::Test, protected TestListener<Tweet>
+class tweetrepository: public testing::Test, protected TestRepositoryListener<Tweet>
 {
 public:
     explicit tweetrepository()

@@ -29,39 +29,75 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "abstractuserqueryhandler.h"
+#include "abstracttweetlistqueryhandler.h"
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
 #include <QtCore/QUrl>
-#include <QtCore/QLoggingCategory>
 #include "tweet.h"
 
-AbstractUserQueryHandler::AbstractUserQueryHandler()
+AbstractTweetListQueryHandler::AbstractTweetListQueryHandler()
 {
 }
 
-void AbstractUserQueryHandler::createRequest(RequestType requestType, QString &outPath,
-                                             Parameters &outParameters) const
+bool AbstractTweetListQueryHandler::treatReply(RequestType requestType, const QJsonArray &data,
+                                           std::vector<Tweet> &items, Placement &placement)
+{
+    items.reserve(data.size());
+    for (const QJsonValue &tweet : data) {
+        if (tweet.isObject()) {
+            items.emplace_back(tweet.toObject());
+        }
+    }
+
+    QString sinceId = !items.empty() ? std::begin(items)->id() : QString();
+    quint64 maxId = items.empty() ? 0 : (std::end(items) - 1)->id().toULongLong();
+    QString maxIdStr = maxId > 0 ? QString::number(maxId - 1) : QString();
+    if (!items.empty()) {
+        switch (requestType) {
+        case Refresh:
+            m_sinceId = std::move(sinceId);
+            if (m_maxId.isEmpty()) {
+                m_maxId = std::move(maxIdStr);
+            }
+            placement = Prepend;
+            break;
+        case LoadMore:
+            if (m_sinceId.isEmpty()) {
+                m_sinceId = std::move(sinceId);
+            }
+            m_maxId = std::move(maxIdStr);
+            placement = Append;
+            break;
+        }
+
+    }
+    return true;
+}
+
+void AbstractTweetListQueryHandler::createRequest(RequestType requestType, QString &outPath,
+                                              Parameters &outParameters) const
 {
     outPath = path();
     outParameters = std::move(commonParameters());
     switch (requestType) {
     case Refresh:
-        qCWarning(QLoggingCategory("abstract-user-query-handler")) << "Refresh is not implemented";
+        if (!m_sinceId.isEmpty()) {
+            outParameters.emplace("since_id", QUrl::toPercentEncoding(m_sinceId));
+        }
         break;
     case LoadMore:
-        if (!m_nextCursor.isEmpty()) {
-            outParameters.emplace("cursor", QUrl::toPercentEncoding(m_nextCursor));
+        if (!m_maxId.isEmpty()) {
+            outParameters.emplace("max_id", QUrl::toPercentEncoding(m_maxId));
         }
         break;
     }
 
 }
 
-bool AbstractUserQueryHandler::treatReply(RequestType requestType, const QByteArray &data,
-                                          std::vector<User> &items, QString &errorMessage,
-                                          IQueryHandler::Placement &placement)
+bool AbstractTweetListQueryHandler::treatReply(RequestType requestType, const QByteArray &data,
+                                           std::vector<Tweet> &items, QString &errorMessage,
+                                           IListQueryHandler::Placement &placement)
 {
     QJsonParseError error {-1, QJsonParseError::NoError};
     QJsonDocument document {QJsonDocument::fromJson(data, &error)};
@@ -71,27 +107,5 @@ bool AbstractUserQueryHandler::treatReply(RequestType requestType, const QByteAr
         return false;
     }
 
-    const QJsonObject &root (document.object());
-    const QJsonArray &users (root.value(QLatin1String("users")).toArray());
-    items.reserve(users.size());
-    for (const QJsonValue &user : users) {
-        if (user.isObject()) {
-            items.emplace_back(user.toObject());
-        }
-    }
-
-    if (!items.empty()) {
-        switch (requestType) {
-        case Refresh:
-            qCWarning(QLoggingCategory("abstract-user-query-handler")) << "Refresh is not implemented";
-            break;
-        case LoadMore:
-            m_nextCursor = QString::number(root.value(QLatin1String("next_cursor")).toInt());
-            placement = Append;
-            break;
-        }
-
-    }
-    return true;
+    return treatReply(requestType, document.array(), items, placement);
 }
-

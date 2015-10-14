@@ -29,8 +29,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef ILISTENER_H
-#define ILISTENER_H
+#ifndef IREPOSITORYLISTENER_H
+#define IREPOSITORYLISTENER_H
 
 #include <vector>
 class QString;
@@ -50,10 +50,10 @@ class QString;
  * doFinished().
  */
 template<class T>
-class IListener
+class IRepositoryListener
 {
 public:
-    virtual ~IListener() {}
+    virtual ~IRepositoryListener() {}
 private:
     /**
      * @brief Notify that a new item is appended
@@ -104,5 +104,5 @@ private:
     template<class C> friend class Repository;
 };
 
-#endif // ILISTENER_H
+#endif // IREPOSITORYLISTENER_H
 

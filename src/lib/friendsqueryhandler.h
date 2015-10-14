@@ -32,18 +32,18 @@
 #ifndef FRIENDSQUERYHANDLER_H
 #define FRIENDSQUERYHANDLER_H
 
-#include "abstractuserqueryhandler.h"
+#include "abstractuserlistqueryhandler.h"
 #include "query.h"
 
-class FriendsQueryHandler: public AbstractUserQueryHandler
+class FriendsQueryHandler final : public AbstractUserListQueryHandler
 {
 public:
     explicit FriendsQueryHandler(const Query::Parameters &parameters);
     DISABLE_COPY_DISABLE_MOVE(FriendsQueryHandler);
 private:
-    QByteArray m_userId;
     QString path() const override;
     Parameters commonParameters() const override;
+    QByteArray m_userId;
 };
 
 #endif // FRIENDSQUERYHANDLER_H

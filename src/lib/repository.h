@@ -36,7 +36,7 @@
 #include <set>
 #include <QtCore/QString>
 #include "globals.h"
-#include "ilistener.h"
+#include "irepositorylistener.h"
 
 /**
  * @brief A generic container
@@ -50,7 +50,7 @@ public:
     DISABLE_COPY_DEFAULT_MOVE(Repository);
     ~Repository()
     {
-        for (IListener<T> *listener : m_listeners) {
+        for (IRepositoryListener<T> *listener : m_listeners) {
             listener->doInvalidate();
             removeListener(*listener);
         }
@@ -74,7 +74,7 @@ public:
     T & append(T &&data)
     {
         m_data.emplace_back(data);
-        for (IListener<T> *listener : m_listeners) {
+        for (IRepositoryListener<T> *listener : m_listeners) {
             listener->doAppend(*(std::end(m_data) - 1));
         }
         return *(std::end(m_data) - 1);
@@ -84,7 +84,7 @@ public:
         for (const T &entry : data) {
             m_data.emplace_back(entry);
         }
-        for (IListener<T> *listener : m_listeners) {
+        for (IRepositoryListener<T> *listener : m_listeners) {
             listener->doAppend(data);
         }
     }
@@ -93,7 +93,7 @@ public:
         for (auto it = data.rbegin(); it != data.rend(); ++it) {
             m_data.emplace_front(*it);
         }
-        for (IListener<T> *listener : m_listeners) {
+        for (IRepositoryListener<T> *listener : m_listeners) {
             listener->doPrepend(data);
         }
     }
@@ -104,7 +104,7 @@ public:
             return;
         }
         m_data[index] = std::move(data);
-        for (IListener<T> *listener : m_listeners) {
+        for (IRepositoryListener<T> *listener : m_listeners) {
             listener->doUpdate(index, *(std::begin(m_data) + index));
         }
     }
@@ -114,14 +114,14 @@ public:
             return;
         }
         m_data.erase(std::begin(m_data) + index);
-        for (IListener<T> *listener : m_listeners) {
+        for (IRepositoryListener<T> *listener : m_listeners) {
             listener->doRemove(index);
         }
     }
     void start()
     {
         m_status = Loading;
-        for (IListener<T> *listener : m_listeners) {
+        for (IRepositoryListener<T> *listener : m_listeners) {
             listener->doStart();
         }
     }
@@ -129,18 +129,18 @@ public:
     {
         m_status = Error;
         m_lastError = error;
-        for (IListener<T> *listener : m_listeners) {
+        for (IRepositoryListener<T> *listener : m_listeners) {
             listener->doError(error);
         }
     }
     void finish()
     {
         m_status = Idle;
-        for (IListener<T> *listener : m_listeners) {
+        for (IRepositoryListener<T> *listener : m_listeners) {
             listener->doFinish();
         }
     }
-    void addListener(IListener<T> &listener)
+    void addListener(IRepositoryListener<T> &listener)
     {
         m_listeners.insert(&listener);
         switch (m_status) {
@@ -154,7 +154,7 @@ public:
             break;
         }
     }
-    void removeListener(IListener<T> &listener)
+    void removeListener(IRepositoryListener<T> &listener)
     {
         m_listeners.erase(&listener);
     }
@@ -165,7 +165,7 @@ private:
         Loading,
         Error
     };
-    std::set<IListener<T> *> m_listeners {};
+    std::set<IRepositoryListener<T> *> m_listeners {};
     Status m_status {Idle};
     QString m_lastError {};
 };

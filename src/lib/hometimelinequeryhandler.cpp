@@ -32,7 +32,7 @@
 #include "hometimelinequeryhandler.h"
 
 HomeTimelineQueryHandler::HomeTimelineQueryHandler()
-    : AbstractTweetQueryHandler()
+    : AbstractTweetListQueryHandler()
 {
 }
 
@@ -41,7 +41,7 @@ QString HomeTimelineQueryHandler::path() const
     return QLatin1String{"statuses/home_timeline.json"};
 }
 
-AbstractTweetQueryHandler::Parameters HomeTimelineQueryHandler::commonParameters() const
+AbstractTweetListQueryHandler::Parameters HomeTimelineQueryHandler::commonParameters() const
 {
     return Parameters{
         {"count", QByteArray::number(200)},
