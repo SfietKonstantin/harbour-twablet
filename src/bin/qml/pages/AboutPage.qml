@@ -88,7 +88,7 @@ Page {
                 anchors.left: parent.left; anchors.leftMargin: Theme.horizontalPageMargin
                 anchors.right: parent.right; anchors.rightMargin: Theme.horizontalPageMargin
                 font.pixelSize: Theme.fontSizeSmall
-                text: qsTr("Twablet is a Twitter client designed for bigger screens. It is an Open Source software, meaning that it can be modified and enhanced by anybody. If you like Friends, please consider a donation. It will help improving the software, while keeping it free and Open Source.")
+                text: qsTr("Twablet is a Twitter client designed for bigger screens. It is an Open Source software, meaning that it can be modified and enhanced by anybody. If you like Twablet, please consider a donation. It will help improving the software, while keeping it free and Open Source.")
             }
         }
 
