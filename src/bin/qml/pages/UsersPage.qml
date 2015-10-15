@@ -108,7 +108,7 @@ Page {
 
         StatusPlaceholder {
             model: userModel
-            errorMessage: (model.status === Model.Idle && model.count === 0) ? qsTr("No friends") : ""
+            errorMessage: (model.status === Model.Idle && model.count === 0) ? qsTr("No follower") : ""
         }
 
         VerticalScrollDecorator {}
