@@ -30,6 +30,7 @@
  */
 
 #include "mediaentity.h"
+#include "entityvisitor.h"
 #include <QtCore/QLoggingCategory>
 #include <QtCore/QJsonObject>
 
@@ -62,11 +63,6 @@ MediaEntity::MediaEntity(const QJsonObject &json)
     if (json.contains(QLatin1String("duration_millis"))) {
         m_duration = json.value(QLatin1String("duration_millis")).toInt();
     }
-}
-
-Entity::Type MediaEntity::type() const
-{
-    return Media;
 }
 
 bool MediaEntity::isValid() const
@@ -107,7 +103,7 @@ QString MediaEntity::mediaUrlLarge() const
     return m_mediaUrl + QLatin1String(":large");
 }
 
-MediaEntity::MediaType MediaEntity::mediaType() const
+MediaEntity::Type MediaEntity::mediaType() const
 {
     return m_mediaType;
 }
@@ -125,5 +121,10 @@ int MediaEntity::height() const
 int MediaEntity::duration() const
 {
     return m_duration;
+}
+
+void MediaEntity::accept(EntityVisitor &visitor) const
+{
+    visitor.visitMedia(*this);
 }
 

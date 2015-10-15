@@ -27,6 +27,7 @@ set(${PROJECT_NAME}_Core_SRCS
     quotedtweet.cpp
     user.cpp
     entity.cpp
+    entityvisitor.cpp
     mediaentity.cpp
     urlentity.cpp
     usermentionentity.cpp

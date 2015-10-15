@@ -34,6 +34,7 @@
 #include "urlentity.h"
 #include "usermentionentity.h"
 #include "hashtagentity.h"
+#include "entityvisitor.h"
 
 namespace qml
 {
@@ -60,6 +61,73 @@ QString EntitiesFormatter::text() const
 
 void EntitiesFormatter::doFormat(const QString &input, Entity::List &&entities, bool includeLinks)
 {
+    class FormatterVisitor: public EntityVisitor
+    {
+    public:
+        explicit FormatterVisitor(const QString &text, bool includeLinks)
+            : m_text(text), m_includeLinks(includeLinks)
+        {
+        }
+        QString text() const
+        {
+            return m_text;
+        }
+        void visitMedia(const MediaEntity &entity) override
+        {
+            if (!entity.isValid()) {
+                return;
+            }
+
+            QString after {};
+            if (m_includeLinks) {
+                after = QString(QLatin1String("<a href=\"%1\">%2</a>")).arg(entity.expandedUrl(), entity.displayUrl());
+            } else {
+                after = entity.displayUrl();
+            }
+            m_text.replace(entity.text(), after);
+        }
+        void visitUrl(const UrlEntity &entity) override
+        {
+            if (!entity.isValid()) {
+                return;
+            }
+
+            QString after {};
+            if (m_includeLinks) {
+                after = QString(QLatin1String("<a href=\"%1\">%2</a>")).arg(entity.expandedUrl(), entity.displayUrl());
+            } else {
+                after = entity.displayUrl();
+            }
+            m_text.replace(entity.text(), after);
+        }
+        void visitUserMention(const UserMentionEntity &entity) override
+        {
+            if (!entity.isValid()) {
+                return;
+            }
+
+            if (m_includeLinks) {
+                QString after {QString(QLatin1String("<a href=\"user://%1\">@%2</a>")).arg(entity.id(), entity.screenName())};
+                m_text.replace(entity.text(), after, Qt::CaseInsensitive);
+            }
+        }
+        void visitHashtag(const HashtagEntity &entity) override
+        {
+            if (!entity.isValid()) {
+                return;
+            }
+
+            if (m_includeLinks) {
+                QString before {QString(QLatin1String("#%1")).arg(entity.text())};
+                QString after {QString(QLatin1String("<a href=\"hashtag://%1\">#%1</a>")).arg(entity.text())};
+                m_text.replace(before, after, Qt::CaseInsensitive);
+            }
+        }
+    private:
+        QString m_text {};
+        bool m_includeLinks {false};
+    };
+
     if (!m_complete) {
         return;
     }
@@ -69,84 +137,16 @@ void EntitiesFormatter::doFormat(const QString &input, Entity::List &&entities, 
         return (first->text().count() > second->text().count());
     });
 
-    QString text {input};
+    FormatterVisitor visitor {input, includeLinks};
     for (const Entity::Ptr &entity : entities) {
-        switch (entity->type()) {
-        case Entity::Media:
-            doFormatMedia(text, dynamic_cast<MediaEntity *>(entity.get()), includeLinks);
-            break;
-        case Entity::Url:
-            doFormatUrl(text, dynamic_cast<UrlEntity *>(entity.get()), includeLinks);
-            break;
-        case Entity::UserMention:
-            doFormatUserMention(text, dynamic_cast<UserMentionEntity *>(entity.get()), includeLinks);
-            break;
-        case Entity::Hashtag:
-            doFormatHashtag(text, dynamic_cast<HashtagEntity *>(entity.get()), includeLinks);
-            break;
-        default:
-            break;
+        if (entity) {
+            entity->accept(visitor);
         }
     }
 
-    if (m_text != text) {
-        m_text = text;
+    if (m_text != visitor.text()) {
+        m_text = visitor.text();
         emit textChanged();
-    }
-}
-
-void EntitiesFormatter::doFormatMedia(QString &text, MediaEntity *entity, bool includeLinks)
-{
-    if (!entity || !entity->isValid()) {
-        return;
-    }
-
-    QString after {};
-    if (includeLinks) {
-        after = QString(QLatin1String("<a href=\"%1\">%2</a>")).arg(entity->expandedUrl(), entity->displayUrl());
-    } else {
-        after = entity->displayUrl();
-    }
-    text.replace(entity->text(), after);
-}
-
-void EntitiesFormatter::doFormatUrl(QString &text, UrlEntity *entity, bool includeLinks)
-{
-    if (!entity || !entity->isValid()) {
-        return;
-    }
-
-    QString after {};
-    if (includeLinks) {
-        after = QString(QLatin1String("<a href=\"%1\">%2</a>")).arg(entity->expandedUrl(), entity->displayUrl());
-    } else {
-        after = entity->displayUrl();
-    }
-    text.replace(entity->text(), after);
-}
-
-void EntitiesFormatter::doFormatUserMention(QString &text, UserMentionEntity *entity, bool includeLinks)
-{
-    if (!entity || !entity->isValid()) {
-        return;
-    }
-
-    if (includeLinks) {
-        QString after {QString(QLatin1String("<a href=\"user://%1\">@%2</a>")).arg(entity->id(), entity->screenName())};
-        text.replace(entity->text(), after, Qt::CaseInsensitive);
-    }
-}
-
-void EntitiesFormatter::doFormatHashtag(QString &text, HashtagEntity *entity, bool includeLinks)
-{
-    if (!entity || !entity->isValid()) {
-        return;
-    }
-
-    if (includeLinks) {
-        QString before {QString(QLatin1String("#%1")).arg(entity->text())};
-        QString after {QString(QLatin1String("<a href=\"hashtag://%1\">#%1</a>")).arg(entity->text())};
-        text.replace(before, after, Qt::CaseInsensitive);
     }
 }
 

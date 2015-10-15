@@ -42,11 +42,11 @@ public:
     explicit UrlEntity() = default;
     explicit UrlEntity(const QJsonObject &json);
     DEFAULT_COPY_DEFAULT_MOVE(UrlEntity);
-    Type type() const override;
     bool isValid() const override;
     QString text() const override;
     QString displayUrl() const;
     QString expandedUrl() const;
+    void accept(EntityVisitor &visitor) const override;
 private:
     QString m_text {};
     QString m_displayUrl {};

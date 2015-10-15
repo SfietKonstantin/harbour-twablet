@@ -30,6 +30,7 @@
  */
 
 #include "usermentionentity.h"
+#include "entityvisitor.h"
 #include <QtCore/QJsonObject>
 
 UserMentionEntity::UserMentionEntity(const QJsonObject &json)
@@ -38,11 +39,6 @@ UserMentionEntity::UserMentionEntity(const QJsonObject &json)
     m_text = QString(QLatin1String("@%1")).arg(m_screenName);
     m_id = std::move(json.value(QLatin1String("id_str")).toString());
     m_name = std::move(json.value(QLatin1String("name")).toString());
-}
-
-Entity::Type UserMentionEntity::type() const
-{
-    return UserMention;
 }
 
 bool UserMentionEntity::isValid() const
@@ -68,5 +64,10 @@ QString UserMentionEntity::screenName() const
 QString UserMentionEntity::name() const
 {
     return m_name;
+}
+
+void UserMentionEntity::accept(EntityVisitor &visitor) const
+{
+    visitor.visitUserMention(*this);
 }
 

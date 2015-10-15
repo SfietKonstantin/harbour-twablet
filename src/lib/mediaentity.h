@@ -39,9 +39,9 @@ class QJsonObject;
 class MediaEntity: public Entity
 {
 public:
-    enum MediaType
+    enum Type
     {
-        InvalidMedia,
+        Invalid,
         Photo,
         Video,
         Gif
@@ -49,25 +49,25 @@ public:
     explicit MediaEntity() = default;
     explicit MediaEntity(const QJsonObject &json);
     DEFAULT_COPY_DEFAULT_MOVE(MediaEntity);
-    Type type() const override;
     bool isValid() const override;
     QString id() const;
-    QString text() const;
+    QString text() const override;
     QString displayUrl() const;
     QString expandedUrl() const;
     QString mediaUrl() const;
     QString mediaUrlLarge() const;
-    MediaType mediaType() const;
+    Type mediaType() const;
     int width() const;
     int height() const;
     int duration() const;
+    void accept(EntityVisitor &visitor) const override;
 private:
     QString m_id {};
     QString m_text {};
     QString m_displayUrl {};
     QString m_expandedUrl {};
     QString m_mediaUrl {};
-    MediaType m_mediaType {InvalidMedia};
+    Type m_mediaType {Invalid};
     int m_width {-1};
     int m_height {-1};
     int m_duration {-1};

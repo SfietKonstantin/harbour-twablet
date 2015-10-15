@@ -35,6 +35,7 @@
 #include <QtCore/QJsonObject>
 #include <memory>
 
+class EntityVisitor;
 /**
  * @brief An entity
  *
@@ -50,42 +51,7 @@ class Entity
 public:
     using Ptr = std::shared_ptr<Entity>;
     using List = std::vector<Ptr>;
-    /**
-     * @brief Entity type
-     */
-    enum Type
-    {
-        /**
-         * @brief Invalid entity
-         */
-        Invalid,
-        /**
-         * @brief An entity that represents a media
-         */
-        Media,
-        /**
-         * @brief An entity that represents an url
-         */
-        Url,
-        /**
-         * @brief An entity that represents a user mention
-         */
-        UserMention,
-        /**
-         * @brief An entity that represents a hashtag
-         */
-        Hashtag,
-        /**
-         * @brief An entity that represents a symbol
-         */
-        Symbol
-    };
     virtual ~Entity() {}
-    /**
-     * @brief Type of the entity
-     * @return type of the entity.
-     */
-    virtual Type type() const = 0;
     /**
      * @brief If the entity instance is valid
      * @return if the entity instance is valid.
@@ -96,6 +62,7 @@ public:
      * @return text captured by the entity.
      */
     virtual QString text() const = 0;
+    virtual void accept(EntityVisitor &visitor) const = 0;
     /**
      * @brief Creates a list of Entity from a JSON object
      *

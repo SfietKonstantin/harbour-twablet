@@ -52,7 +52,7 @@ class MediaObject : public QObject
 public:
     enum Type
     {
-        Invalid = MediaEntity::InvalidMedia,
+        Invalid = MediaEntity::Invalid,
         Photo = MediaEntity::Photo,
         Video = MediaEntity::Video,
         Gif = MediaEntity::Gif

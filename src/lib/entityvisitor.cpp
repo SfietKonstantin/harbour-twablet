@@ -29,26 +29,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "hashtagentity.h"
 #include "entityvisitor.h"
-#include <QtCore/QJsonObject>
+#include <QtCore/QtGlobal>
 
-HashtagEntity::HashtagEntity(const QJsonObject &json)
+EntityVisitor::~EntityVisitor()
 {
-    m_text = std::move(json.value(QLatin1String("text")).toString());
 }
 
-bool HashtagEntity::isValid() const
+void EntityVisitor::visitMedia(const MediaEntity &entity)
 {
-    return !m_text.isEmpty();
+    Q_UNUSED(entity)
 }
 
-QString HashtagEntity::text() const
+void EntityVisitor::visitUrl(const UrlEntity &entity)
 {
-    return m_text;
+    Q_UNUSED(entity)
 }
 
-void HashtagEntity::accept(EntityVisitor &visitor) const
+void EntityVisitor::visitUserMention(const UserMentionEntity &entity)
 {
-    visitor.visitHashtag(*this);
+    Q_UNUSED(entity)
+}
+
+void EntityVisitor::visitHashtag(const HashtagEntity &entity)
+{
+    Q_UNUSED(entity)
 }

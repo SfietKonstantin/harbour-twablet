@@ -31,6 +31,7 @@
 
 #include "userobject.h"
 #include <QtCore/QJsonArray>
+#include "entityvisitor.h"
 #include "urlentity.h"
 
 namespace qml
@@ -160,22 +161,36 @@ void UserObject::update(const User &other)
 
 void UserObject::initializeUrl()
 {
+    class UrlVisitor: public EntityVisitor
+    {
+    public:
+        QString text {};
+        QString url {};
+        QString displayUrl {};
+        void visitUrl(const UrlEntity &entity) override
+        {
+            if (text.isEmpty() && url.isEmpty() && displayUrl.isEmpty()) {
+                text = entity.text();
+                url = entity.expandedUrl();
+                displayUrl = entity.displayUrl();
+            }
+        }
+    };
+
     if (m_data.urlEntities().size() != 1) {
         return;
     }
 
+    UrlVisitor visitor {};
     Entity::Ptr entity {*std::begin(m_data.urlEntities())};
-    if (entity->type() != Entity::Url) {
+    entity->accept(visitor);
+
+    if (visitor.text != m_data.url()) {
         return;
     }
 
-    UrlEntity *urlEntity {dynamic_cast<UrlEntity *>(entity.get())};
-    if (urlEntity->text() != m_data.url()) {
-        return;
-    }
-
-    m_url = urlEntity->expandedUrl();
-    m_displayUrl = urlEntity->displayUrl();
+    m_url = visitor.url;
+    m_displayUrl = visitor.displayUrl;
 }
 
 }

@@ -30,6 +30,7 @@
  */
 
 #include "urlentity.h"
+#include "entityvisitor.h"
 #include <QtCore/QJsonObject>
 
 UrlEntity::UrlEntity(const QJsonObject &json)
@@ -39,11 +40,6 @@ UrlEntity::UrlEntity(const QJsonObject &json)
     m_expandedUrl = std::move(json.value(QLatin1String("expanded_url")).toString());
 }
 
-
-Entity::Type UrlEntity::type() const
-{
-    return Url;
-}
 
 bool UrlEntity::isValid() const
 {
@@ -63,4 +59,9 @@ QString UrlEntity::displayUrl() const
 QString UrlEntity::expandedUrl() const
 {
     return m_expandedUrl;
+}
+
+void UrlEntity::accept(EntityVisitor &visitor) const
+{
+    visitor.visitUrl(*this);
 }

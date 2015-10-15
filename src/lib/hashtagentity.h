@@ -42,9 +42,9 @@ public:
     explicit HashtagEntity() = default;
     explicit HashtagEntity(const QJsonObject &json);
     DEFAULT_COPY_DEFAULT_MOVE(HashtagEntity);
-    Type type() const override;
     bool isValid() const override;
     QString text() const override;
+    void accept(EntityVisitor &visitor) const override;
 private:
     QString m_text {};
 };

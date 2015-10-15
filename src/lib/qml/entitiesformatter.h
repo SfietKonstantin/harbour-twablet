@@ -60,10 +60,6 @@ protected:
     virtual void format() = 0;
     void doFormat(const QString &input, Entity::List &&entities, bool includeLinks = true);
 private:
-    void doFormatMedia(QString &text, MediaEntity *entity, bool includeLinks);
-    void doFormatUrl(QString &text, UrlEntity *entity, bool includeLinks);
-    void doFormatUserMention(QString &text, UserMentionEntity *entit, bool includeLinksy);
-    void doFormatHashtag(QString &text, HashtagEntity *entity, bool includeLinks);
     bool m_complete {false};
     QString m_text {};
 };

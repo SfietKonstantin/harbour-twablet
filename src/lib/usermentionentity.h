@@ -42,12 +42,12 @@ public:
     explicit UserMentionEntity() = default;
     explicit UserMentionEntity(const QJsonObject &json);
     DEFAULT_COPY_DEFAULT_MOVE(UserMentionEntity);
-    Type type() const override;
     bool isValid() const override;
     QString text() const override;
     QString id() const;
     QString screenName() const;
     QString name() const;
+    void accept(EntityVisitor &visitor) const override;
 private:
     QString m_text {};
     QString m_id {};

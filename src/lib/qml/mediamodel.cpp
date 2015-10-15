@@ -30,6 +30,7 @@
  */
 
 #include "mediamodel.h"
+#include "entityvisitor.h"
 
 namespace qml
 {
@@ -37,17 +38,23 @@ namespace qml
 MediaModel::MediaModel(const Entity::List &entities, QObject *parent)
     : QAbstractListModel(parent)
 {
-    std::vector<MediaEntity> media {};
-    for (const Entity::Ptr &entity : entities) {
-        if (entity->type() == Entity::Media) {
-            MediaEntity *mediaEntity {dynamic_cast<MediaEntity *>(entity.get())};
-            media.emplace_back(*mediaEntity);
+    class MediaVisitor: public EntityVisitor
+    {
+    public:
+        std::vector<MediaEntity> media {};
+        void visitMedia(const MediaEntity &entity) override
+        {
+            media.emplace_back(entity);
         }
+    };
+
+    MediaVisitor visitor {};
+    for (const Entity::Ptr &entity : entities) {
+        entity->accept(visitor);
     }
 
-
-    beginInsertRows(QModelIndex(), 0, media.size() - 1);
-    for (const MediaEntity &medium : media) {
+    beginInsertRows(QModelIndex(), 0, visitor.media.size() - 1);
+    for (const MediaEntity &medium : visitor.media) {
         m_data.emplace_back(MediaObject::create(medium, this));
     }
     emit countChanged();
