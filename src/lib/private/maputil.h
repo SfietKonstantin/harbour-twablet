@@ -29,24 +29,31 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef SEARCHQUERYHANDLER_H
-#define SEARCHQUERYHANDLER_H
+#ifndef MAPUTIL_H
+#define MAPUTIL_H
 
-#include "abstracttweetlistqueryhandler.h"
-#include "query.h"
+#include <map>
 
-class SearchQueryHandler final: public AbstractTweetListQueryHandler
+namespace private_util
 {
-public:
-    explicit SearchQueryHandler(const Query::Parameters &parameters);
-    DISABLE_COPY_DISABLE_MOVE(SearchQueryHandler);
-private:
-    QString path() const override;
-    Parameters commonParameters() const override;
-    bool treatReply(RequestType requestType, const QByteArray &data, std::vector<Tweet> &items,
-                    QString &errorMessage, Placement &placement) override;
-    QString m_query {};
-    QByteArray m_resultType {};
-};
 
-#endif // SEARCHQUERYHANDLER_H
+template<class K, class V>
+bool hasValue(const std::map<K, V> &map, const K &key)
+{
+    return (map.find(key) != std::end(map));
+}
+
+template<class K, class V>
+V getValue(const std::map<K, V> &map, const K &key, const V &value = V())
+{
+    auto it = map.find(key);
+    if (it == std::end(map)) {
+        return value;
+    }
+    return it->second;
+}
+
+}
+
+#endif // MAPUTIL_H
+

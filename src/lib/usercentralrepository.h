@@ -57,15 +57,14 @@ private:
     struct MappingData
     {
         explicit MappingData(const Account &inputAccount, const Query &inputQuery,
-                             std::unique_ptr<IListQueryHandler<User>> &&inputHandler);
+                             IListQueryHandler<User>::Ptr &&inputHandler);
         bool loading {false};
         Account account {};
         Query query {};
         UserRepository repository {};
         std::unique_ptr<IListQueryHandler<User>> handler {};
     };
-    void load(MappingData &mappingData,
-              IListQueryHandler<User>::RequestType requestType);
+    void load(MappingData &mappingData, IListQueryHandler<User>::RequestType requestType);
     MappingData * getMappingData(int index, const Account &account, const Query &query);
     IQueryExecutor::Ptr m_queryExecutor {nullptr};
     std::map<int, MappingData> m_mapping {};

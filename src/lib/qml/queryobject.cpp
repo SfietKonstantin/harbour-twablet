@@ -34,19 +34,9 @@
 namespace qml
 {
 
-QueryObject::QueryObject(const Query &data, QObject *parent)
-    : QObject(parent), m_data{data}
+QueryObject::QueryObject(QObject *parent)
+    : QObject(parent)
 {
-}
-
-QueryObject * QueryObject::create(const Query &data, QObject *parent)
-{
-    return new QueryObject(data, parent);
-}
-
-QueryObject::Type QueryObject::type() const
-{
-    return static_cast<Type>(m_data.type());
 }
 
 }

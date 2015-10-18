@@ -33,6 +33,7 @@ set(${PROJECT_NAME}_SRCS
     tst_loadsavemanager.cpp
     mockqueryexecutor.h
     tst_tweetrepository.cpp
+    tst_query.cpp
 )
 
 add_executable(${PROJECT_NAME}

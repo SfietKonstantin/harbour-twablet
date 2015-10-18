@@ -29,23 +29,54 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef USERTIMELINEQUERYHANDLER_H
-#define USERTIMELINEQUERYHANDLER_H
+#include "tweetlistqueryhandler.h"
+#include "private/listqueryhandlerutil.h"
+#include <QtCore/QUrl>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonArray>
 
-#include "abstracttweetlistqueryhandler.h"
-#include "query.h"
-
-class UserTimelineQueryHandler final : public AbstractTweetListQueryHandler
+TweetListQueryHandler::TweetListQueryHandler()
 {
-public:
-    explicit UserTimelineQueryHandler(const Query::Parameters &parameters);
-    DISABLE_COPY_DISABLE_MOVE(UserTimelineQueryHandler);
-private:
-    QString path() const override;
-    Parameters commonParameters() const override;
-    QString m_userId {};
-    QString m_excludeReplies {QLatin1String("false")};
-    QString m_includeRts {QLatin1String("true")};
-};
+}
 
-#endif // USERTIMELINEQUERYHANDLER_H
+IListQueryHandler<Tweet>::Ptr TweetListQueryHandler::create()
+{
+    return Ptr(new TweetListQueryHandler());
+}
+
+Query::Parameters TweetListQueryHandler::additionalParameters(RequestType requestType) const
+{
+    Query::Parameters returned {};
+
+    switch (requestType) {
+    case Refresh:
+        if (!m_sinceId.isEmpty()) {
+            returned.emplace("since_id", QUrl::toPercentEncoding(m_sinceId));
+        }
+        break;
+    case LoadMore:
+        if (!m_maxId.isEmpty()) {
+            returned.emplace("max_id", QUrl::toPercentEncoding(m_maxId));
+        }
+        break;
+    default:
+        break;
+    }
+    return returned;
+}
+
+bool TweetListQueryHandler::treatReply(RequestType requestType, const QByteArray &data,
+                                       std::vector<Tweet> &items, QString &errorMessage,
+                                       Placement &placement)
+{
+    QJsonParseError error {-1, QJsonParseError::NoError};
+    QJsonDocument document {QJsonDocument::fromJson(data, &error)};
+    if (error.error != QJsonParseError::NoError) {
+        errorMessage = error.errorString();
+        placement = Discard;
+        return false;
+    }
+
+    return private_util::treatTweetReply(requestType, document.array(), items, placement,
+                                         m_sinceId, m_maxId);
+}

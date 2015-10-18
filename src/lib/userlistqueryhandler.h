@@ -29,23 +29,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "hometimelinequeryhandler.h"
+#ifndef USERLISTQUERYHANDLER_H
+#define USERLISTQUERYHANDLER_H
 
-HomeTimelineQueryHandler::HomeTimelineQueryHandler()
-    : AbstractTweetListQueryHandler()
-{
-}
+#include "ilistqueryhandler.h"
+#include "user.h"
 
-QString HomeTimelineQueryHandler::path() const
+class UserListQueryHandler final : public IListQueryHandler<User>
 {
-    return QLatin1String{"statuses/home_timeline.json"};
-}
+public:
+    DISABLE_COPY_DISABLE_MOVE(UserListQueryHandler);
+    static IListQueryHandler<User>::Ptr create();
+private:
+    UserListQueryHandler();
+    Query::Parameters additionalParameters(RequestType requestType) const override;
+    bool treatReply(RequestType requestType, const QByteArray &data,
+                    std::vector<User> &items, QString &errorMessage,
+                    Placement &placement) override;
+    QString m_nextCursor {};
+};
 
-AbstractTweetListQueryHandler::Parameters HomeTimelineQueryHandler::commonParameters() const
-{
-    return Parameters{
-        {"count", QByteArray::number(200)},
-        {"trim_user", "false"},
-        {"include_entities", "true"}
-    };
-}
+#endif // USERLISTQUERYHANDLER_H

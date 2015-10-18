@@ -42,25 +42,27 @@ class QueryObject : public QObject
 {
     Q_OBJECT
     Q_ENUMS(Type)
-    Q_PROPERTY(Type type READ type CONSTANT)
+    Q_ENUMS(UserType)
 public:
     enum Type
     {
-        Invalid = Query::Invalid,
-        Home = Query::Home,
-        Mentions = Query::Mentions,
-        Search = Query::Search,
-        Favorites = Query::Favorites,
-        UserTimeline = Query::UserTimeline,
-        Friends = Query::Friends,
-        Followers = Query::Followers
+        InvalidType = TweetListQuery::Invalid,
+        Home = TweetListQuery::Home,
+        Mentions = TweetListQuery::Mentions,
+        Search = TweetListQuery::Search,
+        Favorites = TweetListQuery::Favorites,
+        UserTimeline = TweetListQuery::UserTimeline,
     };
+    enum UserType
+    {
+        InvalidUserType,
+        Friends,
+        Followers
+    };
+
     DISABLE_COPY_DISABLE_MOVE(QueryObject);
-    static QueryObject * create(const Query &data, QObject *parent = 0);
-    Type type() const;
 private:
-    explicit QueryObject(const Query &data, QObject *parent = 0);
-    Query m_data {};
+    explicit QueryObject(QObject *parent = 0);
 };
 
 }

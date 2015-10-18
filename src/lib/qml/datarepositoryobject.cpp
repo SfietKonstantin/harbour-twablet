@@ -32,6 +32,7 @@
 #include "datarepositoryobject.h"
 #include "query.h"
 #include "accountobject.h"
+#include "queryobject.h"
 #include "private/networkqueryexecutor.h"
 #include <QtCore/QVariantMap>
 #include <QtCore/QLoggingCategory>
@@ -189,11 +190,11 @@ void DataRepositoryObject::addDefaultLayouts(int accountIndex, const QString &ho
     }
 
     if (enableHomeTimeline) {
-        m_layouts.append(Layout(homeName, userId, Query(Query::Home, Query::Parameters())));
+        m_layouts.append(Layout(homeName, userId, TweetListQuery(TweetListQuery::Home, TweetListQuery::Parameters())));
         insertRepository();
     }
     if (enableMentionsTimeline) {
-        m_layouts.append(Layout(mentionsName, userId, Query(Query::Mentions, Query::Parameters())));
+        m_layouts.append(Layout(mentionsName, userId, TweetListQuery(TweetListQuery::Mentions, TweetListQuery::Parameters())));
         insertRepository();
     }
     m_loadSaveManager.save(m_layouts);
@@ -252,14 +253,15 @@ int DataRepositoryObject::addTemporaryLayout(AccountObject *account, int queryTy
     }
 
     Query::Parameters queryParameters {};
-    if (!addLayoutCheckQuery(queryType, paramters, queryParameters)) {
+    copyQueryParameters(paramters, queryParameters);
+    TweetListQuery query {static_cast<TweetListQuery::Type>(queryType), std::move(queryParameters)};
+    if (!query.isValid()) {
         return -1;
     }
 
     int index = m_temporaryLayoutsIndex;
     ++m_temporaryLayoutsIndex;
-    m_temporaryLayouts.emplace(index, Layout(QString(), account->userId(), std::move(Query(static_cast<Query::Type>(queryType),
-                                                                                           std::move(queryParameters)))));
+    m_temporaryLayouts.emplace(index, Layout(QString(), account->userId(), std::move(query)));
     auto it = m_temporaryLayouts.find(index);
     insertRepository(it->second);
     refresh(it->second);
@@ -305,12 +307,13 @@ int DataRepositoryObject::addUser(AccountObject *account, int queryType, const Q
     }
 
     Query::Parameters queryParameters {};
-    if (!addUserCheckQuery(queryType, parameters, queryParameters)) {
+    copyQueryParameters(parameters, queryParameters);
+    UserListQuery query {static_cast<UserListQuery::Type>(queryType), std::move(queryParameters)};
+    if (!query.isValid()) {
         return -1;
     }
 
-    return m_userCentralRepository.addRepository(account->data(), std::move(Query(static_cast<Query::Type>(queryType),
-                                                                                  std::move(queryParameters))));
+    return m_userCentralRepository.addRepository(account->data(), std::move(query));
 }
 
 void DataRepositoryObject::removeUser(int index)
@@ -356,12 +359,14 @@ void DataRepositoryObject::addLayout(const QString &name, const QString &userId,
                                      const QVariantMap &parameters)
 {
     Query::Parameters queryParameters {};
-    if (!addLayoutCheckQuery(queryType, parameters, queryParameters)) {
+    copyQueryParameters(parameters, queryParameters);
+
+    TweetListQuery query {static_cast<TweetListQuery::Type>(queryType), std::move(queryParameters)};
+    if (!query.isValid()) {
         return;
     }
 
-    m_layouts.append(Layout(name, userId, Query(static_cast<Query::Type>(queryType),
-                                                std::move(queryParameters))));
+    m_layouts.append(std::move(Layout(name, userId, std::move(query))));
     insertRepository();
     m_loadSaveManager.save(m_layouts);
     refresh();
@@ -377,51 +382,13 @@ bool DataRepositoryObject::addLayoutCheckAccount(int accountIndex, QString &user
     return true;
 }
 
-bool DataRepositoryObject::addLayoutCheckQuery(int queryType, const QVariantMap &parameters,
+void DataRepositoryObject::copyQueryParameters(const QVariantMap &parameters,
                                                Query::Parameters &queryParametrs) const
 {
-    switch (queryType) {
-    case Query::Home:
-        break;
-    case Query::Mentions:
-        break;
-    case Query::Search:
-        break;
-    case Query::Favorites:
-        break;
-    case Query::UserTimeline:
-        break;
-
-    default:
-        return false;
-        break;
-    }
-
     for (const QString &key : parameters.keys()) {
-        queryParametrs.emplace(key, parameters.value(key).toString());
+        queryParametrs.emplace(QUrl::toPercentEncoding(key),
+                               QUrl::toPercentEncoding(parameters.value(key).toString()));
     }
-
-    return true;
-}
-
-bool DataRepositoryObject::addUserCheckQuery(int queryType, const QVariantMap &parameters,
-                                             Query::Parameters &queryParameters) const
-{
-    switch (queryType) {
-    case Query::Friends:
-        break;
-    case Query::Followers:
-        break;
-    default:
-        return false;
-        break;
-    }
-
-    for (const QString &key : parameters.keys()) {
-        queryParameters.emplace(key, parameters.value(key).toString());
-    }
-
-    return true;
 }
 
 void DataRepositoryObject::insertRepository(const Layout &layout)

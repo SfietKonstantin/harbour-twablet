@@ -30,8 +30,10 @@
  */
 
 #include "networkqueryexecutor.h"
-#include "twitterqueryutil.h"
 #include "qobjectutils.h"
+#include "twitterqueryutil.h"
+#include <QtNetwork/QNetworkAccessManager>
+
 
 namespace private_util {
 
@@ -45,7 +47,7 @@ IQueryExecutor::Ptr NetworkQueryExecutor::create(QNetworkAccessManager &network)
     return IQueryExecutor::Ptr(new NetworkQueryExecutor(network));
 }
 
-void NetworkQueryExecutor::execute(const QString &path, const std::map<QByteArray, QByteArray> &parameters,
+void NetworkQueryExecutor::execute(const QByteArray &path, const std::map<QByteArray, QByteArray> &parameters,
                                    const Account &account, const IQueryExecutor::Callback_t &callback)
 {
     QNetworkReply *reply {TwitterQueryUtil::get(m_network, path, parameters, account)};

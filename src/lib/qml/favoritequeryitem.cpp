@@ -74,11 +74,11 @@ bool FavoriteQueryItem::isQueryValid() const
 
 QNetworkReply * FavoriteQueryItem::createQuery() const
 {
-    QString path {};
+    QByteArray path {};
     if (m_favorited) {
-        path = std::move(QLatin1String("favorites/destroy.json"));
+        path = std::move(QByteArray("favorites/destroy.json"));
     } else {
-        path = std::move(QLatin1String("favorites/create.json"));
+        path = std::move(QByteArray("favorites/create.json"));
     }
     std::map<QByteArray, QByteArray> parameters {{"id", QUrl::toPercentEncoding(m_tweetId)}};
 

@@ -66,11 +66,11 @@ private:
     };
     struct MappingData
     {
-        explicit MappingData(std::unique_ptr<IListQueryHandler<Tweet> > &&inputHandler);
+        explicit MappingData(IListQueryHandler<Tweet>::Ptr &&inputHandler);
         bool loading {false};
         TweetRepository repository {};
         int refcount {0};
-        std::unique_ptr<IListQueryHandler<Tweet>> handler {};
+        IListQueryHandler<Tweet>::Ptr handler {};
     };
     class MappingKeyComparator
     {

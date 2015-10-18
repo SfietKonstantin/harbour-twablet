@@ -45,7 +45,7 @@ class LayoutObject : public QObject
     Q_OBJECT
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
     Q_PROPERTY(QString userId READ userId NOTIFY userIdChanged)
-    Q_PROPERTY(qml::QueryObject::Type queryType READ queryType NOTIFY typeChanged)
+    Q_PROPERTY(qml::QueryObject::Type queryType READ queryType NOTIFY queryTypeChanged)
 public:
     DISABLE_COPY_DISABLE_MOVE(LayoutObject);
     static LayoutObject * create(const Layout &data, QObject *parent = 0);
@@ -56,7 +56,7 @@ public:
 signals:
     void nameChanged();
     void userIdChanged();
-    void typeChanged();
+    void queryTypeChanged();
     void unreadChanged();
 private:
     explicit LayoutObject(const Layout &data, QObject *parent = 0);

@@ -31,6 +31,7 @@
 
 #include "layoutrepository.h"
 #include <QtCore/QJsonArray>
+#include <QtCore/QUrl>
 
 int LayoutRepository::count() const
 {
@@ -54,11 +55,11 @@ void LayoutRepository::load(const QJsonObject &json)
             const QJsonObject &parameterObject {parameterValue.toObject()};
             QString key {parameterObject.value(QLatin1String("key")).toString()};
             QString value {parameterObject.value(QLatin1String("value")).toString()};
-            parameters.emplace(key, value);
+            parameters.emplace(QUrl::toPercentEncoding(key), QUrl::toPercentEncoding(value));
         }
 
-        if (!userId.isEmpty() && queryType != Query::Invalid) {
-            Query query {static_cast<Query::Type>(queryType), std::move(parameters)};
+        if (!userId.isEmpty() && queryType != TweetListQuery::Invalid) {
+            TweetListQuery query {static_cast<TweetListQuery::Type>(queryType), std::move(parameters)};
             data.emplace_back(name, userId, std::move(query));
         }
     }
@@ -74,10 +75,10 @@ void LayoutRepository::save(QJsonObject &json) const
         layoutObject.insert(QLatin1String("userId"), layout.userId());
         layoutObject.insert(QLatin1String("queryType"), layout.query().type());
         QJsonArray parameters {};
-        for (const std::pair<QString, QString> &parameter : layout.query().parameters()) {
+        for (const std::pair<QByteArray, QByteArray> &parameter : layout.query().parameters()) {
             QJsonObject parameterObject {};
-            parameterObject.insert(QLatin1String("key"), parameter.first);
-            parameterObject.insert(QLatin1String("value"), parameter.second);
+            parameterObject.insert(QLatin1String("key"), QString::fromLocal8Bit(parameter.first));
+            parameterObject.insert(QLatin1String("value"), QString::fromLocal8Bit(parameter.second));
             parameters.append(parameterObject);
         }
         layoutObject.insert(QLatin1String("queryArguments"), parameters);

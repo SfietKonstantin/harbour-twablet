@@ -29,39 +29,45 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "abstractuserlistqueryhandler.h"
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
+#include "tweetsearchqueryhandler.h"
+#include "private/listqueryhandlerutil.h"
 #include <QtCore/QUrl>
-#include <QtCore/QLoggingCategory>
-#include "tweet.h"
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
 
-AbstractUserListQueryHandler::AbstractUserListQueryHandler()
+TweetSearchQueryHandler::TweetSearchQueryHandler()
 {
 }
 
-void AbstractUserListQueryHandler::createRequest(RequestType requestType, QString &outPath,
-                                             Parameters &outParameters) const
+IListQueryHandler<Tweet>::Ptr TweetSearchQueryHandler::create()
 {
-    outPath = path();
-    outParameters = std::move(commonParameters());
+    return Ptr(new TweetSearchQueryHandler());
+}
+
+Query::Parameters TweetSearchQueryHandler::additionalParameters(RequestType requestType) const
+{
+    Query::Parameters returned {};
+
     switch (requestType) {
     case Refresh:
-        qCWarning(QLoggingCategory("abstract-user-query-handler")) << "Refresh is not implemented";
-        break;
-    case LoadMore:
-        if (!m_nextCursor.isEmpty()) {
-            outParameters.emplace("cursor", QUrl::toPercentEncoding(m_nextCursor));
+        if (!m_sinceId.isEmpty()) {
+            returned.emplace("since_id", QUrl::toPercentEncoding(m_sinceId));
         }
         break;
+    case LoadMore:
+        if (!m_maxId.isEmpty()) {
+            returned.emplace("max_id", QUrl::toPercentEncoding(m_maxId));
+        }
+        break;
+    default:
+        break;
     }
-
+    return returned;
 }
 
-bool AbstractUserListQueryHandler::treatReply(RequestType requestType, const QByteArray &data,
-                                          std::vector<User> &items, QString &errorMessage,
-                                          IListQueryHandler::Placement &placement)
+bool TweetSearchQueryHandler::treatReply(RequestType requestType, const QByteArray &data,
+                                       std::vector<Tweet> &items, QString &errorMessage,
+                                       Placement &placement)
 {
     QJsonParseError error {-1, QJsonParseError::NoError};
     QJsonDocument document {QJsonDocument::fromJson(data, &error)};
@@ -72,26 +78,7 @@ bool AbstractUserListQueryHandler::treatReply(RequestType requestType, const QBy
     }
 
     const QJsonObject &root (document.object());
-    const QJsonArray &users (root.value(QLatin1String("users")).toArray());
-    items.reserve(users.size());
-    for (const QJsonValue &user : users) {
-        if (user.isObject()) {
-            items.emplace_back(user.toObject());
-        }
-    }
-
-    if (!items.empty()) {
-        switch (requestType) {
-        case Refresh:
-            qCWarning(QLoggingCategory("abstract-user-query-handler")) << "Refresh is not implemented";
-            break;
-        case LoadMore:
-            m_nextCursor = QString::number(root.value(QLatin1String("next_cursor")).toInt());
-            placement = Append;
-            break;
-        }
-
-    }
-    return true;
+    const QJsonArray tweets (root.value(QLatin1String("statuses")).toArray());
+    return private_util::treatTweetReply(requestType, tweets, items, placement,
+                                         m_sinceId, m_maxId);
 }
-

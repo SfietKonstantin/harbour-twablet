@@ -45,22 +45,22 @@ namespace private_util
 class TwitterQueryUtil
 {
 public:
-    static QNetworkReply * get(QNetworkAccessManager &network, const QString &path,
+    static QNetworkReply * get(QNetworkAccessManager &network, const QByteArray &path,
                                const std::map<QByteArray, QByteArray> &parameters,
                                const Account &account);
-    static QNetworkReply * post(QNetworkAccessManager &network, const QString &path,
+    static QNetworkReply * post(QNetworkAccessManager &network, const QByteArray &path,
                                 const std::map<QByteArray, QByteArray> &parameters,
                                 const std::map<QByteArray, QByteArray> &postData,
                                 const Account &account);
 private:
-    static QNetworkRequest createRequest(const QByteArray &type, const QString &path,
+    static QNetworkRequest createRequest(const QByteArray &type, const QByteArray &path,
                                          const std::map<QByteArray, QByteArray> &parameters,
                                          const std::map<QByteArray, QByteArray> &postData,
                                          const Account &account);
-    static QNetworkRequest createGetRequest(const QString &path,
+    static QNetworkRequest createGetRequest(const QByteArray &path,
                                             const std::map<QByteArray, QByteArray> &parameters,
                                             const Account &account);
-    static QNetworkRequest createPostRequest(const QString &path,
+    static QNetworkRequest createPostRequest(const QByteArray &path,
                                              const std::map<QByteArray, QByteArray> &parameters,
                                              const std::map<QByteArray, QByteArray> &postData,
                                              const Account &account);

@@ -29,21 +29,48 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FOLLOWERSQUERYHANDLER_H
-#define FOLLOWERSQUERYHANDLER_H
+#include "listqueryhandlerutil.h"
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
 
-#include "abstractuserlistqueryhandler.h"
-#include "query.h"
-
-class FollowersQueryHandler final : public AbstractUserListQueryHandler
+namespace private_util
 {
-public:
-    explicit FollowersQueryHandler(const Query::Parameters &parameters);
-    DISABLE_COPY_DISABLE_MOVE(FollowersQueryHandler);
-private:
-    QString path() const override;
-    Parameters commonParameters() const override;
-    QByteArray m_userId;
-};
 
-#endif // FOLLOWERSQUERYHANDLER_H
+bool treatTweetReply(IListQueryHandler<Tweet>::RequestType requestType,
+                     const QJsonArray &data, std::vector<Tweet> &items,
+                     IListQueryHandler<Tweet>::Placement &placement,
+                     QString &sinceId, QString &maxId)
+{
+    items.reserve(data.size());
+    for (const QJsonValue &item : data) {
+        if (item.isObject()) {
+            items.emplace_back(item.toObject());
+        }
+    }
+
+    QString newSinceId = !items.empty() ? std::begin(items)->id() : QString();
+    quint64 newMaxId = items.empty() ? 0 : (std::end(items) - 1)->id().toULongLong();
+    QString newMaxIdStr = newMaxId > 0 ? QString::number(newMaxId - 1) : QString();
+    if (!items.empty()) {
+        switch (requestType) {
+        case IListQueryHandler<Tweet>::Refresh:
+            sinceId = std::move(newSinceId);
+            if (maxId.isEmpty()) {
+                maxId = std::move(newMaxIdStr);
+            }
+            placement = IListQueryHandler<Tweet>::Prepend;
+            break;
+        case IListQueryHandler<Tweet>::LoadMore:
+            if (sinceId.isEmpty()) {
+                sinceId = std::move(newSinceId);
+            }
+            maxId = std::move(newMaxIdStr);
+            placement = IListQueryHandler<Tweet>::Append;
+            break;
+        }
+
+    }
+    return true;
+}
+
+}

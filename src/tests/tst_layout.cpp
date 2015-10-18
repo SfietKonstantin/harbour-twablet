@@ -32,24 +32,26 @@
 #include <gtest/gtest.h>
 #include <qml/datarepositoryobject.h>
 #include <qml/layoutmodel.h>
+#include "debughelpers.h"
 
 TEST(layout, Layout)
 {
     Query::Parameters parameters {
-        {QLatin1String("test1"), QLatin1String("value1")},
-        {QLatin1String("test2"), QLatin1String("value2")}
+        {"user_id", "12345"},
+        {"exclude_replies", "true"},
+        {"include_rts", "false"}
     };
-    Query query {Query::Mentions, std::move(Query::Parameters(parameters))}; // Copy parameters
+    TweetListQuery query {TweetListQuery::UserTimeline, std::move(parameters)};
+    EXPECT_TRUE(query.isValid());
+
     Layout layout {
         QLatin1String("Layout name"),
         QLatin1String("userId"),
-        std::move(query)
+        std::move(TweetListQuery(query)) // Copy query
     };
 
     EXPECT_TRUE(layout.isValid());
-    EXPECT_TRUE(layout.query().isValid());
-    EXPECT_EQ(layout.query().type(), Query::Mentions);
-    EXPECT_EQ(layout.query().parameters(), parameters);
+    EXPECT_EQ(layout.query(), query);
     EXPECT_EQ(layout.unread(), 0);
 
     Layout movedLayout {std::move(layout)};
@@ -58,8 +60,7 @@ TEST(layout, Layout)
     EXPECT_TRUE(movedLayout.query().isValid());
     EXPECT_EQ(movedLayout.name(), QLatin1String("Layout name"));
     EXPECT_EQ(movedLayout.userId(), QLatin1String("userId"));
-    EXPECT_EQ(movedLayout.query().type(), Query::Mentions);
-    EXPECT_EQ(movedLayout.query().parameters(), parameters);
+    EXPECT_EQ(movedLayout.query(), query);
     EXPECT_EQ(movedLayout.unread(), 0);
 
     movedLayout.setName(QLatin1String("New layout"));
@@ -68,13 +69,11 @@ TEST(layout, Layout)
     EXPECT_EQ(movedLayout.userId(), QLatin1String("1"));
 
     Query::Parameters newParameters {
-        {QLatin1String("newTest1"), QLatin1String("newValue1")},
-        {QLatin1String("newTest2"), QLatin1String("newValue2")}
+        {"user_id", "123"}
     };
-    Query newQuery {Query::Friends, std::move(Query::Parameters(newParameters))}; // Copy parameters
-    movedLayout.setQuery(std::move(newQuery));
-    EXPECT_EQ(movedLayout.query().type(), Query::Friends);
-    EXPECT_EQ(movedLayout.query().parameters(), newParameters);
+    TweetListQuery newQuery {TweetListQuery::Favorites, std::move(newParameters)};
+    movedLayout.setQuery(std::move(TweetListQuery(newQuery))); // Copy query
+    EXPECT_EQ(movedLayout.query(), newQuery);
     movedLayout.setUnread(123);
     EXPECT_EQ(movedLayout.unread(), 123);
 }
@@ -83,7 +82,7 @@ TEST(layout, LayoutRepository)
 {
     LayoutRepository repository {};
     for (int i = 0; i < 4; ++i) {
-        Query query {Query::Home, std::move(Query::Parameters())};
+        TweetListQuery query {TweetListQuery::Home, Query::Parameters()};
         repository.append(Layout(QString::number(i + 1), QString(), std::move(query)));
     }
     EXPECT_EQ((std::begin(repository) + 0)->name(), QString::number(1));
@@ -109,7 +108,7 @@ TEST(layout, LayoutModel)
     LayoutRepository &repository (repositoryObject.layouts());
 
     for (int i = 0; i < 3; ++i) {
-        Query query {Query::Home, std::move(Query::Parameters())};
+        TweetListQuery query {TweetListQuery::Home, std::move(Query::Parameters())};
         repository.append(Layout(QString::number(i + 1), QString(), std::move(query)));
     }
 
@@ -124,7 +123,7 @@ TEST(layout, LayoutModel)
     EXPECT_EQ(getObject(model, 2)->name(), QString::number(3));
 
     {
-        Query query {Query::Home, std::move(Query::Parameters())};
+        TweetListQuery query {TweetListQuery::Home, std::move(Query::Parameters())};
         repository.append(Layout(QString::number(4), QString(), std::move(query)));
     }
 

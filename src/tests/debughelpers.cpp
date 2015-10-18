@@ -29,21 +29,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FRIENDSQUERYHANDLER_H
-#define FRIENDSQUERYHANDLER_H
+#include "debughelpers.h"
+#include <sstream>
 
-#include "abstractuserlistqueryhandler.h"
-#include "query.h"
-
-class FriendsQueryHandler final : public AbstractUserListQueryHandler
+namespace experimental
 {
-public:
-    explicit FriendsQueryHandler(const Query::Parameters &parameters);
-    DISABLE_COPY_DISABLE_MOVE(FriendsQueryHandler);
-private:
-    QString path() const override;
-    Parameters commonParameters() const override;
-    QByteArray m_userId;
-};
 
-#endif // FRIENDSQUERYHANDLER_H
+void PrintTo(const Query::Parameters &data, ::std::ostream *os)
+{
+    std::stringstream ss;
+
+    ss << "(";
+    for (auto it = std::begin(data); it != std::end(data); ++it) {
+        if (it != std::begin(data)) {
+            os << ", ";
+        }
+        os << it->first.data() << ":" << it->second.data();
+    }
+
+    *os << ss;
+}
+
+}

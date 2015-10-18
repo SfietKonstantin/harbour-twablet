@@ -36,12 +36,13 @@
 #include <QtCore/QDebug>
 #include <map>
 #include <vector>
+#include <memory>
+#include "query.h"
 
 template<class T>
 class IListQueryHandler
 {
 public:
-    using Parameters = std::map<QByteArray, QByteArray>;
     enum RequestType
     {
         Refresh,
@@ -53,9 +54,9 @@ public:
         Append,
         Prepend,
     };
+    using Ptr = std::unique_ptr<IListQueryHandler<T>>;
     virtual ~IListQueryHandler() {}
-    virtual void createRequest(RequestType requestType, QString &outPath,
-                               Parameters &outParameters) const = 0;
+    virtual Query::Parameters additionalParameters(RequestType requestType) const = 0;
     virtual bool treatReply(RequestType requestType, const QByteArray &data,
                             std::vector<T> &items, QString &errorMessage,
                             Placement &placement) = 0;

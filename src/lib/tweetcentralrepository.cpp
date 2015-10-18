@@ -30,13 +30,9 @@
  */
 
 #include "tweetcentralrepository.h"
-#include "hometimelinequeryhandler.h"
-#include "mentionstimelinequeryhandler.h"
-#include "searchqueryhandler.h"
-#include "favoritesqueryhandler.h"
-#include "usertimelinequeryhandler.h"
 #include "private/twitterqueryutil.h"
 #include "private/repositoryprocesscallback.h"
+#include "listqueryhandlerfactory.h"
 #include <QtCore/QLoggingCategory>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
@@ -67,7 +63,7 @@ void TweetCentralRepository::referenceQuery(const Account &account, const Query 
     ++data->refcount;
 
     for (const auto &it : m_mapping) {
-        qCDebug(QLoggingCategory("tweet-central-repository")) << "For query" << it.first.query.type()
+        qCDebug(QLoggingCategory("tweet-central-repository")) << "For query" << it.first.query.path()
                                                               << "Refcount:" << it.second.refcount;
     }
 }
@@ -84,7 +80,7 @@ void TweetCentralRepository::dereferenceQuery(const Account &account, const Quer
     }
 
     for (const auto &it : m_mapping) {
-        qCDebug(QLoggingCategory("tweet-central-repository")) << "For query" << it.first.query.type()
+        qCDebug(QLoggingCategory("tweet-central-repository")) << "For query" << it.first.query.path()
                                                               << "Refcount:" << it.second.refcount;
     }
 }
@@ -159,9 +155,11 @@ void TweetCentralRepository::load(const MappingKey &key, MappingData &mappingDat
 
     mappingData.loading = true;
 
-    QString path {};
-    std::map<QByteArray, QByteArray> parameters {};
-    mappingData.handler->createRequest(requestType, path, parameters);
+    QByteArray path {key.query.path()};
+    Query::Parameters parameters (key.query.parameters());
+    const Query::Parameters &additionalParameters (mappingData.handler->additionalParameters(requestType));
+    parameters.insert(std::begin(additionalParameters), std::end(additionalParameters));
+
     qCDebug(QLoggingCategory("tweet-central-repository")) << "Request:" << path << parameters;
     mappingData.repository.start();
 
@@ -189,42 +187,11 @@ TweetCentralRepository::MappingData * TweetCentralRepository::getMappingData(con
         return &(it->second);
     }
 
-    switch (query.type()) {
-    case Query::Home:
-    {
-        std::unique_ptr<IListQueryHandler<Tweet>> handler {new HomeTimelineQueryHandler()};
-        return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
-        break;
-    }
-    case Query::Mentions:
-    {
-        std::unique_ptr<IListQueryHandler<Tweet>> handler {new MentionsTimelineQueryHandler()};
-        return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
-        break;
-    }
-    case Query::Search:
-    {
-        std::unique_ptr<IListQueryHandler<Tweet>> handler {new SearchQueryHandler(query.parameters())};
-        return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
-        break;
-    }
-    case Query::Favorites:
-    {
-        std::unique_ptr<IListQueryHandler<Tweet>> handler {new FavoritesQueryHandler(query.parameters())};
-        return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
-        break;
-    }
-    case Query::UserTimeline:
-    {
-        std::unique_ptr<IListQueryHandler<Tweet>> handler {new UserTimelineQueryHandler(query.parameters())};
-        return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
-        break;
-    }
-    default:
-        qCWarning(QLoggingCategory("tweet-central-repository")) << "Unhandled type" << query.type();
+    IListQueryHandler<Tweet>::Ptr handler {ListQueryHandlerFactory::createTweet(query)};
+    if (!handler) {
         return nullptr;
-        break;
     }
+    return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
 }
 
 bool TweetCentralRepository::MappingKeyComparator::operator()(const MappingKey &first, const MappingKey &second) const
@@ -233,7 +200,7 @@ bool TweetCentralRepository::MappingKeyComparator::operator()(const MappingKey &
                                                              : (first.account.userId() < second.account.userId());
 }
 
-TweetCentralRepository::MappingData::MappingData(std::unique_ptr<IListQueryHandler<Tweet>> &&inputHandler)
+TweetCentralRepository::MappingData::MappingData(IListQueryHandler<Tweet>::Ptr &&inputHandler)
     : handler(std::move(inputHandler))
 {
 }

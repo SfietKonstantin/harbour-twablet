@@ -37,8 +37,8 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QLoggingCategory>
 #include <QtNetwork/QNetworkReply>
-#include "abstracttweetlistqueryhandler.h"
 #include "repository.h"
+#include "ilistqueryhandler.h"
 
 namespace private_util {
 
@@ -127,7 +127,6 @@ private:
     std::vector<T> &m_items;
     bool &m_loading;
 };
-
 
 }
 

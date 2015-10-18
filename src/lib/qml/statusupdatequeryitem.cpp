@@ -74,7 +74,7 @@ bool StatusUpdateQueryItem::isQueryValid() const
 
 QNetworkReply * StatusUpdateQueryItem::createQuery() const
 {
-    QString path {QLatin1String("statuses/update.json")};
+    QByteArray path {"statuses/update.json"};
     std::map<QByteArray, QByteArray> parameters {{"status", QUrl::toPercentEncoding(m_text)}};
     if (!m_inReplyTo.isEmpty()) {
         parameters.insert({"in_reply_to_status_id", QUrl::toPercentEncoding(m_inReplyTo)});

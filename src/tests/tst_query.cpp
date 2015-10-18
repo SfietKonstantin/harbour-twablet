@@ -29,28 +29,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "friendsqueryhandler.h"
+#include <gtest/gtest.h>
+#include <query.h>
 
-FriendsQueryHandler::FriendsQueryHandler(const Query::Parameters &parameters)
-    : AbstractUserListQueryHandler()
+TEST(query, Invalid)
 {
-    auto userIdIt = parameters.find(QLatin1String("user_id"));
-    if (userIdIt != std::end(parameters)) {
-        m_userId = userIdIt->second.toLocal8Bit();
+    {
+        Query query {};
+        EXPECT_FALSE(query.isValid());
     }
-}
-
-QString FriendsQueryHandler::path() const
-{
-    return QLatin1String{"friends/list.json"};
-}
-
-AbstractUserListQueryHandler::Parameters FriendsQueryHandler::commonParameters() const
-{
-    return Parameters{
-        {"count", QByteArray::number(200)},
-        {"user_id", m_userId},
-        {"skip_status", "true"},
-        {"include_user_entities", "true"}
-    };
+    {
+        TweetListQuery query {};
+        EXPECT_FALSE(query.isValid());
+    }
+    {
+        UserListQuery query {};
+        EXPECT_FALSE(query.isValid());
+    }
 }

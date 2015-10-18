@@ -29,42 +29,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "usertimelinequeryhandler.h"
-#include <QtCore/QUrl>
+#ifndef LISTQUERYHANDLERUTIL_H
+#define LISTQUERYHANDLERUTIL_H
 
-UserTimelineQueryHandler::UserTimelineQueryHandler(const Query::Parameters &parameters)
-    : AbstractTweetListQueryHandler()
+#include "ilistqueryhandler.h"
+#include "tweet.h"
+
+class QJsonArray;
+
+namespace private_util
 {
-    auto userIdIt = parameters.find(QLatin1String("user_id"));
-    if (userIdIt != std::end(parameters)) {
-        m_userId = userIdIt->second;
-    }
 
-    auto excludeRepliesIt = parameters.find(QLatin1String("exclude_replies"));
-    if (excludeRepliesIt != std::end(parameters)) {
-        m_excludeReplies = excludeRepliesIt->second;
-    }
+bool treatTweetReply(IListQueryHandler<Tweet>::RequestType requestType,
+                     const QJsonArray &data, std::vector<Tweet> &items,
+                     IListQueryHandler<Tweet>::Placement &placement,
+                     QString &sinceId, QString &maxId);
 
-    auto includeRtsIt = parameters.find(QLatin1String("include_rts"));
-    if (includeRtsIt != std::end(parameters)) {
-        m_includeRts = includeRtsIt->second;
-    }
 }
 
-QString UserTimelineQueryHandler::path() const
-{
-    return QLatin1String("statuses/user_timeline.json");
-}
-
-AbstractTweetListQueryHandler::Parameters UserTimelineQueryHandler::commonParameters() const
-{
-    return Parameters{
-        {"count", QByteArray::number(200)},
-        {"trim_user", "false"},
-        {"include_entities", "true"},
-        {"user_id", QUrl::toPercentEncoding(m_userId)},
-        {"exclude_replies", QUrl::toPercentEncoding(m_excludeReplies)},
-        {"include_rts", QUrl::toPercentEncoding(m_includeRts)}
-    };
-}
+#endif // LISTQUERYHANDLERUTIL_H
 

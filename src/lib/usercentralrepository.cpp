@@ -30,10 +30,9 @@
  */
 
 #include "usercentralrepository.h"
-#include "friendsqueryhandler.h"
-#include "followersqueryhandler.h"
 #include "private/twitterqueryutil.h"
 #include "private/repositoryprocesscallback.h"
+#include "listqueryhandlerfactory.h"
 #include <QtCore/QLoggingCategory>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
@@ -102,9 +101,11 @@ void UserCentralRepository::load(UserCentralRepository::MappingData &mappingData
 
     mappingData.loading = true;
 
-    QString path {};
-    std::map<QByteArray, QByteArray> parameters {};
-    mappingData.handler->createRequest(requestType, path, parameters);
+    QByteArray path {mappingData.query.path()};
+    Query::Parameters parameters (mappingData.query.parameters());
+    const Query::Parameters &additionalParameters (mappingData.handler->additionalParameters(requestType));
+    parameters.insert(std::begin(additionalParameters), std::end(additionalParameters));
+
     qCDebug(QLoggingCategory("user-central-repository")) << "Request:" << path << parameters;
     mappingData.repository.start();
 
@@ -129,28 +130,15 @@ UserCentralRepository::MappingData * UserCentralRepository::getMappingData(int i
         return &(it->second);
     }
 
-    switch (query.type()) {
-    case Query::Friends:
-    {
-        std::unique_ptr<IListQueryHandler<User>> handler {new FriendsQueryHandler(query.parameters())};
-        return &(m_mapping.emplace(index, MappingData{account, query, std::move(handler)}).first->second);
-        break;
-    }
-    case Query::Followers:
-    {
-        std::unique_ptr<IListQueryHandler<User>> handler {new FollowersQueryHandler(query.parameters())};
-        return &(m_mapping.emplace(index, MappingData{account, query, std::move(handler)}).first->second);
-        break;
-    }
-    default:
-        qCWarning(QLoggingCategory("user-central-repository")) << "Unhandled type" << query.type();
+    IListQueryHandler<User>::Ptr handler {ListQueryHandlerFactory::createUser(query)};
+    if (!handler) {
         return nullptr;
-        break;
     }
+    return &(m_mapping.emplace(index, MappingData{account, query, std::move(handler)}).first->second);
 }
 
 UserCentralRepository::MappingData::MappingData(const Account &inputAccount, const Query &inputQuery,
-                                                std::unique_ptr<IListQueryHandler<User> > &&inputHandler)
+                                                IListQueryHandler<User>::Ptr &&inputHandler)
     : account(std::move(inputAccount)), query(std::move(inputQuery)), handler(std::move(inputHandler))
 {
 }

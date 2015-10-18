@@ -77,10 +77,10 @@ void LayoutObject::update(const Layout &other)
     }
 
     if (m_data.query() != other.query()) {
-        Query::Type oldType = m_data.query().type();
+        TweetListQuery::Type oldType = m_data.query().type();
         m_data.setQuery(other.query());
         if (m_data.query().type() != oldType) {
-            emit typeChanged();
+            emit queryTypeChanged();
         }
     }
 

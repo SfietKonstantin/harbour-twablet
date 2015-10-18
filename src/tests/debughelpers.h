@@ -29,19 +29,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef MENTIONSTIMELINEQUERYHANDLER_H
-#define MENTIONSTIMELINEQUERYHANDLER_H
+#ifndef DEBUGHELPERS_H
+#define DEBUGHELPERS_H
 
-#include "abstracttweetlistqueryhandler.h"
+#include <iostream>
+#include <query.h>
 
-class MentionsTimelineQueryHandler final : public AbstractTweetListQueryHandler
+namespace experimental
 {
-public:
-    explicit MentionsTimelineQueryHandler();
-    DISABLE_COPY_DISABLE_MOVE(MentionsTimelineQueryHandler);
-private:
-    QString path() const override;
-    Parameters commonParameters() const override;
-};
 
-#endif // MENTIONSTIMELINEQUERYHANDLER_H
+void PrintTo(const Query::Parameters &data, ::std::ostream *os);
+
+}
+
+#endif // DEBUGHELPERS_H

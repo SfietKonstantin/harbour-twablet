@@ -29,27 +29,31 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef ABSTRACTUSERLISTQUERYHANDLER_H
-#define ABSTRACTUSERLISTQUERYHANDLER_H
+#include "listqueryhandlerfactory.h"
+#include "tweetlistqueryhandler.h"
+#include "tweetsearchqueryhandler.h"
+#include "userlistqueryhandler.h"
 
-#include "ilistqueryhandler.h"
-#include "user.h"
-#include "globals.h"
-
-class AbstractUserListQueryHandler: public IListQueryHandler<User>
+IListQueryHandler<Tweet>::Ptr ListQueryHandlerFactory::createTweet(const Query &query)
 {
-public:
-    DISABLE_COPY_DISABLE_MOVE(AbstractUserListQueryHandler);
-protected:
-    explicit AbstractUserListQueryHandler();
-    virtual QString path() const = 0;
-    virtual Parameters commonParameters() const = 0;
-private:
-    void createRequest(RequestType requestType, QString &outPath,
-                       Parameters &outParameters) const override final;
-    bool treatReply(RequestType requestType, const QByteArray &data, std::vector<User> &items,
-                    QString &errorMessage, Placement &placement) override final;
-    QString m_nextCursor {};
-};
+    if (query.path() == TweetListQuery::pathFromType(TweetListQuery::Home)
+        || query.path() == TweetListQuery::pathFromType(TweetListQuery::Mentions)
+        || query.path() == TweetListQuery::pathFromType(TweetListQuery::Favorites)
+        || query.path() == TweetListQuery::pathFromType(TweetListQuery::UserTimeline)) {
+        return TweetListQueryHandler::create();
+    } else if (query.path() == TweetListQuery::pathFromType(TweetListQuery::Search)) {
+        return TweetSearchQueryHandler::create();
+    } else {
+        return IListQueryHandler<Tweet>::Ptr();
+    }
+}
 
-#endif // ABSTRACTUSERLISTQUERYHANDLER_H
+IListQueryHandler<User>::Ptr ListQueryHandlerFactory::createUser(const Query &query)
+{
+    if (query.path() == UserListQuery::pathFromType(UserListQuery::Friends)
+        || query.path() == UserListQuery::pathFromType(UserListQuery::Followers)) {
+        return UserListQueryHandler::create();
+    } else {
+        return IListQueryHandler<User>::Ptr();
+    }
+}

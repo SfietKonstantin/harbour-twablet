@@ -39,7 +39,7 @@
 class MockQueryExecutor: public IQueryExecutor
 {
 public:
-    void execute(const QString &path, const std::map<QByteArray, QByteArray> &parameters,
+    void execute(const QByteArray &path, const std::map<QByteArray, QByteArray> &parameters,
                  const Account &account, const Callback_t &callback) override
     {
         QBuffer reply {};
@@ -49,9 +49,9 @@ public:
         QString errorMessage {makeErrorMessage(path, parameters, account)};
         return callback(reply, error, errorMessage);
     }
-    MOCK_METHOD3(makeReply, QByteArray (const QString &, const std::map<QByteArray, QByteArray> &, const Account &));
-    MOCK_METHOD3(makeError, QNetworkReply::NetworkError (const QString &, const std::map<QByteArray, QByteArray> &, const Account &));
-    MOCK_METHOD3(makeErrorMessage, QString (const QString &, const std::map<QByteArray, QByteArray> &, const Account &));
+    MOCK_METHOD3(makeReply, QByteArray (const QByteArray &, const std::map<QByteArray, QByteArray> &, const Account &));
+    MOCK_METHOD3(makeError, QNetworkReply::NetworkError (const QByteArray &, const std::map<QByteArray, QByteArray> &, const Account &));
+    MOCK_METHOD3(makeErrorMessage, QString (const QByteArray &, const std::map<QByteArray, QByteArray> &, const Account &));
 };
 
 #endif // MOCKQUERYEXECUTOR_H

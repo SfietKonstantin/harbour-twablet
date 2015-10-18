@@ -43,7 +43,7 @@ public:
     using Ptr = std::unique_ptr<IQueryExecutor>;
     using Callback_t = std::function<void (QIODevice &reply, QNetworkReply::NetworkError error, const QString &errorMessage)>;
     virtual ~IQueryExecutor() {}
-    virtual void execute(const QString &path, const std::map<QByteArray, QByteArray> &parameters,
+    virtual void execute(const QByteArray &path, const std::map<QByteArray, QByteArray> &parameters,
                          const Account &account, const Callback_t &callback) = 0;
 };
 

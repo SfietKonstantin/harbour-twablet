@@ -45,7 +45,7 @@ static const char *TWITTER_API_URL = "https://api.twitter.com/1.1/";
 static const char *TWITTER_API_URL = "http://localhost:8000/";
 #endif
 
-QNetworkReply * TwitterQueryUtil::get(QNetworkAccessManager &network, const QString &path,
+QNetworkReply * TwitterQueryUtil::get(QNetworkAccessManager &network, const QByteArray &path,
                                       const std::map<QByteArray, QByteArray> &parameters,
                                       const Account &account)
 {
@@ -54,7 +54,7 @@ QNetworkReply * TwitterQueryUtil::get(QNetworkAccessManager &network, const QStr
 }
 
 QNetworkReply * TwitterQueryUtil::post(QNetworkAccessManager &network,
-                                       const QString &path,
+                                       const QByteArray &path,
                                        const std::map<QByteArray, QByteArray> &parameters,
                                        const std::map<QByteArray, QByteArray> &postData,
                                        const Account &account)
@@ -67,19 +67,19 @@ QNetworkReply * TwitterQueryUtil::post(QNetworkAccessManager &network,
     return network.post(request, postDataQuery.toString(QUrl::FullyEncoded).toLatin1());
 }
 
-QNetworkRequest TwitterQueryUtil::createRequest(const QByteArray &type, const QString &path,
+QNetworkRequest TwitterQueryUtil::createRequest(const QByteArray &type, const QByteArray &path,
                                                 const std::map<QByteArray, QByteArray> &parameters,
                                                 const std::map<QByteArray, QByteArray> &postData,
                                                 const Account &account)
 {
-    QString url {QLatin1String(TWITTER_API_URL) + path};
+    QByteArray url {QByteArray(TWITTER_API_URL) + path};
     std::map<QByteArray, QByteArray> fullParameters (std::begin(parameters), std::end(parameters));
     fullParameters.insert(std::begin(postData), std::end(postData));
     std::vector<std::pair<QByteArray, QByteArray>> parametersVector (std::begin(fullParameters), std::end(fullParameters));
 
-    QByteArray header {TwitterDataUtil::authorizationHeader(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, type, url.toLocal8Bit(),
+    QByteArray header {TwitterDataUtil::authorizationHeader(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, type, url,
                                                             parametersVector, account.token(), account.tokenSecret())};
-    QUrl urlObject {url};
+    QUrl urlObject {QUrl::fromEncoded(url)};
     QUrlQuery query {};
     for (const std::pair<QByteArray, QByteArray> &parameter : parameters) {
         query.addQueryItem(QLatin1String(parameter.first), QLatin1String(parameter.second));
@@ -91,14 +91,14 @@ QNetworkRequest TwitterQueryUtil::createRequest(const QByteArray &type, const QS
     return request;
 }
 
-QNetworkRequest TwitterQueryUtil::createGetRequest(const QString &path,
+QNetworkRequest TwitterQueryUtil::createGetRequest(const QByteArray &path,
                                                    const std::map<QByteArray, QByteArray> &parameters,
                                                    const Account &account)
 {
     return createRequest("GET", path, parameters, {}, account);
 }
 
-QNetworkRequest TwitterQueryUtil::createPostRequest(const QString &path,
+QNetworkRequest TwitterQueryUtil::createPostRequest(const QByteArray &path,
                                                     const std::map<QByteArray, QByteArray> &parameters,
                                                     const std::map<QByteArray, QByteArray> &postData,
                                                     const Account &account)

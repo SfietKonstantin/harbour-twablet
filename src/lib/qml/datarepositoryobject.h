@@ -96,10 +96,8 @@ private:
     void addLayout(const QString &name, const QString &userId, int queryType,
                    const QVariantMap &parameters);
     bool addLayoutCheckAccount(int accountIndex, QString &userId);
-    bool addLayoutCheckQuery(int queryType, const QVariantMap &parameters,
+    void copyQueryParameters(const QVariantMap &parameters,
                              Query::Parameters &queryParametrs) const;
-    bool addUserCheckQuery(int queryType, const QVariantMap &parameters,
-                           Query::Parameters &queryParameters) const;
     void insertRepository(const Layout &layout);
     void insertRepository();
     void removeLayoutFromRepositories(const Layout &layout);

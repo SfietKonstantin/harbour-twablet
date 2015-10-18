@@ -85,7 +85,7 @@ int QueryListModel::count() const
 int QueryListModel::getType(int index)
 {
     if (index < 0 || index >= rowCount()) {
-        return Query::Invalid;
+        return QueryObject::InvalidType;
     }
     return m_data[index]->type;
 }

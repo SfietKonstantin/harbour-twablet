@@ -90,7 +90,7 @@ bool TweetQueryItem::isQueryValid() const
 
 QNetworkReply * TweetQueryItem::createQuery() const
 {
-    QString path {QLatin1String("statuses/show.json")};
+    QByteArray path {"statuses/show.json"};
     std::map<QByteArray, QByteArray> parameters {
         {"id", QUrl::toPercentEncoding(m_tweetId)},
         {"trim_user", "false"},

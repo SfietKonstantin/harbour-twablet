@@ -61,7 +61,7 @@ bool RetweetQueryItem::isQueryValid() const
 
 QNetworkReply * RetweetQueryItem::createQuery() const
 {
-    QString path {QLatin1String("statuses/retweet.json")};
+    QByteArray path {"statuses/retweet.json"};
     std::map<QByteArray, QByteArray> parameters {{"id", QUrl::toPercentEncoding(m_tweetId)}};
 
     return private_util::TwitterQueryUtil::post(network(), path, {}, parameters, account()->data());

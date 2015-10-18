@@ -31,7 +31,7 @@
 
 #include "layout.h"
 
-Layout::Layout(const QString &name, const QString &userId, Query &&query)
+Layout::Layout(const QString &name, const QString &userId, TweetListQuery &&query)
     : m_name{name}, m_userId{userId}, m_query{std::move(query)}
 {
 }
@@ -61,12 +61,12 @@ void Layout::setUserId(const QString &userId)
     m_userId = userId;
 }
 
-Query Layout::query() const
+TweetListQuery Layout::query() const
 {
     return m_query;
 }
 
-void Layout::setQuery(Query &&query)
+void Layout::setQuery(TweetListQuery &&query)
 {
     m_query = std::move(query);
 }

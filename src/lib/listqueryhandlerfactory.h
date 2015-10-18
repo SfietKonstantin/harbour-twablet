@@ -29,21 +29,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FAVORITESQUERYHANDLER_H
-#define FAVORITESQUERYHANDLER_H
+#ifndef LISTQUERYHANDLERFACTORY_H
+#define LISTQUERYHANDLERFACTORY_H
 
-#include "abstracttweetlistqueryhandler.h"
+#include "ilistqueryhandler.h"
 #include "query.h"
+#include "tweet.h"
+#include "user.h"
 
-class FavoritesQueryHandler final : public AbstractTweetListQueryHandler
+class ListQueryHandlerFactory
 {
 public:
-    explicit FavoritesQueryHandler(const Query::Parameters &parameters);
-    DISABLE_COPY_DISABLE_MOVE(FavoritesQueryHandler);
-private:
-    QString path() const override;
-    Parameters commonParameters() const override;
-    QString m_userId {};
+    static IListQueryHandler<Tweet>::Ptr createTweet(const Query &query);
+    static IListQueryHandler<User>::Ptr createUser(const Query &query);
 };
 
-#endif // FAVORITESQUERYHANDLER_H
+#endif // LISTQUERYHANDLERFACTORY_H

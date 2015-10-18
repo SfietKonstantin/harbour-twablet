@@ -68,7 +68,7 @@ bool UserQueryItem::isQueryValid() const
 
 QNetworkReply * UserQueryItem::createQuery() const
 {
-    QString path {QLatin1String("users/show.json")};
+    QByteArray path {"users/show.json"};
     std::map<QByteArray, QByteArray> parameters {{"user_id", QUrl::toPercentEncoding(m_userId)}};
 
     return private_util::TwitterQueryUtil::get(network(), path, parameters, account()->data());

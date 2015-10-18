@@ -43,21 +43,19 @@ set(${PROJECT_NAME}_Core_SRCS
     usercentralrepository.cpp
     iqueryexecutor.h
     ilistqueryhandler.cpp
-    abstracttweetlistqueryhandler.cpp
-    hometimelinequeryhandler.cpp
-    mentionstimelinequeryhandler.cpp
-    searchqueryhandler.cpp
-    usertimelinequeryhandler.cpp
-    favoritesqueryhandler.cpp
-    abstractuserlistqueryhandler.cpp
-    friendsqueryhandler.cpp
-    followersqueryhandler.cpp
+    listqueryhandlerfactory.cpp
+    tweetlistqueryhandler.cpp
+    tweetsearchqueryhandler.cpp
+    userlistqueryhandler.cpp
 )
 
 set(${PROJECT_NAME}_Private_SRCS
     private/twitterdatautil.cpp
     private/twitterqueryutil.cpp
     private/networkqueryexecutor.cpp
+    private/repositoryprocesscallback.h
+    private/listqueryhandlerutil.cpp
+    private/maputil.h
 )
 
 set(${PROJECT_NAME}_Qml_SRCS

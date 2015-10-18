@@ -33,7 +33,6 @@
 #define NETWORKQUERYEXECUTOR_H
 
 #include "iqueryexecutor.h"
-#include <QtNetwork/QNetworkAccessManager>
 
 namespace private_util {
 
@@ -41,7 +40,7 @@ class NetworkQueryExecutor final : public IQueryExecutor
 {
 public:
     static IQueryExecutor::Ptr create(QNetworkAccessManager &network);
-    void execute(const QString &path, const std::map<QByteArray, QByteArray> &parameters,
+    void execute(const QByteArray &path, const std::map<QByteArray, QByteArray> &parameters,
                  const Account &account, const Callback_t &callback) override;
 private:
     explicit NetworkQueryExecutor(QNetworkAccessManager &network);

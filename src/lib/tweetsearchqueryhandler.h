@@ -29,29 +29,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "followersqueryhandler.h"
+#ifndef TWEETSEARCHQUERYHANDLER_H
+#define TWEETSEARCHQUERYHANDLER_H
 
-FollowersQueryHandler::FollowersQueryHandler(const Query::Parameters &parameters)
-    : AbstractUserListQueryHandler()
+#include "ilistqueryhandler.h"
+#include "tweet.h"
+
+class TweetSearchQueryHandler final : public IListQueryHandler<Tweet>
 {
-    auto userIdIt = parameters.find(QLatin1String("user_id"));
-    if (userIdIt != std::end(parameters)) {
-        m_userId = userIdIt->second.toLocal8Bit();
-    }
-}
+public:
+    DISABLE_COPY_DISABLE_MOVE(TweetSearchQueryHandler);
+    static IListQueryHandler<Tweet>::Ptr create();
+private:
+    TweetSearchQueryHandler();
+    Query::Parameters additionalParameters(RequestType requestType) const override;
+    bool treatReply(RequestType requestType, const QByteArray &data,
+                    std::vector<Tweet> &items, QString &errorMessage,
+                    Placement &placement) override;
+    QString m_sinceId {};
+    QString m_maxId {};
+};
 
-QString FollowersQueryHandler::path() const
-{
-    return QLatin1String{"followers/list.json"};
-}
-
-AbstractUserListQueryHandler::Parameters FollowersQueryHandler::commonParameters() const
-{
-    return Parameters{
-        {"count", QByteArray::number(200)},
-        {"user_id", m_userId},
-        {"skip_status", "true"},
-        {"include_user_entities", "true"}
-    };
-}
-
+#endif // TWEETSEARCHQUERYHANDLER_H

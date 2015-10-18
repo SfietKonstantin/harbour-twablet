@@ -29,28 +29,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "favoritesqueryhandler.h"
-#include <QtCore/QUrl>
+#ifndef TWEETLISTQUERYHANDLER_H
+#define TWEETLISTQUERYHANDLER_H
 
-FavoritesQueryHandler::FavoritesQueryHandler(const Query::Parameters &parameters)
-    : AbstractTweetListQueryHandler()
-{
-    auto userIdIt = parameters.find(QLatin1String("user_id"));
-    if (userIdIt != std::end(parameters)) {
-        m_userId = userIdIt->second;
-    }
-}
+#include "ilistqueryhandler.h"
+#include "tweet.h"
 
-QString FavoritesQueryHandler::path() const
+class TweetListQueryHandler final : public IListQueryHandler<Tweet>
 {
-    return QLatin1String{"favorites/list.json"};
-}
+public:
+    DISABLE_COPY_DISABLE_MOVE(TweetListQueryHandler);
+    static IListQueryHandler<Tweet>::Ptr create();
+private:
+    TweetListQueryHandler();
+    Query::Parameters additionalParameters(RequestType requestType) const override;
+    bool treatReply(RequestType requestType, const QByteArray &data,
+                    std::vector<Tweet> &items, QString &errorMessage,
+                    Placement &placement) override;
+    QString m_sinceId {};
+    QString m_maxId {};
+};
 
-AbstractTweetListQueryHandler::Parameters FavoritesQueryHandler::commonParameters() const
-{
-    return Parameters{
-        {"count", QByteArray::number(200)},
-        {"include_entities", "true"},
-        {"user_id", QUrl::toPercentEncoding(m_userId)}
-    };
-}
+#endif // TWEETLISTQUERYHANDLER_H
