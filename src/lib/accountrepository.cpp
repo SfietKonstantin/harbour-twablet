@@ -31,6 +31,7 @@
 
 #include "accountrepository.h"
 #include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
 
 void AccountRepository::load(const QJsonObject &json)
 {

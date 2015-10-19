@@ -31,7 +31,6 @@
 
 #include "hashtagentity.h"
 #include "entityvisitor.h"
-#include <QtCore/QJsonObject>
 
 HashtagEntity::HashtagEntity(const QJsonObject &json)
 {

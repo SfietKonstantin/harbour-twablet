@@ -29,9 +29,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "tweetcentralrepository.h"
-#include "private/twitterqueryutil.h"
+#include "tweetrepositorycontainer.h"
+#include "private/debughelper.h"
 #include "private/repositoryprocesscallback.h"
+#include "private/twitterqueryutil.h"
 #include "listqueryhandlerfactory.h"
 #include <QtCore/QLoggingCategory>
 #include <QtCore/QJsonDocument>
@@ -39,13 +40,13 @@
 #include <QtCore/QJsonObject>
 #include <QtNetwork/QNetworkReply>
 
-TweetCentralRepository::TweetCentralRepository(IQueryExecutor::Ptr queryExecutor)
+TweetRepositoryContainer::TweetRepositoryContainer(IQueryExecutor::ConstPtr &&queryExecutor)
     : m_queryExecutor(std::move(queryExecutor))
 {
-    Q_ASSERT_X(m_queryExecutor, "TweetCentralRepository", "NULL query executor");
+    Q_ASSERT_X(m_queryExecutor, "TweetRepositoryContainer", "NULL query executor");
 }
 
-TweetRepository * TweetCentralRepository::repository(const Account &account, const Query &query)
+TweetRepository * TweetRepositoryContainer::repository(const Account &account, const Query &query)
 {
     auto it = m_mapping.find(MappingKey{account, query});
     if (it == std::end(m_mapping)) {
@@ -54,7 +55,7 @@ TweetRepository * TweetCentralRepository::repository(const Account &account, con
     return &(it->second.repository);
 }
 
-void TweetCentralRepository::referenceQuery(const Account &account, const Query &query)
+void TweetRepositoryContainer::referenceQuery(const Account &account, const Query &query)
 {
     MappingData *data {getMappingData(account, query)};
     if (data == nullptr) {
@@ -68,7 +69,7 @@ void TweetCentralRepository::referenceQuery(const Account &account, const Query 
     }
 }
 
-void TweetCentralRepository::dereferenceQuery(const Account &account, const Query &query)
+void TweetRepositoryContainer::dereferenceQuery(const Account &account, const Query &query)
 {
     MappingData *data {getMappingData(account, query)};
     if (data == nullptr) {
@@ -85,7 +86,7 @@ void TweetCentralRepository::dereferenceQuery(const Account &account, const Quer
     }
 }
 
-std::set<Query> TweetCentralRepository::referencedQueries(const Account &account) const
+std::set<Query> TweetRepositoryContainer::referencedQueries(const Account &account) const
 {
     std::set<Query> returned;
     for (auto it = std::begin(m_mapping); it != std::end(m_mapping); ++it) {
@@ -96,14 +97,14 @@ std::set<Query> TweetCentralRepository::referencedQueries(const Account &account
     return returned;
 }
 
-void TweetCentralRepository::refresh()
+void TweetRepositoryContainer::refresh()
 {
     for (auto it = std::begin(m_mapping); it != std::end(m_mapping); ++it) {
         load(it->first, it->second, IListQueryHandler<Tweet>::Refresh);
     }
 }
 
-void TweetCentralRepository::refresh(const Account &account, const Query &query)
+void TweetRepositoryContainer::refresh(const Account &account, const Query &query)
 {
     auto it = m_mapping.find(MappingKey{account, query});
     if (it != std::end(m_mapping)) {
@@ -111,7 +112,7 @@ void TweetCentralRepository::refresh(const Account &account, const Query &query)
     }
 }
 
-void TweetCentralRepository::loadMore(const Account &account, const Query &query)
+void TweetRepositoryContainer::loadMore(const Account &account, const Query &query)
 {
     auto it = m_mapping.find(MappingKey{account, query});
     if (it != std::end(m_mapping)) {
@@ -119,7 +120,7 @@ void TweetCentralRepository::loadMore(const Account &account, const Query &query
     }
 }
 
-Tweet TweetCentralRepository::tweet(const QString &id) const
+Tweet TweetRepositoryContainer::tweet(const QString &id) const
 {
     auto it = m_data.find(id);
     if (it != std::end(m_data)) {
@@ -128,7 +129,7 @@ Tweet TweetCentralRepository::tweet(const QString &id) const
     return Tweet();
 }
 
-void TweetCentralRepository::updateTweet(const Tweet &tweet)
+void TweetRepositoryContainer::updateTweet(const Tweet &tweet)
 {
     auto it = m_data.find(tweet.id());
     if (it != std::end(m_data)) {
@@ -146,7 +147,7 @@ void TweetCentralRepository::updateTweet(const Tweet &tweet)
     }
 }
 
-void TweetCentralRepository::load(const MappingKey &key, MappingData &mappingData,
+void TweetRepositoryContainer::load(const MappingKey &key, MappingData &mappingData,
                                   IListQueryHandler<Tweet>::RequestType requestType)
 {
     if (mappingData.loading) {
@@ -180,7 +181,7 @@ void TweetCentralRepository::load(const MappingKey &key, MappingData &mappingDat
     });
 }
 
-TweetCentralRepository::MappingData * TweetCentralRepository::getMappingData(const Account &account, const Query &query)
+TweetRepositoryContainer::MappingData * TweetRepositoryContainer::getMappingData(const Account &account, const Query &query)
 {
     auto it = m_mapping.find(MappingKey(account, query));
     if (it != std::end(m_mapping)) {
@@ -194,18 +195,18 @@ TweetCentralRepository::MappingData * TweetCentralRepository::getMappingData(con
     return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
 }
 
-bool TweetCentralRepository::MappingKeyComparator::operator()(const MappingKey &first, const MappingKey &second) const
+bool TweetRepositoryContainer::MappingKeyComparator::operator()(const MappingKey &first, const MappingKey &second) const
 {
     return first.account.userId() == second.account.userId() ? (first.query < second.query)
                                                              : (first.account.userId() < second.account.userId());
 }
 
-TweetCentralRepository::MappingData::MappingData(IListQueryHandler<Tweet>::Ptr &&inputHandler)
+TweetRepositoryContainer::MappingData::MappingData(IListQueryHandler<Tweet>::Ptr &&inputHandler)
     : handler(std::move(inputHandler))
 {
 }
 
-TweetCentralRepository::MappingKey::MappingKey(const Account &inputAccount, const Query &inputQuery)
+TweetRepositoryContainer::MappingKey::MappingKey(const Account &inputAccount, const Query &inputQuery)
     : account(std::move(inputAccount)), query(std::move(inputQuery))
 {
 }

@@ -30,10 +30,7 @@
  */
 
 #include "quotedtweet.h"
-
-#include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
-#include <QtCore/QJsonDocument>
 
 QuotedTweet::QuotedTweet(const QJsonObject &json)
 {

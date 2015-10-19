@@ -29,46 +29,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef USERCENTRALREPOSITORY_H
-#define USERCENTRALREPOSITORY_H
+#include "debughelper.h"
 
-#include <map>
-#include <QtNetwork/QNetworkAccessManager>
-#include "globals.h"
-#include "qobjectutils.h"
-#include "account.h"
-#include "query.h"
-#include "userrepository.h"
-#include "ilistqueryhandler.h"
-#include "iqueryexecutor.h"
-
-class UserCentralRepository
+QDebug & operator<<(QDebug &debug, const Query::Parameters &parameters)
 {
-public:
-    explicit UserCentralRepository(IQueryExecutor::Ptr queryExecutor);
-    DISABLE_COPY_DEFAULT_MOVE(UserCentralRepository);
-    bool isValid(int index) const;
-    UserRepository * repository(int index);
-    void refresh(int index);
-    void loadMore(int index);
-    int addRepository(const Account &account, const Query &query);
-    void removeRepository(int index);
-private:
-    struct MappingData
-    {
-        explicit MappingData(const Account &inputAccount, const Query &inputQuery,
-                             IListQueryHandler<User>::Ptr &&inputHandler);
-        bool loading {false};
-        Account account {};
-        Query query {};
-        UserRepository repository {};
-        std::unique_ptr<IListQueryHandler<User>> handler {};
-    };
-    void load(MappingData &mappingData, IListQueryHandler<User>::RequestType requestType);
-    MappingData * getMappingData(int index, const Account &account, const Query &query);
-    IQueryExecutor::Ptr m_queryExecutor {nullptr};
-    std::map<int, MappingData> m_mapping {};
-    int m_index {0};
-};
-
-#endif // USERCENTRALREPOSITORY_H
+    QDebugStateSaver saver(debug);
+    debug.nospace() << "(";
+    for (auto it = std::begin(parameters); it != std::end(parameters); ++it) {
+        if (it != std::begin(parameters)) {
+            debug << ", ";
+        }
+        debug << it->first.data() << ":" << it->second.data();
+    }
+    debug << ")";
+    return debug;
+}

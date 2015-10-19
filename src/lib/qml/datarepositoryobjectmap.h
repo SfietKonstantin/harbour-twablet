@@ -37,6 +37,8 @@
 #include "tweetrepository.h"
 #include "userrepository.h"
 #include "datarepositoryobject.h"
+#include "itweetrepositorycontainerobject.h"
+#include "ilayoutcontainerobject.h"
 
 class Account;
 class Layout;
@@ -62,30 +64,38 @@ public:
 template<> class DataRepositoryObjectMap<Layout>
 {
 public:
-    static LayoutRepository * get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
+    static LayoutRepository * get(QObject &object, int layoutIndex, bool temporary)
     {
         Q_UNUSED(layoutIndex)
         Q_UNUSED(temporary)
-        return &(repository.layouts());
+        ILayoutContainerObject *layoutContainer = qobject_cast<ILayoutContainerObject *>(&object);
+        return layoutContainer != nullptr ? &(layoutContainer->layouts()) : nullptr;
     }
 };
 
+template<class T> class DataRepositoryObjectMap;
 template<> class DataRepositoryObjectMap<Tweet>
 {
 public:
-    static TweetRepository * get(DataRepositoryObject &repository, int layoutIndex, bool temporary)
+    static TweetRepository * get(QObject &object, int layoutIndex, bool temporary)
     {
+        ILayoutContainerObject *layoutContainer = qobject_cast<ILayoutContainerObject *>(&object);
+        ITweetRepositoryContainerObject *tweetContainer = qobject_cast<ITweetRepositoryContainerObject *>(&object);
+        if (layoutContainer == nullptr || tweetContainer == nullptr) {
+            return nullptr;
+        }
+
         const Layout *layout {nullptr};
         if (temporary) {
-            layout = repository.temporaryLayout(layoutIndex);
+            layout = tweetContainer->temporaryLayout(layoutIndex);
         } else {
-            const LayoutRepository &layoutRepository (repository.layouts());
+            const LayoutRepository &layoutRepository (layoutContainer->layouts());
             if (layoutIndex >= 0 && layoutIndex < layoutRepository.size()) {
                 layout = &(*(std::begin(layoutRepository) + layoutIndex));
             }
         }
 
-        return layout ? repository.tweets(*layout) : nullptr;
+        return layout != nullptr ? tweetContainer->tweets(*layout) : nullptr;
     }
 };
 

@@ -29,11 +29,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEETCENTRALREPOSITORY_H
-#define TWEETCENTRALREPOSITORY_H
+#ifndef TWEETREPOSITORYCONTAINER_H
+#define TWEETREPOSITORYCONTAINER_H
 
 #include <map>
-#include <QtNetwork/QNetworkAccessManager>
 #include "globals.h"
 #include "qobjectutils.h"
 #include "account.h"
@@ -43,11 +42,11 @@
 #include "iqueryexecutor.h"
 
 class Layout;
-class TweetCentralRepository
+class TweetRepositoryContainer
 {
 public:
-    explicit TweetCentralRepository(IQueryExecutor::Ptr queryExecutor);
-    DISABLE_COPY_DEFAULT_MOVE(TweetCentralRepository);
+    explicit TweetRepositoryContainer(IQueryExecutor::ConstPtr &&queryExecutor);
+    DISABLE_COPY_DEFAULT_MOVE(TweetRepositoryContainer);
     TweetRepository * repository(const Account &account, const Query &query);
     void referenceQuery(const Account &account, const Query &query);
     void dereferenceQuery(const Account &account, const Query &query);
@@ -80,9 +79,9 @@ private:
     void load(const MappingKey &key, MappingData &mappingData,
               IListQueryHandler<Tweet>::RequestType requestType);
     MappingData * getMappingData(const Account &account, const Query &query);
-    IQueryExecutor::Ptr m_queryExecutor {nullptr};
+    IQueryExecutor::ConstPtr m_queryExecutor {nullptr};
     std::map<QString, Tweet> m_data {};
     std::map<MappingKey, MappingData, MappingKeyComparator> m_mapping {};
 };
 
-#endif // TWEETCENTRALREPOSITORY_H
+#endif // TWEETREPOSITORYCONTAINER_H

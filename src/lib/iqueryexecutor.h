@@ -35,16 +35,16 @@
 #include <memory>
 #include <functional>
 #include <QtNetwork/QNetworkReply>
-#include "account.h"
 
+class Account;
 class IQueryExecutor
 {
 public:
-    using Ptr = std::unique_ptr<IQueryExecutor>;
+    using ConstPtr = std::unique_ptr<const IQueryExecutor>;
     using Callback_t = std::function<void (QIODevice &reply, QNetworkReply::NetworkError error, const QString &errorMessage)>;
     virtual ~IQueryExecutor() {}
     virtual void execute(const QByteArray &path, const std::map<QByteArray, QByteArray> &parameters,
-                         const Account &account, const Callback_t &callback) = 0;
+                         const Account &account, const Callback_t &callback) const = 0;
 };
 
 #endif // ILISTQUERYEXECUTOR_H

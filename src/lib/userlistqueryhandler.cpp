@@ -30,10 +30,10 @@
  */
 
 #include "userlistqueryhandler.h"
-#include "private/listqueryhandlerutil.h"
-#include <QtCore/QUrl>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
+#include <QtCore/QUrl>
+#include "private/listqueryhandlerutil.h"
 
 UserListQueryHandler::UserListQueryHandler()
 {

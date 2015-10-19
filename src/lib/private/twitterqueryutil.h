@@ -32,12 +32,12 @@
 #ifndef TWITTERQUERYUTIL_H
 #define TWITTERQUERYUTIL_H
 
-#include <QtNetwork/QNetworkRequest>
 #include <map>
-#include "account.h"
+#include <QtNetwork/QNetworkRequest>
 
 class QNetworkAccessManager;
 class QNetworkReply;
+class Account;
 
 namespace private_util
 {

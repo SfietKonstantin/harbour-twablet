@@ -30,11 +30,12 @@
  */
 
 #include "twitterqueryutil.h"
-#include "twitterdatautil.h"
-#include "twitter-secrets.h"
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 #include <QtNetwork/QNetworkAccessManager>
+#include "account.h"
+#include "twitter-secrets.h"
+#include "twitterdatautil.h"
 
 namespace private_util
 {

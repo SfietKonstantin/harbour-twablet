@@ -30,6 +30,7 @@
  */
 
 #include "user.h"
+#include <QtCore/QJsonObject>
 #include "private/timeutil.h"
 
 User::User(const QJsonObject &json)

@@ -32,9 +32,9 @@
 #ifndef QUERY_H
 #define QUERY_H
 
-#include <QtCore/QObject>
-#include <QtCore/QVariantMap>
 #include "globals.h"
+#include <map>
+#include <QtCore/QByteArray>
 
 /**
  * @brief A query

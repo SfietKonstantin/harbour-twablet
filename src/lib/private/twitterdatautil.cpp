@@ -31,17 +31,14 @@
 
 #include "twitterdatautil.h"
 
-#include <QtCore/QVariantMap>
-#include <QtCore/QObject>
-#include <QtCore/QList>
-#include <QtCore/QString>
 #include <QtCore/QByteArray>
-#include <QtCore/QUuid>
-#include <QtCore/qmath.h>
 #include <QtCore/QDateTime>
-#include <QtCore/QUrl>
-#include <QtCore/QStringList>
+#include <QtCore/QList>
+#include <QtCore/QMap>
+#include <QtCore/qmath.h>
 #include <QtCore/QMessageAuthenticationCode>
+#include <QtCore/QUrl>
+#include <QtCore/QUuid>
 
 namespace private_util
 {

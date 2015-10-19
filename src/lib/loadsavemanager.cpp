@@ -35,8 +35,8 @@
 #include <QtCore/QFile>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
-#include <QtCore/QStandardPaths>
 #include <QtCore/QLoggingCategory>
+#include <QtCore/QStandardPaths>
 
 LoadSaveManager::LoadSaveManager()
 {

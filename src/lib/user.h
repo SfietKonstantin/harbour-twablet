@@ -32,12 +32,12 @@
 #ifndef USER_H
 #define USER_H
 
-#include <QtCore/QString>
 #include <QtCore/QDateTime>
-#include <QtCore/QJsonObject>
+#include <QtCore/QString>
 #include "globals.h"
 #include "entity.h"
 
+class QJsonObject;
 /**
  * @brief An user
  *

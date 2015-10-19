@@ -31,7 +31,6 @@
 
 #include "urlentity.h"
 #include "entityvisitor.h"
-#include <QtCore/QJsonObject>
 
 UrlEntity::UrlEntity(const QJsonObject &json)
 {

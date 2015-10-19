@@ -34,6 +34,7 @@
 
 #include "globals.h"
 #include "iloadsave.h"
+#include <QtCore/QString>
 
 class LoadSaveManager
 {

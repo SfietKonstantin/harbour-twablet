@@ -30,11 +30,8 @@
  */
 
 #include "tweet.h"
-#include "private/timeutil.h"
-#include <set>
-#include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
-#include <QtCore/QJsonDocument>
+#include "private/timeutil.h"
 
 Tweet::Tweet(const QJsonObject &json)
 {

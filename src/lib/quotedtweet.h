@@ -32,7 +32,6 @@
 #ifndef QUOTEDTWEET_H
 #define QUOTEDTWEET_H
 
-#include <QtCore/QString>
 #include "globals.h"
 #include "user.h"
 

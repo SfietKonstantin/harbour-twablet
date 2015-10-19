@@ -29,9 +29,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "usercentralrepository.h"
-#include "private/twitterqueryutil.h"
+#include "userrepositorycontainer.h"
+#include "private/debughelper.h"
 #include "private/repositoryprocesscallback.h"
+#include "private/twitterqueryutil.h"
 #include "listqueryhandlerfactory.h"
 #include <QtCore/QLoggingCategory>
 #include <QtCore/QJsonDocument>
@@ -39,18 +40,18 @@
 #include <QtCore/QJsonObject>
 #include <QtNetwork/QNetworkReply>
 
-UserCentralRepository::UserCentralRepository(IQueryExecutor::Ptr queryExecutor)
+UserRepositoryContainer::UserRepositoryContainer(IQueryExecutor::ConstPtr &&queryExecutor)
     : m_queryExecutor(std::move(queryExecutor))
 {
     Q_ASSERT_X(m_queryExecutor, "UserCentralRepository", "NULL query executor");
 }
 
-bool UserCentralRepository::isValid(int index) const
+bool UserRepositoryContainer::isValid(int index) const
 {
     return m_mapping.find(index) != std::end(m_mapping);
 }
 
-UserRepository * UserCentralRepository::repository(int index)
+UserRepository * UserRepositoryContainer::repository(int index)
 {
     auto it = m_mapping.find(index);
     if (it == std::end(m_mapping)) {
@@ -59,7 +60,7 @@ UserRepository * UserCentralRepository::repository(int index)
     return &(it->second.repository);
 }
 
-void UserCentralRepository::refresh(int index)
+void UserRepositoryContainer::refresh(int index)
 {
     auto it = m_mapping.find(index);
     if (it != std::end(m_mapping)) {
@@ -67,7 +68,7 @@ void UserCentralRepository::refresh(int index)
     }
 }
 
-void UserCentralRepository::loadMore(int index)
+void UserRepositoryContainer::loadMore(int index)
 {
     auto it = m_mapping.find(index);
     if (it != std::end(m_mapping)) {
@@ -75,7 +76,7 @@ void UserCentralRepository::loadMore(int index)
     }
 }
 
-int UserCentralRepository::addRepository(const Account &account, const Query &query)
+int UserRepositoryContainer::addRepository(const Account &account, const Query &query)
 {
     int index = m_index;
     ++m_index;
@@ -87,12 +88,12 @@ int UserCentralRepository::addRepository(const Account &account, const Query &qu
     return index;
 }
 
-void UserCentralRepository::removeRepository(int index)
+void UserRepositoryContainer::removeRepository(int index)
 {
     m_mapping.erase(index);
 }
 
-void UserCentralRepository::load(UserCentralRepository::MappingData &mappingData,
+void UserRepositoryContainer::load(UserRepositoryContainer::MappingData &mappingData,
                                  IListQueryHandler<User>::RequestType requestType)
 {
     if (mappingData.loading) {
@@ -122,7 +123,7 @@ void UserCentralRepository::load(UserCentralRepository::MappingData &mappingData
     });
 }
 
-UserCentralRepository::MappingData * UserCentralRepository::getMappingData(int index, const Account &account,
+UserRepositoryContainer::MappingData * UserRepositoryContainer::getMappingData(int index, const Account &account,
                                                                            const Query &query)
 {
     auto it = m_mapping.find(index);
@@ -137,7 +138,7 @@ UserCentralRepository::MappingData * UserCentralRepository::getMappingData(int i
     return &(m_mapping.emplace(index, MappingData{account, query, std::move(handler)}).first->second);
 }
 
-UserCentralRepository::MappingData::MappingData(const Account &inputAccount, const Query &inputQuery,
+UserRepositoryContainer::MappingData::MappingData(const Account &inputAccount, const Query &inputQuery,
                                                 IListQueryHandler<User>::Ptr &&inputHandler)
     : account(std::move(inputAccount)), query(std::move(inputQuery)), handler(std::move(inputHandler))
 {

@@ -32,9 +32,9 @@
 #ifndef LAYOUTREPOSITORY_H
 #define LAYOUTREPOSITORY_H
 
-#include "repository.h"
 #include "iloadsave.h"
 #include "layout.h"
+#include "repository.h"
 
 class LayoutRepository: public Repository<Layout>, public ILoadSave
 {

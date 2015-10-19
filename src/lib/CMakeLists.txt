@@ -39,10 +39,10 @@ set(${PROJECT_NAME}_Core_SRCS
     layoutrepository.cpp
     tweetrepository.h
     userrepository.h
-    tweetcentralrepository.cpp
-    usercentralrepository.cpp
+    tweetrepositorycontainer.cpp
+    userrepositorycontainer.cpp
     iqueryexecutor.h
-    ilistqueryhandler.cpp
+    ilistqueryhandler.h
     listqueryhandlerfactory.cpp
     tweetlistqueryhandler.cpp
     tweetsearchqueryhandler.cpp
@@ -56,6 +56,7 @@ set(${PROJECT_NAME}_Private_SRCS
     private/repositoryprocesscallback.h
     private/listqueryhandlerutil.cpp
     private/maputil.h
+    private/debughelper.cpp
 )
 
 set(${PROJECT_NAME}_Qml_SRCS
@@ -75,6 +76,8 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/mediamodel.cpp
     qml/querylistmodel.cpp
     qml/accountselectionmodel.cpp
+    qml/itweetrepositorycontainerobject.h
+    qml/ilayoutcontainerobject.h
     qml/twitterauthentification.cpp
     qml/datarepositoryobject.cpp
     qml/datarepositoryobjectmap.h

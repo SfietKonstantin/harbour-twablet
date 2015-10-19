@@ -37,23 +37,27 @@
 #include "loadsavemanager.h"
 #include "accountrepository.h"
 #include "layoutrepository.h"
-#include "tweetcentralrepository.h"
-#include "usercentralrepository.h"
+#include "tweetrepositorycontainer.h"
+#include "userrepositorycontainer.h"
+#include "ilayoutcontainerobject.h"
+#include "itweetrepositorycontainerobject.h"
 
 namespace qml
 {
 
 class AccountObject;
-class DataRepositoryObject : public QObject
+class DataRepositoryObject : public QObject, public ILayoutContainerObject, public ITweetRepositoryContainerObject
 {
     Q_OBJECT
     Q_PROPERTY(bool hasAccounts READ hasAccounts NOTIFY hasAccountsChanged)
+    Q_INTERFACES(qml::ILayoutContainerObject)
+    Q_INTERFACES(qml::ITweetRepositoryContainerObject)
 public:
     explicit DataRepositoryObject(QObject *parent = 0);
     bool hasAccounts() const;
     AccountRepository & accounts();
-    LayoutRepository & layouts();
-    TweetRepository * tweets(const Layout &layout);
+    LayoutRepository & layouts() override;
+    TweetRepository * tweets(const Layout &layout) override;
     const Layout * temporaryLayout(int index) const;
     bool isTemporaryLayoutValid(int index) const;
     bool isUserRepositoryValid(int index) const;
@@ -108,9 +112,9 @@ private:
     AccountRepository m_accounts {};
     std::map<QString, const Account &> m_accountsMapping {};
     LayoutRepository m_layouts {};
-    TweetCentralRepository m_tweetsCentralRepository;
+    TweetRepositoryContainer m_tweetsCentralRepository;
     std::map<int, Layout> m_temporaryLayouts {};
-    UserCentralRepository m_userCentralRepository;
+    UserRepositoryContainer m_userCentralRepository;
     int m_temporaryLayoutsIndex {0};
 };
 

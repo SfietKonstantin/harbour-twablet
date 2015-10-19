@@ -32,8 +32,8 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include <QtCore/QJsonObject>
 #include <memory>
+#include <QtCore/QJsonObject>
 
 class EntityVisitor;
 /**

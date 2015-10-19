@@ -32,11 +32,9 @@
 #ifndef ILISTQUERYHANDLER_H
 #define ILISTQUERYHANDLER_H
 
-#include <QtCore/QString>
-#include <QtCore/QDebug>
-#include <map>
-#include <vector>
 #include <memory>
+#include <vector>
+#include <QtCore/QString>
 #include "query.h"
 
 template<class T>
@@ -61,8 +59,6 @@ public:
                             std::vector<T> &items, QString &errorMessage,
                             Placement &placement) = 0;
 };
-
-QDebug & operator<<(QDebug &debug, const std::map<QByteArray, QByteArray> &parameters);
 
 #endif // ILISTQUERYHANDLER_H
 

@@ -30,9 +30,8 @@
  */
 
 #include "mediaentity.h"
-#include "entityvisitor.h"
 #include <QtCore/QLoggingCategory>
-#include <QtCore/QJsonObject>
+#include "entityvisitor.h"
 
 MediaEntity::MediaEntity(const QJsonObject &json)
 {

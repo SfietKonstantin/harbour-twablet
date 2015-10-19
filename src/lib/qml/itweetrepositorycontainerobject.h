@@ -29,19 +29,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef LISTQUERYHANDLERFACTORY_H
-#define LISTQUERYHANDLERFACTORY_H
+#ifndef ITWEETREPOSITORYCONTAINEROBJECT_H
+#define ITWEETREPOSITORYCONTAINEROBJECT_H
 
-#include "ilistqueryhandler.h"
-#include "tweet.h"
-#include "user.h"
+#include <QtCore/QtPlugin>
+#include "tweetrepository.h"
 
-class Query;
-class ListQueryHandlerFactory
+class Layout;
+namespace qml
+{
+
+class ITweetRepositoryContainerObject
 {
 public:
-    static IListQueryHandler<Tweet>::Ptr createTweet(const Query &query);
-    static IListQueryHandler<User>::Ptr createUser(const Query &query);
+    virtual ~ITweetRepositoryContainerObject() {}
+    virtual TweetRepository * tweets(const Layout &layout) = 0;
+    virtual const Layout * temporaryLayout(int index) const = 0;
 };
 
-#endif // LISTQUERYHANDLERFACTORY_H
+}
+
+Q_DECLARE_INTERFACE(qml::ITweetRepositoryContainerObject,
+                    "harbour.twablet.ITweetRepositoryContainerObject")
+
+#endif // ITWEETREPOSITORYCONTAINEROBJECT_H
+

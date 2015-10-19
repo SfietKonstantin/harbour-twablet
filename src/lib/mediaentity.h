@@ -35,7 +35,6 @@
 #include "entity.h"
 #include "globals.h"
 
-class QJsonObject;
 class MediaEntity: public Entity
 {
 public:

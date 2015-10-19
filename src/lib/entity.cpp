@@ -30,20 +30,21 @@
  */
 
 #include "entity.h"
+#include <map>
+#include <set>
+#include <QtCore/QJsonArray>
+#include "private/maputil.h"
 #include "urlentity.h"
 #include "mediaentity.h"
 #include "usermentionentity.h"
 #include "hashtagentity.h"
-#include <set>
-#include <map>
-#include <QtCore/QJsonArray>
 
 template <class T>
 static void insertEntity(const QJsonValue &value, std::map<QString, Entity::Ptr> &map,
                          std::vector<QString> &texts)
 {
     Entity::Ptr entity {new T(value.toObject())};
-    if (map.find(entity->text()) == std::end(map)) {
+    if (!private_util::hasValue(map, entity->text())) {
         texts.push_back(entity->text());
     }
     map.emplace(entity->text(), entity);

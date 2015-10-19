@@ -31,13 +31,14 @@
 
 
 #include <gtest/gtest.h>
+#include <memory>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
+#include <QtCore/QJsonObject>
 #include <QtCore/QStandardPaths>
-#include <memory>
-#include <loadsavemanager.h>
 #include <accountrepository.h>
+#include <loadsavemanager.h>
 
 class SimpleLoadSave: public ILoadSave
 {

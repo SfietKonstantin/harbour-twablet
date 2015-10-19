@@ -31,7 +31,6 @@
 
 #include "usermentionentity.h"
 #include "entityvisitor.h"
-#include <QtCore/QJsonObject>
 
 UserMentionEntity::UserMentionEntity(const QJsonObject &json)
 {

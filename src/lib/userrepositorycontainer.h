@@ -29,19 +29,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef LISTQUERYHANDLERFACTORY_H
-#define LISTQUERYHANDLERFACTORY_H
+#ifndef USERREPOSITORYCONTAINER_H
+#define USERREPOSITORYCONTAINER_H
 
+#include <map>
+#include "globals.h"
+#include "account.h"
+#include "query.h"
+#include "userrepository.h"
 #include "ilistqueryhandler.h"
-#include "tweet.h"
-#include "user.h"
+#include "iqueryexecutor.h"
 
-class Query;
-class ListQueryHandlerFactory
+class UserRepositoryContainer
 {
 public:
-    static IListQueryHandler<Tweet>::Ptr createTweet(const Query &query);
-    static IListQueryHandler<User>::Ptr createUser(const Query &query);
+    explicit UserRepositoryContainer(IQueryExecutor::ConstPtr &&queryExecutor);
+    DISABLE_COPY_DEFAULT_MOVE(UserRepositoryContainer);
+    bool isValid(int index) const;
+    UserRepository * repository(int index);
+    void refresh(int index);
+    void loadMore(int index);
+    int addRepository(const Account &account, const Query &query);
+    void removeRepository(int index);
+private:
+    struct MappingData
+    {
+        explicit MappingData(const Account &inputAccount, const Query &inputQuery,
+                             IListQueryHandler<User>::Ptr &&inputHandler);
+        bool loading {false};
+        Account account {};
+        Query query {};
+        UserRepository repository {};
+        std::unique_ptr<IListQueryHandler<User>> handler {};
+    };
+    void load(MappingData &mappingData, IListQueryHandler<User>::RequestType requestType);
+    MappingData * getMappingData(int index, const Account &account, const Query &query);
+    IQueryExecutor::ConstPtr m_queryExecutor {nullptr};
+    std::map<int, MappingData> m_mapping {};
+    int m_index {0};
 };
 
-#endif // LISTQUERYHANDLERFACTORY_H
+#endif // USERREPOSITORYCONTAINER_H

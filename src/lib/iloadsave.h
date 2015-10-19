@@ -32,8 +32,7 @@
 #ifndef ILOADSAVE_H
 #define ILOADSAVE_H
 
-#include <QtCore/QJsonObject>
-
+class QJsonObject;
 class ILoadSave
 {
 public:

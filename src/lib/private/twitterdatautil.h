@@ -32,11 +32,9 @@
 #ifndef TWITTERDATAUTIL_P_H
 #define TWITTERDATAUTIL_P_H
 
-#include <QtCore/QVariant>
-#include <QtCore/QString>
-#include <QtCore/QByteArray>
-#include <vector>
 #include <utility>
+#include <vector>
+#include <QtCore/QByteArray>
 
 namespace private_util
 {

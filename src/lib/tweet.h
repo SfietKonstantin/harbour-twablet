@@ -32,9 +32,6 @@
 #ifndef TWEET_H
 #define TWEET_H
 
-#include <QtCore/QString>
-#include <QtCore/QDateTime>
-#include "globals.h"
 #include "user.h"
 #include "quotedtweet.h"
 

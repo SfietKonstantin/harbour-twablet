@@ -32,9 +32,9 @@
 #ifndef ACCOUNTREPOSITORY_H
 #define ACCOUNTREPOSITORY_H
 
-#include "repository.h"
-#include "iloadsave.h"
 #include "account.h"
+#include "iloadsave.h"
+#include "repository.h"
 
 class AccountRepository: public Repository<Account>, public ILoadSave
 {

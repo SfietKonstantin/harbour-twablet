@@ -29,18 +29,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "ilistqueryhandler.h"
+#ifndef DEBUGHELPER_H
+#define DEBUGHELPER_H
 
-QDebug & operator<<(QDebug &debug, const std::map<QByteArray, QByteArray> &parameters)
-{
-    QDebugStateSaver saver(debug);
-    debug.nospace() << "(";
-    for (auto it = std::begin(parameters); it != std::end(parameters); ++it) {
-        if (it != std::begin(parameters)) {
-            debug << ", ";
-        }
-        debug << it->first.data() << ":" << it->second.data();
-    }
-    debug << ")";
-    return debug;
-}
+#include <QtCore/QDebug>
+#include "query.h"
+
+QDebug & operator<<(QDebug &debug, const Query::Parameters &parameters);
+
+#endif // DEBUGHELPER_H

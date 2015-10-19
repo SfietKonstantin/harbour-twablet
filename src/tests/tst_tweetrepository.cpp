@@ -33,7 +33,7 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
-#include <tweetcentralrepository.h>
+#include <tweetrepositorycontainer.h>
 #include "mockqueryexecutor.h"
 #include "testrepositorylistener.h"
 
@@ -63,12 +63,12 @@ public:
         : account(QLatin1String("test"), QLatin1String("test"), QLatin1String("test"), QByteArray(), QByteArray())
     {
         queryExecutor = new MockQueryExecutor();
-        repository.reset(new TweetCentralRepository(IQueryExecutor::Ptr(queryExecutor)));
+        repository.reset(new TweetRepositoryContainer(IQueryExecutor::ConstPtr(queryExecutor)));
     }
 protected:
     MockQueryExecutor *queryExecutor {nullptr};
     Account account;
-    std::unique_ptr<TweetCentralRepository> repository {nullptr};
+    std::unique_ptr<TweetRepositoryContainer> repository {nullptr};
 };
 
 TEST_F(tweetrepository, SupportedTypes)

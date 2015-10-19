@@ -33,8 +33,8 @@
 #define IREPOSITORYLISTENER_H
 
 #include <vector>
-class QString;
 
+class QString;
 /**
  * @brief An interface for a Repository listener
  *

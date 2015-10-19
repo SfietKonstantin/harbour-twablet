@@ -31,6 +31,7 @@
 
 #include "layoutrepository.h"
 #include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
 #include <QtCore/QUrl>
 
 int LayoutRepository::count() const
