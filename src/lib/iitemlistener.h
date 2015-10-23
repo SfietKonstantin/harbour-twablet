@@ -29,36 +29,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "networkmonitor.h"
-#include <QtCore/QLoggingCategory>
+#ifndef IITEMLISTENER_H
+#define IITEMLISTENER_H
 
-static QLoggingCategory logger {"network-monitor"};
-
-NetworkMonitor::NetworkMonitor(QObject *parent) :
-    QObject(parent)
+template<class T>
+class IItemListener
 {
-    m_networkManager.reset(new QNetworkConfigurationManager());
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::onlineStateChanged, [this]() {
-        setOnline();
-    });
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::updateCompleted, [this]() {
-        setOnline();
-    });
-    m_networkManager->updateConfigurations();
-    setOnline();
-}
+public:
+    virtual ~IItemListener() {}
+    virtual void doStart() = 0;
+    virtual void doError(const QString &error) = 0;
+    virtual void doFinish(T &&item) = 0;
+};
 
-bool NetworkMonitor::isOnline() const
-{
-    return m_online;
-}
+#endif // IITEMLISTENER_H
 
-void NetworkMonitor::setOnline()
-{
-    bool online {m_networkManager->isOnline()};
-    qCDebug(logger) << "Online:" << online;
-    if (m_online != online) {
-        m_online = online;
-        emit onlineChanged();
-    }
-}

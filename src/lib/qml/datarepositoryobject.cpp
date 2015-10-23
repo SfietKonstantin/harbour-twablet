@@ -30,7 +30,6 @@
  */
 
 #include "datarepositoryobject.h"
-#include <QtCore/QLoggingCategory>
 #include <QtCore/QVariantMap>
 #include "private/conversionutil.h"
 #include "private/networkqueryexecutor.h"
@@ -47,6 +46,7 @@ DataRepositoryObject::DataRepositoryObject(QObject *parent)
     , m_network(new QNetworkAccessManager())
     , m_tweetRepositoryContainer(private_util::NetworkQueryExecutor::create(*m_network))
     , m_userRepositoryContainer(private_util::NetworkQueryExecutor::create(*m_network))
+    , m_itemQueryContainer(private_util::NetworkQueryExecutor::create(*m_network))
 {
     m_loadSaveManager.load(m_accounts);
     for (const Account &account : m_accounts) {
@@ -110,6 +110,11 @@ Account DataRepositoryObject::account(const QString &accountUserId) const
         return Account{};
     }
     return it->second;
+}
+
+ItemQueryContainer * DataRepositoryObject::itemQueryContainer()
+{
+    return &m_itemQueryContainer;
 }
 
 int DataRepositoryObject::addAccount(const QString &name, const QString &userId,

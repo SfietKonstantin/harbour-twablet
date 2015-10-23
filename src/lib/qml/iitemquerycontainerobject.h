@@ -29,36 +29,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "networkmonitor.h"
-#include <QtCore/QLoggingCategory>
+#ifndef IITEMQUERYCONTAINEROBJECT_H
+#define IITEMQUERYCONTAINEROBJECT_H
 
-static QLoggingCategory logger {"network-monitor"};
+#include <QtCore/QtPlugin>
+#include "itemquerycontainer.h"
 
-NetworkMonitor::NetworkMonitor(QObject *parent) :
-    QObject(parent)
+class Layout;
+namespace qml
 {
-    m_networkManager.reset(new QNetworkConfigurationManager());
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::onlineStateChanged, [this]() {
-        setOnline();
-    });
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::updateCompleted, [this]() {
-        setOnline();
-    });
-    m_networkManager->updateConfigurations();
-    setOnline();
+
+class IItemQueryContainerObject
+{
+public:
+    virtual ~IItemQueryContainerObject() {}
+    virtual ItemQueryContainer * itemQueryContainer() = 0;
+};
+
 }
 
-bool NetworkMonitor::isOnline() const
-{
-    return m_online;
-}
+Q_DECLARE_INTERFACE(qml::IItemQueryContainerObject,
+                    "harbour.twablet.IItemQueryContainerObject")
 
-void NetworkMonitor::setOnline()
-{
-    bool online {m_networkManager->isOnline()};
-    qCDebug(logger) << "Online:" << online;
-    if (m_online != online) {
-        m_online = online;
-        emit onlineChanged();
-    }
-}
+#endif // IITEMQUERYCONTAINEROBJECT_H
+

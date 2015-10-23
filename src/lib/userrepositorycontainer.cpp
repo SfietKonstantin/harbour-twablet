@@ -108,7 +108,7 @@ void UserRepositoryContainer::load(const ContainerKey &key, Data &mappingData,
 
     mappingData.repository.start();
 
-    m_queryExecutor->execute(path, parameters, key.account(), [this, &mappingData, requestType](QIODevice &reply, QNetworkReply::NetworkError error, const QString &errorMessage) {
+    m_queryExecutor->execute(key.query().requestType(), path, parameters, key.account(), [this, &mappingData, requestType](QIODevice &reply, QNetworkReply::NetworkError error, const QString &errorMessage) {
         std::vector<User> items {};
         private_util::ListQueryHandler<User> callback {
             requestType,

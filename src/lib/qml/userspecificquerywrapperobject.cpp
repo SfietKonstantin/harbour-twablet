@@ -29,55 +29,36 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "retweetqueryitem.h"
-#include "private/twitterqueryutil.h"
-#include "accountobject.h"
+#include "userspecificquerywrapperobject.h"
 
 namespace qml
 {
 
-RetweetQueryItem::RetweetQueryItem(QObject *parent)
-    : AbstractQueryItem(parent)
+UserSpecificQueryWrapperObject::UserSpecificQueryWrapperObject(QObject *parent)
+    : UserQueryWrapperObject(parent)
 {
 }
 
-QString RetweetQueryItem::tweetId() const
+QString UserSpecificQueryWrapperObject::userId() const
 {
-    return m_tweetId;
+    return m_userId;
 }
 
-void RetweetQueryItem::setTweetId(QString tweetId)
+void UserSpecificQueryWrapperObject::setUserId(const QString &userId)
 {
-    if (m_tweetId != tweetId) {
-        m_tweetId = tweetId;
-        emit tweetIdChanged();
+    if (m_userId != userId) {
+        m_userId = userId;
+        updateParameters();
+        emit userIdChanged();
     }
 }
 
-bool RetweetQueryItem::isQueryValid() const
+void UserSpecificQueryWrapperObject::updateParameters()
 {
-    return !m_tweetId.isEmpty();
-}
-
-QNetworkReply * RetweetQueryItem::createQuery(const Account &account) const
-{
-    QByteArray path {"statuses/retweet.json"};
-    std::map<QByteArray, QByteArray> parameters {{"id", QUrl::toPercentEncoding(m_tweetId)}};
-
-    return private_util::TwitterQueryUtil::post(network(), path, {}, parameters, account);
-}
-
-void RetweetQueryItem::handleReply(const QByteArray &reply,
-                                   QNetworkReply::NetworkError networkError,
-                                   const QString &errorMessage)
-{
-    Q_UNUSED(reply)
-    Q_UNUSED(errorMessage)
-    if (networkError != QNetworkReply::NoError) {
-        if (networkError == QNetworkReply::ContentOperationNotPermittedError) {
-            setStatusAndErrorMessage(Error, tr("Retweeting is not allowed."));
-        }
-    }
+    QVariantMap parameters = QVariantMap {
+        {QLatin1String{"user_id"}, m_userId}
+    };
+    setParameters(parameters);
 }
 
 }

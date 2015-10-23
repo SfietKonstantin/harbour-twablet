@@ -29,30 +29,51 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEETQUERYITEM_H
-#define TWEETQUERYITEM_H
+#ifndef TWEETQUERYWRAPPEROBJECT_H
+#define TWEETQUERYWRAPPEROBJECT_H
 
-#include "queryitem.h"
-#include "tweetobject.h"
+#include <QtCore/QVariantMap>
+#include "iquerywrapperobject.h"
+#include "query.h"
+#include "querytypeobject.h"
 
 namespace qml
 {
 
-class TweetQueryItem: public QueryItem<Tweet, TweetObject *>
+class TweetQueryWrapperObject : public QObject, public IQueryWrapperObject
 {
     Q_OBJECT
-    Q_PROPERTY(TweetObject * item READ item NOTIFY itemChanged)
+    Q_INTERFACES(qml::IQueryWrapperObject)
+    Q_PROPERTY(QString accountUserId READ accountUserId WRITE setAccountUserId
+               NOTIFY accountUserIdChanged)
+    Q_PROPERTY(qml::QueryTypeObject::TweetItemType type READ type WRITE setType NOTIFY typeChanged)
+    Q_PROPERTY(QVariantMap parameters READ parameters WRITE setParameters NOTIFY parametersChanged)
 public:
-    explicit TweetQueryItem(QObject *parent = 0);
-public slots:
-    void setRetweeted(bool retweeted);
-    void setFavorited(bool favorited);
+    explicit TweetQueryWrapperObject(QObject *parent = 0);
+    explicit TweetQueryWrapperObject(const QString accountUserId, const TweetItemQuery &query,
+                                     QObject *parent = 0);
+    QString accountUserId() const override;
+    void setAccountUserId(const QString &accountUserId);
+    Query query() const override;
+    void setQuery(TweetItemQuery &&query);
+    QueryTypeObject::TweetItemType type() const;
+    void setType(QueryTypeObject::TweetItemType type);
+    QVariantMap parameters() const;
+    void setParameters(const QVariantMap &parameters);
+    void accept(QueryWrapperVisitor &visitor) const override;
 signals:
-    void itemChanged();
+    void accountUserIdChanged();
+    void typeChanged();
+    void parametersChanged();
 private:
-    void doItemChanged() override final;
+    void updateQuery();
+    TweetItemQuery::Type convertedType() const;
+    QString m_accountUserId {};
+    TweetItemQuery m_query {};
+    QueryTypeObject::TweetItemType m_type {QueryTypeObject::InvalidTweetItem};
+    QVariantMap m_parameters {};
 };
 
 }
 
-#endif // TWEETQUERYITEM_H
+#endif // TWEETQUERYWRAPPEROBJECT_H

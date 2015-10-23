@@ -29,36 +29,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "networkmonitor.h"
-#include <QtCore/QLoggingCategory>
+#ifndef USERITEMQUERYHANDLER_H
+#define USERITEMQUERYHANDLER_H
 
-static QLoggingCategory logger {"network-monitor"};
+#include "iitemqueryhandler.h"
+#include "user.h"
 
-NetworkMonitor::NetworkMonitor(QObject *parent) :
-    QObject(parent)
+class UserItemQueryHandler final: public IItemQueryHandler<User>
 {
-    m_networkManager.reset(new QNetworkConfigurationManager());
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::onlineStateChanged, [this]() {
-        setOnline();
-    });
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::updateCompleted, [this]() {
-        setOnline();
-    });
-    m_networkManager->updateConfigurations();
-    setOnline();
-}
+public:
+    DISABLE_COPY_DISABLE_MOVE(UserItemQueryHandler);
+    static IItemQueryHandler<User>::Ptr create();
+private:
+    UserItemQueryHandler();
+    bool treatError(const QByteArray &data, QNetworkReply::NetworkError error,
+                    QString &errorMessage) override;
+    bool treatReply(const QByteArray &data, User &item, QString &errorMessage) override;
+};
 
-bool NetworkMonitor::isOnline() const
-{
-    return m_online;
-}
-
-void NetworkMonitor::setOnline()
-{
-    bool online {m_networkManager->isOnline()};
-    qCDebug(logger) << "Online:" << online;
-    if (m_online != online) {
-        m_online = online;
-        emit onlineChanged();
-    }
-}
+#endif // USERITEMQUERYHANDLER_H

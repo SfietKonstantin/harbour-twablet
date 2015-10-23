@@ -37,12 +37,16 @@ namespace qml
 
 class TweetListQueryWrapperObject;
 class UserListQueryWrapperObject;
+class TweetQueryWrapperObject;
+class UserQueryWrapperObject;
 class QueryWrapperVisitor
 {
 public:
     virtual ~QueryWrapperVisitor();
     virtual void visitTweetListQuery(const TweetListQueryWrapperObject &wrapperObject);
     virtual void visitUserListQuery(const UserListQueryWrapperObject &wrapperObject);
+    virtual void visitTweetItemQuery(const TweetQueryWrapperObject &wrapperObject);
+    virtual void visitUserItemQuery(const UserQueryWrapperObject &wrapperObject);
 };
 
 }

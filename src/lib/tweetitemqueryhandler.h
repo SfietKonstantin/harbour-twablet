@@ -29,37 +29,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef FAVORITEQUERYITEM_H
-#define FAVORITEQUERYITEM_H
+#ifndef TWEETITEMQUERYHANDLER_H
+#define TWEETITEMQUERYHANDLER_H
 
-#include "abstractqueryitem.h"
+#include "iitemqueryhandler.h"
+#include "tweet.h"
 
-namespace qml
+class TweetItemQueryHandler final: public IItemQueryHandler<Tweet>
 {
-
-class FavoriteQueryItem : public AbstractQueryItem
-{
-    Q_OBJECT
-    Q_PROPERTY(QString tweetId READ tweetId WRITE setTweetId NOTIFY tweetIdChanged)
-    Q_PROPERTY(bool favorited READ isFavorited WRITE setFavorited NOTIFY favoritedChanged)
 public:
-    explicit FavoriteQueryItem(QObject *parent = 0);
-    QString tweetId() const;
-    void setTweetId(QString tweetId);
-    bool isFavorited() const;
-    void setFavorited(bool favorited);
-signals:
-    void tweetIdChanged();
-    void favoritedChanged();
+    DISABLE_COPY_DISABLE_MOVE(TweetItemQueryHandler);
+    static IItemQueryHandler<Tweet>::Ptr create();
 private:
-    bool isQueryValid() const override final;
-    QNetworkReply * createQuery(const Account &account) const override final;
-    void handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
-                     const QString &errorMessage) override final;
-    QString m_tweetId {};
-    bool m_favorited {false};
+    TweetItemQueryHandler();
+    bool treatError(const QByteArray &data, QNetworkReply::NetworkError error,
+                    QString &errorMessage) override;
+    bool treatReply(const QByteArray &data, Tweet &item, QString &errorMessage) override;
 };
 
-}
-
-#endif // FAVORITEQUERYITEM_H
+#endif // TWEETITEMQUERYHANDLER_H

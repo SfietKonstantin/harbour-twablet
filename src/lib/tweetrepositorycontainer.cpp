@@ -40,8 +40,7 @@
 #include <QtCore/QJsonObject>
 #include <QtNetwork/QNetworkReply>
 
-Q_DECLARE_LOGGING_CATEGORY(trc)
-Q_LOGGING_CATEGORY(trc, "tweet-repository-container")
+static const QLoggingCategory logger {"tweet-repository-container"};
 
 TweetRepositoryContainer::TweetRepositoryContainer(IQueryExecutor::ConstPtr &&queryExecutor)
     : m_queryExecutor(std::move(queryExecutor))
@@ -66,9 +65,9 @@ void TweetRepositoryContainer::referenceQuery(const Account &account, const Quer
     }
     ++data->refcount;
 
-    qCDebug(trc) << "Refcount info:";
+    qCDebug(logger) << "Refcount info:";
     for (const auto &it : m_mapping) {
-        qCDebug(trc) << "  For query" << it.first.query() << "Refcount:" << it.second.refcount
+        qCDebug(logger) << "  For query" << it.first.query() << "Refcount:" << it.second.refcount
                      << "Observers:" << it.second.repository.listeners().size();
     }
 }
@@ -84,9 +83,9 @@ void TweetRepositoryContainer::dereferenceQuery(const Account &account, const Qu
         m_mapping.erase(ContainerKey{Account{account}, Query{query}});
     }
 
-    qCDebug(trc) << "Refcount info:";
+    qCDebug(logger) << "Refcount info:";
     for (const auto &it : m_mapping) {
-        qCDebug(trc) << "  For query" << it.first.query() << "Refcount:" << it.second.refcount;
+        qCDebug(logger) << "  For query" << it.first.query() << "Refcount:" << it.second.refcount;
     }
 }
 
@@ -158,9 +157,9 @@ void TweetRepositoryContainer::load(const ContainerKey &key, Data &mappingData,
         return;
     }
 
-    qCDebug(trc) << "Refcount info:";
+    qCDebug(logger) << "Refcount info:";
     for (const auto &it : m_mapping) {
-        qCDebug(trc) << "  For query" << it.first.query() << "Refcount:" << it.second.refcount
+        qCDebug(logger) << "  For query" << it.first.query() << "Refcount:" << it.second.refcount
                      << "Observers:" << it.second.repository.listeners().size();
     }
 
@@ -171,10 +170,10 @@ void TweetRepositoryContainer::load(const ContainerKey &key, Data &mappingData,
     const Query::Parameters &additionalParameters (mappingData.handler->additionalParameters(requestType));
     parameters.insert(std::begin(additionalParameters), std::end(additionalParameters));
 
-    qCDebug(trc) << "Request:" << path << parameters;
+    qCDebug(logger) << "Request:" << path << parameters;
     mappingData.repository.start();
 
-    m_queryExecutor->execute(path, parameters, key.account(), [this, &mappingData, requestType](QIODevice &reply, QNetworkReply::NetworkError error, const QString &errorMessage) {
+    m_queryExecutor->execute(key.query().requestType(), path, parameters, key.account(), [this, &mappingData, requestType](QIODevice &reply, QNetworkReply::NetworkError error, const QString &errorMessage) {
         std::vector<Tweet> items {};
         private_util::ListQueryHandler<Tweet> callback {
             requestType,
@@ -186,7 +185,7 @@ void TweetRepositoryContainer::load(const ContainerKey &key, Data &mappingData,
         callback(reply, error, errorMessage);
         for (const Tweet &tweet : items) {
             m_data.emplace(tweet.id(), tweet);
-            qCDebug(trc) << "Adding tweet with id" << tweet.id();
+            qCDebug(logger) << "Adding tweet with id" << tweet.id();
         }
     });
 }

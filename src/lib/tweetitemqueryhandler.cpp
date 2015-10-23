@@ -29,36 +29,40 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "networkmonitor.h"
-#include <QtCore/QLoggingCategory>
+#include "tweetitemqueryhandler.h"
+#include <QtCore/QUrl>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
 
-static QLoggingCategory logger {"network-monitor"};
-
-NetworkMonitor::NetworkMonitor(QObject *parent) :
-    QObject(parent)
+TweetItemQueryHandler::TweetItemQueryHandler()
 {
-    m_networkManager.reset(new QNetworkConfigurationManager());
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::onlineStateChanged, [this]() {
-        setOnline();
-    });
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::updateCompleted, [this]() {
-        setOnline();
-    });
-    m_networkManager->updateConfigurations();
-    setOnline();
 }
 
-bool NetworkMonitor::isOnline() const
+IItemQueryHandler<Tweet>::Ptr TweetItemQueryHandler::create()
 {
-    return m_online;
+    return IItemQueryHandler<Tweet>::Ptr(new TweetItemQueryHandler());
 }
 
-void NetworkMonitor::setOnline()
+bool TweetItemQueryHandler::treatError(const QByteArray &data, QNetworkReply::NetworkError error,
+                                       QString &errorMessage)
 {
-    bool online {m_networkManager->isOnline()};
-    qCDebug(logger) << "Online:" << online;
-    if (m_online != online) {
-        m_online = online;
-        emit onlineChanged();
+    Q_UNUSED(data)
+    Q_UNUSED(error)
+    Q_UNUSED(errorMessage)
+    return false;
+}
+
+bool TweetItemQueryHandler::treatReply(const QByteArray &data, Tweet &item, QString &errorMessage)
+{
+    QJsonParseError error {-1, QJsonParseError::NoError};
+    QJsonDocument document {QJsonDocument::fromJson(data, &error)};
+    Q_UNUSED(document)
+    if (error.error != QJsonParseError::NoError) {
+        errorMessage = error.errorString();
+        item = Tweet();
+        return false;
     }
+    item = Tweet(document.object());
+    return true;
 }
+

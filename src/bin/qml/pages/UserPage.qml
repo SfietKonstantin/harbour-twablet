@@ -39,10 +39,15 @@ Page {
     property alias userId: query.userId
     property alias accountUserId: query.accountUserId
     property RightPanel panel
-    function load() { query.load(Repository) }
+    function load() { queryItem.load() }
 
     UserQueryItem {
-        id: query
+        id: queryItem
+        repository: Repository
+        query: UserQuery {
+            id: query
+            type: QueryType.ShowUser
+        }
     }
 
     SilicaFlickable {
@@ -52,14 +57,14 @@ Page {
 
         Column {
             id: column
-            visible: query.status === QueryItem.Idle
+            visible: queryItem.status === QueryItem.Idle
             anchors.left: parent.left; anchors.right: parent.right
 
             TwitterImage {
                 id: image
                 anchors.left: parent.left; anchors.right: parent.right
                 height: 3 * Theme.itemSizeLarge
-                source: query.user ? (Screen.sizeCategory === Screen.Large ? query.user.bannerUrlLarge : query.user.bannerUrl) : ""
+                source: queryItem.item ? (Screen.sizeCategory === Screen.Large ? queryItem.item.bannerUrlLarge : queryItem.item.bannerUrl) : ""
 
                 ShaderEffect {
                     id: gradient
@@ -89,7 +94,7 @@ Page {
                     anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
                     width: Theme.itemSizeMedium
                     height: Theme.itemSizeMedium
-                    source: query.user ? (Screen.sizeCategory === Screen.Large ? query.user.imageUrlLarge : query.user.imageUrl) : ""
+                    source: queryItem.item ? (Screen.sizeCategory === Screen.Large ? queryItem.item.imageUrlLarge : queryItem.item.imageUrl) : ""
                 }
 
                 Label {
@@ -97,7 +102,7 @@ Page {
                     anchors.bottom: name.top; anchors.bottomMargin: Theme.paddingSmall
                     font.pixelSize: Theme.fontSizeMedium
                     color: Theme.highlightColor
-                    text: query.user ? "@" + query.user.screenName : ""
+                    text: queryItem.item ? "@" + queryItem.item.screenName : ""
                 }
 
                 Label {
@@ -106,7 +111,7 @@ Page {
                     anchors.bottom: parent.bottom; anchors.bottomMargin: Theme.paddingMedium
                     font.pixelSize: Theme.fontSizeLarge
                     color: Theme.highlightColor
-                    text: query.user ? query.user.name : ""
+                    text: queryItem.item ? queryItem.item.name : ""
                 }
             }
 
@@ -116,7 +121,7 @@ Page {
 
                 DescriptionFormatter {
                     id: descriptionFormatter
-                    user: query.user
+                    user: queryItem.item
                 }
 
                 Label {
@@ -139,20 +144,20 @@ Page {
                 anchors.left: parent.left; anchors.right: parent.right
                 MiniButton {
                     width: parent.width / 3
-                    text: query.user ? qsTr("%n\ntweets", "", query.user.statusesCount) : ""
-                    onClicked: container.panel.openUserTimeline(query.userId, query.user.screenName,
+                    text: queryItem.item ? qsTr("%n\ntweets", "", queryItem.item.statusesCount) : ""
+                    onClicked: container.panel.openUserTimeline(container.userId, queryItem.item.screenName,
                                                                 container.accountUserId, false)
                 }
                 MiniButton {
                     width: parent.width / 3
-                    text: query.user ? qsTr("%n\nfriends", "", query.user.friendsCount) : ""
-                    onClicked: container.panel.openFriends(query.userId, query.user.screenName,
+                    text: queryItem.item ? qsTr("%n\nfriends", "", queryItem.item.friendsCount) : ""
+                    onClicked: container.panel.openFriends(container.userId, queryItem.item.screenName,
                                                            container.accountUserId, false)
                 }
                 MiniButton {
                     width: parent.width / 3
-                    text: query.user ? qsTr("%n\nfollowers", "", query.user.followersCount) : ""
-                    onClicked: container.panel.openFollowers(query.userId, query.user.screenName,
+                    text: queryItem.item ? qsTr("%n\nfollowers", "", queryItem.item.followersCount) : ""
+                    onClicked: container.panel.openFollowers(container.userId, queryItem.item.screenName,
                                                              container.accountUserId, false)
                 }
             }
@@ -167,19 +172,19 @@ Page {
                     anchors.verticalCenter: parent.verticalCenter
                     truncationMode: TruncationMode.Fade
                     color: Theme.highlightColor
-                    text: query.user ? qsTr("%n tweets per day", "", query.user.tweetsPerDay) : ""
+                    text: queryItem.item ? qsTr("%n tweets per day", "", queryItem.item.tweetsPerDay) : ""
                 }
             }
 
             MiniButton {
-                visible: query.user && query.user.displayUrl !== ""
-                text: query.user ? query.user.displayUrl : ""
-                onClicked: Qt.openUrlExternally(query.user.url)
+                visible: queryItem.item && queryItem.item.displayUrl !== ""
+                text: queryItem.item ? queryItem.item.displayUrl : ""
+                onClicked: Qt.openUrlExternally(queryItem.item.url)
             }
 
             MiniButton {
-                text: query.user ? qsTr("%n favourites", "", query.user.favouritesCount) : ""
-                onClicked: container.panel.openFavorites(query.userId, query.user.screenName,
+                text: queryItem.item ? qsTr("%n favourites", "", queryItem.item.favouritesCount) : ""
+                onClicked: container.panel.openFavorites(container.userId, queryItem.item.screenName,
                                                          container.accountUserId, false)
             }
 
@@ -188,12 +193,12 @@ Page {
             }
 
             MiniButton {
-                text: query.user ? qsTr("Listed in %n lists", "", query.user.listedCount) : ""
+                text: queryItem.item ? qsTr("Listed in %n lists", "", queryItem.item.listedCount) : ""
             }
         }
 
         StatusPlaceholder {
-            query: query
+            query: queryItem
         }
 
         VerticalScrollDecorator {}

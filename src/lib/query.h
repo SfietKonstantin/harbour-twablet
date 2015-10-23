@@ -207,4 +207,44 @@ private:
     static Parameters makeParameters(const Parameters &additionalParameters);
 };
 
+class TweetItemQuery: public Query
+{
+public:
+    enum Type
+    {
+        Invalid = 0,
+        Show,
+        StatusUpdate,
+        Favorite,
+        Unfavorite,
+        Retweet
+    };
+    explicit TweetItemQuery() = default;
+    explicit TweetItemQuery(Type type, Query::Parameters &&additionalParameters);
+    DEFAULT_COPY_DEFAULT_MOVE(TweetItemQuery);
+    static QByteArray pathFromType(Type type);
+private:
+    static RequestType requestTypeFromtype(Type type);
+    static QByteArray pathFromTypeWithCheck(Type type, const Parameters &additionalParameters);
+    static Parameters makeParameters(Type type, const Parameters &additionalParameters);
+};
+
+class UserItemQuery: public Query
+{
+public:
+    enum Type
+    {
+        Invalid = 0,
+        Show
+    };
+    explicit UserItemQuery() = default;
+    explicit UserItemQuery(Type type, Query::Parameters &&additionalParameters);
+    DEFAULT_COPY_DEFAULT_MOVE(UserItemQuery);
+    static QByteArray pathFromType(Type type);
+private:
+    static RequestType requestTypeFromtype(Type type);
+    static QByteArray pathFromTypeWithCheck(Type type, const Parameters &additionalParameters);
+    static Parameters makeParameters(Type type, const Parameters &additionalParameters);
+};
+
 #endif // QUERY_H

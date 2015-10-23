@@ -47,10 +47,22 @@ IQueryExecutor::ConstPtr NetworkQueryExecutor::create(QNetworkAccessManager &net
     return IQueryExecutor::ConstPtr(new NetworkQueryExecutor(network));
 }
 
-void NetworkQueryExecutor::execute(const QByteArray &path, const std::map<QByteArray, QByteArray> &parameters,
+void NetworkQueryExecutor::execute(Query::RequestType type, const QByteArray &path,
+                                   const std::map<QByteArray, QByteArray> &parameters,
                                    const Account &account, const IQueryExecutor::Callback_t &callback) const
 {
-    QNetworkReply *reply {TwitterQueryUtil::get(m_network, path, parameters, account)};
+    QNetworkReply *reply {nullptr};
+    switch (type) {
+    case Query::Get:
+        reply = TwitterQueryUtil::get(m_network, path, parameters, account);
+        break;
+    case Query::Post:
+        reply = TwitterQueryUtil::post(m_network, path, {}, parameters, account);
+        break;
+    default:
+        Q_ASSERT_X(false, "NetworkQueryExecutor", "Type must be GET or POST");
+        break;
+    }
     reply->connect(reply, &QNetworkReply::finished, [reply, callback]() {
         QObjectPtr<QNetworkReply> replyPtr {reply};
         callback(*reply, reply->error(), reply->errorString());

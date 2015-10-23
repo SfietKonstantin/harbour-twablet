@@ -34,6 +34,8 @@ set(${PROJECT_NAME}_SRCS
     mockqueryexecutor.h
     tst_tweetrepository.cpp
     tst_query.cpp
+    mockitemlistener.h
+    tst_itemquerycontainer.cpp
 )
 
 add_executable(${PROJECT_NAME}

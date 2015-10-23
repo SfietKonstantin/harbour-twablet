@@ -29,36 +29,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "networkmonitor.h"
-#include <QtCore/QLoggingCategory>
+#ifndef STATUSUPDATEQUERYWRAPPEROBJECT_H
+#define STATUSUPDATEQUERYWRAPPEROBJECT_H
 
-static QLoggingCategory logger {"network-monitor"};
+#include "tweetquerywrapperobject.h"
 
-NetworkMonitor::NetworkMonitor(QObject *parent) :
-    QObject(parent)
+namespace qml
 {
-    m_networkManager.reset(new QNetworkConfigurationManager());
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::onlineStateChanged, [this]() {
-        setOnline();
-    });
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::updateCompleted, [this]() {
-        setOnline();
-    });
-    m_networkManager->updateConfigurations();
-    setOnline();
+
+class StatusUpdateQueryWrapperObject: public TweetQueryWrapperObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QString status READ status WRITE setStatus NOTIFY statusChanged)
+    Q_PROPERTY(QString inReplyTo READ inReplyTo WRITE setInReplyTo NOTIFY inReplyToChanged)
+public:
+    explicit StatusUpdateQueryWrapperObject(QObject *parent = 0);
+    QString status() const;
+    void setStatus(QString status);
+    QString inReplyTo() const;
+    void setInReplyTo(QString inReplyTo);
+signals:
+    void statusChanged();
+    void inReplyToChanged();
+private:
+    void updateParameters();
+    QString m_status {};
+    QString m_inReplyTo {};
+};
+
 }
 
-bool NetworkMonitor::isOnline() const
-{
-    return m_online;
-}
-
-void NetworkMonitor::setOnline()
-{
-    bool online {m_networkManager->isOnline()};
-    qCDebug(logger) << "Online:" << online;
-    if (m_online != online) {
-        m_online = online;
-        emit onlineChanged();
-    }
-}
+#endif // STATUSUPDATEQUERYWRAPPEROBJECT_H

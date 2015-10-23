@@ -29,63 +29,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef ABSTRACTQUERYITEM_H
-#define ABSTRACTQUERYITEM_H
+#ifndef USERSPECIFICQUERYWRAPPEROBJECT_H
+#define USERSPECIFICQUERYWRAPPEROBJECT_H
 
-#include <QtCore/QObject>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
-#include "globals.h"
-#include "qobjectutils.h"
+#include "userquerywrapperobject.h"
 
-class Account;
 namespace qml
 {
 
-class AccountObject;
-class AbstractQueryItem : public QObject
+class UserSpecificQueryWrapperObject: public UserQueryWrapperObject
 {
     Q_OBJECT
-    Q_PROPERTY(Status status READ status NOTIFY statusChanged)
-    Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
-    Q_PROPERTY(QString accountUserId READ accountUserId WRITE setAccountUserId
-               NOTIFY accountUserIdChanged)
-    Q_ENUMS(Status)
+    Q_PROPERTY(QString userId READ userId WRITE setUserId NOTIFY userIdChanged)
 public:
-    enum Status
-    {
-        Idle,
-        Loading,
-        Error
-    };
-    DISABLE_COPY_DISABLE_MOVE(AbstractQueryItem);
-    QString accountUserId() const;
-    void setAccountUserId(const QString &accountUserId);
-    Status status() const;
-    QString errorMessage() const;
-public slots:
-    bool load(QObject *object);
+    explicit UserSpecificQueryWrapperObject(QObject *parent = 0);
+    QString userId() const;
+    void setUserId(const QString &userId);
 signals:
-    void statusChanged();
-    void errorMessageChanged();
-    void accountUserIdChanged();
-    void finished();
-    void error();
-protected:
-    explicit AbstractQueryItem(QObject *parent = 0);
-    QNetworkAccessManager & network() const;
-    void setStatusAndErrorMessage(Status status, const QString &errorMessage);
-    virtual bool isQueryValid() const = 0;
-    virtual QNetworkReply * createQuery(const Account &account) const = 0;
-    virtual void handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
-                             const QString &errorMessage) = 0;
+    void userIdChanged();
 private:
-    QObjectPtr<QNetworkAccessManager> m_network {nullptr};
-    QString m_accountUserId {};
-    Status m_status {Idle};
-    QString m_errorMessage {};
+    void updateParameters();
+    QString m_userId {};
 };
 
 }
 
-#endif // ABSTRACTQUERYITEM_H
+#endif // USERSPECIFICQUERYWRAPPEROBJECT_H

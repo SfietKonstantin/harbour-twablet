@@ -40,6 +40,8 @@
 #include "repository.h"
 #include "ilistqueryhandler.h"
 
+static const QLoggingCategory lqcLogger {"list-query-callback"};
+
 namespace private_util {
 
 template<class T>
@@ -73,11 +75,11 @@ public:
         LoadingLock loadingLock {m_loading};
 
         if (error != QNetworkReply::NoError) {
-            qCWarning(QLoggingCategory("list-query-callback")) << "Error happened";
-            qCWarning(QLoggingCategory("list-query-callback")) << "Error code:" << error;
-            qCWarning(QLoggingCategory("list-query-callback")) << "Error message (Qt):" << errorMessage;
+            qCWarning(lqcLogger) << "Network error";
+            qCWarning(lqcLogger) << "  Error code:" << error;
+            qCWarning(lqcLogger) << "  Error message (Qt):" << errorMessage;
             const QByteArray &data {reply.readAll()};
-            qCWarning(QLoggingCategory("list-query-callback")) << "Error message (Twitter):" << data;
+            qCWarning(lqcLogger) << "  Error message (Twitter):" << data;
 
             // Check if Twitter sent us an issue
             QJsonDocument document {QJsonDocument::fromJson(data)};
@@ -87,6 +89,7 @@ public:
                 if (array.count() == 1) {
                     const QJsonObject &firstError {array.first().toObject()};
                     if (firstError.value(QLatin1String("code")).toInt() == 88) {
+                        qCWarning(lqcLogger) << "  Parsed error: \"Rate limit exceeded\"";
                         m_repository.error(QObject::tr("Twitter rate limit exceeded. Please try again later."));
                         return;
                     }
@@ -101,12 +104,11 @@ public:
         typename IListQueryHandler<T>::Placement placement {IListQueryHandler<T>::Discard};
         bool returned = m_handler.treatReply(m_requestType, reply.readAll(), m_items, newErrorMessage, placement);
         if (!returned) {
-            qCWarning(QLoggingCategory("list-query-callback")) << "Error happened";
-            qCWarning(QLoggingCategory("list-query-callback")) << "Parsing error: " << newErrorMessage;
+            qCWarning(lqcLogger) << "Parsing error: " << newErrorMessage;
             m_repository.error(QObject::tr("Internal error"));
             return;
         } else {
-            qCDebug(QLoggingCategory("list-query-callback")) << "New data available. Count:" << m_items.size();
+            qCDebug(lqcLogger) << "Finished. New data count:" << m_items.size();
             switch (placement) {
             case IListQueryHandler<T>::Append:
                 m_repository.append(m_items);

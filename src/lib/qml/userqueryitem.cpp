@@ -30,68 +30,18 @@
  */
 
 #include "userqueryitem.h"
-#include "private/twitterqueryutil.h"
-#include "accountobject.h"
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
 
 namespace qml
 {
 
 UserQueryItem::UserQueryItem(QObject *parent)
-    : AbstractQueryItem(parent)
+    : QueryItem<User, UserObject *>(parent)
 {
 }
 
-QString UserQueryItem::userId() const
+void UserQueryItem::doItemChanged()
 {
-    return m_userId;
-}
-
-void UserQueryItem::setUserId(const QString &userId)
-{
-    if (m_userId != userId) {
-        m_userId = userId;
-        emit userIdChanged();
-    }
-}
-
-UserObject * UserQueryItem::user() const
-{
-    return m_user.get();
-}
-
-bool UserQueryItem::isQueryValid() const
-{
-    return !m_userId.isEmpty();
-}
-
-QNetworkReply * UserQueryItem::createQuery(const Account &account) const
-{
-    QByteArray path {"users/show.json"};
-    std::map<QByteArray, QByteArray> parameters {{"user_id", QUrl::toPercentEncoding(m_userId)}};
-
-    return private_util::TwitterQueryUtil::get(network(), path, parameters, account);
-}
-
-void UserQueryItem::handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
-                                const QString &errorMessage)
-{
-    Q_UNUSED(errorMessage)
-    if (networkError != QNetworkReply::NoError) {
-        return;
-    }
-
-    QJsonParseError error {-1, QJsonParseError::NoError};
-    QJsonDocument document {QJsonDocument::fromJson(reply, &error)};
-    if (error.error != QJsonParseError::NoError) {
-        setStatusAndErrorMessage(Error, tr("Internal error"));
-        return;
-    }
-
-    const QJsonObject &user {document.object()};
-    m_user.reset(UserObject::create(User(user)));
-    emit userChanged();
+    emit itemChanged();
 }
 
 }

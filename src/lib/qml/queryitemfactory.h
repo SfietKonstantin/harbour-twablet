@@ -29,36 +29,35 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "networkmonitor.h"
-#include <QtCore/QLoggingCategory>
+#ifndef QUERYITEMFACTORY_H
+#define QUERYITEMFACTORY_H
 
-static QLoggingCategory logger {"network-monitor"};
+#include "tweetobject.h"
+#include "userobject.h"
 
-NetworkMonitor::NetworkMonitor(QObject *parent) :
-    QObject(parent)
+namespace qml
 {
-    m_networkManager.reset(new QNetworkConfigurationManager());
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::onlineStateChanged, [this]() {
-        setOnline();
-    });
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::updateCompleted, [this]() {
-        setOnline();
-    });
-    m_networkManager->updateConfigurations();
-    setOnline();
-}
 
-bool NetworkMonitor::isOnline() const
+template<class T, class O> class QueryItemFactory;
+template<> class QueryItemFactory<Tweet, TweetObject *>
 {
-    return m_online;
-}
-
-void NetworkMonitor::setOnline()
-{
-    bool online {m_networkManager->isOnline()};
-    qCDebug(logger) << "Online:" << online;
-    if (m_online != online) {
-        m_online = online;
-        emit onlineChanged();
+public:
+    static TweetObject * create(const Tweet &input, QObject *parent)
+    {
+        return TweetObject::create(input, parent);
     }
+};
+
+template<> class QueryItemFactory<User, UserObject *>
+{
+public:
+    static UserObject * create(const User &input, QObject *parent)
+    {
+        return UserObject::create(input, parent);
+    }
+};
+
 }
+
+#endif // QUERYITEMFACTORY_H
+

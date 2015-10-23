@@ -33,6 +33,8 @@
 #include <QtCore/QLoggingCategory>
 #include "entityvisitor.h"
 
+static const QLoggingCategory logger {"media-entity"};
+
 MediaEntity::MediaEntity(const QJsonObject &json)
 {
     m_id = std::move(json.value(QLatin1String("id_str")).toString());
@@ -50,7 +52,7 @@ MediaEntity::MediaEntity(const QJsonObject &json)
     } else if (type == QLatin1String("animated_gif")) {
         m_mediaType = Gif;
     } else {
-        qCDebug(QLoggingCategory("media")) << "Unknown type" << type;
+        qCDebug(logger) << "Unknown type" << type;
     }
 
     // Use "large" for size

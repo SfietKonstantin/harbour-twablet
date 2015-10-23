@@ -29,36 +29,47 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "networkmonitor.h"
-#include <QtCore/QLoggingCategory>
+#ifndef ITEMQUERYCONTAINER_H
+#define ITEMQUERYCONTAINER_H
 
-static QLoggingCategory logger {"network-monitor"};
+#include <map>
+#include <set>
+#include "containerkey.h"
+#include "globals.h"
+#include "iitemqueryhandler.h"
+#include "iqueryexecutor.h"
+#include "iitemlistener.h"
+#include "query.h"
 
-NetworkMonitor::NetworkMonitor(QObject *parent) :
-    QObject(parent)
+class Account;
+class User;
+class Tweet;
+class ItemQueryContainer
 {
-    m_networkManager.reset(new QNetworkConfigurationManager());
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::onlineStateChanged, [this]() {
-        setOnline();
-    });
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::updateCompleted, [this]() {
-        setOnline();
-    });
-    m_networkManager->updateConfigurations();
-    setOnline();
-}
+public:
+    explicit ItemQueryContainer(IQueryExecutor::ConstPtr queryExecutor);
+    DISABLE_COPY_DEFAULT_MOVE(ItemQueryContainer);
+    bool executeQuery(const Account &account, const Query &query,
+                      IItemListener<Tweet> &listener);
+    bool executeQuery(const Account &account, const Query &query,
+                      IItemListener<User> &listener);
+private:
+    template<class T> class Data
+    {
+    public:
+        Data(typename IItemQueryHandler<T>::Ptr &&inputHandler);
+        typename IItemQueryHandler<T>::Ptr handler {};
+        std::set<IItemListener<T> *> listeners {};
+        bool loading {false};
+    };
+    template<class T> using QueryMap = std::map<ContainerKey, Data<T>>;
+    template<class T> Data<T> * getMappingData(const ContainerKey &key);
+    template<class T> bool doExecuteQuery(const Account &account, const Query &query,
+                                          IItemListener<T> *listeners);
+    IQueryExecutor::ConstPtr m_queryExecutor {nullptr};
+    QueryMap<Tweet> m_tweetQueries {};
+    QueryMap<User> m_userQueries {};
+    template<class T> friend class ItemQueryContainerPrivate;
+};
 
-bool NetworkMonitor::isOnline() const
-{
-    return m_online;
-}
-
-void NetworkMonitor::setOnline()
-{
-    bool online {m_networkManager->isOnline()};
-    qCDebug(logger) << "Online:" << online;
-    if (m_online != online) {
-        m_online = online;
-        emit onlineChanged();
-    }
-}
+#endif // ITEMQUERYCONTAINER_H

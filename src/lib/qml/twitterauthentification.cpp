@@ -36,6 +36,8 @@
 #include <QtCore/QLoggingCategory>
 #include <QtNetwork/QNetworkReply>
 
+static const QLoggingCategory logger {"twitter-authentification"};
+
 namespace qml
 {
 
@@ -94,7 +96,7 @@ void TwitterAuthentification::startRequest()
 {
     std::vector<std::pair<QByteArray, QByteArray>> args {{TWITTER_API_REQUEST_TOKEN_PARAM_KEY, TWITTER_API_REQUEST_TOKEN_PARAM_VALUE}};
     QByteArray header {private_util::TwitterDataUtil::authorizationHeader(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, "POST", TWITTER_API_REQUEST_TOKEN, args)};
-    qCDebug(QLoggingCategory("twitter-auth")) << "The authentification header for the start request is:" << header;
+    qCDebug(logger) << "The authentification header for the start request is:" << header;
 
     QByteArray url {QByteArray(TWITTER_API_REQUEST_TOKEN) + "?" + TWITTER_API_REQUEST_TOKEN_PARAM_KEY + "=" + TWITTER_API_REQUEST_TOKEN_PARAM_VALUE};
     QNetworkRequest request {QUrl(QLatin1String(url))};
@@ -105,9 +107,9 @@ void TwitterAuthentification::startRequest()
     connect(reply, &QNetworkReply::finished, [reply, this]() {
         QObjectPtr<QNetworkReply> replyPtr {reply};
         if (replyPtr->error() != QNetworkReply::NoError) {
-            qCDebug(QLoggingCategory("twitter-auth")) << "Error happened. Code:" << reply->error();
-            qCDebug(QLoggingCategory("twitter-auth")) << "Error message (Qt):" << reply->errorString();
-            qCDebug(QLoggingCategory("twitter-auth")) << "Error message (Twitter):" << reply->readAll();
+            qCDebug(logger) << "Error happened. Code:" << reply->error();
+            qCDebug(logger) << "Error message (Qt):" << reply->errorString();
+            qCDebug(logger) << "Error message (Twitter):" << reply->readAll();
             emit error(tr("An error happened when connecting to Twitter. Please check your internet connection."));
             return;
         }
@@ -120,7 +122,7 @@ void TwitterAuthentification::startRequest()
         }
 
         if (dataMap.value(TWITTER_API_OAUTH_CALLBACK_CONFIRMED_KEY) != QByteArray(TWITTER_API_OAUTH_CALLBACK_CONFIRMED_VALUE)) {
-            qCWarning(QLoggingCategory("twitter-auth")) << "The callback is not confirmed";
+            qCWarning(logger) << "The callback is not confirmed";
             return;
         }
 
@@ -129,7 +131,7 @@ void TwitterAuthentification::startRequest()
 
         // Now we need to continue the PIN based authentification
         QByteArray url {QByteArray(TWITTER_API_AUTHORIZE) + "?" + TWITTER_API_OAUTH_TOKEN_KEY + "=" + m_tempToken};
-        qCDebug(QLoggingCategory("twitter-auth")) << "Sending url" << url;
+        qCDebug(logger) << "Sending url" << url;
         emit sendAuthorize(QUrl(QLatin1String(url)));
     });
 }
@@ -140,11 +142,11 @@ void TwitterAuthentification::continueRequest()
         return;
     }
 
-    qCDebug(QLoggingCategory("twitter-auth")) << "Continuing request with pin:" << m_pin;
+    qCDebug(logger) << "Continuing request with pin:" << m_pin;
 
     std::vector<std::pair<QByteArray, QByteArray>> args {{TWITTER_API_ACCESS_TOKEN_PARAM_KEY, m_pin.toLocal8Bit()}};
     QByteArray header = private_util::TwitterDataUtil::authorizationHeader(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, "POST", TWITTER_API_ACCESS_TOKEN, args, m_tempToken, m_tempTokenSecret);
-    qCDebug(QLoggingCategory("twitter-auth")) << "The authentification header for the continue request is:" << header;
+    qCDebug(logger) << "The authentification header for the continue request is:" << header;
 
     QNetworkRequest request (QUrl(QLatin1String(TWITTER_API_ACCESS_TOKEN) + QLatin1String("?") + QLatin1String(TWITTER_API_ACCESS_TOKEN_PARAM_KEY) + QLatin1String("=") + m_pin));
     request.setRawHeader("Authorization", header);
@@ -154,9 +156,9 @@ void TwitterAuthentification::continueRequest()
     connect(reply, &QNetworkReply::finished, [reply, this]() {
         QObjectPtr<QNetworkReply> replyPtr {reply};
         if (replyPtr->error() != QNetworkReply::NoError) {
-            qCWarning(QLoggingCategory("twitter-auth")) << "Error happened. Code:" << replyPtr->error();
-            qCWarning(QLoggingCategory("twitter-auth")) << "Error message (Qt):" << replyPtr->errorString();
-            qCWarning(QLoggingCategory("twitter-auth")) << "Error message (Twitter):" << replyPtr->readAll();
+            qCWarning(logger) << "Network error. Code:" << replyPtr->error();
+            qCWarning(logger) << "Error message (Qt):" << replyPtr->errorString();
+            qCWarning(logger) << "Error message (Twitter):" << replyPtr->readAll();
             emit error(tr("An error happened when authentification to Twitter please retry."));
             return;
         }
@@ -173,11 +175,11 @@ void TwitterAuthentification::continueRequest()
                 QLatin1String(dataMap.value(TWITTER_API_OAUTH_USER_ID_KEY)),
                 QLatin1String(dataMap.value(TWITTER_API_OAUTH_SCREEN_NAME_KEY)));
 
-        qCDebug(QLoggingCategory("twitter-auth")) << "Login successful";
-        qCDebug(QLoggingCategory("twitter-auth")) << "Token:" << m_token;
-        qCDebug(QLoggingCategory("twitter-auth")) << "Token secret:" << m_tokenSecret;
-        qCDebug(QLoggingCategory("twitter-auth")) << "User id:" << m_userId;
-        qCDebug(QLoggingCategory("twitter-auth")) << "Screen name:" << m_screenName;
+        qCDebug(logger) << "Login successful";
+        qCDebug(logger) << "Token:" << m_token;
+        qCDebug(logger) << "Token secret:" << m_tokenSecret;
+        qCDebug(logger) << "User id:" << m_userId;
+        qCDebug(logger) << "Screen name:" << m_screenName;
         emit done();
     });
 }

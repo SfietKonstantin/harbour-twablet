@@ -30,96 +30,32 @@
  */
 
 #include "tweetqueryitem.h"
-#include "private/twitterqueryutil.h"
-#include "accountobject.h"
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
 
 namespace qml
 {
 
 TweetQueryItem::TweetQueryItem(QObject *parent)
-    : AbstractQueryItem(parent)
+    : QueryItem<Tweet, TweetObject *>(parent)
 {
 }
 
-QString TweetQueryItem::tweetId() const
+void TweetQueryItem::setRetweeted(bool retweeted)
 {
-    return m_tweetId;
-}
-
-void TweetQueryItem::setTweetId(const QString &tweetId)
-{
-    if (m_tweetId != tweetId) {
-        m_tweetId = tweetId;
-        emit tweetIdChanged();
-    }
-}
-
-TweetObject * TweetQueryItem::data() const
-{
-    return m_data.get();
+    Tweet tweet {item()->data()};
+    tweet.setRetweeted(retweeted);
+    setItem(std::move(tweet));
 }
 
 void TweetQueryItem::setFavorited(bool favorited)
 {
-    if (m_data == nullptr) {
-        return;
-    }
-
-    Tweet tweet {std::move(m_data->data())};
+    Tweet tweet {item()->data()};
     tweet.setFavorited(favorited);
-    m_data->update(tweet);
+    setItem(std::move(tweet));
 }
 
-void TweetQueryItem::setRetweeted()
+void TweetQueryItem::doItemChanged()
 {
-    if (m_data == nullptr) {
-        return;
-    }
-
-    Tweet tweet {std::move(m_data->data())};
-    tweet.setRetweeted(true);
-    m_data->update(tweet);
-}
-
-bool TweetQueryItem::isQueryValid() const
-{
-    return !m_tweetId.isEmpty();
-}
-
-QNetworkReply * TweetQueryItem::createQuery(const Account &account) const
-{
-    QByteArray path {"statuses/show.json"};
-    std::map<QByteArray, QByteArray> parameters {
-        {"id", QUrl::toPercentEncoding(m_tweetId)},
-        {"trim_user", "false"},
-        {"include_entities", "true"}
-    };
-
-    return private_util::TwitterQueryUtil::get(network(), path, parameters, account);
-}
-
-void TweetQueryItem::handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
-                                 const QString &errorMessage)
-{
-    Q_UNUSED(reply)
-    Q_UNUSED(errorMessage)
-    if (networkError != QNetworkReply::NoError) {
-        setStatusAndErrorMessage(Error, tr("Failed to retrieve tweet"));
-        return;
-    }
-
-    QJsonParseError error {-1, QJsonParseError::NoError};
-    QJsonDocument document {QJsonDocument::fromJson(reply, &error)};
-    if (error.error != QJsonParseError::NoError) {
-        setStatusAndErrorMessage(Error, tr("Failed to retrieve tweet"));
-        return;
-    }
-
-    Tweet tweet {document.object()};
-    m_data.reset(TweetObject::create(tweet));
-    emit dataChanged();
+    emit itemChanged();
 }
 
 }

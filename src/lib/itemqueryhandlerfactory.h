@@ -29,36 +29,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "networkmonitor.h"
-#include <QtCore/QLoggingCategory>
+#ifndef ITEMQUERYHANDLERFACTORY_H
+#define ITEMQUERYHANDLERFACTORY_H
 
-static QLoggingCategory logger {"network-monitor"};
+#include "iitemqueryhandler.h"
 
-NetworkMonitor::NetworkMonitor(QObject *parent) :
-    QObject(parent)
+class Query;
+class Tweet;
+class User;
+class ItemQueryHandlerFactory
 {
-    m_networkManager.reset(new QNetworkConfigurationManager());
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::onlineStateChanged, [this]() {
-        setOnline();
-    });
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::updateCompleted, [this]() {
-        setOnline();
-    });
-    m_networkManager->updateConfigurations();
-    setOnline();
-}
+public:
+    static IItemQueryHandler<Tweet>::Ptr createTweetItem(const Query &query);
+    static IItemQueryHandler<User>::Ptr createUserItem(const Query &query);
+};
 
-bool NetworkMonitor::isOnline() const
-{
-    return m_online;
-}
-
-void NetworkMonitor::setOnline()
-{
-    bool online {m_networkManager->isOnline()};
-    qCDebug(logger) << "Online:" << online;
-    if (m_online != online) {
-        m_online = online;
-        emit onlineChanged();
-    }
-}
+#endif // ITEMQUERYHANDLERFACTORY_H

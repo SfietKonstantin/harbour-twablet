@@ -29,25 +29,51 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef IQUERYEXECUTOR_H
-#define IQUERYEXECUTOR_H
+#ifndef USERQUERYWRAPPEROBJECT_H
+#define USERQUERYWRAPPEROBJECT_H
 
-#include <memory>
-#include <functional>
-#include <QtNetwork/QNetworkReply>
+#include <QtCore/QVariantMap>
+#include "iquerywrapperobject.h"
 #include "query.h"
+#include "querytypeobject.h"
 
-class Account;
-class IQueryExecutor
+namespace qml
 {
+
+class UserQueryWrapperObject : public QObject, public IQueryWrapperObject
+{
+    Q_OBJECT
+    Q_INTERFACES(qml::IQueryWrapperObject)
+    Q_PROPERTY(QString accountUserId READ accountUserId WRITE setAccountUserId
+               NOTIFY accountUserIdChanged)
+    Q_PROPERTY(qml::QueryTypeObject::UserItemType type READ type WRITE setType NOTIFY typeChanged)
+    Q_PROPERTY(QVariantMap parameters READ parameters WRITE setParameters NOTIFY parametersChanged)
 public:
-    using ConstPtr = std::unique_ptr<const IQueryExecutor>;
-    using Callback_t = std::function<void (QIODevice &reply, QNetworkReply::NetworkError error, const QString &errorMessage)>;
-    virtual ~IQueryExecutor() {}
-    virtual void execute(Query::RequestType type, const QByteArray &path,
-                         const std::map<QByteArray, QByteArray> &parameters,
-                         const Account &account, const Callback_t &callback) const = 0;
+    explicit UserQueryWrapperObject(QObject *parent = 0);
+    explicit UserQueryWrapperObject(const QString accountUserId, const UserItemQuery &query,
+                                     QObject *parent = 0);
+    QString accountUserId() const override;
+    void setAccountUserId(const QString &accountUserId);
+    Query query() const override;
+    void setQuery(UserItemQuery &&query);
+    QueryTypeObject::UserItemType type() const;
+    void setType(QueryTypeObject::UserItemType type);
+    QVariantMap parameters() const;
+    void setParameters(const QVariantMap &parameters);
+    void accept(QueryWrapperVisitor &visitor) const override;
+signals:
+    void accountUserIdChanged();
+    void typeChanged();
+    void parametersChanged();
+private:
+    void updateQuery();
+    UserItemQuery::Type convertedType() const;
+    QString m_accountUserId {};
+    UserItemQuery m_query {};
+    QueryTypeObject::UserItemType m_type {QueryTypeObject::InvalidUserItem};
+    QVariantMap m_parameters {};
 };
 
-#endif // ILISTQUERYEXECUTOR_H
+}
 
+#endif // USERQUERYWRAPPEROBJECT_H

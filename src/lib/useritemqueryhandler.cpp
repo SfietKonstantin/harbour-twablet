@@ -29,38 +29,40 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef STATUSUPDATEQUERYITEM_H
-#define STATUSUPDATEQUERYITEM_H
+#include "useritemqueryhandler.h"
+#include <QtCore/QUrl>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
 
-#include "abstractqueryitem.h"
-
-namespace qml
+UserItemQueryHandler::UserItemQueryHandler()
 {
-
-class StatusUpdateQueryItem : public AbstractQueryItem
-{
-    Q_OBJECT
-    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
-    Q_PROPERTY(QString inReplyTo READ inReplyTo WRITE setInReplyTo NOTIFY inReplyToChanged)
-public:
-    explicit StatusUpdateQueryItem(QObject *parent = 0);
-    DISABLE_COPY_DISABLE_MOVE(StatusUpdateQueryItem);
-    QString text() const;
-    void setText(const QString &text);
-    QString inReplyTo() const;
-    void setInReplyTo(const QString &inReplyTo);
-signals:
-    void textChanged();
-    void inReplyToChanged();
-private:
-    bool isQueryValid() const override final;
-    QNetworkReply * createQuery(const Account &account) const override final;
-    void handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
-                     const QString &errorMessage) override final;
-    QString m_text {};
-    QString m_inReplyTo {};
-};
-
 }
 
-#endif // STATUSUPDATEQUERYITEM_H
+IItemQueryHandler<User>::Ptr UserItemQueryHandler::create()
+{
+    return IItemQueryHandler<User>::Ptr(new UserItemQueryHandler());
+}
+
+bool UserItemQueryHandler::treatError(const QByteArray &data, QNetworkReply::NetworkError error,
+                                       QString &errorMessage)
+{
+    Q_UNUSED(data)
+    Q_UNUSED(error)
+    Q_UNUSED(errorMessage)
+    return false;
+}
+
+bool UserItemQueryHandler::treatReply(const QByteArray &data, User &item, QString &errorMessage)
+{
+    QJsonParseError error {-1, QJsonParseError::NoError};
+    QJsonDocument document {QJsonDocument::fromJson(data, &error)};
+    Q_UNUSED(document)
+    if (error.error != QJsonParseError::NoError) {
+        errorMessage = error.errorString();
+        item = User();
+        return false;
+    }
+    item = User(document.object());
+    return true;
+}
+

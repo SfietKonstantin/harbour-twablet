@@ -48,6 +48,12 @@ set(${PROJECT_NAME}_Core_SRCS
     tweetlistqueryhandler.cpp
     tweetsearchqueryhandler.cpp
     userlistqueryhandler.cpp
+    iitemqueryhandler.h
+    itemqueryhandlerfactory.cpp
+    iitemlistener.h
+    itemquerycontainer.cpp
+    tweetitemqueryhandler.cpp
+    useritemqueryhandler.cpp
 )
 
 set(${PROJECT_NAME}_Private_SRCS
@@ -59,6 +65,7 @@ set(${PROJECT_NAME}_Private_SRCS
     private/listquerycallback.h
     private/listqueryhandlerutil.cpp
     private/conversionutil.cpp
+    private/itemquerycallback.h
 )
 
 set(${PROJECT_NAME}_Qml_SRCS
@@ -82,6 +89,7 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/ilayoutcontainerobject.h
     qml/itweetrepositorycontainerobject.h
     qml/iuserrepositorycontainerobject.h
+    qml/iitemquerycontainerobject.h
     qml/twitterauthentification.cpp
     qml/datarepositoryobject.cpp
     qml/datarepositoryobjectmap.h
@@ -89,16 +97,20 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/entitiesformatter.cpp
     qml/tweetformatter.cpp
     qml/quotedtweetformatter.cpp
-    qml/abstractqueryitem.cpp
-    qml/statusupdatequeryitem.cpp
-    qml/tweetqueryitem.cpp
-    qml/retweetqueryitem.cpp
-    qml/favoritequeryitem.cpp
-    qml/userqueryitem.cpp
     qml/iquerywrapperobject.h
     qml/querywrappervisitor.cpp
     qml/tweetlistquerywrapperobject.cpp
     qml/userlistquerywrapperobject.cpp
+    qml/iqueryitem.h
+    qml/queryitem.h
+    qml/queryitemfactory.h
+    qml/tweetqueryitem.cpp
+    qml/userqueryitem.cpp
+    qml/tweetquerywrapperobject.cpp
+    qml/statusupdatequerywrapperobject.cpp
+    qml/tweetspecificquerywrapperobject.cpp
+    qml/userquerywrapperobject.cpp
+    qml/userspecificquerywrapperobject.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC

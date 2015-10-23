@@ -43,6 +43,7 @@
 #include "ilayoutcontainerobject.h"
 #include "itweetrepositorycontainerobject.h"
 #include "iuserrepositorycontainerobject.h"
+#include "iitemquerycontainerobject.h"
 
 namespace qml
 {
@@ -55,6 +56,7 @@ class DataRepositoryObject
         , public ILayoutContainerObject
         , public ITweetRepositoryContainerObject
         , public IUserRepositoryContainerObject
+        , public IItemQueryContainerObject
 {
     Q_OBJECT
     Q_PROPERTY(bool hasAccounts READ hasAccounts NOTIFY hasAccountsChanged)
@@ -62,6 +64,7 @@ class DataRepositoryObject
     Q_INTERFACES(qml::ILayoutContainerObject)
     Q_INTERFACES(qml::ITweetRepositoryContainerObject)
     Q_INTERFACES(qml::IUserRepositoryContainerObject)
+    Q_INTERFACES(qml::IItemQueryContainerObject)
 public:
     explicit DataRepositoryObject(QObject *parent = 0);
     bool hasAccounts() const;
@@ -74,6 +77,7 @@ public:
     void referenceUserListQuery(const Account &account, const Query &query) override;
     void dereferenceUserListQuery(const Account &account, const Query &query) override;
     Account account(const QString &accountUserId) const override;
+    ItemQueryContainer * itemQueryContainer() override;
 signals:
     void hasAccountsChanged();
 public slots:
@@ -112,6 +116,7 @@ private:
     LayoutRepository m_layouts {};
     TweetRepositoryContainer m_tweetRepositoryContainer;
     UserRepositoryContainer m_userRepositoryContainer;
+    ItemQueryContainer m_itemQueryContainer;
 };
 
 }

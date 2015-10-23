@@ -29,36 +29,36 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "networkmonitor.h"
+#include "itemqueryhandlerfactory.h"
 #include <QtCore/QLoggingCategory>
+#include "private/debughelper.h"
+#include "tweetitemqueryhandler.h"
+#include "useritemqueryhandler.h"
+#include "query.h"
 
-static QLoggingCategory logger {"network-monitor"};
+static const QLoggingCategory logger {"item-query-handler-factory"};
 
-NetworkMonitor::NetworkMonitor(QObject *parent) :
-    QObject(parent)
+IItemQueryHandler<Tweet>::Ptr ItemQueryHandlerFactory::createTweetItem(const Query &query)
 {
-    m_networkManager.reset(new QNetworkConfigurationManager());
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::onlineStateChanged, [this]() {
-        setOnline();
-    });
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::updateCompleted, [this]() {
-        setOnline();
-    });
-    m_networkManager->updateConfigurations();
-    setOnline();
-}
-
-bool NetworkMonitor::isOnline() const
-{
-    return m_online;
-}
-
-void NetworkMonitor::setOnline()
-{
-    bool online {m_networkManager->isOnline()};
-    qCDebug(logger) << "Online:" << online;
-    if (m_online != online) {
-        m_online = online;
-        emit onlineChanged();
+    if (query.path() == TweetItemQuery::pathFromType(TweetItemQuery::Show)
+        || query.path() == TweetItemQuery::pathFromType(TweetItemQuery::StatusUpdate)
+        || query.path() == TweetItemQuery::pathFromType(TweetItemQuery::Favorite)
+        || query.path() == TweetItemQuery::pathFromType(TweetItemQuery::Unfavorite)
+        || query.path() == TweetItemQuery::pathFromType(TweetItemQuery::Retweet)) {
+        return TweetItemQueryHandler::create();
+    } else {
+        qCWarning(logger) << "Cannot create query handler from query" << query;
+        return IItemQueryHandler<Tweet>::Ptr();
     }
 }
+
+IItemQueryHandler<User>::Ptr ItemQueryHandlerFactory::createUserItem(const Query &query)
+{
+    if (query.path() == UserItemQuery::pathFromType(UserItemQuery::Show)) {
+        return UserItemQueryHandler::create();
+    } else {
+        qCWarning(logger) << "Cannot create query handler from query" << query;
+        return IItemQueryHandler<User>::Ptr();
+    }
+}
+

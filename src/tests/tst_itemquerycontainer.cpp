@@ -29,36 +29,42 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "networkmonitor.h"
-#include <QtCore/QLoggingCategory>
+#include <gtest/gtest.h>
+#include <itemquerycontainer.h>
+#include "mockqueryexecutor.h"
+#include "mockitemlistener.h"
 
-static QLoggingCategory logger {"network-monitor"};
+using testing::Return;
+using testing::_;
 
-NetworkMonitor::NetworkMonitor(QObject *parent) :
-    QObject(parent)
+class itemquerycontainer: public testing::Test
 {
-    m_networkManager.reset(new QNetworkConfigurationManager());
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::onlineStateChanged, [this]() {
-        setOnline();
-    });
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::updateCompleted, [this]() {
-        setOnline();
-    });
-    m_networkManager->updateConfigurations();
-    setOnline();
-}
-
-bool NetworkMonitor::isOnline() const
-{
-    return m_online;
-}
-
-void NetworkMonitor::setOnline()
-{
-    bool online {m_networkManager->isOnline()};
-    qCDebug(logger) << "Online:" << online;
-    if (m_online != online) {
-        m_online = online;
-        emit onlineChanged();
+public:
+    explicit itemquerycontainer()
+        : account(QLatin1String("test"), QLatin1String("test"), QLatin1String("test"), QByteArray(), QByteArray())
+    {
+        queryExecutor = new MockQueryExecutor();
+        container.reset(new ItemQueryContainer(IQueryExecutor::ConstPtr(queryExecutor)));
     }
+protected:
+    MockQueryExecutor *queryExecutor {nullptr};
+    Account account;
+    std::unique_ptr<ItemQueryContainer> container {nullptr};
+};
+
+TEST_F(itemquerycontainer, Base)
+{
+    EXPECT_CALL(*queryExecutor, makeError(_, _, _)).WillRepeatedly(Return(QNetworkReply::NoError));
+    EXPECT_CALL(*queryExecutor, makeErrorMessage(_, _, _)).WillRepeatedly(Return(QString()));
+    EXPECT_CALL(*queryExecutor, makeReply(QByteArray{"favorites/create.json"}, _, _))
+            .Times(1).WillRepeatedly(Return(QByteArray("{}")));
+
+    MockItemListener listener;
+    EXPECT_CALL(listener, doStart()).Times(1);
+    EXPECT_CALL(listener, doError(_)).Times(0);
+    EXPECT_CALL(listener, handleFinish(_)).Times(1);
+
+    TweetItemQuery query {TweetItemQuery::Favorite, Query::Parameters{{"id", "0"}}};
+    container->executeQuery(account, query, listener);
 }
+

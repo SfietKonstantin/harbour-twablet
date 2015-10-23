@@ -38,6 +38,8 @@
 #include <QtCore/QLoggingCategory>
 #include <QtCore/QStandardPaths>
 
+static QLoggingCategory logger {"load-save-manager"};
+
 LoadSaveManager::LoadSaveManager()
 {
 }
@@ -47,22 +49,19 @@ QString LoadSaveManager::configFilePath()
     QDir dir {QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)};
     if (!dir.exists()) {
         if (!QDir::root().mkpath(dir.absolutePath())) {
-            qCWarning(QLoggingCategory("load-save-manager")) << "Failed to create root config dir"
-                                                             << dir.absolutePath();
+            qCWarning(logger) << "Failed to create root config dir" << dir.absolutePath();
             return QString();
         }
     }
     const QString &appName {QCoreApplication::instance()->applicationName()};
     if (!dir.exists(appName)) {
         if (!dir.mkdir(appName)) {
-            qCWarning(QLoggingCategory("load-save-manager")) << "Failed to create config dir"
-                                                             << dir.absoluteFilePath(appName);
+            qCWarning(logger) << "Failed to create config dir" << dir.absoluteFilePath(appName);
             return QString();
         }
     }
     if(!dir.cd(appName)) {
-        qCWarning(QLoggingCategory("load-save-manager")) << "Failed to enter in config dir"
-                                                         << dir.absoluteFilePath(appName);
+        qCWarning(logger) << "Failed to enter in config dir" << dir.absoluteFilePath(appName);
         return QString();
     }
     return dir.absoluteFilePath(QLatin1String("config.json"));
@@ -72,20 +71,18 @@ bool LoadSaveManager::load(ILoadSave &loadSave)
 {
     const QString &path {configFilePath()};
     if (path.isEmpty()) {
-        qCDebug(QLoggingCategory("load-save-manager")) << "Failed to find config file";
+        qCDebug(logger) << "Failed to find config file";
         return false;
     }
 
     QFile file {path};
     if (!file.exists()) {
-        qCDebug(QLoggingCategory("load-save-manager")) << "Failed to find config file"
-                                                       << path;
+        qCDebug(logger) << "Failed to find config file" << path;
         return true; // No file, so no config to load
     }
 
     if (!file.open(QIODevice::ReadOnly)) {
-        qCWarning(QLoggingCategory("load-save-manager")) << "Failed to open config file"
-                                                         << path;
+        qCWarning(logger) << "Failed to open config file" << path;
         return false;
     }
     QJsonParseError error {-1, QJsonParseError::NoError};
@@ -93,8 +90,8 @@ bool LoadSaveManager::load(ILoadSave &loadSave)
     file.close();
 
     if (error.error != QJsonParseError::NoError) {
-        qCWarning(QLoggingCategory("load-save-manager")) << "Failed to parse configuration file";
-        qCWarning(QLoggingCategory("load-save-manager")) << "Error" << error.errorString();
+        qCWarning(logger) << "Failed to parse configuration file";
+        qCWarning(logger) << "Error" << error.errorString();
         return false;
     }
 
@@ -106,14 +103,13 @@ bool LoadSaveManager::save(const ILoadSave &loadSave)
 {
     const QString &path {configFilePath()};
     if (path.isEmpty()) {
-        qCDebug(QLoggingCategory("load-save-manager")) << "Failed to find config file";
+        qCDebug(logger) << "Failed to find config file";
         return false;
     }
 
     QFile file {path};
     if (!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
-        qCWarning(QLoggingCategory("load-save-manager")) << "Failed to open config file"
-                                                         << path;
+        qCWarning(logger) << "Failed to open config file" << path;
         return false;
     }
     QJsonParseError error {-1, QJsonParseError::NoError};

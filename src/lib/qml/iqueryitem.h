@@ -29,36 +29,54 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "networkmonitor.h"
-#include <QtCore/QLoggingCategory>
+#ifndef IQUERYITEM_H
+#define IQUERYITEM_H
 
-static QLoggingCategory logger {"network-monitor"};
+#include <QtCore/QObject>
+#include <QtQml/QQmlParserStatus>
+#include "globals.h"
 
-NetworkMonitor::NetworkMonitor(QObject *parent) :
-    QObject(parent)
+namespace qml
 {
-    m_networkManager.reset(new QNetworkConfigurationManager());
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::onlineStateChanged, [this]() {
-        setOnline();
-    });
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::updateCompleted, [this]() {
-        setOnline();
-    });
-    m_networkManager->updateConfigurations();
-    setOnline();
+
+class AccountObject;
+class IQueryItem : public QObject, public QQmlParserStatus
+{
+    Q_OBJECT
+    Q_INTERFACES(QQmlParserStatus)
+    Q_PROPERTY(Status status READ status NOTIFY statusChanged)
+    Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
+    Q_PROPERTY(QObject * repository READ repository WRITE setRepository NOTIFY repositoryChanged)
+    Q_PROPERTY(QObject * query READ query WRITE setQuery NOTIFY queryChanged)
+    Q_ENUMS(Status)
+public:
+    enum Status
+    {
+        Idle,
+        Loading,
+        Error
+    };
+    DISABLE_COPY_DISABLE_MOVE(IQueryItem);
+    virtual Status status() const = 0;
+    virtual QString errorMessage() const = 0;
+    virtual QObject * repository() const = 0;
+    virtual void setRepository(QObject *repository) = 0;
+    virtual QObject * query() const = 0;
+    virtual void setQuery(QObject *query) = 0;
+public slots:
+    virtual bool load() = 0;
+signals:
+    void statusChanged();
+    void errorMessageChanged();
+    void repositoryChanged();
+    void queryChanged();
+    void finished();
+    void error();
+protected:
+    explicit IQueryItem(QObject *parent = 0) : QObject(parent) {}
+};
+
 }
 
-bool NetworkMonitor::isOnline() const
-{
-    return m_online;
-}
+#endif // IQUERYITEM_H
 
-void NetworkMonitor::setOnline()
-{
-    bool online {m_networkManager->isOnline()};
-    qCDebug(logger) << "Online:" << online;
-    if (m_online != online) {
-        m_online = online;
-        emit onlineChanged();
-    }
-}

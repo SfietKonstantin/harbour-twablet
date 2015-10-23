@@ -29,71 +29,53 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "statusupdatequeryitem.h"
-#include "private/twitterqueryutil.h"
-#include "accountobject.h"
+#include "statusupdatequerywrapperobject.h"
 
 namespace qml
 {
 
-StatusUpdateQueryItem::StatusUpdateQueryItem(QObject *parent)
-    : AbstractQueryItem(parent)
+StatusUpdateQueryWrapperObject::StatusUpdateQueryWrapperObject(QObject *parent)
+    : TweetQueryWrapperObject{parent}
 {
+    setType(QueryTypeObject::StatusUpdate);
 }
 
-QString StatusUpdateQueryItem::text() const
+QString StatusUpdateQueryWrapperObject::status() const
 {
-    return m_text;
+    return m_status;
 }
 
-void StatusUpdateQueryItem::setText(const QString &text)
+void StatusUpdateQueryWrapperObject::setStatus(QString status)
 {
-    if (m_text != text) {
-        m_text = text;
-        emit textChanged();
+    if (m_status != status) {
+        m_status = status;
+        updateParameters();
+        emit statusChanged();
     }
 }
 
-QString StatusUpdateQueryItem::inReplyTo() const
+QString StatusUpdateQueryWrapperObject::inReplyTo() const
 {
     return m_inReplyTo;
 }
 
-void StatusUpdateQueryItem::setInReplyTo(const QString &inReplyTo)
+void StatusUpdateQueryWrapperObject::setInReplyTo(QString inReplyTo)
 {
     if (m_inReplyTo != inReplyTo) {
         m_inReplyTo = inReplyTo;
+        updateParameters();
         emit inReplyToChanged();
     }
 }
 
-bool StatusUpdateQueryItem::isQueryValid() const
+void StatusUpdateQueryWrapperObject::updateParameters()
 {
-    return !m_text.isEmpty();
-}
-
-QNetworkReply * StatusUpdateQueryItem::createQuery(const Account &account) const
-{
-    QByteArray path {"statuses/update.json"};
-    std::map<QByteArray, QByteArray> parameters {{"status", QUrl::toPercentEncoding(m_text)}};
-    if (!m_inReplyTo.isEmpty()) {
-        parameters.insert({"in_reply_to_status_id", QUrl::toPercentEncoding(m_inReplyTo)});
-    }
-
-    return private_util::TwitterQueryUtil::post(network(), path, {}, parameters, account);
-}
-
-void StatusUpdateQueryItem::handleReply(const QByteArray &reply,
-                                        QNetworkReply::NetworkError networkError,
-                                        const QString &errorMessage)
-{
-    Q_UNUSED(reply)
-    Q_UNUSED(errorMessage)
-    if (networkError != QNetworkReply::NoError) {
-        if (networkError == QNetworkReply::ContentOperationNotPermittedError) {
-            setStatusAndErrorMessage(Error, tr("Sending the same tweet twice is not allowed."));
-        }
-    }
+    QVariantMap parameters = QVariantMap {
+        {QLatin1String{"status"}, m_status},
+        {QLatin1String{"in_reply_to_status_id"}, m_inReplyTo}
+    };
+    setParameters(parameters);
 }
 
 }
+

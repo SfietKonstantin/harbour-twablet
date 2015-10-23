@@ -29,36 +29,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "networkmonitor.h"
-#include <QtCore/QLoggingCategory>
+#ifndef TWEETSPECIFICQUERYWRAPPEROBJECT_H
+#define TWEETSPECIFICQUERYWRAPPEROBJECT_H
 
-static QLoggingCategory logger {"network-monitor"};
+#include "tweetquerywrapperobject.h"
 
-NetworkMonitor::NetworkMonitor(QObject *parent) :
-    QObject(parent)
+namespace qml
 {
-    m_networkManager.reset(new QNetworkConfigurationManager());
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::onlineStateChanged, [this]() {
-        setOnline();
-    });
-    connect(m_networkManager.get(), &QNetworkConfigurationManager::updateCompleted, [this]() {
-        setOnline();
-    });
-    m_networkManager->updateConfigurations();
-    setOnline();
+
+class TweetSpecificQueryWrapperObject: public TweetQueryWrapperObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QString tweetId READ tweetId WRITE setTweetId NOTIFY tweetIdChanged)
+public:
+    explicit TweetSpecificQueryWrapperObject(QObject *parent = 0);
+    QString tweetId() const;
+    void setTweetId(const QString &tweetId);
+signals:
+    void tweetIdChanged();
+private:
+    void updateParameters();
+    QString m_tweetId {};
+};
+
 }
 
-bool NetworkMonitor::isOnline() const
-{
-    return m_online;
-}
-
-void NetworkMonitor::setOnline()
-{
-    bool online {m_networkManager->isOnline()};
-    qCDebug(logger) << "Online:" << online;
-    if (m_online != online) {
-        m_online = online;
-        emit onlineChanged();
-    }
-}
+#endif // TWEETSPECIFICQUERYWRAPPEROBJECT_H

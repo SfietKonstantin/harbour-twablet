@@ -49,17 +49,17 @@
 #include "qml/querytypeobject.h"
 #include "qml/querylistmodel.h"
 #include "qml/tweetmodel.h"
-#include "qml/statusupdatequeryitem.h"
-#include "qml/userqueryitem.h"
 #include "qml/descriptionformatter.h"
 #include "qml/tweetformatter.h"
 #include "qml/quotedtweetformatter.h"
 #include "qml/usermodel.h"
 #include "qml/tweetqueryitem.h"
-#include "qml/retweetqueryitem.h"
-#include "qml/favoritequeryitem.h"
+#include "qml/userqueryitem.h"
 #include "qml/tweetlistquerywrapperobject.h"
 #include "qml/userlistquerywrapperobject.h"
+#include "qml/statusupdatequerywrapperobject.h"
+#include "qml/tweetspecificquerywrapperobject.h"
+#include "qml/userspecificquerywrapperobject.h"
 #include "version.h"
 #include "networkmonitor.h"
 
@@ -101,7 +101,7 @@ public:
 
 int main(int argc, char *argv[])
 {
-    QLoggingCategory::setFilterRules(QLatin1String("tweet-central-repository.debug=false"));
+    // QLoggingCategory::setFilterRules(QLatin1String("*.debug=false"));
 
     qmlRegisterUncreatableType<qml::DataRepositoryObject>("harbour.twablet", 1, 0, "DataRepository", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::IModel>("harbour.twablet", 1, 0, "Model", QLatin1String("Uncreatable"));
@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<qml::UserObject>("harbour.twablet", 1, 0, "User", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::MediaObject>("harbour.twablet", 1, 0, "Media", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::MediaModel>("harbour.twablet", 1, 0, "MediaModel", QLatin1String("Uncreatable"));
-    qmlRegisterUncreatableType<qml::AbstractQueryItem>("harbour.twablet", 1, 0, "QueryItem", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<qml::IQueryItem>("harbour.twablet", 1, 0, "QueryItem", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<Info>("harbour.twablet", 1, 0, "Info", QLatin1String("Uncreatable"));
     qmlRegisterType<qml::TwitterAuthentification>("harbour.twablet", 1, 0, "TwitterAuthentification");
     qmlRegisterType<qml::AccountModel>("harbour.twablet", 1, 0, "AccountModel");
@@ -121,17 +121,17 @@ int main(int argc, char *argv[])
     qmlRegisterType<qml::LayoutModel>("harbour.twablet", 1, 0, "LayoutModel");
     qmlRegisterType<qml::TweetModel>("harbour.twablet", 1, 0, "TweetModel");
     qmlRegisterType<qml::QueryListModel>("harbour.twablet", 1, 0, "QueryListModel");
-    qmlRegisterType<qml::StatusUpdateQueryItem>("harbour.twablet", 1, 0, "StatusUpdateQueryItem");
-    qmlRegisterType<qml::UserQueryItem>("harbour.twablet", 1, 0, "UserQueryItem");
     qmlRegisterType<qml::DescriptionFormatter>("harbour.twablet", 1, 0, "DescriptionFormatter");
     qmlRegisterType<qml::TweetFormatter>("harbour.twablet", 1, 0, "TweetFormatter");
     qmlRegisterType<qml::QuotedTweetFormatter>("harbour.twablet", 1, 0, "QuotedTweetFormatter");
     qmlRegisterType<qml::UserModel>("harbour.twablet", 1, 0, "UserModel");
     qmlRegisterType<qml::TweetQueryItem>("harbour.twablet", 1, 0, "TweetQueryItem");
-    qmlRegisterType<qml::RetweetQueryItem>("harbour.twablet", 1, 0, "RetweetQueryItem");
-    qmlRegisterType<qml::FavoriteQueryItem>("harbour.twablet", 1, 0, "FavoriteQueryItem");
+    qmlRegisterType<qml::UserQueryItem>("harbour.twablet", 1, 0, "UserQueryItem");
     qmlRegisterType<qml::TweetListQueryWrapperObject>("harbour.twablet", 1, 0, "TweetListQuery");
     qmlRegisterType<qml::UserListQueryWrapperObject>("harbour.twablet", 1, 0, "UserListQuery");
+    qmlRegisterType<qml::StatusUpdateQueryWrapperObject>("harbour.twablet", 1, 0, "StatusUpdateQuery");
+    qmlRegisterType<qml::TweetSpecificQueryWrapperObject>("harbour.twablet", 1, 0, "TweetQuery");
+    qmlRegisterType<qml::UserSpecificQueryWrapperObject>("harbour.twablet", 1, 0, "UserQuery");
     qmlRegisterSingletonType<qml::DataRepositoryObject>("harbour.twablet", 1, 0, "Repository",
                                                           [](QQmlEngine *e, QJSEngine *) -> QObject * {
         return new qml::DataRepositoryObject(e);

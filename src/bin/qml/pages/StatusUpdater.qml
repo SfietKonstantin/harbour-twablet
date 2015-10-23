@@ -56,10 +56,15 @@ Item {
             height: textArea.height
             anchors.left: parent.left; anchors.right: parent.right
 
-            StatusUpdateQueryItem {
+            TweetQueryItem {
                 id: queryItem
-                accountUserId: postAccountSelectionModel.selection.userId
-                text: (container.replyOnly ? container.inReplyScreenName + " " : "") + textArea.text
+                repository: Repository
+                query: StatusUpdateQuery {
+                    accountUserId: postAccountSelectionModel.selection.userId
+                    status: (container.replyOnly ? container.inReplyScreenName + " " : "") + textArea.text
+                    inReplyTo: container.inReplyTo
+                }
+
                 onFinished: {
                     textArea.text = ""
                     Repository.refresh()
@@ -89,7 +94,7 @@ Item {
                     id: sendMouseArea
                     enabled: send.sendEnabled
                     anchors.fill: parent
-                    onClicked: queryItem.load(Repository)
+                    onClicked: queryItem.load()
                 }
             }
         }

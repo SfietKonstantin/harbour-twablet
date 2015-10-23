@@ -38,6 +38,8 @@
 #include "datarepositoryobjectmap.h"
 #include <QtCore/QLoggingCategory>
 
+static QLoggingCategory mLogging {"model"};
+
 namespace qml
 {
 
@@ -211,7 +213,7 @@ private:
     }
     void setStatusAndErrorMessage(Status status, const QString &errorMessage)
     {
-        qCDebug(QLoggingCategory("model")) << "Current status" << status << errorMessage;
+        qCDebug(mLogging) << "Current status" << status << errorMessage;
         if (m_status != status) {
             m_status = status;
             emit statusChanged();

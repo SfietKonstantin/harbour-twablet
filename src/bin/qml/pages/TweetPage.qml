@@ -40,41 +40,53 @@ Page {
     property string retweetId // Used to mark retweeted
     property alias accountUserId: query.accountUserId
     property RightPanel panel
-    function load() { query.load(Repository) }
+    function load() { queryItem.load() }
 
     TweetQueryItem {
-        id: query
+        id: queryItem
+        repository: Repository
+        query: TweetQuery {
+            id: query
+            type: QueryType.ShowTweet
+        }
     }
 
-    RetweetQueryItem {
-        id: retweetQuery
-        accountUserId: query.accountUserId
-        tweetId: container.retweetId
+    TweetQueryItem {
+        id: retweetQueryItem
+        repository: Repository
+        query: TweetQuery {
+            type: QueryType.Retweet
+            accountUserId: query.accountUserId
+            tweetId: query.tweetId
+        }
         onFinished: {
             Repository.setTweetRetweeted(container.tweetId)
             if (container.retweetId !== container.tweetId) {
                 Repository.setTweetRetweeted(container.retweetId)
             }
-            query.setRetweeted(true)
+            queryItem.setRetweeted(true)
         }
     }
 
-    FavoriteQueryItem {
-        id: favoriteQuery
-        accountUserId: query.accountUserId
-        tweetId: container.retweetId
-        favorited: query.data && query.data.favorited
+    TweetQueryItem {
+        id: favoriteQueryItem
+        repository: Repository
+        query: TweetQuery {
+            type: queryItem.item && queryItem.item.favorited ? QueryType.Unfavorite : QueryType.Favorite
+            accountUserId: query.accountUserId
+            tweetId: query.tweetId
+        }
         onFinished: {
-            if (!query.data) {
+            if (!item) {
                 return
             }
 
-            var favorited = !query.data.favorited
+            var favorited = item.favorited
             Repository.setTweetFavorited(container.tweetId, favorited)
             if (container.retweetId !== container.tweetId) {
                 Repository.setTweetFavorited(container.retweetId, favorited)
             }
-            query.setFavorited(favorited)
+            queryItem.setFavorited(favorited)
         }
     }
 
@@ -85,7 +97,7 @@ Page {
 
         Column {
             id: column
-            opacity: query.status === QueryItem.Idle && query.data ? 1 : 0
+            opacity: queryItem.status === QueryItem.Idle && queryItem.item ? 1 : 0
             anchors.left: parent.left; anchors.right: parent.right
 
             PageHeader {
@@ -98,7 +110,7 @@ Page {
                 onOpenTweet: {
                     panel.openTweet(originalId, id, container.accountUserId)
                 }
-                tweet: query.data
+                tweet: queryItem.item
                 onHandleLink: LH.handleLink(url, container.panel, container.accountUserId, false)
                 onHandleOpenImageBrowser: panel.openImageBrowser(tweet, container.accountUserId)
                 fontSize: Theme.fontSizeSmall
@@ -113,26 +125,26 @@ Page {
                }
                ProgressIconButton {
                    source: "image://theme/icon-s-retweet"
-                   enabled: query.data ? !query.data.retweeted && container.accountUserId !== query.data.user.id: false
-                   highlighted: down || (query.data ? query.data.retweeted : false)
-                   busy: retweetQuery.status === QueryItem.Loading
-                   error: retweetQuery.status === QueryItem.Error
-                   onClicked: retweetQuery.load(Repository)
+                   enabled: queryItem.item ? !queryItem.item.retweeted && container.accountUserId !== queryItem.item.user.id: false
+                   highlighted: down || (queryItem.item ? queryItem.item.retweeted : false)
+                   busy: retweetQueryItem.status === QueryItem.Loading
+                   error: retweetQueryItem.status === QueryItem.Error
+                   onClicked: retweetQueryItem.load()
                }
                ProgressIconButton {
                    source: "image://theme/icon-s-favorite"
-                   highlighted: down || (query.data ? query.data.favorited : false)
-                   busy: favoriteQuery.status === QueryItem.Loading
-                   error: favoriteQuery.status === QueryItem.Error
-                   onClicked: favoriteQuery.load(Repository)
+                   highlighted: down || (queryItem.item ? queryItem.item.favorited : false)
+                   busy: favoriteQueryItem.status === QueryItem.Loading
+                   error: favoriteQueryItem.status === QueryItem.Error
+                   onClicked: favoriteQueryItem.load()
                }
             }
 
             StatusUpdater {
                 id: replyStatusUpdater
                 replyOnly: true
-                inReplyTo: query.data ? query.data.id : ""
-                inReplyScreenName: query.data ? "@" + query.data.user.screenName : ""
+                inReplyTo: queryItem.item ? queryItem.item.id : ""
+                inReplyScreenName: queryItem.item ? "@" + queryItem.item.user.screenName : ""
                 anchors.left: parent.left; anchors.right: parent.right
             }
 
@@ -148,8 +160,8 @@ Page {
         PullDownMenu {
             MenuItem {
                 text: qsTr("Open in browser")
-                enabled: query.data
-                onClicked: Qt.openUrlExternally("https://twitter.com/" + query.data.user.screenName + "/status/" + query.data.id)
+                enabled: queryItem.item
+                onClicked: Qt.openUrlExternally("https://twitter.com/" + queryItem.item.user.screenName + "/status/" + queryItem.item.id)
             }
         }
 

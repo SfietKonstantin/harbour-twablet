@@ -48,5 +48,15 @@ void QueryWrapperVisitor::visitUserListQuery(const UserListQueryWrapperObject &w
     Q_UNUSED(wrapperObject)
 }
 
+void QueryWrapperVisitor::visitTweetItemQuery(const TweetQueryWrapperObject &wrapperObject)
+{
+    Q_UNUSED(wrapperObject)
+}
+
+void QueryWrapperVisitor::visitUserItemQuery(const UserQueryWrapperObject &wrapperObject)
+{
+    Q_UNUSED(wrapperObject)
+}
+
 }
 

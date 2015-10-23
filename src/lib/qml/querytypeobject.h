@@ -43,6 +43,8 @@ class QueryTypeObject : public QObject
     Q_OBJECT
     Q_ENUMS(TweetListType)
     Q_ENUMS(UserListType)
+    Q_ENUMS(TweetItemType)
+    Q_ENUMS(UserItemType)
 public:
     enum TweetListType
     {
@@ -55,10 +57,25 @@ public:
     };
     enum UserListType
     {
-        InvalidUserList,
-        Friends,
-        Followers
+        InvalidUserList = UserListQuery::Invalid,
+        Friends = UserListQuery::Friends,
+        Followers = UserListQuery::Followers
     };
+    enum TweetItemType
+    {
+        InvalidTweetItem = TweetItemQuery::Invalid,
+        ShowTweet = TweetItemQuery::Show,
+        StatusUpdate = TweetItemQuery::StatusUpdate,
+        Favorite = TweetItemQuery::Favorite,
+        Unfavorite = TweetItemQuery::Unfavorite,
+        Retweet = TweetItemQuery::Retweet
+    };
+    enum UserItemType
+    {
+        InvalidUserItem = UserItemQuery::Invalid,
+        ShowUser = UserItemQuery::Show
+    };
+
     DISABLE_COPY_DISABLE_MOVE(QueryTypeObject);
 private:
     explicit QueryTypeObject(QObject *parent = 0);

@@ -40,7 +40,8 @@ class NetworkQueryExecutor final : public IQueryExecutor
 {
 public:
     static IQueryExecutor::ConstPtr create(QNetworkAccessManager &network);
-    void execute(const QByteArray &path, const std::map<QByteArray, QByteArray> &parameters,
+    void execute(Query::RequestType type, const QByteArray &path,
+                 const std::map<QByteArray, QByteArray> &parameters,
                  const Account &account, const Callback_t &callback) const override;
 private:
     explicit NetworkQueryExecutor(QNetworkAccessManager &network);

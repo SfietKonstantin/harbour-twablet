@@ -29,33 +29,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef RETWEETQUERYITEM_H
-#define RETWEETQUERYITEM_H
+#ifndef MOCKITEMLISTENER_H
+#define MOCKITEMLISTENER_H
 
-#include "abstractqueryitem.h"
+#include <gmock/gmock.h>
+#include <iitemlistener.h>
+#include <tweet.h>
 
-namespace qml
+class MockItemListener: public IItemListener<Tweet>
 {
-
-class RetweetQueryItem : public AbstractQueryItem
-{
-    Q_OBJECT
-    Q_PROPERTY(QString tweetId READ tweetId WRITE setTweetId NOTIFY tweetIdChanged)
 public:
-    explicit RetweetQueryItem(QObject *parent = 0);
-    DISABLE_COPY_DISABLE_MOVE(RetweetQueryItem);
-    QString tweetId() const;
-    void setTweetId(QString tweetId);
-signals:
-    void tweetIdChanged();
-private:
-    bool isQueryValid() const override final;
-    QNetworkReply * createQuery(const Account &account) const override final;
-    void handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
-                     const QString &errorMessage) override final;
-    QString m_tweetId {};
+    MOCK_METHOD0(doStart, void());
+    MOCK_METHOD1(doError, void(const QString &));
+    MOCK_METHOD1(handleFinish, void(const Tweet &));
+    void doFinish(Tweet &&item)
+    {
+        handleFinish(std::move(item));
+    }
 };
 
-}
 
-#endif // RETWEETQUERYITEM_H
+#endif // MOCKITEMLISTENER_H
+

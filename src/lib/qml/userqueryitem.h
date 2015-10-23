@@ -32,33 +32,22 @@
 #ifndef USERQUERYITEM_H
 #define USERQUERYITEM_H
 
-#include "abstractqueryitem.h"
+#include "queryitem.h"
 #include "userobject.h"
 
 namespace qml
 {
 
-class UserQueryItem : public AbstractQueryItem
+class UserQueryItem: public QueryItem<User, UserObject *>
 {
     Q_OBJECT
-    Q_PROPERTY(QString userId READ userId WRITE setUserId NOTIFY userIdChanged)
-    Q_PROPERTY(qml::UserObject * user READ user NOTIFY userChanged)
+    Q_PROPERTY(UserObject * item READ item NOTIFY itemChanged)
 public:
     explicit UserQueryItem(QObject *parent = 0);
-    DISABLE_COPY_DISABLE_MOVE(UserQueryItem);
-    QString userId() const;
-    void setUserId(const QString &userId);
-    UserObject * user() const;
 signals:
-    void userIdChanged();
-    void userChanged();
+    void itemChanged();
 private:
-    bool isQueryValid() const override final;
-    QNetworkReply * createQuery(const Account &account) const override final;
-    void handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
-                     const QString &errorMessage) override final;
-    QString m_userId {};
-    QObjectPtr<UserObject> m_user {nullptr};
+    void doItemChanged() override final;
 };
 
 }

@@ -29,75 +29,36 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "favoritequeryitem.h"
-#include "private/twitterqueryutil.h"
-#include "accountobject.h"
+#include "tweetspecificquerywrapperobject.h"
 
 namespace qml
 {
 
-FavoriteQueryItem::FavoriteQueryItem(QObject *parent)
-    : AbstractQueryItem(parent)
+TweetSpecificQueryWrapperObject::TweetSpecificQueryWrapperObject(QObject *parent)
+    : TweetQueryWrapperObject(parent)
 {
 }
 
-QString FavoriteQueryItem::tweetId() const
+QString TweetSpecificQueryWrapperObject::tweetId() const
 {
     return m_tweetId;
 }
 
-void FavoriteQueryItem::setTweetId(QString tweetId)
+void TweetSpecificQueryWrapperObject::setTweetId(const QString &tweetId)
 {
     if (m_tweetId != tweetId) {
         m_tweetId = tweetId;
+        updateParameters();
         emit tweetIdChanged();
     }
 }
 
-bool FavoriteQueryItem::isFavorited() const
+void TweetSpecificQueryWrapperObject::updateParameters()
 {
-    return m_favorited;
-}
-
-void FavoriteQueryItem::setFavorited(bool favorited)
-{
-    if (m_favorited != favorited) {
-        m_favorited = favorited;
-        emit favoritedChanged();
-    }
-}
-
-bool FavoriteQueryItem::isQueryValid() const
-{
-    return !m_tweetId.isEmpty();
-}
-
-QNetworkReply * FavoriteQueryItem::createQuery(const Account &account) const
-{
-    QByteArray path {};
-    if (m_favorited) {
-        path = std::move(QByteArray("favorites/destroy.json"));
-    } else {
-        path = std::move(QByteArray("favorites/create.json"));
-    }
-    std::map<QByteArray, QByteArray> parameters {{"id", QUrl::toPercentEncoding(m_tweetId)}};
-
-    return private_util::TwitterQueryUtil::post(network(), path, {}, parameters, account);
-}
-
-void FavoriteQueryItem::handleReply(const QByteArray &reply,
-                                    QNetworkReply::NetworkError networkError,
-                                    const QString &errorMessage)
-{
-    Q_UNUSED(reply)
-    Q_UNUSED(errorMessage)
-    if (networkError != QNetworkReply::NoError) {
-        if (networkError == QNetworkReply::ContentOperationNotPermittedError) {
-            setStatusAndErrorMessage(Error, tr("Favoriting is not allowed."));
-        } else if (networkError == QNetworkReply::ContentNotFoundError) {
-            setStatusAndErrorMessage(Error, tr("This tweet is not in your favorites"));
-        }
-    }
+    QVariantMap parameters = QVariantMap {
+        {QLatin1String{"id"}, m_tweetId}
+    };
+    setParameters(parameters);
 }
 
 }

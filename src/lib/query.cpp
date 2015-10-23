@@ -30,7 +30,11 @@
  */
 
 #include "query.h"
+#include <QtCore/QLoggingCategory>
 #include "private/maputil.h"
+#include "private/debughelper.h"
+
+static const QLoggingCategory logger {"query"};
 
 Query::Query(Query::RequestType type, QByteArray &&path, Parameters &&parameters)
     : m_type(type), m_path(std::move(path)), m_parameters(std::move(parameters))
@@ -110,7 +114,8 @@ QByteArray TweetListQuery::pathFromType(Type type)
         return QByteArray{"statuses/user_timeline.json"};
         break;
     default:
-        return QByteArray();
+        qCDebug(logger) << "Type" << type << "is not compatible with TweetListQuery";
+        return QByteArray{};
         break;
     }
 }
@@ -120,8 +125,7 @@ TweetListQuery::Type TweetListQuery::type() const
     return m_type;
 }
 
-QByteArray TweetListQuery::pathFromTypeWithCheck(TweetListQuery::Type type,
-                                                 const Query::Parameters &additionalParameters)
+QByteArray TweetListQuery::pathFromTypeWithCheck(Type type, const Query::Parameters &additionalParameters)
 {
     bool ok {false};
     switch (type) {
@@ -132,15 +136,28 @@ QByteArray TweetListQuery::pathFromTypeWithCheck(TweetListQuery::Type type,
         ok = true;
         break;
     case Search:
-        ok = private_util::hasValue(additionalParameters, QByteArray{"q"});
+        if (private_util::hasValue(additionalParameters, QByteArray{"q"})) {
+            ok = true;
+        } else {
+            qCDebug(logger) << "Search query must contain parameter q";
+        }
         break;
     case Favorites:
-        ok = private_util::hasValue(additionalParameters, QByteArray{"user_id"});
+        if (private_util::hasValue(additionalParameters, QByteArray{"user_id"})) {
+            ok = true;
+        } else {
+            qCDebug(logger) << "Favorites query must contain parameter user_id";
+        }
         break;
     case UserTimeline:
-        ok = private_util::hasValue(additionalParameters, QByteArray{"user_id"});
+        if (private_util::hasValue(additionalParameters, QByteArray{"user_id"})) {
+            ok = true;
+        } else {
+            qCDebug(logger) << "UserTimeline query must contain parameter user_id";
+        }
         break;
     default:
+        qCDebug(logger) << "Type" << type << "is not compatible with TweetListQuery";
         break;
     }
 
@@ -154,69 +171,71 @@ Query::Parameters TweetListQuery::makeParameters(Type type, const Parameters &ad
     {
     case Home:
     {
-        returned = std::move(Parameters{
+        returned = Parameters{
             {"count", QByteArray::number(200)},
             {"trim_user", "false"},
             {"include_entities", "true"}
-        });
+        };
         break;
     }
     case Mentions:
     {
-        returned = std::move(Parameters{
+        returned = Parameters{
             {"count", QByteArray::number(200)},
             {"trim_user", "false"},
             {"include_entities", "true"}
-        });
+        };
         break;
     }
     case Search:
     {
         QByteArray q = private_util::getValue(additionalParameters, QByteArray{"q"});
         if (q.isEmpty()) {
+            qCDebug(logger) << "Search query must contain parameter q";
             break;
         }
         QByteArray resultType = private_util::getValue(additionalParameters, QByteArray{"result_type"});
-        Parameters searchParameters {
+        returned = Parameters{
             {"count", QByteArray::number(100)},
             {"include_entities", "true"},
             {"q", q.toLower()}
         };
         if (resultType == "mixed" || resultType == "recent" || resultType == "popular") {
-            searchParameters.emplace("result_type", resultType);
+            returned.emplace("result_type", resultType);
         }
-        returned = std::move(searchParameters);
         break;
     }
     case Favorites:
     {
         QByteArray userId = private_util::getValue(additionalParameters, QByteArray{"user_id"});
         if (userId.isEmpty()) {
+            qCDebug(logger) << "Favorites query must contain parameter user_id";
             break;
         }
-        returned = std::move(Parameters{
+        returned = Parameters{
             {"count", QByteArray::number(200)},
             {"include_entities", "true"},
             {"user_id", userId}
-        });
+        };
         break;
     }
     case UserTimeline:
     {
         QByteArray userId = private_util::getValue(additionalParameters, QByteArray{"user_id"});
         if (userId.isEmpty()) {
+            qCDebug(logger) << "UserTimeline query must contain parameter user_id";
             break;
         }
         QByteArray excludeReplies = private_util::getValue(additionalParameters, QByteArray{"exclude_replies"}, QByteArray{"false"});
         QByteArray includeRts = private_util::getValue(additionalParameters, QByteArray{"include_rts"}, QByteArray{"true"});
-        returned = std::move(Parameters{
+        returned = Parameters{
             {"count", QByteArray::number(200)},
             {"trim_user", "false"},
             {"include_entities", "true"},
             {"user_id", userId},
             {"exclude_replies", excludeReplies},
             {"include_rts", includeRts}
-        });
+        };
         break;
     }
     default:
@@ -225,7 +244,7 @@ Query::Parameters TweetListQuery::makeParameters(Type type, const Parameters &ad
     return returned;
 }
 
-UserListQuery::UserListQuery(UserListQuery::Type type, Query::Parameters &&additionalParameters)
+UserListQuery::UserListQuery(Type type, Query::Parameters &&additionalParameters)
     : Query(Get, std::move(pathFromType(type)), std::move(makeParameters(std::move(additionalParameters))))
 {
 }
@@ -241,22 +260,27 @@ QByteArray UserListQuery::pathFromType(UserListQuery::Type type)
         return QByteArray{"followers/list.json"};
         break;
     default:
-        return QByteArray();
+        qCDebug(logger) << "Type" << type << "is not compatible with UserListQuery";
+        return QByteArray{};
         break;
     }
 }
 
-QByteArray UserListQuery::pathFromTypeWithCheck(UserListQuery::Type type,
-                                                const Query::Parameters &additionalParameters)
+QByteArray UserListQuery::pathFromTypeWithCheck(Type type, const Query::Parameters &additionalParameters)
 {
-    return private_util::hasValue(additionalParameters, QByteArray{"user_id"}) ? pathFromType(type)
-                                                                               : QByteArray{};
+    if (!private_util::hasValue(additionalParameters, QByteArray{"user_id"})) {
+        qCDebug(logger) << "UserListQuery based query must contain parameter user_id";
+        return QByteArray{};
+    }
+
+    return  pathFromType(type);
 }
 
 Query::Parameters UserListQuery::makeParameters(const Query::Parameters &additionalParameters)
 {
     QByteArray userId = private_util::getValue(additionalParameters, QByteArray{"user_id"});
     if (userId.isEmpty()) {
+        qCDebug(logger) << "UserListQuery based query must contain parameter user_id";
         return Parameters{};
     }
 
@@ -268,4 +292,195 @@ Query::Parameters UserListQuery::makeParameters(const Query::Parameters &additio
     };
 }
 
+TweetItemQuery::TweetItemQuery(Type type, Parameters &&additionalParameters)
+    : Query(requestTypeFromtype(type), std::move(pathFromTypeWithCheck(type, additionalParameters)),
+            makeParameters(type, additionalParameters))
+{
+}
 
+QByteArray TweetItemQuery::pathFromType(Type type)
+{
+    switch (type) {
+    case Show:
+        return QByteArray{"statuses/show.json"};
+        break;
+    case StatusUpdate:
+        return QByteArray{"statuses/update.json"};
+        break;
+    case Favorite:
+        return QByteArray{"favorites/create.json"};
+        break;
+    case Unfavorite:
+        return QByteArray{"favorites/destroy.json"};
+        break;
+    case Retweet:
+        return QByteArray{"statuses/retweet.json"};
+        break;
+    default:
+        qCDebug(logger) << "Type" << type << "is not compatible with TweetItemQuery";
+        return QByteArray{};
+        break;
+    }
+}
+
+Query::RequestType TweetItemQuery::requestTypeFromtype(TweetItemQuery::Type type)
+{
+    return type == Invalid || type == Show ? Get : Post;
+}
+
+QByteArray TweetItemQuery::pathFromTypeWithCheck(Type type, const Query::Parameters &additionalParameters)
+{
+    bool ok {false};
+    switch (type) {
+    case StatusUpdate:
+        if (private_util::hasValue(additionalParameters, QByteArray{"status"})) {
+            ok = true;
+        } else {
+            qCDebug(logger) << "StatusUpdate query must contain parameter status";
+        }
+        break;
+    case Show:
+    case Favorite:
+    case Unfavorite:
+    case Retweet:
+        if (private_util::hasValue(additionalParameters, QByteArray{"id"})) {
+            ok = true;
+        } else {
+            qCDebug(logger) << "Show, Favorite, Unfavorite or Retweet query must contain parameter id";
+        }
+        break;
+    default:
+        qCDebug(logger) << "Type" << type << "is not compatible with TweetItemQuery";
+        break;
+    }
+
+    return ok ? pathFromType(type) : QByteArray{};
+}
+
+Query::Parameters TweetItemQuery::makeParameters(Type type, const Query::Parameters &additionalParameters)
+{
+    Parameters returned {};
+    switch (type)
+    {
+    case StatusUpdate:
+    {
+        QByteArray status = private_util::getValue(additionalParameters, QByteArray{"status"});
+        if (status.isEmpty()) {
+            qCDebug(logger) << "StatusUpdate query must contain parameter status";
+            break;
+        }
+        returned = Parameters{
+            {"status", status}
+        };
+        QByteArray inReplyTo = private_util::getValue(additionalParameters, QByteArray{"in_reply_to_status_id"});
+        if (!inReplyTo.isEmpty()) {
+            returned.emplace("in_reply_to_status_id", inReplyTo);
+        }
+        break;
+    }
+    case Show:
+    {
+        QByteArray id = private_util::getValue(additionalParameters, QByteArray{"id"});
+        if (id.isEmpty()) {
+            qCDebug(logger) << "Show query must contain parameter id";
+            break;
+        }
+        returned = Parameters{
+            {"id", id},
+            {"trim_user", "false"},
+            {"include_my_retweet", "false"},
+            {"include_entities", "true"}
+        };
+        break;
+    }
+    case Favorite:
+    case Unfavorite:
+    case Retweet:
+    {
+        QByteArray id = private_util::getValue(additionalParameters, QByteArray{"id"});
+        if (id.isEmpty()) {
+            qCDebug(logger) << "Favorite, Unfavorite or Retweet query must contain parameter id";
+            break;
+        }
+        returned = Parameters{
+            {"id", id}
+        };
+        break;
+    }
+    default:
+        qCDebug(logger) << "Type" << type << "is not compatible with TweetItemQuery";
+        break;
+    }
+    return returned;
+}
+
+UserItemQuery::UserItemQuery(UserItemQuery::Type type, Query::Parameters &&additionalParameters)
+    : Query(requestTypeFromtype(type), std::move(pathFromTypeWithCheck(type, additionalParameters)),
+            makeParameters(type, additionalParameters))
+{
+}
+
+QByteArray UserItemQuery::pathFromType(Type type)
+{
+    switch (type) {
+    case Show:
+        return QByteArray{"users/show.json"};
+        break;
+    default:
+        qCDebug(logger) << "Type" << type << "is not compatible with UserItemQuery";
+        return QByteArray{};
+        break;
+    }
+}
+
+Query::RequestType UserItemQuery::requestTypeFromtype(UserItemQuery::Type type)
+{
+    Q_UNUSED(type)
+    return Get;
+}
+
+QByteArray UserItemQuery::pathFromTypeWithCheck(UserItemQuery::Type type,
+                                                const Query::Parameters &additionalParameters)
+{
+    bool ok {false};
+    switch (type) {
+    case Show:
+        if (private_util::hasValue(additionalParameters, QByteArray{"user_id"})) {
+            ok = true;
+        } else {
+            qCDebug(logger) << "Show query must contain parameter user_id";
+        }
+        break;
+    default:
+        qCDebug(logger) << "Type" << type << "is not compatible with UserItemQuery";
+        break;
+    }
+
+    return ok ? pathFromType(type) : QByteArray{};
+}
+
+Query::Parameters UserItemQuery::makeParameters(UserItemQuery::Type type,
+                                                const Query::Parameters &additionalParameters)
+{
+    Parameters returned {};
+    switch (type)
+    {
+    case Show:
+    {
+        QByteArray userId = private_util::getValue(additionalParameters, QByteArray{"user_id"});
+        if (userId.isEmpty()) {
+            qCDebug(logger) << "Show query must contain parameter user_id";
+            break;
+        }
+        returned = Parameters{
+            {"user_id", userId},
+            {"include_entities", "true"}
+        };
+        break;
+    }
+    default:
+        qCDebug(logger) << "Type" << type << "is not compatible with UserItemQuery";
+        break;
+    }
+    return returned;
+}
