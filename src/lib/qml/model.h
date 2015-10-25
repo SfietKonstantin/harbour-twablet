@@ -48,7 +48,9 @@ public:
     ~Model()
     {
         if (m_internalRepository != nullptr) {
-            m_internalRepository->removeListener(*this);
+            DataRepositoryObjectMap<T>::removeListener(*m_internalRepository, *this,
+                                                       m_repository, m_internalAccountUserId,
+                                                       m_internalQuery);
         }
     }
     void classBegin() override
@@ -76,18 +78,6 @@ public:
     {
         return m_errorMessage;
     }
-    int layoutIndex() const override
-    {
-        return m_layoutIndex;
-    }
-    void setLayoutIndex(int layoutIndex) override
-    {
-        if (m_layoutIndex != layoutIndex) {
-            m_layoutIndex = layoutIndex;
-            updateInternalRepository();
-            emit layoutIndexChanged();
-        }
-    }
     DataRepositoryObject * repository() const override
     {
         return m_repository;
@@ -100,16 +90,16 @@ public:
             emit repositoryChanged();
         }
     }
-    bool isTemporary() const override
+    QObject * query() const override
     {
-        return m_temporary;
+        return m_query;
     }
-    void setTemporary(bool temporary) override
+    void setQuery(QObject *query) override
     {
-        if (m_temporary != temporary) {
-            m_temporary = temporary;
+        if (m_query != query) {
+            m_query = query;
             updateInternalRepository();
-            emit temporaryChanged();
+            emit queryChanged();
         }
     }
 protected:
@@ -244,14 +234,19 @@ private:
     }
     void updateInternalRepository()
     {
-        Repository<T> *internalRepository = m_repository != nullptr ? DataRepositoryObjectMap<T>::get(*m_repository, m_layoutIndex, m_temporary) : nullptr;
+        DataRepositoryObjectMap<T>::getQueryInfo(m_query, m_internalAccountUserId, m_internalQuery);
+        Repository<T> *internalRepository = m_repository != nullptr ? DataRepositoryObjectMap<T>::get(*m_repository, m_internalAccountUserId, m_internalQuery) : nullptr;
         if (m_internalRepository != internalRepository) {
             if (m_internalRepository) {
-                m_internalRepository->removeListener(*this);
+                DataRepositoryObjectMap<T>::removeListener(*m_internalRepository, *this,
+                                                           m_repository, m_internalAccountUserId,
+                                                           m_internalQuery);
             }
             m_internalRepository = internalRepository;
             if (m_internalRepository) {
-                m_internalRepository->addListener(*this);
+                DataRepositoryObjectMap<T>::addListener(*m_internalRepository, *this,
+                                                        m_repository, m_internalAccountUserId,
+                                                        m_internalQuery);
             }
             refreshData();
         }
@@ -260,9 +255,10 @@ private:
     bool m_complete {false};
     Status m_status {Idle};
     QString m_errorMessage {};
-    int m_layoutIndex {-1};
     DataRepositoryObject *m_repository {nullptr};
-    bool m_temporary {false};
+    QObject *m_query {nullptr};
+    QString m_internalAccountUserId {};
+    Query m_internalQuery {};
     Repository<T> *m_internalRepository {nullptr};
 };
 

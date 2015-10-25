@@ -33,8 +33,9 @@
 #define USERREPOSITORYCONTAINER_H
 
 #include <map>
-#include "globals.h"
 #include "account.h"
+#include "containerkey.h"
+#include "globals.h"
 #include "query.h"
 #include "userrepository.h"
 #include "ilistqueryhandler.h"
@@ -45,28 +46,25 @@ class UserRepositoryContainer
 public:
     explicit UserRepositoryContainer(IQueryExecutor::ConstPtr &&queryExecutor);
     DISABLE_COPY_DEFAULT_MOVE(UserRepositoryContainer);
-    bool isValid(int index) const;
-    UserRepository * repository(int index);
-    void refresh(int index);
-    void loadMore(int index);
-    int addRepository(const Account &account, const Query &query);
-    void removeRepository(int index);
+    UserRepository * repository(const Account &account, const Query &query);
+    void referenceQuery(const Account &account, const Query &query);
+    void dereferenceQuery(const Account &account, const Query &query);
+    void refresh(const Account &account, const Query &query);
+    void loadMore(const Account &account, const Query &query);
 private:
-    struct MappingData
+    struct Data
     {
-        explicit MappingData(const Account &inputAccount, const Query &inputQuery,
-                             IListQueryHandler<User>::Ptr &&inputHandler);
+        explicit Data(IListQueryHandler<User>::Ptr &&inputHandler);
         bool loading {false};
-        Account account {};
-        Query query {};
         UserRepository repository {};
-        std::unique_ptr<IListQueryHandler<User>> handler {};
+        int refcount {0};
+        IListQueryHandler<User>::Ptr handler {};
     };
-    void load(MappingData &mappingData, IListQueryHandler<User>::RequestType requestType);
-    MappingData * getMappingData(int index, const Account &account, const Query &query);
+    void load(const ContainerKey &key, Data &mappingData,
+              IListQueryHandler<User>::RequestType requestType);
+    Data * getMappingData(const ContainerKey &key);
     IQueryExecutor::ConstPtr m_queryExecutor {nullptr};
-    std::map<int, MappingData> m_mapping {};
-    int m_index {0};
+    std::map<ContainerKey, Data> m_mapping {};
 };
 
 #endif // USERREPOSITORYCONTAINER_H

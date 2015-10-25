@@ -98,7 +98,7 @@ Dialog {
 
             TextField {
                 id: searchQuery
-                property bool isSearch: (queryListModel.getType(queryCombo.currentIndex) === Query.Search)
+                property bool isSearch: (queryListModel.getType(queryCombo.currentIndex) === QueryType.Search)
                 property bool isSearchOk: (isSearch && searchQuery.text.length > 0 || !isSearch)
                 anchors.left: parent.left; anchors.right: parent.right
                 visible: isSearch

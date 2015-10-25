@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,17 +29,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-.pragma library
+#include "conversionutil.h"
+#include <QtCore/QTextStream>
+#include <QtCore/QUrl>
 
-function handleLink(url, panel, accountUserId, clear)
+namespace private_util
 {
-    if (url.indexOf("http") === 0) {
-        Qt.openUrlExternally(url)
-    } else if (url.indexOf("user://") === 0) {
-        var userId = url.slice(7)
-        panel.openUser(userId, accountUserId, clear)
-    } else if (url.indexOf("hashtag://") === 0) {
-        var hashtag = url.slice(10)
-        panel.openSearch("#" + hashtag, accountUserId, clear)
+
+Query::Parameters convertParameters(const QVariantMap &parameters)
+{
+    Query::Parameters returned {};
+    for (const QString &key : parameters.keys()) {
+        returned.emplace(QUrl::toPercentEncoding(key),
+                         QUrl::toPercentEncoding(parameters.value(key).toString()));
     }
+    return returned;
 }
+
+}
+

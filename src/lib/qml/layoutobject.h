@@ -35,7 +35,9 @@
 #include <QtCore/QObject>
 #include "layout.h"
 #include "model.h"
-#include "queryobject.h"
+#include "qobjectutils.h"
+#include "querytypeobject.h"
+#include "tweetlistquerywrapperobject.h"
 
 namespace qml
 {
@@ -45,14 +47,16 @@ class LayoutObject : public QObject
     Q_OBJECT
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
     Q_PROPERTY(QString userId READ userId NOTIFY userIdChanged)
-    Q_PROPERTY(qml::QueryObject::Type queryType READ queryType NOTIFY queryTypeChanged)
+    Q_PROPERTY(qml::QueryTypeObject::TweetListType queryType READ queryType NOTIFY queryTypeChanged)
+    Q_PROPERTY(QObject * query READ query CONSTANT)
 public:
     DISABLE_COPY_DISABLE_MOVE(LayoutObject);
     static LayoutObject * create(const Layout &data, QObject *parent = 0);
     QString name() const;
     QString userId() const;
     int unread() const;
-    QueryObject::Type queryType() const;
+    QueryTypeObject::TweetListType queryType() const;
+    QObject * query() const;
 signals:
     void nameChanged();
     void userIdChanged();
@@ -62,6 +66,7 @@ private:
     explicit LayoutObject(const Layout &data, QObject *parent = 0);
     void update(const Layout &other);
     Layout m_data {};
+    QObjectPtr<TweetListQueryWrapperObject> m_query {};
     friend class Model<Layout, LayoutObject>;
 };
 

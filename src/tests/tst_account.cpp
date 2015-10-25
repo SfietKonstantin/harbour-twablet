@@ -83,7 +83,7 @@ static qml::AccountObject * getObject(qml::AccountModel &model, int index)
 TEST(account, AccountModel)
 {
     qml::DataRepositoryObject repositoryObject {};
-    AccountRepository &repository (repositoryObject.accounts());
+    AccountRepository &repository (repositoryObject.accountRepository());
 
     for (int i = 0; i < 3; ++i) {
         repository.append(Account(QString::number(i + 1), QString(), QString(),

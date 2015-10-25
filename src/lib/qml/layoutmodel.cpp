@@ -53,6 +53,9 @@ QVariant LayoutModel::data(const QModelIndex &index, int role) const
     case QueryTypeRole:
         return layout->queryType();
         break;
+    case QueryRole:
+        return QVariant::fromValue(layout->query());
+        break;
     case UnreadRole:
         return layout->unread();
         break;
@@ -67,7 +70,13 @@ QVariant LayoutModel::data(const QModelIndex &index, int role) const
 
 QHash<int, QByteArray> LayoutModel::roleNames() const
 {
-    return {{NameRole, "name"}, {QueryTypeRole, "queryType"}, {UnreadRole, "unread"}, {LayoutRole, "layout"}};
+    return {
+        {NameRole, "name"},
+        {QueryTypeRole, "queryType"},
+        {QueryRole, "query"},
+        {UnreadRole, "unread"},
+        {LayoutRole, "layout"}
+    };
 }
 
 }

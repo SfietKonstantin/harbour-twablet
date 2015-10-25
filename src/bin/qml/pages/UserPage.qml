@@ -37,9 +37,9 @@ import "LinkHandler.js" as LH
 Page {
     id: container
     property alias userId: query.userId
-    property alias account: query.account
+    property alias accountUserId: query.accountUserId
     property RightPanel panel
-    function load() { query.load() }
+    function load() { query.load(Repository) }
 
     UserQueryItem {
         id: query
@@ -130,7 +130,7 @@ Page {
                     text: descriptionFormatter.text
                     textFormat: Text.StyledText
                     onLinkActivated: {
-                        LH.handleLink(link, container.panel, container.account, false)
+                        LH.handleLink(link, container.panel, container.accountUserId, false)
                     }
                 }
             }
@@ -141,19 +141,19 @@ Page {
                     width: parent.width / 3
                     text: query.user ? qsTr("%n\ntweets", "", query.user.statusesCount) : ""
                     onClicked: container.panel.openUserTimeline(query.userId, query.user.screenName,
-                                                                container.account, false)
+                                                                container.accountUserId, false)
                 }
                 MiniButton {
                     width: parent.width / 3
                     text: query.user ? qsTr("%n\nfriends", "", query.user.friendsCount) : ""
                     onClicked: container.panel.openFriends(query.userId, query.user.screenName,
-                                                           container.account, false)
+                                                           container.accountUserId, false)
                 }
                 MiniButton {
                     width: parent.width / 3
                     text: query.user ? qsTr("%n\nfollowers", "", query.user.followersCount) : ""
                     onClicked: container.panel.openFollowers(query.userId, query.user.screenName,
-                                                             container.account, false)
+                                                             container.accountUserId, false)
                 }
             }
 
@@ -180,7 +180,7 @@ Page {
             MiniButton {
                 text: query.user ? qsTr("%n favourites", "", query.user.favouritesCount) : ""
                 onClicked: container.panel.openFavorites(query.userId, query.user.screenName,
-                                                         container.account, false)
+                                                         container.accountUserId, false)
             }
 
             MiniButton {

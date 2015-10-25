@@ -53,7 +53,7 @@ signals:
     void favoritedChanged();
 private:
     bool isQueryValid() const override final;
-    QNetworkReply * createQuery() const override final;
+    QNetworkReply * createQuery(const Account &account) const override final;
     void handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
                      const QString &errorMessage) override final;
     QString m_tweetId {};

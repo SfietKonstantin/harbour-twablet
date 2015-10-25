@@ -29,8 +29,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef REPOSITORYPROCESSCALLBACK_H
-#define REPOSITORYPROCESSCALLBACK_H
+#ifndef LISTQUERYCALLBACK_H
+#define LISTQUERYCALLBACK_H
 
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
@@ -43,12 +43,12 @@
 namespace private_util {
 
 template<class T>
-class RepositoryProcessCallback
+class ListQueryHandler
 {
 public:
-    explicit RepositoryProcessCallback(typename IListQueryHandler<T>::RequestType requestType,
-                                       IListQueryHandler<T> &handler, Repository<T> &repository,
-                                       std::vector<T> &items, bool &loading)
+    explicit ListQueryHandler(typename IListQueryHandler<T>::RequestType requestType,
+                              IListQueryHandler<T> &handler, Repository<T> &repository,
+                              std::vector<T> &items, bool &loading)
         : m_requestType(requestType), m_handler(handler), m_repository(repository)
         , m_items(items), m_loading(loading)
     {
@@ -73,11 +73,11 @@ public:
         LoadingLock loadingLock {m_loading};
 
         if (error != QNetworkReply::NoError) {
-            qCWarning(QLoggingCategory("repository-process-callback")) << "Error happened";
-            qCWarning(QLoggingCategory("repository-process-callback")) << "Error code:" << error;
-            qCWarning(QLoggingCategory("repository-process-callback")) << "Error message (Qt):" << errorMessage;
+            qCWarning(QLoggingCategory("list-query-callback")) << "Error happened";
+            qCWarning(QLoggingCategory("list-query-callback")) << "Error code:" << error;
+            qCWarning(QLoggingCategory("list-query-callback")) << "Error message (Qt):" << errorMessage;
             const QByteArray &data {reply.readAll()};
-            qCWarning(QLoggingCategory("repository-process-callback")) << "Error message (Twitter):" << data;
+            qCWarning(QLoggingCategory("list-query-callback")) << "Error message (Twitter):" << data;
 
             // Check if Twitter sent us an issue
             QJsonDocument document {QJsonDocument::fromJson(data)};
@@ -101,12 +101,12 @@ public:
         typename IListQueryHandler<T>::Placement placement {IListQueryHandler<T>::Discard};
         bool returned = m_handler.treatReply(m_requestType, reply.readAll(), m_items, newErrorMessage, placement);
         if (!returned) {
-            qCWarning(QLoggingCategory("repository-process-callback")) << "Error happened";
-            qCWarning(QLoggingCategory("repository-process-callback")) << "Parsing error: " << newErrorMessage;
+            qCWarning(QLoggingCategory("list-query-callback")) << "Error happened";
+            qCWarning(QLoggingCategory("list-query-callback")) << "Parsing error: " << newErrorMessage;
             m_repository.error(QObject::tr("Internal error"));
             return;
         } else {
-            qCDebug(QLoggingCategory("repository-process-callback")) << "New data available. Count:" << m_items.size();
+            qCDebug(QLoggingCategory("list-query-callback")) << "New data available. Count:" << m_items.size();
             switch (placement) {
             case IListQueryHandler<T>::Append:
                 m_repository.append(m_items);
@@ -130,5 +130,5 @@ private:
 
 }
 
-#endif // REPOSITORYPROCESSCALLBACK_H
+#endif // LISTQUERYCALLBACK_H
 

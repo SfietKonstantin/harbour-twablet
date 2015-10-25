@@ -47,10 +47,9 @@ class IModel : public QAbstractListModel, public QQmlParserStatus
     Q_PROPERTY(int count READ count NOTIFY countChanged)
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
-    Q_PROPERTY(int layoutIndex READ layoutIndex WRITE setLayoutIndex NOTIFY layoutIndexChanged)
     Q_PROPERTY(qml::DataRepositoryObject * repository READ repository WRITE setRepository
                NOTIFY repositoryChanged)
-    Q_PROPERTY(bool temporary READ isTemporary WRITE setTemporary NOTIFY temporaryChanged)
+    Q_PROPERTY(QObject * query READ query WRITE setQuery NOTIFY queryChanged)
     Q_ENUMS(Status)
 public:
     enum Status
@@ -64,21 +63,18 @@ public:
     virtual int count() const = 0;
     virtual Status status() const = 0;
     virtual QString errorMessage() const = 0;
-    virtual int layoutIndex() const = 0;
-    virtual void setLayoutIndex(int layoutIndex) = 0;
     virtual DataRepositoryObject * repository() const = 0;
     virtual void setRepository(DataRepositoryObject *repository) = 0;
-    virtual bool isTemporary() const = 0;
-    virtual void setTemporary(bool temporary) = 0;
+    virtual QObject * query() const = 0;
+    virtual void setQuery(QObject *query) = 0;
 signals:
     void countChanged();
     void prependPre();
     void prependPost(int insertedCount);
     void statusChanged();
     void errorMessageChanged();
-    void layoutIndexChanged();
     void repositoryChanged();
-    void temporaryChanged();
+    void queryChanged();
     void finished();
     void error();
 protected:

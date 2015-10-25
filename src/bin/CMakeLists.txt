@@ -52,6 +52,7 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/pages/UserPage.qml
     qml/pages/MiniButton.qml
     qml/pages/UsersPage.qml
+    qml/pages/TweetsPage.qml
     qml/pages/TweetPage.qml
     qml/pages/StatusUpdater.qml
     qml/pages/ProgressIconButton.qml

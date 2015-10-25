@@ -29,42 +29,51 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef QUERYOBJECT_H
-#define QUERYOBJECT_H
+#ifndef TWEETLISTQUERYWRAPPEROBJECT_H
+#define TWEETLISTQUERYWRAPPEROBJECT_H
 
-#include <QtCore/QObject>
+#include <QtCore/QVariantMap>
+#include "iquerywrapperobject.h"
 #include "query.h"
+#include "querytypeobject.h"
 
 namespace qml
 {
 
-class QueryObject : public QObject
+class TweetListQueryWrapperObject : public QObject, public IQueryWrapperObject
 {
     Q_OBJECT
-    Q_ENUMS(Type)
-    Q_ENUMS(UserType)
+    Q_INTERFACES(qml::IQueryWrapperObject)
+    Q_PROPERTY(QString accountUserId READ accountUserId WRITE setAccountUserId
+               NOTIFY accountUserIdChanged)
+    Q_PROPERTY(qml::QueryTypeObject::TweetListType type READ type WRITE setType NOTIFY typeChanged)
+    Q_PROPERTY(QVariantMap parameters READ parameters WRITE setParameters NOTIFY parametersChanged)
 public:
-    enum Type
-    {
-        InvalidType = TweetListQuery::Invalid,
-        Home = TweetListQuery::Home,
-        Mentions = TweetListQuery::Mentions,
-        Search = TweetListQuery::Search,
-        Favorites = TweetListQuery::Favorites,
-        UserTimeline = TweetListQuery::UserTimeline,
-    };
-    enum UserType
-    {
-        InvalidUserType,
-        Friends,
-        Followers
-    };
-
-    DISABLE_COPY_DISABLE_MOVE(QueryObject);
+    explicit TweetListQueryWrapperObject(QObject *parent = 0);
+    explicit TweetListQueryWrapperObject(const QString accountUserId, const TweetListQuery &query,
+                                         QObject *parent = 0);
+    QString accountUserId() const override;
+    void setAccountUserId(const QString &accountUserId);
+    Query query() const override;
+    void setQuery(TweetListQuery &&query);
+    QueryTypeObject::TweetListType type() const;
+    void setType(QueryTypeObject::TweetListType type);
+    QVariantMap parameters() const;
+    void setParameters(const QVariantMap &parameters);
+    void accept(QueryWrapperVisitor &visitor) const override;
+signals:
+    void accountUserIdChanged();
+    void typeChanged();
+    void parametersChanged();
 private:
-    explicit QueryObject(QObject *parent = 0);
+    void updateQuery();
+    TweetListQuery::Type convertedType() const;
+    QString m_accountUserId {};
+    TweetListQuery m_query {};
+    QueryTypeObject::TweetListType m_type {QueryTypeObject::InvalidTweetList};
+    QVariantMap m_parameters {};
 };
 
 }
 
-#endif // QUERYOBJECT_H
+#endif // TWEETLISTQUERYWRAPPEROBJECT_H

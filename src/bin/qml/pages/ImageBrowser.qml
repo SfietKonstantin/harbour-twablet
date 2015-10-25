@@ -38,7 +38,7 @@ Page {
     id: container
     property RightPanel panel
     property QtObject tweet
-    property QtObject account
+    property string accountUserId
     allowedOrientations: app.defaultAllowedOrientations
 
     Drawer {
@@ -64,7 +64,7 @@ Page {
                     tweet: container.tweet
                     padding: Theme.paddingMedium
                     anchors.left: parent.left; anchors.right: parent.right
-                    onHandleLink: LH.handleLink(url, container.panel, container.account, Info.Replace)
+                    onHandleLink: LH.handleLink(url, container.panel, container.accountUserId, Info.Replace)
                 }
 
                 TweetText {
@@ -72,7 +72,7 @@ Page {
                     anchors.left: parent.left; anchors.leftMargin: Theme.paddingSmall
                     anchors.right: parent.right; anchors.rightMargin: Theme.paddingSmall
                     font.pixelSize: Theme.fontSizeSmall
-                    onHandleLink: LH.handleLink(url, container.panel, container.account, Info.Replace)
+                    onHandleLink: LH.handleLink(url, container.panel, container.accountUserId, Info.Replace)
                 }
 
                 TweetFooter {

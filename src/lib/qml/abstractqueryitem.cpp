@@ -31,6 +31,8 @@
 
 #include "abstractqueryitem.h"
 #include <QtCore/QLoggingCategory>
+#include "account.h"
+#include "iaccountrepositorycontainerobject.h"
 
 namespace qml
 {
@@ -40,16 +42,16 @@ AbstractQueryItem::AbstractQueryItem(QObject *parent)
 {
 }
 
-AccountObject * AbstractQueryItem::account() const
+QString AbstractQueryItem::accountUserId() const
 {
-    return m_account;
+    return m_accountUserId;
 }
 
-void AbstractQueryItem::setAccount(AccountObject *account)
+void AbstractQueryItem::setAccountUserId(const QString &accountUserId)
 {
-    if (m_account != account) {
-        m_account = account;
-        emit accountChanged();
+    if (m_accountUserId != accountUserId) {
+        m_accountUserId = accountUserId;
+        emit accountUserIdChanged();
     }
 }
 
@@ -63,13 +65,18 @@ QString AbstractQueryItem::errorMessage() const
     return m_errorMessage;
 }
 
-bool AbstractQueryItem::load()
+bool AbstractQueryItem::load(QObject *object)
 {
-    if (m_account == nullptr || !isQueryValid() || m_status == Loading) {
+    if (m_accountUserId.isEmpty() || !isQueryValid() || m_status == Loading) {
         return false;
     }
 
-    QNetworkReply *reply = createQuery();
+    IAccountRepositoryContainerObject *accountRepository = qobject_cast<IAccountRepositoryContainerObject *>(object);
+    if (accountRepository == nullptr) {
+        return false;
+    }
+
+    QNetworkReply *reply = createQuery(accountRepository->account(m_accountUserId));
     setStatusAndErrorMessage(Loading, QString());
 
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {

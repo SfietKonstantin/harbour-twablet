@@ -59,14 +59,14 @@ TEST(layout, Layout)
     EXPECT_TRUE(movedLayout.isValid());
     EXPECT_TRUE(movedLayout.query().isValid());
     EXPECT_EQ(movedLayout.name(), QLatin1String("Layout name"));
-    EXPECT_EQ(movedLayout.userId(), QLatin1String("userId"));
+    EXPECT_EQ(movedLayout.accountUserId(), QLatin1String("userId"));
     EXPECT_EQ(movedLayout.query(), query);
     EXPECT_EQ(movedLayout.unread(), 0);
 
     movedLayout.setName(QLatin1String("New layout"));
     EXPECT_EQ(movedLayout.name(), QLatin1String("New layout"));
-    movedLayout.setUserId(QLatin1String("1"));
-    EXPECT_EQ(movedLayout.userId(), QLatin1String("1"));
+    movedLayout.setAccountUserId(QLatin1String("1"));
+    EXPECT_EQ(movedLayout.accountUserId(), QLatin1String("1"));
 
     Query::Parameters newParameters {
         {"user_id", "123"}

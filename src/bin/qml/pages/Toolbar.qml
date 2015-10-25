@@ -91,19 +91,19 @@ Rectangle {
             }
             source: {
                 switch (model.queryType) {
-                case Query.Home:
+                case QueryType.Home:
                     Qt.resolvedUrl("../../data/home.svg")
                     break
-                case Query.Mentions:
+                case QueryType.Mentions:
                     Qt.resolvedUrl("../../data/mail.svg")
                     break
-                case Query.Search:
+                case QueryType.Search:
                     Qt.resolvedUrl("../../data/search.svg")
                     break
-                case Query.Favorites:
+                case QueryType.Favorites:
                     "image://theme/icon-l-favorite"
                     break
-                case Query.UserTimeline:
+                case QueryType.UserTimeline:
                     Qt.resolvedUrl("../../data/me.svg")
                     break
                 default:

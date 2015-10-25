@@ -72,7 +72,7 @@ bool StatusUpdateQueryItem::isQueryValid() const
     return !m_text.isEmpty();
 }
 
-QNetworkReply * StatusUpdateQueryItem::createQuery() const
+QNetworkReply * StatusUpdateQueryItem::createQuery(const Account &account) const
 {
     QByteArray path {"statuses/update.json"};
     std::map<QByteArray, QByteArray> parameters {{"status", QUrl::toPercentEncoding(m_text)}};
@@ -80,7 +80,7 @@ QNetworkReply * StatusUpdateQueryItem::createQuery() const
         parameters.insert({"in_reply_to_status_id", QUrl::toPercentEncoding(m_inReplyTo)});
     }
 
-    return private_util::TwitterQueryUtil::post(network(), path, {}, parameters, account()->data());
+    return private_util::TwitterQueryUtil::post(network(), path, {}, parameters, account);
 }
 
 void StatusUpdateQueryItem::handleReply(const QByteArray &reply,

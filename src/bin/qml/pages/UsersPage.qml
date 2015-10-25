@@ -36,20 +36,13 @@ import harbour.twablet 1.0
 Page {
     id: container
     property string title
-    property int queryType
-    property var args
-    property QtObject account
+    property alias type: query.type
+    property alias parameters: query.parameters
+    property alias accountUserId: query.accountUserId
     property RightPanel panel
 
     Component.onCompleted: {
-        var layoutIndex = Repository.addUser(container.account, container.queryType, container.args)
-        if (layoutIndex >= 0) {
-            userModel.layoutIndex = layoutIndex
-        }
-    }
-
-    Component.onDestruction: {
-        Repository.removeUser(userModel.layoutIndex)
+        Repository.loadMore(query)
     }
 
     SilicaListView {
@@ -57,6 +50,9 @@ Page {
         model: UserModel {
             id: userModel
             repository: Repository
+            query: UserListQuery {
+                id: query
+            }
         }
 
         header: PageHeader {
@@ -67,7 +63,7 @@ Page {
             id: delegate
             height: Theme.itemSizeMedium
             anchors.left: parent.left; anchors.right: parent.right
-            onClicked: container.panel.openUser(model.id, container.account, false)
+            onClicked: container.panel.openUser(model.id, container.accountUserId, false)
 
             TwitterImage {
                 id: profilePicture
@@ -103,7 +99,7 @@ Page {
 
         footer: LoadMoreButton {
             model: userModel
-            onClicked: Repository.userLoadMore(userModel.layoutIndex)
+            onClicked: Repository.loadMore(query)
         }
 
         StatusPlaceholder {

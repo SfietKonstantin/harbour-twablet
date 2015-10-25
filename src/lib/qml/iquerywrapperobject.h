@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,17 +29,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-.pragma library
+#ifndef IQUERYWRAPPEROBJECT_H
+#define IQUERYWRAPPEROBJECT_H
 
-function handleLink(url, panel, accountUserId, clear)
+#include <QtCore/QtPlugin>
+#include "query.h"
+
+namespace qml
 {
-    if (url.indexOf("http") === 0) {
-        Qt.openUrlExternally(url)
-    } else if (url.indexOf("user://") === 0) {
-        var userId = url.slice(7)
-        panel.openUser(userId, accountUserId, clear)
-    } else if (url.indexOf("hashtag://") === 0) {
-        var hashtag = url.slice(10)
-        panel.openSearch("#" + hashtag, accountUserId, clear)
-    }
+
+class QueryWrapperVisitor;
+class IQueryWrapperObject
+{
+public:
+    virtual ~IQueryWrapperObject() {}
+    virtual QString accountUserId() const = 0;
+    virtual Query query() const = 0;
+    virtual void accept(QueryWrapperVisitor &visitor) const = 0;
+};
+
 }
+
+Q_DECLARE_INTERFACE(qml::IQueryWrapperObject, "harbour.twablet.IQueryWrapperObject")
+
+
+#endif // IQUERYWRAPPEROBJECT_H
+

@@ -39,6 +39,7 @@ set(${PROJECT_NAME}_Core_SRCS
     layoutrepository.cpp
     tweetrepository.h
     userrepository.h
+    containerkey.cpp
     tweetrepositorycontainer.cpp
     userrepositorycontainer.cpp
     iqueryexecutor.h
@@ -50,13 +51,14 @@ set(${PROJECT_NAME}_Core_SRCS
 )
 
 set(${PROJECT_NAME}_Private_SRCS
+    private/maputil.h
+    private/debughelper.cpp
     private/twitterdatautil.cpp
     private/twitterqueryutil.cpp
     private/networkqueryexecutor.cpp
-    private/repositoryprocesscallback.h
+    private/listquerycallback.h
     private/listqueryhandlerutil.cpp
-    private/maputil.h
-    private/debughelper.cpp
+    private/conversionutil.cpp
 )
 
 set(${PROJECT_NAME}_Qml_SRCS
@@ -66,7 +68,7 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/quotedtweetobject.cpp
     qml/userobject.cpp
     qml/mediaobject.cpp
-    qml/queryobject.cpp
+    qml/querytypeobject.cpp
     qml/imodel.h
     qml/model.h
     qml/accountmodel.cpp
@@ -76,8 +78,10 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/mediamodel.cpp
     qml/querylistmodel.cpp
     qml/accountselectionmodel.cpp
-    qml/itweetrepositorycontainerobject.h
+    qml/iaccountrepositorycontainerobject.h
     qml/ilayoutcontainerobject.h
+    qml/itweetrepositorycontainerobject.h
+    qml/iuserrepositorycontainerobject.h
     qml/twitterauthentification.cpp
     qml/datarepositoryobject.cpp
     qml/datarepositoryobjectmap.h
@@ -91,6 +95,10 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/retweetqueryitem.cpp
     qml/favoritequeryitem.cpp
     qml/userqueryitem.cpp
+    qml/iquerywrapperobject.h
+    qml/querywrappervisitor.cpp
+    qml/tweetlistquerywrapperobject.cpp
+    qml/userlistquerywrapperobject.cpp
 )
 
 add_library(${PROJECT_NAME} STATIC

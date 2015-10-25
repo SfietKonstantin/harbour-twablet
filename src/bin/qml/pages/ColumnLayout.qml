@@ -36,10 +36,11 @@ import harbour.twablet 1.0
 SilicaListView {
     id: container
     property string title
-    property alias temporary: twitterModel.temporary
-    property alias layoutIndex: twitterModel.layoutIndex
+    property alias query: twitterModel.query
     signal handleLink(string url)
     signal openTweet(string tweetId, string retweetId)
+    signal unreadChanged(int unread)
+    signal removed()
     function setUnread(index) {
         if (internal.unread > index && index !== -1) {
             internal.unread = index
@@ -61,7 +62,7 @@ SilicaListView {
         property double opacity: isLoading ? 0. : 1
         property bool isLoading: twitterModel.count === 0 && twitterModel.status === Model.Loading
         onUnreadChanged: {
-            Repository.updateLayoutUnread(container.layoutIndex, unread)
+            container.unreadChanged(unread)
         }
 
         Behavior on opacity {
@@ -140,7 +141,7 @@ SilicaListView {
                     headerTimer.stop()
                     header.state = ""
                     header.remorseAction(qsTr("Removing column"), function() {
-                        Repository.removeLayout(container.layoutIndex)
+                        container.removed()
                     })
                 }
 
@@ -190,7 +191,7 @@ SilicaListView {
 
     footer: LoadMoreButton {
         model: twitterModel
-        onClicked: Repository.loadMore(container.layoutIndex)
+        onClicked: Repository.loadMore(twitterModel.query)
     }
 
     StatusPlaceholder {

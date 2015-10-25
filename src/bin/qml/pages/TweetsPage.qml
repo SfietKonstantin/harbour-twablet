@@ -37,45 +37,39 @@ import "LinkHandler.js" as LH
 Page {
     id: container
     property string title
-    property int queryType
-    property var args
-    property QtObject account
+    property alias type: query.type
+    property alias parameters: query.parameters
+    property alias accountUserId: query.accountUserId
     property RightPanel panel
 
     Component.onCompleted: {
-        var layoutIndex = Repository.addTemporaryLayout(container.account, container.queryType,
-                                                        container.args)
-        if (layoutIndex >= 0) {
-            layout.layoutIndex = layoutIndex
-        }
-    }
-
-    Component.onDestruction: {
-        Repository.removeTemporaryLayout(layout.layoutIndex)
+        Repository.refresh(query)
     }
 
     ColumnLayout {
         id: layout
+        query: TweetListQuery {
+            id: query
+        }
         anchors.fill: parent
-        temporary: true
         title: container.title
         onHandleLink: {
-            LH.handleLink(url, container.panel, container.account, false)
+            LH.handleLink(url, container.panel, container.accountUserId, false)
         }
         onOpenTweet: {
-            container.panel.openTweet(tweetId, retweetId, container.account, false)
+            container.panel.openTweet(tweetId, retweetId, container.accountUserId, false)
         }
 
         PullDownMenu {
             MenuItem {
                 text: qsTr("Add as column")
-                onClicked: Repository.addLayout(container.title, container.account, container.queryType,
-                                                container.args)
+                onClicked: Repository.addLayout(container.title, container.accountUserId,
+                                                query.type, query.parameters)
             }
 
             MenuItem {
                 text: qsTr("Refresh")
-                onClicked: Repository.refreshTemporary(container.layoutIndex)
+                onClicked: Repository.refresh(query)
             }
         }
     }

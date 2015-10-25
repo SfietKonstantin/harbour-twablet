@@ -44,3 +44,10 @@ QDebug & operator<<(QDebug &debug, const Query::Parameters &parameters)
     debug << ")";
     return debug;
 }
+
+QDebug & operator<<(QDebug &debug, const Query &query)
+{
+    QDebugStateSaver saver(debug);
+    debug.nospace() << "(" << query.path() << " " << query.parameters() << ")";
+    return debug;
+}

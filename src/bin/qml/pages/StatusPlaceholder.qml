@@ -56,7 +56,7 @@ Item {
 
         function retry() {
             if (container.query != null) {
-                container.query.load()
+                container.query.load(Repository)
             }
             if (container.model != null) {
                 Repository.refresh()

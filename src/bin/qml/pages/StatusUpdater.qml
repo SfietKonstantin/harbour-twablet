@@ -58,7 +58,7 @@ Item {
 
             StatusUpdateQueryItem {
                 id: queryItem
-                account: postAccountSelectionModel.selection
+                accountUserId: postAccountSelectionModel.selection.userId
                 text: (container.replyOnly ? container.inReplyScreenName + " " : "") + textArea.text
                 onFinished: {
                     textArea.text = ""
@@ -89,7 +89,7 @@ Item {
                     id: sendMouseArea
                     enabled: send.sendEnabled
                     anchors.fill: parent
-                    onClicked: queryItem.load()
+                    onClicked: queryItem.load(Repository)
                 }
             }
         }

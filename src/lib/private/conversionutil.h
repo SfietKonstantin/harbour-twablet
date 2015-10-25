@@ -29,14 +29,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "queryobject.h"
+#ifndef CONVERSIONUTIL_H
+#define CONVERSIONUTIL_H
 
-namespace qml
+#include <QtCore/QVariantMap>
+#include "query.h"
+
+namespace private_util
 {
 
-QueryObject::QueryObject(QObject *parent)
-    : QObject(parent)
-{
-}
+Query::Parameters convertParameters(const QVariantMap &parameters);
 
 }
+
+#endif // CONVERSIONUTIL_H

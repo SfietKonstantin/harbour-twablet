@@ -29,70 +29,49 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "querylistmodel.h"
+#ifndef USERLISTQUERYWRAPPEROBJECT_H
+#define USERLISTQUERYWRAPPEROBJECT_H
+
+#include <QtCore/QVariantMap>
+#include "iquerywrapperobject.h"
+#include "query.h"
 #include "querytypeobject.h"
 
 namespace qml
 {
 
-QueryListModel::QueryListModel(QObject *parent) :
-    QAbstractListModel(parent)
+class UserListQueryWrapperObject : public QObject, public IQueryWrapperObject
 {
-    m_data.emplace_back(new Data {tr("Home"), QueryTypeObject::Home});
-    m_data.emplace_back(new Data {tr("Mentions"), QueryTypeObject::Mentions});
-    m_data.emplace_back(new Data {tr("Search"), QueryTypeObject::Search});
-}
-
-void QueryListModel::classBegin()
-{
-}
-
-void QueryListModel::componentComplete()
-{
-}
-
-int QueryListModel::rowCount(const QModelIndex &index) const
-{
-    Q_UNUSED(index)
-    return m_data.size();
-}
-
-QVariant QueryListModel::data(const QModelIndex &index, int role) const
-{
-    int row = index.row();
-    if (row < 0 || row >= rowCount()) {
-        return QVariant();
-    }
-    const std::unique_ptr<Data> &data = m_data[row];
-    switch (role) {
-    case NameRole:
-        return data->name;
-        break;
-    case QueryTypeRole:
-        return data->type;
-        break;
-    default:
-        return QVariant();
-        break;
-    }
-}
-
-int QueryListModel::count() const
-{
-    return rowCount();
-}
-
-int QueryListModel::getType(int index)
-{
-    if (index < 0 || index >= rowCount()) {
-        return QueryTypeObject::InvalidTweetList;
-    }
-    return m_data[index]->type;
-}
-
-QHash<int, QByteArray> QueryListModel::roleNames() const
-{
-    return {{NameRole, "name"}, {QueryTypeRole, "type"}};
-}
+    Q_OBJECT
+    Q_INTERFACES(qml::IQueryWrapperObject)
+    Q_PROPERTY(QString accountUserId READ accountUserId WRITE setAccountUserId
+               NOTIFY accountUserIdChanged)
+    Q_PROPERTY(qml::QueryTypeObject::UserListType type READ type WRITE setType NOTIFY typeChanged)
+    Q_PROPERTY(QVariantMap parameters READ parameters WRITE setParameters NOTIFY parametersChanged)
+public:
+    explicit UserListQueryWrapperObject(QObject *parent = 0);
+    QString accountUserId() const override;
+    void setAccountUserId(const QString &accountUserId);
+    Query query() const override;
+    void setQuery(UserListQuery &&query);
+    QueryTypeObject::UserListType type() const;
+    void setType(QueryTypeObject::UserListType type);
+    QVariantMap parameters() const;
+    void setParameters(const QVariantMap &parameters);
+    void accept(QueryWrapperVisitor &visitor) const override;
+signals:
+    void accountUserIdChanged();
+    void typeChanged();
+    void parametersChanged();
+private:
+    void updateQuery();
+    UserListQuery::Type convertedType() const;
+    QString m_accountUserId {};
+    UserListQuery m_query {};
+    QueryTypeObject::UserListType m_type {QueryTypeObject::InvalidUserList};
+    QVariantMap m_parameters {};
+};
 
 }
+
+#endif // USERLISTQUERYWRAPPEROBJECT_H

@@ -123,7 +123,7 @@ MouseArea {
             MouseArea {
                 anchors.fill: mediaGrid
                 enabled: !container.enabled
-                onClicked: container.handleOpenImageBrowser(container.tweet, container.account)
+                onClicked: container.handleOpenImageBrowser(container.tweet)
             }
 
             Grid {

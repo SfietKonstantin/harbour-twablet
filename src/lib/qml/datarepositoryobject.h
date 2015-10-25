@@ -39,29 +39,41 @@
 #include "layoutrepository.h"
 #include "tweetrepositorycontainer.h"
 #include "userrepositorycontainer.h"
+#include "iaccountrepositorycontainerobject.h"
 #include "ilayoutcontainerobject.h"
 #include "itweetrepositorycontainerobject.h"
+#include "iuserrepositorycontainerobject.h"
 
 namespace qml
 {
 
 class AccountObject;
-class DataRepositoryObject : public QObject, public ILayoutContainerObject, public ITweetRepositoryContainerObject
+class TweetListQueryWrapperObject;
+class DataRepositoryObject
+        : public QObject
+        , public IAccountRepositoryContainerObject
+        , public ILayoutContainerObject
+        , public ITweetRepositoryContainerObject
+        , public IUserRepositoryContainerObject
 {
     Q_OBJECT
     Q_PROPERTY(bool hasAccounts READ hasAccounts NOTIFY hasAccountsChanged)
+    Q_INTERFACES(qml::IAccountRepositoryContainerObject)
     Q_INTERFACES(qml::ILayoutContainerObject)
     Q_INTERFACES(qml::ITweetRepositoryContainerObject)
+    Q_INTERFACES(qml::IUserRepositoryContainerObject)
 public:
     explicit DataRepositoryObject(QObject *parent = 0);
     bool hasAccounts() const;
-    AccountRepository & accounts();
+    AccountRepository & accountRepository() override;
     LayoutRepository & layouts() override;
-    TweetRepository * tweets(const Layout &layout) override;
-    const Layout * temporaryLayout(int index) const;
-    bool isTemporaryLayoutValid(int index) const;
-    bool isUserRepositoryValid(int index) const;
-    UserRepository * user(int index);
+    TweetRepository * tweetRepository(const Account &account, const Query &query) override;
+    void referenceTweetListQuery(const Account &account, const Query &query) override;
+    void dereferenceTweetListQuery(const Account &account, const Query &query) override;
+    UserRepository * userRepository(const Account &account, const Query &query) override;
+    void referenceUserListQuery(const Account &account, const Query &query) override;
+    void dereferenceUserListQuery(const Account &account, const Query &query) override;
+    Account account(const QString &accountUserId) const override;
 signals:
     void hasAccountsChanged();
 public slots:
@@ -81,41 +93,25 @@ public slots:
     void updateLayoutUnread(int index, int unread);
     void removeLayout(int index);
     void refresh();
-    void loadMore(int layoutIndex);
-    // Temporary layout
-    int addTemporaryLayout(qml::AccountObject *account, int queryType, const QVariantMap &paramters);
-    void removeTemporaryLayout(int index);
-    void clearTemporary();
-    void refreshTemporary(int index);
-    // Users
-    int addUser(qml::AccountObject *account, int queryType, const QVariantMap &parameters);
-    void removeUser(int index);
-    void userLoadMore(int index);
+    void refresh(QObject *query);
+    void loadMore(QObject *query);
     // Action on tweets
     void setTweetRetweeted(const QString &tweetId);
     void setTweetFavorited(const QString &tweetId, bool favorited);
 private:
-    Account accountFromId(const QString &userId) const;
-    void refresh(const Layout &layout);
     void addLayout(const QString &name, const QString &userId, int queryType,
                    const QVariantMap &parameters);
     bool addLayoutCheckAccount(int accountIndex, QString &userId);
-    void copyQueryParameters(const QVariantMap &parameters,
-                             Query::Parameters &queryParametrs) const;
-    void insertRepository(const Layout &layout);
-    void insertRepository();
-    void removeLayoutFromRepositories(const Layout &layout);
-    void removeLayoutFromRepositories(int index);
+    void referenceLastLayoutTweetList();
+    void dereferenceLayoutTweetList(int index);
 
     QObjectPtr<QNetworkAccessManager> m_network {nullptr};
     LoadSaveManager m_loadSaveManager {};
     AccountRepository m_accounts {};
     std::map<QString, const Account &> m_accountsMapping {};
     LayoutRepository m_layouts {};
-    TweetRepositoryContainer m_tweetsCentralRepository;
-    std::map<int, Layout> m_temporaryLayouts {};
-    UserRepositoryContainer m_userCentralRepository;
-    int m_temporaryLayoutsIndex {0};
+    TweetRepositoryContainer m_tweetRepositoryContainer;
+    UserRepositoryContainer m_userRepositoryContainer;
 };
 
 }

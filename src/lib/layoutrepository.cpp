@@ -73,13 +73,13 @@ void LayoutRepository::save(QJsonObject &json) const
     for (const Layout &layout : m_data) {
         QJsonObject layoutObject {};
         layoutObject.insert(QLatin1String("name"), layout.name());
-        layoutObject.insert(QLatin1String("userId"), layout.userId());
+        layoutObject.insert(QLatin1String("userId"), layout.accountUserId());
         layoutObject.insert(QLatin1String("queryType"), layout.query().type());
         QJsonArray parameters {};
         for (const std::pair<QByteArray, QByteArray> &parameter : layout.query().parameters()) {
             QJsonObject parameterObject {};
-            parameterObject.insert(QLatin1String("key"), QString::fromLocal8Bit(parameter.first));
-            parameterObject.insert(QLatin1String("value"), QString::fromLocal8Bit(parameter.second));
+            parameterObject.insert(QLatin1String("key"), QUrl::fromPercentEncoding(parameter.first));
+            parameterObject.insert(QLatin1String("value"), QUrl::fromPercentEncoding(parameter.second));
             parameters.append(parameterObject);
         }
         layoutObject.insert(QLatin1String("queryArguments"), parameters);

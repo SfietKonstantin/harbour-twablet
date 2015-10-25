@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,17 +29,26 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-.pragma library
+#include "containerkey.h"
 
-function handleLink(url, panel, accountUserId, clear)
+ContainerKey::ContainerKey(Account &&account, Query &&query)
+    : m_account(std::move(account)), m_query(std::move(query))
 {
-    if (url.indexOf("http") === 0) {
-        Qt.openUrlExternally(url)
-    } else if (url.indexOf("user://") === 0) {
-        var userId = url.slice(7)
-        panel.openUser(userId, accountUserId, clear)
-    } else if (url.indexOf("hashtag://") === 0) {
-        var hashtag = url.slice(10)
-        panel.openSearch("#" + hashtag, accountUserId, clear)
-    }
+}
+
+const Account & ContainerKey::account() const
+{
+    return m_account;
+}
+
+const Query & ContainerKey::query() const
+{
+    return m_query;
+}
+
+bool ContainerKey::operator<(const ContainerKey &other) const
+{
+    return m_account.userId() == other.m_account.userId()
+            ? m_query < other.m_query
+            : m_account.userId() < other.m_account.userId();
 }

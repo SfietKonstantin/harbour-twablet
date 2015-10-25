@@ -144,25 +144,25 @@ Page {
                     id: delegate
                     width: view.columnWidth
                     height: view.height
-                    layoutIndex: index
                     title: name
+                    query: layout.query
                     onHandleLink: {
-                        var account = accountModel.get(layout.userId)
-                        if (account !== null) {
-                            LH.handleLink(url, panel, account, Info.Clear)
-                        }
+                        LH.handleLink(url, panel, layout.userId, Info.Clear)
                     }
                     onOpenTweet: {
-                        var account = accountModel.get(layout.userId)
-                        if (account !== null) {
-                            panel.openTweet(tweetId, retweetId, account, Info.Clear)
-                        }
+                        panel.openTweet(tweetId, retweetId, layout.userId, Info.Clear)
+                    }
+                    onUnreadChanged: {
+                        Repository.updateLayoutUnread(model.index, unread)
+                    }
+                    onRemoved: {
+                        Repository.removeLayout(model.index)
                     }
 
                     Connections {
                         target: toolbar
                         onGoToTop: {
-                            if (delegate.layoutIndex == index) {
+                            if (model.index == index) {
                                 delegate.scrollToTop()
                                 delegate.setUnread(0)
                             }

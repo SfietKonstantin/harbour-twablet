@@ -35,7 +35,9 @@
 #include <QtCore/QtPlugin>
 #include "tweetrepository.h"
 
+class Account;
 class Layout;
+class Query;
 namespace qml
 {
 
@@ -43,8 +45,9 @@ class ITweetRepositoryContainerObject
 {
 public:
     virtual ~ITweetRepositoryContainerObject() {}
-    virtual TweetRepository * tweets(const Layout &layout) = 0;
-    virtual const Layout * temporaryLayout(int index) const = 0;
+    virtual TweetRepository * tweetRepository(const Account &account, const Query &query) = 0;
+    virtual void referenceTweetListQuery(const Account &account, const Query &query) = 0;
+    virtual void dereferenceTweetListQuery(const Account &account, const Query &query) = 0;
 };
 
 }

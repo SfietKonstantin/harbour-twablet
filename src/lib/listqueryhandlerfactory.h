@@ -40,8 +40,8 @@ class Query;
 class ListQueryHandlerFactory
 {
 public:
-    static IListQueryHandler<Tweet>::Ptr createTweet(const Query &query);
-    static IListQueryHandler<User>::Ptr createUser(const Query &query);
+    static IListQueryHandler<Tweet>::Ptr createTweetList(const Query &query);
+    static IListQueryHandler<User>::Ptr createUserList(const Query &query);
 };
 
 #endif // LISTQUERYHANDLERFACTORY_H

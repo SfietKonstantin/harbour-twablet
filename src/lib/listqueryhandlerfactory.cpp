@@ -34,7 +34,7 @@
 #include "tweetsearchqueryhandler.h"
 #include "userlistqueryhandler.h"
 
-IListQueryHandler<Tweet>::Ptr ListQueryHandlerFactory::createTweet(const Query &query)
+IListQueryHandler<Tweet>::Ptr ListQueryHandlerFactory::createTweetList(const Query &query)
 {
     if (query.path() == TweetListQuery::pathFromType(TweetListQuery::Home)
         || query.path() == TweetListQuery::pathFromType(TweetListQuery::Mentions)
@@ -48,7 +48,7 @@ IListQueryHandler<Tweet>::Ptr ListQueryHandlerFactory::createTweet(const Query &
     }
 }
 
-IListQueryHandler<User>::Ptr ListQueryHandlerFactory::createUser(const Query &query)
+IListQueryHandler<User>::Ptr ListQueryHandlerFactory::createUserList(const Query &query)
 {
     if (query.path() == UserListQuery::pathFromType(UserListQuery::Friends)
         || query.path() == UserListQuery::pathFromType(UserListQuery::Followers)) {

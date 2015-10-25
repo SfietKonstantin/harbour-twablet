@@ -59,12 +59,12 @@ bool RetweetQueryItem::isQueryValid() const
     return !m_tweetId.isEmpty();
 }
 
-QNetworkReply * RetweetQueryItem::createQuery() const
+QNetworkReply * RetweetQueryItem::createQuery(const Account &account) const
 {
     QByteArray path {"statuses/retweet.json"};
     std::map<QByteArray, QByteArray> parameters {{"id", QUrl::toPercentEncoding(m_tweetId)}};
 
-    return private_util::TwitterQueryUtil::post(network(), path, {}, parameters, account()->data());
+    return private_util::TwitterQueryUtil::post(network(), path, {}, parameters, account);
 }
 
 void RetweetQueryItem::handleReply(const QByteArray &reply,

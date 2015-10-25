@@ -35,7 +35,7 @@
 #include <memory>
 #include <QtCore/QAbstractListModel>
 #include <QtQml/QQmlParserStatus>
-#include "queryobject.h"
+#include "querytypeobject.h"
 
 namespace qml
 {
@@ -65,7 +65,7 @@ private:
     struct Data
     {
         QString name;
-        QueryObject::Type type;
+        QueryTypeObject::TweetListType type;
     };
     std::vector<std::unique_ptr<Data>> m_data {};
 };

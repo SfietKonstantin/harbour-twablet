@@ -38,6 +38,7 @@
 #include "globals.h"
 #include "qobjectutils.h"
 
+class Account;
 namespace qml
 {
 
@@ -47,7 +48,8 @@ class AbstractQueryItem : public QObject
     Q_OBJECT
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
-    Q_PROPERTY(qml::AccountObject * account READ account WRITE setAccount NOTIFY accountChanged)
+    Q_PROPERTY(QString accountUserId READ accountUserId WRITE setAccountUserId
+               NOTIFY accountUserIdChanged)
     Q_ENUMS(Status)
 public:
     enum Status
@@ -57,16 +59,16 @@ public:
         Error
     };
     DISABLE_COPY_DISABLE_MOVE(AbstractQueryItem);
-    AccountObject * account() const;
-    void setAccount(AccountObject *account);
+    QString accountUserId() const;
+    void setAccountUserId(const QString &accountUserId);
     Status status() const;
     QString errorMessage() const;
 public slots:
-    bool load();
+    bool load(QObject *object);
 signals:
     void statusChanged();
     void errorMessageChanged();
-    void accountChanged();
+    void accountUserIdChanged();
     void finished();
     void error();
 protected:
@@ -74,12 +76,12 @@ protected:
     QNetworkAccessManager & network() const;
     void setStatusAndErrorMessage(Status status, const QString &errorMessage);
     virtual bool isQueryValid() const = 0;
-    virtual QNetworkReply * createQuery() const = 0;
+    virtual QNetworkReply * createQuery(const Account &account) const = 0;
     virtual void handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,
                              const QString &errorMessage) = 0;
 private:
     QObjectPtr<QNetworkAccessManager> m_network {nullptr};
-    AccountObject *m_account {nullptr};
+    QString m_accountUserId {};
     Status m_status {Idle};
     QString m_errorMessage {};
 };

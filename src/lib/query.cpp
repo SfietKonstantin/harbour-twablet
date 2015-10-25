@@ -180,7 +180,7 @@ Query::Parameters TweetListQuery::makeParameters(Type type, const Parameters &ad
         Parameters searchParameters {
             {"count", QByteArray::number(100)},
             {"include_entities", "true"},
-            {"q", q}
+            {"q", q.toLower()}
         };
         if (resultType == "mixed" || resultType == "recent" || resultType == "popular") {
             searchParameters.emplace("result_type", resultType);

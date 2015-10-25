@@ -31,7 +31,7 @@
 
 #include "userrepositorycontainer.h"
 #include "private/debughelper.h"
-#include "private/repositoryprocesscallback.h"
+#include "private/listquerycallback.h"
 #include "private/twitterqueryutil.h"
 #include "listqueryhandlerfactory.h"
 #include <QtCore/QLoggingCategory>
@@ -46,55 +46,54 @@ UserRepositoryContainer::UserRepositoryContainer(IQueryExecutor::ConstPtr &&quer
     Q_ASSERT_X(m_queryExecutor, "UserCentralRepository", "NULL query executor");
 }
 
-bool UserRepositoryContainer::isValid(int index) const
+UserRepository * UserRepositoryContainer::repository(const Account &account, const Query &query)
 {
-    return m_mapping.find(index) != std::end(m_mapping);
-}
-
-UserRepository * UserRepositoryContainer::repository(int index)
-{
-    auto it = m_mapping.find(index);
+    auto it = m_mapping.find(ContainerKey{Account{account}, Query{query}});
     if (it == std::end(m_mapping)) {
         return nullptr;
     }
     return &(it->second.repository);
 }
 
-void UserRepositoryContainer::refresh(int index)
+void UserRepositoryContainer::referenceQuery(const Account &account, const Query &query)
 {
-    auto it = m_mapping.find(index);
+    Data *data {getMappingData(ContainerKey{Account{account}, Query{query}})};
+    if (data == nullptr) {
+        return;
+    }
+    ++data->refcount;
+}
+
+void UserRepositoryContainer::dereferenceQuery(const Account &account, const Query &query)
+{
+    Data *data {getMappingData(ContainerKey{Account{account}, Query{query}})};
+    if (data == nullptr) {
+        return;
+    }
+    --data->refcount;
+    if (data->refcount == 0) {
+        m_mapping.erase(ContainerKey{Account{account}, Query{query}});
+    }
+}
+
+void UserRepositoryContainer::refresh(const Account &account, const Query &query)
+{
+    auto it = m_mapping.find(ContainerKey{Account{account}, Query{query}});
     if (it != std::end(m_mapping)) {
-        load(it->second, IListQueryHandler<User>::Refresh);
+        load(it->first, it->second, IListQueryHandler<User>::Refresh);
     }
 }
 
-void UserRepositoryContainer::loadMore(int index)
+void UserRepositoryContainer::loadMore(const Account &account, const Query &query)
 {
-    auto it = m_mapping.find(index);
+    auto it = m_mapping.find(ContainerKey{Account{account}, Query{query}});
     if (it != std::end(m_mapping)) {
-        load(it->second, IListQueryHandler<User>::LoadMore);
+        load(it->first, it->second, IListQueryHandler<User>::LoadMore);
     }
 }
 
-int UserRepositoryContainer::addRepository(const Account &account, const Query &query)
-{
-    int index = m_index;
-    ++m_index;
-    MappingData *data {getMappingData(index, account, query)};
-    if (!data) {
-        return -1;
-    }
-    loadMore(index);
-    return index;
-}
-
-void UserRepositoryContainer::removeRepository(int index)
-{
-    m_mapping.erase(index);
-}
-
-void UserRepositoryContainer::load(UserRepositoryContainer::MappingData &mappingData,
-                                 IListQueryHandler<User>::RequestType requestType)
+void UserRepositoryContainer::load(const ContainerKey &key, Data &mappingData,
+                                   IListQueryHandler<User>::RequestType requestType)
 {
     if (mappingData.loading) {
         return;
@@ -102,17 +101,16 @@ void UserRepositoryContainer::load(UserRepositoryContainer::MappingData &mapping
 
     mappingData.loading = true;
 
-    QByteArray path {mappingData.query.path()};
-    Query::Parameters parameters (mappingData.query.parameters());
+    QByteArray path {key.query().path()};
+    Query::Parameters parameters (key.query().parameters());
     const Query::Parameters &additionalParameters (mappingData.handler->additionalParameters(requestType));
     parameters.insert(std::begin(additionalParameters), std::end(additionalParameters));
 
-    qCDebug(QLoggingCategory("user-central-repository")) << "Request:" << path << parameters;
     mappingData.repository.start();
 
-    m_queryExecutor->execute(path, parameters, mappingData.account, [this, &mappingData, requestType](QIODevice &reply, QNetworkReply::NetworkError error, const QString &errorMessage) {
+    m_queryExecutor->execute(path, parameters, key.account(), [this, &mappingData, requestType](QIODevice &reply, QNetworkReply::NetworkError error, const QString &errorMessage) {
         std::vector<User> items {};
-        private_util::RepositoryProcessCallback<User> callback {
+        private_util::ListQueryHandler<User> callback {
             requestType,
             *mappingData.handler,
             mappingData.repository,
@@ -123,23 +121,26 @@ void UserRepositoryContainer::load(UserRepositoryContainer::MappingData &mapping
     });
 }
 
-UserRepositoryContainer::MappingData * UserRepositoryContainer::getMappingData(int index, const Account &account,
-                                                                           const Query &query)
+UserRepositoryContainer::Data * UserRepositoryContainer::getMappingData(const ContainerKey &key)
 {
-    auto it = m_mapping.find(index);
+    auto it = m_mapping.find(key);
     if (it != std::end(m_mapping)) {
         return &(it->second);
     }
 
-    IListQueryHandler<User>::Ptr handler {ListQueryHandlerFactory::createUser(query)};
+    if (!key.account().isValid()) {
+        return nullptr;
+    }
+
+    IListQueryHandler<User>::Ptr handler {ListQueryHandlerFactory::createUserList(key.query())};
     if (!handler) {
         return nullptr;
     }
-    return &(m_mapping.emplace(index, MappingData{account, query, std::move(handler)}).first->second);
+    return &(m_mapping.emplace(key, Data{std::move(handler)}).first->second);
 }
 
-UserRepositoryContainer::MappingData::MappingData(const Account &inputAccount, const Query &inputQuery,
-                                                IListQueryHandler<User>::Ptr &&inputHandler)
-    : account(std::move(inputAccount)), query(std::move(inputQuery)), handler(std::move(inputHandler))
+
+UserRepositoryContainer::Data::Data(IListQueryHandler<User>::Ptr &&inputHandler)
+    : handler{std::move(inputHandler)}
 {
 }

@@ -33,15 +33,14 @@
 #define TWEETREPOSITORYCONTAINER_H
 
 #include <map>
-#include "globals.h"
-#include "qobjectutils.h"
 #include "account.h"
+#include "containerkey.h"
+#include "globals.h"
 #include "query.h"
 #include "tweetrepository.h"
 #include "ilistqueryhandler.h"
 #include "iqueryexecutor.h"
 
-class Layout;
 class TweetRepositoryContainer
 {
 public:
@@ -57,31 +56,20 @@ public:
     Tweet tweet(const QString &id) const;
     void updateTweet(const Tweet &tweet);
 private:
-    struct MappingKey
+    struct Data
     {
-        explicit MappingKey(const Account &inputAccount, const Query &inputQuery);
-        Account account {};
-        Query query {};
-    };
-    struct MappingData
-    {
-        explicit MappingData(IListQueryHandler<Tweet>::Ptr &&inputHandler);
+        explicit Data(IListQueryHandler<Tweet>::Ptr &&inputHandler);
         bool loading {false};
         TweetRepository repository {};
         int refcount {0};
         IListQueryHandler<Tweet>::Ptr handler {};
     };
-    class MappingKeyComparator
-    {
-    public:
-        bool operator()(const MappingKey &first, const MappingKey &second) const;
-    };
-    void load(const MappingKey &key, MappingData &mappingData,
+    void load(const ContainerKey &key, Data &mappingData,
               IListQueryHandler<Tweet>::RequestType requestType);
-    MappingData * getMappingData(const Account &account, const Query &query);
+    Data * getMappingData(const ContainerKey &key);
     IQueryExecutor::ConstPtr m_queryExecutor {nullptr};
     std::map<QString, Tweet> m_data {};
-    std::map<MappingKey, MappingData, MappingKeyComparator> m_mapping {};
+    std::map<ContainerKey, Data> m_mapping {};
 };
 
 #endif // TWEETREPOSITORYCONTAINER_H

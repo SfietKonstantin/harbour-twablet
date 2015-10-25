@@ -32,13 +32,13 @@
 #include "layout.h"
 
 Layout::Layout(const QString &name, const QString &userId, TweetListQuery &&query)
-    : m_name{name}, m_userId{userId}, m_query{std::move(query)}
+    : m_name{name}, m_accountUserId{userId}, m_query{std::move(query)}
 {
 }
 
 bool Layout::isValid() const
 {
-    return (!m_name.isEmpty() && !m_userId.isEmpty() && m_query.isValid());
+    return (!m_name.isEmpty() && !m_accountUserId.isEmpty() && m_query.isValid());
 }
 
 QString Layout::name() const
@@ -51,14 +51,14 @@ void Layout::setName(const QString &name)
     m_name = name;
 }
 
-QString Layout::userId() const
+QString Layout::accountUserId() const
 {
-    return m_userId;
+    return m_accountUserId;
 }
 
-void Layout::setUserId(const QString &userId)
+void Layout::setAccountUserId(const QString &userId)
 {
-    m_userId = userId;
+    m_accountUserId = userId;
 }
 
 TweetListQuery Layout::query() const

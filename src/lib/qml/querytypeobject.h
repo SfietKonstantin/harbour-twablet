@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,17 +29,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-.pragma library
+#ifndef QUERYTYPEOBJECT_H
+#define QUERYTYPEOBJECT_H
 
-function handleLink(url, panel, accountUserId, clear)
+#include <QtCore/QObject>
+#include "query.h"
+
+namespace qml
 {
-    if (url.indexOf("http") === 0) {
-        Qt.openUrlExternally(url)
-    } else if (url.indexOf("user://") === 0) {
-        var userId = url.slice(7)
-        panel.openUser(userId, accountUserId, clear)
-    } else if (url.indexOf("hashtag://") === 0) {
-        var hashtag = url.slice(10)
-        panel.openSearch("#" + hashtag, accountUserId, clear)
-    }
+
+class QueryTypeObject : public QObject
+{
+    Q_OBJECT
+    Q_ENUMS(TweetListType)
+    Q_ENUMS(UserListType)
+public:
+    enum TweetListType
+    {
+        InvalidTweetList = TweetListQuery::Invalid,
+        Home = TweetListQuery::Home,
+        Mentions = TweetListQuery::Mentions,
+        Search = TweetListQuery::Search,
+        Favorites = TweetListQuery::Favorites,
+        UserTimeline = TweetListQuery::UserTimeline,
+    };
+    enum UserListType
+    {
+        InvalidUserList,
+        Friends,
+        Followers
+    };
+    DISABLE_COPY_DISABLE_MOVE(QueryTypeObject);
+private:
+    explicit QueryTypeObject(QObject *parent = 0);
+};
+
 }
+
+#endif // QUERYTYPEOBJECT_H

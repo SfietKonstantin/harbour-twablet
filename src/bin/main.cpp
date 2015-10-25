@@ -46,7 +46,7 @@
 #include "qml/accountobject.h"
 #include "qml/accountselectionmodel.h"
 #include "qml/layoutmodel.h"
-#include "qml/queryobject.h"
+#include "qml/querytypeobject.h"
 #include "qml/querylistmodel.h"
 #include "qml/tweetmodel.h"
 #include "qml/statusupdatequeryitem.h"
@@ -58,6 +58,8 @@
 #include "qml/tweetqueryitem.h"
 #include "qml/retweetqueryitem.h"
 #include "qml/favoritequeryitem.h"
+#include "qml/tweetlistquerywrapperobject.h"
+#include "qml/userlistquerywrapperobject.h"
 #include "version.h"
 #include "networkmonitor.h"
 
@@ -105,7 +107,7 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<qml::IModel>("harbour.twablet", 1, 0, "Model", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::AccountObject>("harbour.twablet", 1, 0, "Account", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::LayoutObject>("harbour.twablet", 1, 0, "Layout", QLatin1String("Uncreatable"));
-    qmlRegisterUncreatableType<qml::QueryObject>("harbour.twablet", 1, 0, "Query", QLatin1String("Uncreatable"));
+    qmlRegisterUncreatableType<qml::QueryTypeObject>("harbour.twablet", 1, 0, "QueryType", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::TweetObject>("harbour.twablet", 1, 0, "Tweet", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::QuotedTweetObject>("harbour.twablet", 1, 0, "QuotedTweet", QLatin1String("Uncreatable"));
     qmlRegisterUncreatableType<qml::UserObject>("harbour.twablet", 1, 0, "User", QLatin1String("Uncreatable"));
@@ -128,6 +130,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<qml::TweetQueryItem>("harbour.twablet", 1, 0, "TweetQueryItem");
     qmlRegisterType<qml::RetweetQueryItem>("harbour.twablet", 1, 0, "RetweetQueryItem");
     qmlRegisterType<qml::FavoriteQueryItem>("harbour.twablet", 1, 0, "FavoriteQueryItem");
+    qmlRegisterType<qml::TweetListQueryWrapperObject>("harbour.twablet", 1, 0, "TweetListQuery");
+    qmlRegisterType<qml::UserListQueryWrapperObject>("harbour.twablet", 1, 0, "UserListQuery");
     qmlRegisterSingletonType<qml::DataRepositoryObject>("harbour.twablet", 1, 0, "Repository",
                                                           [](QQmlEngine *e, QJSEngine *) -> QObject * {
         return new qml::DataRepositoryObject(e);

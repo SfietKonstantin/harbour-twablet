@@ -45,6 +45,7 @@ public:
     enum Roles {
         NameRole = Qt::UserRole + 1,
         QueryTypeRole,
+        QueryRole,
         UnreadRole,
         LayoutRole
     };

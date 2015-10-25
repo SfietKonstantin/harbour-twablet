@@ -88,7 +88,7 @@ bool TweetQueryItem::isQueryValid() const
     return !m_tweetId.isEmpty();
 }
 
-QNetworkReply * TweetQueryItem::createQuery() const
+QNetworkReply * TweetQueryItem::createQuery(const Account &account) const
 {
     QByteArray path {"statuses/show.json"};
     std::map<QByteArray, QByteArray> parameters {
@@ -97,7 +97,7 @@ QNetworkReply * TweetQueryItem::createQuery() const
         {"include_entities", "true"}
     };
 
-    return private_util::TwitterQueryUtil::get(network(), path, parameters, account()->data());
+    return private_util::TwitterQueryUtil::get(network(), path, parameters, account);
 }
 
 void TweetQueryItem::handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,

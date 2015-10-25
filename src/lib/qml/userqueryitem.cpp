@@ -66,12 +66,12 @@ bool UserQueryItem::isQueryValid() const
     return !m_userId.isEmpty();
 }
 
-QNetworkReply * UserQueryItem::createQuery() const
+QNetworkReply * UserQueryItem::createQuery(const Account &account) const
 {
     QByteArray path {"users/show.json"};
     std::map<QByteArray, QByteArray> parameters {{"user_id", QUrl::toPercentEncoding(m_userId)}};
 
-    return private_util::TwitterQueryUtil::get(network(), path, parameters, account()->data());
+    return private_util::TwitterQueryUtil::get(network(), path, parameters, account);
 }
 
 void UserQueryItem::handleReply(const QByteArray &reply, QNetworkReply::NetworkError networkError,

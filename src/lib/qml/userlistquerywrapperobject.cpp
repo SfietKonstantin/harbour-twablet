@@ -29,70 +29,85 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "querylistmodel.h"
-#include "querytypeobject.h"
+#include "userlistquerywrapperobject.h"
+#include "private/conversionutil.h"
+#include "querywrappervisitor.h"
 
 namespace qml
 {
 
-QueryListModel::QueryListModel(QObject *parent) :
-    QAbstractListModel(parent)
-{
-    m_data.emplace_back(new Data {tr("Home"), QueryTypeObject::Home});
-    m_data.emplace_back(new Data {tr("Mentions"), QueryTypeObject::Mentions});
-    m_data.emplace_back(new Data {tr("Search"), QueryTypeObject::Search});
-}
-
-void QueryListModel::classBegin()
+UserListQueryWrapperObject::UserListQueryWrapperObject(QObject *parent)
+    : QObject(parent)
 {
 }
 
-void QueryListModel::componentComplete()
+QString UserListQueryWrapperObject::accountUserId() const
 {
+    return m_accountUserId;
 }
 
-int QueryListModel::rowCount(const QModelIndex &index) const
+void UserListQueryWrapperObject::setAccountUserId(const QString &accountUserId)
 {
-    Q_UNUSED(index)
-    return m_data.size();
-}
-
-QVariant QueryListModel::data(const QModelIndex &index, int role) const
-{
-    int row = index.row();
-    if (row < 0 || row >= rowCount()) {
-        return QVariant();
-    }
-    const std::unique_ptr<Data> &data = m_data[row];
-    switch (role) {
-    case NameRole:
-        return data->name;
-        break;
-    case QueryTypeRole:
-        return data->type;
-        break;
-    default:
-        return QVariant();
-        break;
+    if (m_accountUserId != accountUserId) {
+        m_accountUserId = accountUserId;
+        emit accountUserIdChanged();
     }
 }
 
-int QueryListModel::count() const
+
+Query UserListQueryWrapperObject::query() const
 {
-    return rowCount();
+    return m_query;
 }
 
-int QueryListModel::getType(int index)
+void UserListQueryWrapperObject::setQuery(UserListQuery &&query)
 {
-    if (index < 0 || index >= rowCount()) {
-        return QueryTypeObject::InvalidTweetList;
+    m_query = std::move(query);
+}
+
+QueryTypeObject::UserListType UserListQueryWrapperObject::type() const
+{
+    return m_type;
+}
+
+void UserListQueryWrapperObject::setType(QueryTypeObject::UserListType type)
+{
+    if (m_type != type) {
+        m_type = type;
+        updateQuery();
+        emit typeChanged();
     }
-    return m_data[index]->type;
 }
 
-QHash<int, QByteArray> QueryListModel::roleNames() const
+QVariantMap UserListQueryWrapperObject::parameters() const
 {
-    return {{NameRole, "name"}, {QueryTypeRole, "type"}};
+    return m_parameters;
+}
+
+void UserListQueryWrapperObject::setParameters(const QVariantMap &parameters)
+{
+    if (m_parameters != parameters) {
+        m_parameters = parameters;
+        updateQuery();
+        emit parametersChanged();
+    }
+}
+
+void UserListQueryWrapperObject::accept(QueryWrapperVisitor &visitor) const
+{
+    visitor.visitUserListQuery(*this);
+}
+
+void UserListQueryWrapperObject::updateQuery()
+{
+    if (convertedType() != UserListQuery::Invalid) {
+        setQuery(UserListQuery(convertedType(), private_util::convertParameters(m_parameters)));
+    }
+}
+
+UserListQuery::Type UserListQueryWrapperObject::convertedType() const
+{
+    return static_cast<UserListQuery::Type>(m_type);
 }
 
 }

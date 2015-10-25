@@ -158,6 +158,11 @@ public:
     {
         m_listeners.erase(&listener);
     }
+    const std::set<IRepositoryListener<T> *> listeners() const
+    {
+        return m_listeners;
+    }
+protected:
     std::deque<T> m_data {};
 private:
     enum Status {

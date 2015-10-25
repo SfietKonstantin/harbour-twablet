@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,17 +29,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-.pragma library
+#include "querywrappervisitor.h"
+#include <QtCore/QtGlobal>
 
-function handleLink(url, panel, accountUserId, clear)
+namespace qml {
+
+QueryWrapperVisitor::~QueryWrapperVisitor()
 {
-    if (url.indexOf("http") === 0) {
-        Qt.openUrlExternally(url)
-    } else if (url.indexOf("user://") === 0) {
-        var userId = url.slice(7)
-        panel.openUser(userId, accountUserId, clear)
-    } else if (url.indexOf("hashtag://") === 0) {
-        var hashtag = url.slice(10)
-        panel.openSearch("#" + hashtag, accountUserId, clear)
-    }
 }
+
+void QueryWrapperVisitor::visitTweetListQuery(const TweetListQueryWrapperObject &wrapperObject)
+{
+    Q_UNUSED(wrapperObject)
+}
+
+void QueryWrapperVisitor::visitUserListQuery(const UserListQueryWrapperObject &wrapperObject)
+{
+    Q_UNUSED(wrapperObject)
+}
+
+}
+

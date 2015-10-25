@@ -31,7 +31,7 @@
 
 #include "tweetrepositorycontainer.h"
 #include "private/debughelper.h"
-#include "private/repositoryprocesscallback.h"
+#include "private/listquerycallback.h"
 #include "private/twitterqueryutil.h"
 #include "listqueryhandlerfactory.h"
 #include <QtCore/QLoggingCategory>
@@ -39,6 +39,9 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
 #include <QtNetwork/QNetworkReply>
+
+Q_DECLARE_LOGGING_CATEGORY(trc)
+Q_LOGGING_CATEGORY(trc, "tweet-repository-container")
 
 TweetRepositoryContainer::TweetRepositoryContainer(IQueryExecutor::ConstPtr &&queryExecutor)
     : m_queryExecutor(std::move(queryExecutor))
@@ -48,7 +51,7 @@ TweetRepositoryContainer::TweetRepositoryContainer(IQueryExecutor::ConstPtr &&qu
 
 TweetRepository * TweetRepositoryContainer::repository(const Account &account, const Query &query)
 {
-    auto it = m_mapping.find(MappingKey{account, query});
+    auto it = m_mapping.find(ContainerKey{Account{account}, Query{query}});
     if (it == std::end(m_mapping)) {
         return nullptr;
     }
@@ -57,32 +60,33 @@ TweetRepository * TweetRepositoryContainer::repository(const Account &account, c
 
 void TweetRepositoryContainer::referenceQuery(const Account &account, const Query &query)
 {
-    MappingData *data {getMappingData(account, query)};
+    Data *data {getMappingData(ContainerKey{Account{account}, Query{query}})};
     if (data == nullptr) {
         return;
     }
     ++data->refcount;
 
+    qCDebug(trc) << "Refcount info:";
     for (const auto &it : m_mapping) {
-        qCDebug(QLoggingCategory("tweet-central-repository")) << "For query" << it.first.query.path()
-                                                              << "Refcount:" << it.second.refcount;
+        qCDebug(trc) << "  For query" << it.first.query() << "Refcount:" << it.second.refcount
+                     << "Observers:" << it.second.repository.listeners().size();
     }
 }
 
 void TweetRepositoryContainer::dereferenceQuery(const Account &account, const Query &query)
 {
-    MappingData *data {getMappingData(account, query)};
+    Data *data {getMappingData(ContainerKey{Account{account}, Query{query}})};
     if (data == nullptr) {
         return;
     }
     --data->refcount;
     if (data->refcount == 0) {
-        m_mapping.erase(MappingKey{account, query});
+        m_mapping.erase(ContainerKey{Account{account}, Query{query}});
     }
 
+    qCDebug(trc) << "Refcount info:";
     for (const auto &it : m_mapping) {
-        qCDebug(QLoggingCategory("tweet-central-repository")) << "For query" << it.first.query.path()
-                                                              << "Refcount:" << it.second.refcount;
+        qCDebug(trc) << "  For query" << it.first.query() << "Refcount:" << it.second.refcount;
     }
 }
 
@@ -90,8 +94,8 @@ std::set<Query> TweetRepositoryContainer::referencedQueries(const Account &accou
 {
     std::set<Query> returned;
     for (auto it = std::begin(m_mapping); it != std::end(m_mapping); ++it) {
-        if (it->first.account.userId() == account.userId()) {
-            returned.insert(it->first.query);
+        if (it->first.account().userId() == account.userId()) {
+            returned.insert(it->first.query());
         }
     }
     return returned;
@@ -106,7 +110,7 @@ void TweetRepositoryContainer::refresh()
 
 void TweetRepositoryContainer::refresh(const Account &account, const Query &query)
 {
-    auto it = m_mapping.find(MappingKey{account, query});
+    auto it = m_mapping.find(ContainerKey{Account{account}, Query{query}});
     if (it != std::end(m_mapping)) {
         load(it->first, it->second, IListQueryHandler<Tweet>::Refresh);
     }
@@ -114,7 +118,7 @@ void TweetRepositoryContainer::refresh(const Account &account, const Query &quer
 
 void TweetRepositoryContainer::loadMore(const Account &account, const Query &query)
 {
-    auto it = m_mapping.find(MappingKey{account, query});
+    auto it = m_mapping.find(ContainerKey{Account{account}, Query{query}});
     if (it != std::end(m_mapping)) {
         load(it->first, it->second, IListQueryHandler<Tweet>::LoadMore);
     }
@@ -147,26 +151,32 @@ void TweetRepositoryContainer::updateTweet(const Tweet &tweet)
     }
 }
 
-void TweetRepositoryContainer::load(const MappingKey &key, MappingData &mappingData,
+void TweetRepositoryContainer::load(const ContainerKey &key, Data &mappingData,
                                   IListQueryHandler<Tweet>::RequestType requestType)
 {
     if (mappingData.loading) {
         return;
     }
 
+    qCDebug(trc) << "Refcount info:";
+    for (const auto &it : m_mapping) {
+        qCDebug(trc) << "  For query" << it.first.query() << "Refcount:" << it.second.refcount
+                     << "Observers:" << it.second.repository.listeners().size();
+    }
+
     mappingData.loading = true;
 
-    QByteArray path {key.query.path()};
-    Query::Parameters parameters (key.query.parameters());
+    QByteArray path {key.query().path()};
+    Query::Parameters parameters (key.query().parameters());
     const Query::Parameters &additionalParameters (mappingData.handler->additionalParameters(requestType));
     parameters.insert(std::begin(additionalParameters), std::end(additionalParameters));
 
-    qCDebug(QLoggingCategory("tweet-central-repository")) << "Request:" << path << parameters;
+    qCDebug(trc) << "Request:" << path << parameters;
     mappingData.repository.start();
 
-    m_queryExecutor->execute(path, parameters, key.account, [this, &mappingData, requestType](QIODevice &reply, QNetworkReply::NetworkError error, const QString &errorMessage) {
+    m_queryExecutor->execute(path, parameters, key.account(), [this, &mappingData, requestType](QIODevice &reply, QNetworkReply::NetworkError error, const QString &errorMessage) {
         std::vector<Tweet> items {};
-        private_util::RepositoryProcessCallback<Tweet> callback {
+        private_util::ListQueryHandler<Tweet> callback {
             requestType,
             *mappingData.handler,
             mappingData.repository,
@@ -176,37 +186,30 @@ void TweetRepositoryContainer::load(const MappingKey &key, MappingData &mappingD
         callback(reply, error, errorMessage);
         for (const Tweet &tweet : items) {
             m_data.emplace(tweet.id(), tweet);
-            qCDebug(QLoggingCategory("tweet-central-repository")) << "Adding tweet with id" << tweet.id();
+            qCDebug(trc) << "Adding tweet with id" << tweet.id();
         }
     });
 }
 
-TweetRepositoryContainer::MappingData * TweetRepositoryContainer::getMappingData(const Account &account, const Query &query)
+TweetRepositoryContainer::Data * TweetRepositoryContainer::getMappingData(const ContainerKey &key)
 {
-    auto it = m_mapping.find(MappingKey(account, query));
+    auto it = m_mapping.find(key);
     if (it != std::end(m_mapping)) {
         return &(it->second);
     }
 
-    IListQueryHandler<Tweet>::Ptr handler {ListQueryHandlerFactory::createTweet(query)};
+    if (!key.account().isValid()) {
+        return nullptr;
+    }
+
+    IListQueryHandler<Tweet>::Ptr handler {ListQueryHandlerFactory::createTweetList(key.query())};
     if (!handler) {
         return nullptr;
     }
-    return &(m_mapping.emplace(MappingKey{account, query}, MappingData{std::move(handler)}).first->second);
+    return &(m_mapping.emplace(key, Data{std::move(handler)}).first->second);
 }
 
-bool TweetRepositoryContainer::MappingKeyComparator::operator()(const MappingKey &first, const MappingKey &second) const
-{
-    return first.account.userId() == second.account.userId() ? (first.query < second.query)
-                                                             : (first.account.userId() < second.account.userId());
-}
-
-TweetRepositoryContainer::MappingData::MappingData(IListQueryHandler<Tweet>::Ptr &&inputHandler)
+TweetRepositoryContainer::Data::Data(IListQueryHandler<Tweet>::Ptr &&inputHandler)
     : handler(std::move(inputHandler))
-{
-}
-
-TweetRepositoryContainer::MappingKey::MappingKey(const Account &inputAccount, const Query &inputQuery)
-    : account(std::move(inputAccount)), query(std::move(inputQuery))
 {
 }

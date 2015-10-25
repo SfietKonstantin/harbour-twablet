@@ -40,88 +40,94 @@ Item {
     anchors.top: parent.top; anchors.bottom: parent.bottom
     visible: false
 
-    function openUser(id, account, pushMode) {
-        var page = _open(Qt.resolvedUrl("UserPage.qml"), {userId: id, account: account, panel: container}, pushMode)
+    function openUser(id, accountUserId, pushMode) {
+        var params = {
+            userId: id,
+            accountUserId: accountUserId,
+            panel: container
+        }
+
+        var page = _open(Qt.resolvedUrl("UserPage.qml"), params, pushMode)
         page.load()
     }
-    function openSearch(query, account, pushMode) {
-        var args = {q: query, result_type: "recent"}
+    function openSearch(query, accountUserId, pushMode) {
+        var parameters = {q: query, result_type: "recent"}
         var params = {
             title: query,
-            queryType: Query.Search,
-            args: args,
-            account: account,
+            type: QueryType.Search,
+            parameters: parameters,
+            accountUserId: accountUserId,
             panel: container
         }
 
         _open(Qt.resolvedUrl("TweetsPage.qml"), params, pushMode)
     }
-    function openFavorites(userId, screenName, account, pushMode) {
-        var args = {user_id: userId}
+    function openFavorites(userId, screenName, accountUserId, pushMode) {
+        var parameters = {user_id: userId}
         var params = {
             title: qsTr("%1's favorites").arg(screenName),
-            queryType: Query.Favorites,
-            args: args,
-            account: account,
+            type: QueryType.Favorites,
+            parameters: parameters,
+            accountUserId: accountUserId,
             panel: container
         }
 
         _open(Qt.resolvedUrl("TweetsPage.qml"), params, pushMode)
     }
-    function openUserTimeline(userId, screenName, account, pushMode) {
-        var args = {user_id: userId}
+    function openUserTimeline(userId, screenName, accountUserId, pushMode) {
+        var parameters = {user_id: userId}
         var params = {
             title: qsTr("Tweets from %1").arg(screenName),
-            queryType: Query.UserTimeline,
-            args: args,
-            account: account,
+            type: QueryType.UserTimeline,
+            parameters: parameters,
+            accountUserId: accountUserId,
             panel: container
         }
 
         _open(Qt.resolvedUrl("TweetsPage.qml"), params, pushMode)
     }
 
-    function openFriends(userId, screenName, account, pushMode) {
-        var args = {"user_id": userId}
+    function openFriends(userId, screenName, accountUserId, pushMode) {
+        var parameters = {"user_id": userId}
         var params = {
             title: qsTr("%1's friends").arg(screenName),
-            queryType: Query.Friends,
-            args: args,
-            account: account,
+            type: QueryType.Friends,
+            parameters: parameters,
+            accountUserId: accountUserId,
             panel: container
         }
 
         _open(Qt.resolvedUrl("UsersPage.qml"), params, pushMode)
     }
 
-    function openFollowers(userId, screenName, account, pushMode) {
-        var args = {"user_id": userId}
+    function openFollowers(userId, screenName, accountUserId, pushMode) {
+        var parameters = {"user_id": userId}
         var params = {
             title: qsTr("%1's followers").arg(screenName),
-            queryType: Query.Followers,
-            args: args,
-            account: account,
+            type: QueryType.Followers,
+            parameters: parameters,
+            accountUserId: accountUserId,
             panel: container
         }
 
         _open(Qt.resolvedUrl("UsersPage.qml"), params, pushMode)
     }
 
-    function openTweet(tweetId, retweetId, account, pushMode) {
+    function openTweet(tweetId, retweetId, accountUserId, pushMode) {
         var params = {
             tweetId: tweetId,
             retweetId: retweetId,
-            account: account,
+            accountUserId: accountUserId,
             panel: container
         }
         var page = _open(Qt.resolvedUrl("TweetPage.qml"), params, pushMode)
         page.load()
     }
 
-    function openImageBrowser(tweet, account) {
+    function openImageBrowser(tweet, accountUserId) {
         var params = {
             tweet: tweet,
-            account: account,
+            accountUserId: accountUserId,
             panel: container
         }
 
@@ -136,7 +142,6 @@ Item {
         if (Screen.sizeCategory === Screen.Large) {
             if (pushMode === Info.Clear) {
                 panelPageStack.clear()
-                Repository.clearTemporary()
             }
             container.open = true
             args.width = container.width
@@ -148,10 +153,6 @@ Item {
             }
             return panelPageStack.push(page, args)
         } else {
-            if (pushMode === Info.Clear) {
-                Repository.clearTemporary()
-            }
-
             if (pushMode === Info.Replace) {
                 return pageStack.replace(page, args)
             } else {
@@ -283,6 +284,9 @@ Item {
                     target: container
                     property: "visible"
                     value: false
+                }
+                ScriptAction {
+                    script: panelPageStack.clear()
                 }
             }
         }

@@ -38,9 +38,9 @@ Page {
     id: container
     property alias tweetId: query.tweetId
     property string retweetId // Used to mark retweeted
-    property alias account: query.account
+    property alias accountUserId: query.accountUserId
     property RightPanel panel
-    function load() { query.load() }
+    function load() { query.load(Repository) }
 
     TweetQueryItem {
         id: query
@@ -48,7 +48,7 @@ Page {
 
     RetweetQueryItem {
         id: retweetQuery
-        account: query.account
+        accountUserId: query.accountUserId
         tweetId: container.retweetId
         onFinished: {
             Repository.setTweetRetweeted(container.tweetId)
@@ -61,7 +61,7 @@ Page {
 
     FavoriteQueryItem {
         id: favoriteQuery
-        account: query.account
+        accountUserId: query.accountUserId
         tweetId: container.retweetId
         favorited: query.data && query.data.favorited
         onFinished: {
@@ -96,11 +96,11 @@ Page {
                 enabled: false
                 anchors.left: parent.left; anchors.right: parent.right
                 onOpenTweet: {
-                    panel.openTweet(originalId, id, container.account)
+                    panel.openTweet(originalId, id, container.accountUserId)
                 }
                 tweet: query.data
-                onHandleLink: LH.handleLink(url, container.panel, container.account, false)
-                onHandleOpenImageBrowser: panel.openImageBrowser(tweet, container.account)
+                onHandleLink: LH.handleLink(url, container.panel, container.accountUserId, false)
+                onHandleOpenImageBrowser: panel.openImageBrowser(tweet, container.accountUserId)
                 fontSize: Theme.fontSizeSmall
                 fontSizeSmall: Theme.fontSizeExtraSmall
                 itemSize: Theme.itemSizeSmall
@@ -113,18 +113,18 @@ Page {
                }
                ProgressIconButton {
                    source: "image://theme/icon-s-retweet"
-                   enabled: query.data ? !query.data.retweeted && container.account.userId !== query.data.user.id: false
+                   enabled: query.data ? !query.data.retweeted && container.accountUserId !== query.data.user.id: false
                    highlighted: down || (query.data ? query.data.retweeted : false)
                    busy: retweetQuery.status === QueryItem.Loading
                    error: retweetQuery.status === QueryItem.Error
-                   onClicked: retweetQuery.load()
+                   onClicked: retweetQuery.load(Repository)
                }
                ProgressIconButton {
                    source: "image://theme/icon-s-favorite"
                    highlighted: down || (query.data ? query.data.favorited : false)
                    busy: favoriteQuery.status === QueryItem.Loading
                    error: favoriteQuery.status === QueryItem.Error
-                   onClicked: favoriteQuery.load()
+                   onClicked: favoriteQuery.load(Repository)
                }
             }
 

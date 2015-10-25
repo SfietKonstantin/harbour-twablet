@@ -72,7 +72,7 @@ bool FavoriteQueryItem::isQueryValid() const
     return !m_tweetId.isEmpty();
 }
 
-QNetworkReply * FavoriteQueryItem::createQuery() const
+QNetworkReply * FavoriteQueryItem::createQuery(const Account &account) const
 {
     QByteArray path {};
     if (m_favorited) {
@@ -82,7 +82,7 @@ QNetworkReply * FavoriteQueryItem::createQuery() const
     }
     std::map<QByteArray, QByteArray> parameters {{"id", QUrl::toPercentEncoding(m_tweetId)}};
 
-    return private_util::TwitterQueryUtil::post(network(), path, {}, parameters, account()->data());
+    return private_util::TwitterQueryUtil::post(network(), path, {}, parameters, account);
 }
 
 void FavoriteQueryItem::handleReply(const QByteArray &reply,

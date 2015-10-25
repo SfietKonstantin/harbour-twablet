@@ -58,7 +58,7 @@ public:
      * @param userId user id of the account.
      * @param query query.
      */
-    explicit Layout(const QString &name, const QString &userId, TweetListQuery &&query);
+    explicit Layout(const QString &name, const QString &accountUserId, TweetListQuery &&query);
     DEFAULT_COPY_DEFAULT_MOVE(Layout);
     /**
      * @brief If the Layout instance is valid
@@ -83,12 +83,12 @@ public:
      * @brief User id of the account to use
      * @return user id of the account to use.
      */
-    QString userId() const;
+    QString accountUserId() const;
     /**
      * @brief Set the user id of the account to use
      * @param userId user id of the account to use.
      */
-    void setUserId(const QString &userId);
+    void setAccountUserId(const QString &accountUserId);
     /**
      * @brief Query to use
      * @return query to use.
@@ -111,7 +111,7 @@ public:
     void setUnread(int unread);
 private:
     QString m_name {};
-    QString m_userId {};
+    QString m_accountUserId {};
     TweetListQuery m_query {};
     int m_unread {0};
 };

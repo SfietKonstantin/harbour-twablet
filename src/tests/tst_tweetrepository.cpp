@@ -60,7 +60,8 @@ class tweetrepository: public testing::Test, protected TestRepositoryListener<Tw
 {
 public:
     explicit tweetrepository()
-        : account(QLatin1String("test"), QLatin1String("test"), QLatin1String("test"), QByteArray(), QByteArray())
+        : account(QLatin1String("test"), QLatin1String("test"), QLatin1String("test"),
+                  QByteArray("test"), QByteArray("test"))
     {
         queryExecutor = new MockQueryExecutor();
         repository.reset(new TweetRepositoryContainer(IQueryExecutor::ConstPtr(queryExecutor)));

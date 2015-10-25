@@ -36,5 +36,6 @@
 #include "query.h"
 
 QDebug & operator<<(QDebug &debug, const Query::Parameters &parameters);
+QDebug & operator<<(QDebug &debug, const Query &query);
 
 #endif // DEBUGHELPER_H

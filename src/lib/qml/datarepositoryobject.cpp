@@ -30,12 +30,14 @@
  */
 
 #include "datarepositoryobject.h"
-#include "query.h"
-#include "accountobject.h"
-#include "queryobject.h"
-#include "private/networkqueryexecutor.h"
-#include <QtCore/QVariantMap>
 #include <QtCore/QLoggingCategory>
+#include <QtCore/QVariantMap>
+#include "private/conversionutil.h"
+#include "private/networkqueryexecutor.h"
+#include "accountobject.h"
+#include "query.h"
+#include "querytypeobject.h"
+#include "querywrappervisitor.h"
 
 namespace qml
 {
@@ -43,8 +45,8 @@ namespace qml
 DataRepositoryObject::DataRepositoryObject(QObject *parent)
     : QObject(parent)
     , m_network(new QNetworkAccessManager())
-    , m_tweetsCentralRepository(private_util::NetworkQueryExecutor::create(*m_network))
-    , m_userCentralRepository(private_util::NetworkQueryExecutor::create(*m_network))
+    , m_tweetRepositoryContainer(private_util::NetworkQueryExecutor::create(*m_network))
+    , m_userRepositoryContainer(private_util::NetworkQueryExecutor::create(*m_network))
 {
     m_loadSaveManager.load(m_accounts);
     for (const Account &account : m_accounts) {
@@ -52,7 +54,7 @@ DataRepositoryObject::DataRepositoryObject(QObject *parent)
     }
     m_loadSaveManager.load(m_layouts);
     for (const Layout &layout : m_layouts) {
-        insertRepository(layout);
+        m_tweetRepositoryContainer.referenceQuery(account(layout.accountUserId()), layout.query());
     }
 }
 
@@ -61,7 +63,7 @@ bool DataRepositoryObject::hasAccounts() const
     return m_accounts.empty();
 }
 
-AccountRepository & DataRepositoryObject::accounts()
+AccountRepository & DataRepositoryObject::accountRepository()
 {
     return m_accounts;
 }
@@ -71,34 +73,43 @@ LayoutRepository & DataRepositoryObject::layouts()
     return m_layouts;
 }
 
-TweetRepository * DataRepositoryObject::tweets(const Layout &layout)
+TweetRepository * DataRepositoryObject::tweetRepository(const Account &account, const Query &query)
 {
-    return m_tweetsCentralRepository.repository(accountFromId(layout.userId()), layout.query());
+    return m_tweetRepositoryContainer.repository(account, query);
 }
 
-const Layout * DataRepositoryObject::temporaryLayout(int index) const
+void DataRepositoryObject::referenceTweetListQuery(const Account &account, const Query &query)
 {
-    auto it = m_temporaryLayouts.find(index);
-    if (it == std::end(m_temporaryLayouts)) {
-        return nullptr;
+    m_tweetRepositoryContainer.referenceQuery(account, query);
+}
+
+void DataRepositoryObject::dereferenceTweetListQuery(const Account &account, const Query &query)
+{
+    m_tweetRepositoryContainer.dereferenceQuery(account, query);
+}
+
+UserRepository * DataRepositoryObject::userRepository(const Account &account, const Query &query)
+{
+    return m_userRepositoryContainer.repository(account, query);
+}
+
+void DataRepositoryObject::referenceUserListQuery(const Account &account, const Query &query)
+{
+    return m_userRepositoryContainer.referenceQuery(account, query);
+}
+
+void DataRepositoryObject::dereferenceUserListQuery(const Account &account, const Query &query)
+{
+    return m_userRepositoryContainer.dereferenceQuery(account, query);
+}
+
+Account DataRepositoryObject::account(const QString &accountUserId) const
+{
+    auto it = m_accountsMapping.find(accountUserId);
+    if (it == std::end(m_accountsMapping)) {
+        return Account{};
     }
-
-    return &(it->second);
-}
-
-bool DataRepositoryObject::isTemporaryLayoutValid(int index) const
-{
-    return m_temporaryLayouts.find(index) != std::end(m_temporaryLayouts);
-}
-
-bool DataRepositoryObject::isUserRepositoryValid(int index) const
-{
-    return m_userCentralRepository.isValid(index);
-}
-
-UserRepository * DataRepositoryObject::user(int index)
-{
-    return m_userCentralRepository.repository(index);
+    return it->second;
 }
 
 int DataRepositoryObject::addAccount(const QString &name, const QString &userId,
@@ -136,21 +147,21 @@ void DataRepositoryObject::removeAccount(int index)
     }
 
     bool oldHasAccounts = hasAccounts();
-    const QString userId {(std::begin(m_accounts) + index)->userId()};
-    m_accountsMapping.erase(userId);
+    const QString accountUserId {(std::begin(m_accounts) + index)->userId()};
+    m_accountsMapping.erase(accountUserId);
     m_accounts.remove(index);
     m_loadSaveManager.save(m_accounts);
 
     std::vector<int> removedIndexes;
     for (int i = 0; i < m_layouts.count(); ++i) {
-        if ((std::begin(m_layouts) + i)->userId() == userId) {
+        if ((std::begin(m_layouts) + i)->accountUserId() == accountUserId) {
             removedIndexes.push_back(i);
         }
     }
     std::sort(std::begin(removedIndexes), std::end(removedIndexes), [](int first, int second) { return first > second; });
 
     for (int i : removedIndexes) {
-        removeLayoutFromRepositories(i);
+        dereferenceLayoutTweetList(i);
     }
     m_loadSaveManager.save(m_layouts);
 
@@ -191,11 +202,11 @@ void DataRepositoryObject::addDefaultLayouts(int accountIndex, const QString &ho
 
     if (enableHomeTimeline) {
         m_layouts.append(Layout(homeName, userId, TweetListQuery(TweetListQuery::Home, TweetListQuery::Parameters())));
-        insertRepository();
+        referenceLastLayoutTweetList();
     }
     if (enableMentionsTimeline) {
         m_layouts.append(Layout(mentionsName, userId, TweetListQuery(TweetListQuery::Mentions, TweetListQuery::Parameters())));
-        insertRepository();
+        referenceLastLayoutTweetList();
     }
     m_loadSaveManager.save(m_layouts);
 }
@@ -227,147 +238,118 @@ void DataRepositoryObject::removeLayout(int index)
         return;
     }
 
-    removeLayoutFromRepositories(index);
+    dereferenceLayoutTweetList(index);
     m_loadSaveManager.save(m_layouts);
 }
 
 void DataRepositoryObject::refresh()
 {
-    m_tweetsCentralRepository.refresh();
+    m_tweetRepositoryContainer.refresh();
 }
 
-void DataRepositoryObject::loadMore(int layoutIndex)
+void DataRepositoryObject::refresh(QObject *query)
 {
-    if (layoutIndex < 0 || layoutIndex >= m_layouts.count()) {
+    IQueryWrapperObject *queryWrapper = qobject_cast<IQueryWrapperObject *>(query);
+    if (queryWrapper == nullptr) {
         return;
     }
 
-    const Layout &layout {*(std::begin(m_layouts) + layoutIndex)};
-    m_tweetsCentralRepository.loadMore(accountFromId(layout.userId()), layout.query());
+    class RefreshVisitor: public QueryWrapperVisitor
+    {
+    public:
+        explicit RefreshVisitor(DataRepositoryObject &parent,
+                                TweetRepositoryContainer &tweetRepositoryContainer,
+                                UserRepositoryContainer &userRepositoryContainer)
+            : m_parent{parent}, m_tweetRepositoryContainer{tweetRepositoryContainer}
+            , m_userRepositoryContainer{userRepositoryContainer}
+        {
+        }
+        void visitTweetListQuery(const TweetListQueryWrapperObject &wrapperObject) override
+        {
+            const Account &account {m_parent.account(wrapperObject.accountUserId())};
+            m_tweetRepositoryContainer.refresh(account, wrapperObject.query());
+        }
+        void visitUserListQuery(const UserListQueryWrapperObject &wrapperObject) override
+        {
+            const Account &account {m_parent.account(wrapperObject.accountUserId())};
+            m_userRepositoryContainer.refresh(account, wrapperObject.query());
+        }
+    private:
+        DataRepositoryObject &m_parent;
+        TweetRepositoryContainer &m_tweetRepositoryContainer;
+        UserRepositoryContainer &m_userRepositoryContainer;
+    };
+    RefreshVisitor visitor {*this, m_tweetRepositoryContainer, m_userRepositoryContainer};
+    queryWrapper->accept(visitor);
 }
 
-int DataRepositoryObject::addTemporaryLayout(AccountObject *account, int queryType, const QVariantMap &paramters)
+void DataRepositoryObject::loadMore(QObject *query)
 {
-    if (account == nullptr) {
-        return -1;
-    }
-
-    Query::Parameters queryParameters {};
-    copyQueryParameters(paramters, queryParameters);
-    TweetListQuery query {static_cast<TweetListQuery::Type>(queryType), std::move(queryParameters)};
-    if (!query.isValid()) {
-        return -1;
-    }
-
-    int index = m_temporaryLayoutsIndex;
-    ++m_temporaryLayoutsIndex;
-    m_temporaryLayouts.emplace(index, Layout(QString(), account->userId(), std::move(query)));
-    auto it = m_temporaryLayouts.find(index);
-    insertRepository(it->second);
-    refresh(it->second);
-    return index;
-}
-
-void DataRepositoryObject::removeTemporaryLayout(int index)
-{
-    if (index < 0) {
+    IQueryWrapperObject *queryWrapper = qobject_cast<IQueryWrapperObject *>(query);
+    if (queryWrapper == nullptr) {
         return;
     }
 
-    auto it = m_temporaryLayouts.find(index);
-    if (it == std::end(m_temporaryLayouts)) {
-        return;
-    }
-
-    removeLayoutFromRepositories(it->second);
-    m_temporaryLayouts.erase(it);
-}
-
-void DataRepositoryObject::clearTemporary()
-{
-    for (auto it = std::begin(m_temporaryLayouts); it != std::end(m_temporaryLayouts); ++it) {
-        removeLayoutFromRepositories(it->second);
-    }
-    m_temporaryLayouts.clear();
-}
-
-void DataRepositoryObject::refreshTemporary(int index)
-{
-    auto it = m_temporaryLayouts.find(index);
-    if (it == std::end(m_temporaryLayouts)) {
-        return;
-    }
-    refresh(it->second);
-}
-
-int DataRepositoryObject::addUser(AccountObject *account, int queryType, const QVariantMap &parameters)
-{
-    if (account == nullptr) {
-        return -1;
-    }
-
-    Query::Parameters queryParameters {};
-    copyQueryParameters(parameters, queryParameters);
-    UserListQuery query {static_cast<UserListQuery::Type>(queryType), std::move(queryParameters)};
-    if (!query.isValid()) {
-        return -1;
-    }
-
-    return m_userCentralRepository.addRepository(account->data(), std::move(query));
-}
-
-void DataRepositoryObject::removeUser(int index)
-{
-    m_userCentralRepository.removeRepository(index);
-}
-
-void DataRepositoryObject::userLoadMore(int index)
-{
-    m_userCentralRepository.loadMore(index);
+    class LoadMoreVisitor: public QueryWrapperVisitor
+    {
+    public:
+        explicit LoadMoreVisitor(DataRepositoryObject &parent,
+                                 TweetRepositoryContainer &tweetRepositoryContainer,
+                                 UserRepositoryContainer &userRepositoryContainer)
+            : m_parent{parent}, m_tweetRepositoryContainer{tweetRepositoryContainer}
+            , m_userRepositoryContainer{userRepositoryContainer}
+        {
+        }
+        void visitTweetListQuery(const TweetListQueryWrapperObject &wrapperObject) override
+        {
+            const Account &account {m_parent.account(wrapperObject.accountUserId())};
+            m_tweetRepositoryContainer.loadMore(account, wrapperObject.query());
+        }
+        void visitUserListQuery(const UserListQueryWrapperObject &wrapperObject) override
+        {
+            const Account &account {m_parent.account(wrapperObject.accountUserId())};
+            m_userRepositoryContainer.loadMore(account, wrapperObject.query());
+        }
+    private:
+        DataRepositoryObject &m_parent;
+        TweetRepositoryContainer &m_tweetRepositoryContainer;
+        UserRepositoryContainer &m_userRepositoryContainer;
+    };
+    LoadMoreVisitor visitor {*this, m_tweetRepositoryContainer, m_userRepositoryContainer};
+    queryWrapper->accept(visitor);
 }
 
 void DataRepositoryObject::setTweetRetweeted(const QString &tweetId)
 {
-    Tweet tweet = m_tweetsCentralRepository.tweet(tweetId);
+    Tweet tweet = m_tweetRepositoryContainer.tweet(tweetId);
     if (tweet.isValid()) {
         tweet.setRetweeted(true);
-        m_tweetsCentralRepository.updateTweet(tweet);
+        m_tweetRepositoryContainer.updateTweet(tweet);
     }
 }
 
 void DataRepositoryObject::setTweetFavorited(const QString &tweetId, bool favorited)
 {
-    Tweet tweet = m_tweetsCentralRepository.tweet(tweetId);
+    Tweet tweet = m_tweetRepositoryContainer.tweet(tweetId);
     if (tweet.isValid()) {
         tweet.setFavorited(favorited);
-        m_tweetsCentralRepository.updateTweet(tweet);
+        m_tweetRepositoryContainer.updateTweet(tweet);
     }
-}
-
-Account DataRepositoryObject::accountFromId(const QString &userId) const
-{
-    return m_accountsMapping.at(userId);
-}
-
-void DataRepositoryObject::refresh(const Layout &layout)
-{
-    const Account &account {accountFromId(layout.userId())};
-    m_tweetsCentralRepository.refresh(account, layout.query());
 }
 
 void DataRepositoryObject::addLayout(const QString &name, const QString &userId, int queryType,
                                      const QVariantMap &parameters)
 {
-    Query::Parameters queryParameters {};
-    copyQueryParameters(parameters, queryParameters);
-
-    TweetListQuery query {static_cast<TweetListQuery::Type>(queryType), std::move(queryParameters)};
+    TweetListQuery query {
+        static_cast<TweetListQuery::Type>(queryType),
+        std::move(private_util::convertParameters(parameters))
+    };
     if (!query.isValid()) {
         return;
     }
 
     m_layouts.append(std::move(Layout(name, userId, std::move(query))));
-    insertRepository();
+    referenceLastLayoutTweetList();
     m_loadSaveManager.save(m_layouts);
     refresh();
 }
@@ -382,34 +364,16 @@ bool DataRepositoryObject::addLayoutCheckAccount(int accountIndex, QString &user
     return true;
 }
 
-void DataRepositoryObject::copyQueryParameters(const QVariantMap &parameters,
-                                               Query::Parameters &queryParametrs) const
+void DataRepositoryObject::referenceLastLayoutTweetList()
 {
-    for (const QString &key : parameters.keys()) {
-        queryParametrs.emplace(QUrl::toPercentEncoding(key),
-                               QUrl::toPercentEncoding(parameters.value(key).toString()));
-    }
+    const Layout &layout {*(std::end(m_layouts) - 1)};
+    m_tweetRepositoryContainer.referenceQuery(account(layout.accountUserId()), layout.query());
 }
 
-void DataRepositoryObject::insertRepository(const Layout &layout)
-{
-    m_tweetsCentralRepository.referenceQuery(accountFromId(layout.userId()), layout.query());
-}
-
-void DataRepositoryObject::insertRepository()
-{
-    insertRepository(*(std::end(m_layouts) - 1));
-}
-
-void DataRepositoryObject::removeLayoutFromRepositories(const Layout &layout)
-{
-    m_tweetsCentralRepository.dereferenceQuery(accountFromId(layout.userId()), layout.query());
-}
-
-void DataRepositoryObject::removeLayoutFromRepositories(int index)
+void DataRepositoryObject::dereferenceLayoutTweetList(int index)
 {
     const Layout &layout {*(std::begin(m_layouts) + index)};
-    removeLayoutFromRepositories(layout);
+    m_tweetRepositoryContainer.dereferenceQuery(account(layout.accountUserId()), layout.query());
     m_layouts.remove(index);
 }
 
