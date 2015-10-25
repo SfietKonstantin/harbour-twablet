@@ -260,8 +260,8 @@ void DataRepositoryObject::refresh(QObject *query)
         explicit RefreshVisitor(DataRepositoryObject &parent,
                                 TweetRepositoryContainer &tweetRepositoryContainer,
                                 UserRepositoryContainer &userRepositoryContainer)
-            : m_parent{parent}, m_tweetRepositoryContainer{tweetRepositoryContainer}
-            , m_userRepositoryContainer{userRepositoryContainer}
+            : m_parent(parent), m_tweetRepositoryContainer(tweetRepositoryContainer)
+            , m_userRepositoryContainer(userRepositoryContainer)
         {
         }
         void visitTweetListQuery(const TweetListQueryWrapperObject &wrapperObject) override
@@ -296,8 +296,8 @@ void DataRepositoryObject::loadMore(QObject *query)
         explicit LoadMoreVisitor(DataRepositoryObject &parent,
                                  TweetRepositoryContainer &tweetRepositoryContainer,
                                  UserRepositoryContainer &userRepositoryContainer)
-            : m_parent{parent}, m_tweetRepositoryContainer{tweetRepositoryContainer}
-            , m_userRepositoryContainer{userRepositoryContainer}
+            : m_parent(parent), m_tweetRepositoryContainer(tweetRepositoryContainer)
+            , m_userRepositoryContainer(userRepositoryContainer)
         {
         }
         void visitTweetListQuery(const TweetListQueryWrapperObject &wrapperObject) override
