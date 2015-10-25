@@ -90,7 +90,7 @@ Item {
     function openFriends(userId, screenName, accountUserId, pushMode) {
         var parameters = {"user_id": userId}
         var params = {
-            title: qsTr("%1's friends").arg(screenName),
+            title: qsTr("%1 is following").arg(screenName),
             type: QueryType.Friends,
             parameters: parameters,
             accountUserId: accountUserId,

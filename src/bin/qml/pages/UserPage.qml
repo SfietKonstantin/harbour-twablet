@@ -150,7 +150,7 @@ Page {
                 }
                 MiniButton {
                     width: parent.width / 3
-                    text: queryItem.item ? qsTr("%n\nfriends", "", queryItem.item.friendsCount) : ""
+                    text: queryItem.item ? qsTr("%n\nfollowing", "", queryItem.item.friendsCount) : ""
                     onClicked: container.panel.openFriends(container.userId, queryItem.item.screenName,
                                                            container.accountUserId, false)
                 }
