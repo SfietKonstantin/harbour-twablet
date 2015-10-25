@@ -54,7 +54,9 @@ IItemQueryHandler<Tweet>::Ptr ItemQueryHandlerFactory::createTweetItem(const Que
 
 IItemQueryHandler<User>::Ptr ItemQueryHandlerFactory::createUserItem(const Query &query)
 {
-    if (query.path() == UserItemQuery::pathFromType(UserItemQuery::Show)) {
+    if (query.path() == UserItemQuery::pathFromType(UserItemQuery::Show)
+        || query.path() == UserItemQuery::pathFromType(UserItemQuery::Follow)
+        || query.path() == UserItemQuery::pathFromType(UserItemQuery::Unfollow)) {
         return UserItemQueryHandler::create();
     } else {
         qCWarning(logger) << "Cannot create query handler from query" << query;

@@ -50,6 +50,24 @@ Page {
         }
     }
 
+    UserQueryItem {
+        id: followQueryItem
+        repository: Repository
+        query: UserQuery {
+            type: queryItem.item && queryItem.item.following ? QueryType.Unfollow : QueryType.Follow
+            accountUserId: query.accountUserId
+            userId: query.userId
+        }
+        onFinished: {
+            if (!item) {
+                return
+            }
+
+            var following = item.following
+            queryItem.setFollowing(following)
+        }
+    }
+
     SilicaFlickable {
         anchors.fill: parent
         clip: true
@@ -90,11 +108,19 @@ Page {
                 }
 
                 TwitterImage {
+                    id: profilePicture
                     anchors.top: parent.top; anchors.topMargin: Theme.paddingMedium
                     anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
                     width: Theme.itemSizeMedium
                     height: Theme.itemSizeMedium
                     source: queryItem.item ? (Screen.sizeCategory === Screen.Large ? queryItem.item.imageUrlLarge : queryItem.item.imageUrl) : ""
+                }
+
+                Image {
+                    anchors.verticalCenter: profilePicture.verticalCenter
+                    anchors.right: profilePicture.left; anchors.rightMargin: Theme.paddingMedium
+                    source: "image://theme/icon-s-installed?" + Theme.highlightColor
+                    visible: queryItem.item && queryItem.item.following
                 }
 
                 Label {
@@ -194,6 +220,17 @@ Page {
 
             MiniButton {
                 text: queryItem.item ? qsTr("Listed in %n lists", "", queryItem.item.listedCount) : ""
+            }
+        }
+
+        PullDownMenu {
+            visible: queryItem.status === QueryItem.Idle
+            MenuItem {
+                text: queryItem.item ? (queryItem.item.following ? qsTr("Unfollow @%1").arg(queryItem.item.screenName)
+                                                                 : qsTr("Follow @%1").arg(queryItem.item.screenName))
+                                     : ""
+                onClicked: followQueryItem.load()
+                enabled: followQueryItem.status === QueryItem.Idle
             }
         }
 

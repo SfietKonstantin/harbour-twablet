@@ -73,7 +73,9 @@ public:
     enum UserItemType
     {
         InvalidUserItem = UserItemQuery::Invalid,
-        ShowUser = UserItemQuery::Show
+        ShowUser = UserItemQuery::Show,
+        Follow = UserItemQuery::Follow,
+        Unfollow = UserItemQuery::Unfollow
     };
 
     DISABLE_COPY_DISABLE_MOVE(QueryTypeObject);

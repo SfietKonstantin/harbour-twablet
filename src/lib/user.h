@@ -113,10 +113,15 @@ public:
      */
     bool isProtected() const;
     /**
-     * @brief If the user is following the current account
-     * @return if the user is following the current account.
+     * @brief If the current account is following the user
+     * @return if the current account is following the user.
      */
     bool isFollowing() const;
+    /**
+     * @brief Set if the current account is following the user
+     * @param following if the current account is following the user
+     */
+    void setFollowing(bool following);
     /**
      * @brief Number of status updates sent by the user
      * @return number of status updates sent by the user.

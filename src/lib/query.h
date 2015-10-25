@@ -235,7 +235,9 @@ public:
     enum Type
     {
         Invalid = 0,
-        Show
+        Show,
+        Follow,
+        Unfollow
     };
     explicit UserItemQuery() = default;
     explicit UserItemQuery(Type type, Query::Parameters &&additionalParameters);

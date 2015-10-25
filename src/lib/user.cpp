@@ -112,6 +112,11 @@ bool User::isFollowing() const
     return m_following;
 }
 
+void User::setFollowing(bool following)
+{
+    m_following = following;
+}
+
 int User::statusesCount() const
 {
     return m_statusesCount;

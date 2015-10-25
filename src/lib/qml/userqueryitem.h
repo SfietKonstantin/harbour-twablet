@@ -44,6 +44,8 @@ class UserQueryItem: public QueryItem<User, UserObject *>
     Q_PROPERTY(UserObject * item READ item NOTIFY itemChanged)
 public:
     explicit UserQueryItem(QObject *parent = 0);
+public slots:
+    void setFollowing(bool following);
 signals:
     void itemChanged();
 private:

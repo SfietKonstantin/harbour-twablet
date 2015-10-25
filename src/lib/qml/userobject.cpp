@@ -156,7 +156,10 @@ User UserObject::data() const
 
 void UserObject::update(const User &other)
 {
-    Q_UNUSED(other)
+    if (m_data.isFollowing() != other.isFollowing()) {
+        m_data.setFollowing(other.isFollowing());
+        emit followingChanged();
+    }
 }
 
 void UserObject::initializeUrl()

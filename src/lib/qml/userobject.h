@@ -51,7 +51,7 @@ class UserObject : public QObject
     Q_PROPERTY(QString displayUrl READ displayUrl CONSTANT)
     Q_PROPERTY(QString url READ url CONSTANT)
     Q_PROPERTY(bool protected READ isProtected CONSTANT)
-    Q_PROPERTY(bool following READ isFollowing CONSTANT)
+    Q_PROPERTY(bool following READ isFollowing NOTIFY followingChanged)
     Q_PROPERTY(int statusesCount READ statusesCount CONSTANT)
     Q_PROPERTY(int followersCount READ followersCount CONSTANT)
     Q_PROPERTY(int friendsCount READ friendsCount CONSTANT)
@@ -86,9 +86,11 @@ public:
     QString bannerUrlLarge() const;
     int tweetsPerDay() const;
     User data() const;
+    void update(const User &other);
+signals:
+    void followingChanged();
 private:
     explicit UserObject(const User &data, QObject *parent = 0);
-    void update(const User &other);
     void initializeUrl();
     User m_data {};
     QString m_displayUrl {};

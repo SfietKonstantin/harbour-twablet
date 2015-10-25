@@ -426,6 +426,12 @@ QByteArray UserItemQuery::pathFromType(Type type)
     case Show:
         return QByteArray{"users/show.json"};
         break;
+    case Follow:
+        return QByteArray{"friendships/create.json"};
+        break;
+    case Unfollow:
+        return QByteArray{"friendships/destroy.json"};
+        break;
     default:
         qCDebug(logger) << "Type" << type << "is not compatible with UserItemQuery";
         return QByteArray{};
@@ -435,8 +441,7 @@ QByteArray UserItemQuery::pathFromType(Type type)
 
 Query::RequestType UserItemQuery::requestTypeFromtype(UserItemQuery::Type type)
 {
-    Q_UNUSED(type)
-    return Get;
+    return type == Show || type == Invalid ? Get : Post;
 }
 
 QByteArray UserItemQuery::pathFromTypeWithCheck(UserItemQuery::Type type,
@@ -445,10 +450,12 @@ QByteArray UserItemQuery::pathFromTypeWithCheck(UserItemQuery::Type type,
     bool ok {false};
     switch (type) {
     case Show:
+    case Follow:
+    case Unfollow:
         if (private_util::hasValue(additionalParameters, QByteArray{"user_id"})) {
             ok = true;
         } else {
-            qCDebug(logger) << "Show query must contain parameter user_id";
+            qCDebug(logger) << "Show, Follow or Unfollow query must contain parameter user_id";
         }
         break;
     default:
@@ -475,6 +482,31 @@ Query::Parameters UserItemQuery::makeParameters(UserItemQuery::Type type,
         returned = Parameters{
             {"user_id", userId},
             {"include_entities", "true"}
+        };
+        break;
+    }
+    case Follow:
+    {
+        QByteArray userId = private_util::getValue(additionalParameters, QByteArray{"user_id"});
+        if (userId.isEmpty()) {
+            qCDebug(logger) << "Follow query must contain parameter user_id";
+            break;
+        }
+        returned = Parameters{
+            {"user_id", userId},
+            {"follow", "true"}
+        };
+        break;
+    }
+    case Unfollow:
+    {
+        QByteArray userId = private_util::getValue(additionalParameters, QByteArray{"user_id"});
+        if (userId.isEmpty()) {
+            qCDebug(logger) << "Unfollow query must contain parameter user_id";
+            break;
+        }
+        returned = Parameters{
+            {"user_id", userId}
         };
         break;
     }

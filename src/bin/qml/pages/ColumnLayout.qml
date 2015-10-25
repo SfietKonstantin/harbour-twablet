@@ -73,7 +73,7 @@ Item {
         id: refreshUnreadCountTimer
         interval: 250
         repeat: false
-        onTriggered: container.setUnread(container.indexAt(0, container.contentY + 5))
+        onTriggered: container.setUnread(view.indexAt(0, container.contentY + 5))
     }
 
     SilicaListView {

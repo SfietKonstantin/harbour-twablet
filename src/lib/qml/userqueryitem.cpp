@@ -39,6 +39,13 @@ UserQueryItem::UserQueryItem(QObject *parent)
 {
 }
 
+void UserQueryItem::setFollowing(bool following)
+{
+    User user {item()->data()};
+    user.setFollowing(following);
+    setItem(std::move(user));
+}
+
 void UserQueryItem::doItemChanged()
 {
     emit itemChanged();
