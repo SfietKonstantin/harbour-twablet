@@ -94,6 +94,7 @@ Page {
             orientation: Qt.Horizontal
             highlightRangeMode: ListView.StrictlyEnforceRange
             cacheBuffer: 4 * view.imageWidth
+            snapMode: ListView.SnapOneItem
 
             delegate: Item {
                 width: view.width
