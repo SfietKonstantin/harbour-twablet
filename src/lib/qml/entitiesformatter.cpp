@@ -137,7 +137,8 @@ void EntitiesFormatter::doFormat(const QString &input, Entity::List &&entities, 
         return (first->text().count() > second->text().count());
     });
 
-    FormatterVisitor visitor {input, includeLinks};
+    // Use HTML escaped to provide correct formatting for styled Label
+    FormatterVisitor visitor {input.toHtmlEscaped(), includeLinks};
     for (const Entity::Ptr &entity : entities) {
         if (entity) {
             entity->accept(visitor);
