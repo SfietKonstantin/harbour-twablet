@@ -33,7 +33,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.twablet 1.0
 
-SilicaListView {
+Item {
     id: container
     property string title
     property alias query: twitterModel.query
@@ -46,13 +46,11 @@ SilicaListView {
             internal.unread = index
         }
     }
-    clip: true
-    spacing: Theme.paddingMedium
-
-    model: TweetModel {
-        id: twitterModel
-        repository: Repository
+    function scrollToTop() {
+        view.scrollToTop()
     }
+
+    clip: true
 
     QtObject {
         id: internal
@@ -78,126 +76,137 @@ SilicaListView {
         onTriggered: container.setUnread(container.indexAt(0, container.contentY + 5))
     }
 
-    onContentYChanged: refreshUnreadCountTimer.running = true
+    SilicaListView {
+        id: view
+        anchors.fill: parent
+        spacing: Theme.paddingMedium
 
-    Connections {
-        // Workaround to prepend tweets
-        // Not showing the first delegate will
-        // make the ListView not to scroll
-        // After inserting elements we reposition
-        // the view
-        target: twitterModel
-        onPrependPre: {
-            internal.isInit = (twitterModel.count === 0)
-            if (!internal.isInit) {
-                var previousY = container.contentY
-                container.positionViewAtIndex(1, ListView.Beginning)
-                internal.refreshDelta = container.contentY - previousY
+        model: TweetModel {
+            id: twitterModel
+            repository: Repository
+        }
+
+        onContentYChanged: refreshUnreadCountTimer.running = true
+
+        Connections {
+            // Workaround to prepend tweets
+            // Not showing the first delegate will
+            // make the ListView not to scroll
+            // After inserting elements we reposition
+            // the view
+            target: twitterModel
+            onPrependPre: {
+                internal.isInit = (twitterModel.count === 0)
+                if (!internal.isInit) {
+                    var previousY = container.contentY
+                    container.positionViewAtIndex(1, ListView.Beginning)
+                    internal.refreshDelta = container.contentY - previousY
+                }
+            }
+            onPrependPost: {
+                if (!internal.isInit) {
+                    container.positionViewAtIndex(1 + insertedCount, ListView.Beginning)
+                    container.contentY -= internal.refreshDelta
+                    internal.unread += insertedCount
+                }
             }
         }
-        onPrependPost: {
-            if (!internal.isInit) {
-                container.positionViewAtIndex(1 + insertedCount, ListView.Beginning)
-                container.contentY -= internal.refreshDelta
-                internal.unread += insertedCount
-            }
-        }
-    }
 
-    header: Column {
-        width: container.width
+        header: Column {
+            width: container.width
 
-        ListItem {
-            id: header
-            anchors.left: parent.left; anchors.right: parent.right
-            onClicked: header.state = "visible"
-            contentHeight: pageHeader.height
-            enabled: !container.temporary
-
-            PageHeader {
-                id: pageHeader
-                anchors.left: headerRemove.right; anchors.right: parent.right
-                title: container.title
-                height: Theme.itemSizeLarge
-                _titleItem.color: header.pressed || container.temporary ? Theme.highlightColor: Theme.primaryColor
-            }
-
-            BusyIndicator {
-                id: headerIndicator
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
-                running: model.status === Model.Loading
-                size: BusyIndicatorSize.Small
-            }
-
-            IconButton {
-                id: headerRemove
-                anchors.left: headerIndicator.right; anchors.leftMargin: Theme.paddingMedium
-                anchors.verticalCenter: parent.verticalCenter
-                icon.source: "image://theme/icon-m-remove"
+            ListItem {
+                id: header
+                anchors.left: parent.left; anchors.right: parent.right
+                onClicked: header.state = "visible"
+                contentHeight: pageHeader.height
                 enabled: !container.temporary
-                opacity: 0
-                onClicked: {
-                    headerTimer.stop()
-                    header.state = ""
-                    header.remorseAction(qsTr("Removing column"), function() {
-                        container.removed()
-                    })
+
+                PageHeader {
+                    id: pageHeader
+                    anchors.left: headerRemove.right; anchors.right: parent.right
+                    title: container.title
+                    height: Theme.itemSizeLarge
+                    _titleItem.color: header.pressed || container.temporary ? Theme.highlightColor: Theme.primaryColor
                 }
 
-                Behavior on opacity { NumberAnimation { duration: 200 } }
-            }
-
-            Timer {
-                id: headerTimer
-                interval: 5000
-                repeat: false
-                onTriggered: header.state = ""
-            }
-
-            states: [
-                State {
-                    name: "visible"
-                    PropertyChanges {
-                        target: headerRemove
-                        opacity: 1
-                    }
-                    PropertyChanges {
-                        target: headerTimer
-                        running: true
-                    }
+                BusyIndicator {
+                    id: headerIndicator
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
+                    running: model.status === Model.Loading
+                    size: BusyIndicatorSize.Small
                 }
-            ]
+
+                IconButton {
+                    id: headerRemove
+                    anchors.left: headerIndicator.right; anchors.leftMargin: Theme.paddingMedium
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon.source: "image://theme/icon-m-remove"
+                    enabled: !container.temporary
+                    opacity: 0
+                    onClicked: {
+                        headerTimer.stop()
+                        header.state = ""
+                        header.remorseAction(qsTr("Removing column"), function() {
+                            container.removed()
+                        })
+                    }
+
+                    Behavior on opacity { NumberAnimation { duration: 200 } }
+                }
+
+                Timer {
+                    id: headerTimer
+                    interval: 5000
+                    repeat: false
+                    onTriggered: header.state = ""
+                }
+
+                states: [
+                    State {
+                        name: "visible"
+                        PropertyChanges {
+                            target: headerRemove
+                            opacity: 1
+                        }
+                        PropertyChanges {
+                            target: headerTimer
+                            running: true
+                        }
+                    }
+                ]
+            }
+
+            StatusHeader {
+                model: twitterModel
+            }
         }
 
-        StatusHeader {
+        delegate: TweetDelegate {
+            id: delegate
+            onOpenTweet: {
+                container.openTweet(originalId, id)
+            }
+            width: container.width
+            tweet: model.item
+            onHandleLink: container.handleLink(url)
+            opacity: internal.opacity
+            itemSize: Theme.itemSizeExtraSmall
+            fontSize: Theme.fontSizeExtraSmall
+            fontSizeSmall: Theme.fontSizeTiny
+        }
+
+        footer: LoadMoreButton {
             model: twitterModel
+            onClicked: Repository.loadMore(twitterModel.query)
         }
-    }
 
-    delegate: TweetDelegate {
-        id: delegate
-        onOpenTweet: {
-            container.openTweet(originalId, id)
+        StatusPlaceholder {
+            model: twitterModel
+            errorMessage: (model.status === Model.Idle && model.count === 0) ? qsTr("No tweets") : ""
         }
-        width: container.width
-        tweet: model.item
-        onHandleLink: container.handleLink(url)
-        opacity: internal.opacity
-        itemSize: Theme.itemSizeExtraSmall
-        fontSize: Theme.fontSizeExtraSmall
-        fontSizeSmall: Theme.fontSizeTiny
-    }
 
-    footer: LoadMoreButton {
-        model: twitterModel
-        onClicked: Repository.loadMore(twitterModel.query)
+        VerticalScrollDecorator {}
     }
-
-    StatusPlaceholder {
-        model: twitterModel
-        errorMessage: (model.status === Model.Idle && model.count === 0) ? qsTr("No tweets") : ""
-    }
-
-    VerticalScrollDecorator {}
 }

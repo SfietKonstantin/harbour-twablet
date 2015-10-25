@@ -144,13 +144,13 @@ Page {
                     id: delegate
                     width: view.columnWidth
                     height: view.height
-                    title: name
-                    query: layout.query
+                    title: model.name
+                    query: model.layout.query
                     onHandleLink: {
-                        LH.handleLink(url, panel, layout.userId, Info.Clear)
+                        LH.handleLink(url, panel, model.layout.userId, Info.Clear)
                     }
                     onOpenTweet: {
-                        panel.openTweet(tweetId, retweetId, layout.userId, Info.Clear)
+                        panel.openTweet(tweetId, retweetId, model.layout.userId, Info.Clear)
                     }
                     onUnreadChanged: {
                         Repository.updateLayoutUnread(model.index, unread)
@@ -162,7 +162,7 @@ Page {
                     Connections {
                         target: toolbar
                         onGoToTop: {
-                            if (model.index == index) {
+                            if (index === model.index) {
                                 delegate.scrollToTop()
                                 delegate.setUnread(0)
                             }
