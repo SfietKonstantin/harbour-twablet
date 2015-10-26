@@ -41,7 +41,7 @@ namespace qml
 class UserQueryItem: public QueryItem<User, UserObject *>
 {
     Q_OBJECT
-    Q_PROPERTY(UserObject * item READ item NOTIFY itemChanged)
+    Q_PROPERTY(qml::UserObject * item READ item NOTIFY itemChanged)
 public:
     explicit UserQueryItem(QObject *parent = 0);
 public slots:

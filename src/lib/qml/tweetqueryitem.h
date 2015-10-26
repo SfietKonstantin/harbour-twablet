@@ -41,7 +41,7 @@ namespace qml
 class TweetQueryItem: public QueryItem<Tweet, TweetObject *>
 {
     Q_OBJECT
-    Q_PROPERTY(TweetObject * item READ item NOTIFY itemChanged)
+    Q_PROPERTY(qml::TweetObject * item READ item NOTIFY itemChanged)
 public:
     explicit TweetQueryItem(QObject *parent = 0);
 public slots:
