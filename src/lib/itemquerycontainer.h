@@ -58,8 +58,8 @@ private:
     {
     public:
         Data(typename IItemQueryHandler<T>::Ptr &&inputHandler);
-        typename IItemQueryHandler<T>::Ptr handler {};
-        std::set<IItemListener<T> *> listeners {};
+        typename IItemQueryHandler<T>::Ptr handler;
+        std::set<IItemListener<T> *> listeners;
         bool loading {false};
     };
     template<class T> using QueryMap = std::map<ContainerKey, Data<T>>;
