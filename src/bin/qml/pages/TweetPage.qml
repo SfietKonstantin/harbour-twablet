@@ -106,6 +106,7 @@ Page {
 
             TweetDelegate {
                 enabled: false
+                userLinkEnabled: true
                 anchors.left: parent.left; anchors.right: parent.right
                 onOpenTweet: {
                     panel.openTweet(originalId, id, container.accountUserId)

@@ -41,6 +41,7 @@ MouseArea {
     property real itemSize: Theme.itemSizeSmall
     property real fontSize: Theme.fontSizeSmall
     property real fontSizeSmall: Theme.fontSizeExtraSmall
+    property bool userLinkEnabled: false
     signal handleLink(string url)
     signal handleOpenImageBrowser(QtObject tweet)
     onClicked: openTweet(tweet.originalId, tweet.id)
@@ -95,6 +96,7 @@ MouseArea {
 
         TweetHeader {
             id: tweetHeader
+            enabled: container.userLinkEnabled
             tweet: container.tweet
             padding: container.enabled ? 0 : Theme.paddingMedium
             height: container.itemSize
