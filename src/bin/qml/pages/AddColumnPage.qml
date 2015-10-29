@@ -35,36 +35,50 @@ import harbour.twablet 1.0
 
 Dialog {
     id: container
-    property AccountModel accountModel
+    property SettingsPage parentPage: null
+    property int index: -1
+    property string initialName
+    property string initialAccountUserId
+    property int initialType: -1
+    property var initialParameters
+    readonly property bool editing: index != -1
 
     canAccept: nameField.text.length > 0 && searchQuery.isSearchOk
     allowedOrientations: app.defaultAllowedOrientations
 
     onAccepted: {
         var accountIndex = accountCombo.currentIndex
-        var queryType = queryListModel.getType(queryCombo.currentIndex)
+        var queryType = queryTypeModel.getType(queryCombo.currentIndex)
 
         var args = new Object
         if (searchQuery.isSearch) {
             args.q = searchQuery.text.trim()
             args.result_type = resultTypeModel.get(resultTypeCombo.currentIndex).value
         }
-        Repository.addLayout(nameField.text, accountIndex, queryType, args)
+        if (!container.editing) {
+            Repository.addLayout(nameField.text, accountIndex, queryType, args)
+        } else {
+            Repository.updateLayout(container.index, nameField.text, accountIndex, queryType, args)
+        }
     }
 
     SilicaFlickable {
         id: flickable
         anchors.fill: parent
+        property bool editable: (container.initialAccountUserId.length == 0 && container.initialType == -1)
+                                || ((container.initialAccountUserId.length > 0 && container.initialType != -1)
+                                    && accountCombo.currentIndex != -1 && queryCombo.currentIndex != -1)
 
         Column {
             anchors.left: parent.left; anchors.right: parent.right
             DialogHeader {
                 id: header
-                acceptText: qsTr("Add tab")
+                acceptText: container.editing ? qsTr("Edit column") : qsTr("Add column")
             }
 
             TextField {
                 id: nameField
+                text: initialName
                 anchors.left: parent.left; anchors.right: parent.right
                 placeholderText: qsTr("Name of the column")
                 label: qsTr("Name of the column")
@@ -72,10 +86,19 @@ Dialog {
 
             ComboBox {
                 id: accountCombo
+                visible: flickable.editable
                 label: qsTr("Account")
                 menu: ContextMenu {
                     Repeater {
-                        model: container.accountModel
+                        model: AccountModel {
+                            id: accountModel
+                            repository: Repository
+                            Component.onCompleted: {
+                                if (container.editing) {
+                                    accountCombo.currentIndex = accountModel.getIndex(container.initialAccountUserId)
+                                }
+                            }
+                        }
                         delegate: MenuItem {
                             text: model.name
                         }
@@ -85,10 +108,18 @@ Dialog {
 
             ComboBox {
                 id: queryCombo
+                visible: flickable.editable
                 label: qsTr("Column type")
                 menu: ContextMenu {
                     Repeater {
-                        model: QueryListModel {id: queryListModel}
+                        model: QueryTypeModel {
+                            id: queryTypeModel
+                            Component.onCompleted: {
+                                if (container.editing) {
+                                    queryCombo.currentIndex = queryTypeModel.getIndex(container.initialType)
+                                }
+                            }
+                        }
                         delegate: MenuItem {
                             text: model.name
                         }
@@ -98,12 +129,18 @@ Dialog {
 
             TextField {
                 id: searchQuery
-                property bool isSearch: (queryListModel.getType(queryCombo.currentIndex) === QueryType.Search)
+                property bool isSearch: (queryTypeModel.getType(queryCombo.currentIndex) === QueryType.Search)
                 property bool isSearchOk: (isSearch && searchQuery.text.length > 0 || !isSearch)
                 anchors.left: parent.left; anchors.right: parent.right
                 visible: isSearch
                 placeholderText: qsTr("Search query")
                 label: qsTr("Search query")
+
+                Component.onCompleted: {
+                    if (container.editing && container.initialType == QueryType.Search) {
+                        searchQuery.text = container.initialParameters.q
+                    }
+                }
             }
 
             ComboBox {
@@ -132,6 +169,31 @@ Dialog {
                             text: qsTr(model.text)
                         }
                     }
+                }
+                Component.onCompleted: {
+                    if (container.editing && container.initialType == QueryType.Search) {
+                        var resultType = container.initialParameters.result_type
+                        if (resultType === "recent") {
+                            resultTypeCombo.currentIndex = 0
+                        } else if (resultType === "popular") {
+                            resultTypeCombo.currentIndex = 1
+                        } else if (resultType === "mixed") {
+                            resultTypeCombo.currentIndex = 2
+                        } else {
+                            resultTypeCombo.currentIndex = -1
+                        }
+                    }
+                }
+            }
+        }
+
+        PullDownMenu {
+            visible: container.editing
+            MenuItem {
+                text: qsTr("Remove")
+                onClicked: {
+                    container.parentPage.removeLayout(container.index)
+                    pageStack.pop()
                 }
             }
         }

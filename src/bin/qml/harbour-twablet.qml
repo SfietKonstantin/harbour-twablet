@@ -44,7 +44,7 @@ ApplicationWindow {
 
     Component.onCompleted: {
         if (accountModel.count === 0) {
-            pageStack.push(Qt.resolvedUrl("pages/AccountsPage.qml"), {initial: true})
+            pageStack.push(Qt.resolvedUrl("pages/SettingsPage.qml"), {initial: true})
         } else {
             pageStack.push(Qt.resolvedUrl("pages/MainPage.qml"))
         }

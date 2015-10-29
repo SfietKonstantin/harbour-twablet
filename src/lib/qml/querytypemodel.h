@@ -29,52 +29,48 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef LAYOUTOBJECT_H
-#define LAYOUTOBJECT_H
+#ifndef QUERYTYPEMODEL_H
+#define QUERYTYPEMODEL_H
 
-#include <QtCore/QObject>
-#include "layout.h"
-#include "model.h"
-#include "qobjectutils.h"
+#include <memory>
+#include <QtCore/QAbstractListModel>
+#include <QtQml/QQmlParserStatus>
 #include "querytypeobject.h"
-#include "tweetlistquerywrapperobject.h"
 
 namespace qml
 {
 
-class LayoutObject : public QObject
+class QueryTypeModel : public QAbstractListModel, public QQmlParserStatus
 {
     Q_OBJECT
-    Q_PROPERTY(QString name READ name NOTIFY nameChanged)
-    Q_PROPERTY(QString accountUserId READ accountUserId NOTIFY accountUserIdChanged)
-    Q_PROPERTY(qml::QueryTypeObject::TweetListType queryType READ queryType NOTIFY queryTypeChanged)
-    Q_PROPERTY(QObject * query READ query NOTIFY queryChanged)
-    Q_PROPERTY(QVariantMap parameters READ parameters NOTIFY parametersChanged)
+    Q_INTERFACES(QQmlParserStatus)
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
 public:
-    DISABLE_COPY_DISABLE_MOVE(LayoutObject);
-    static LayoutObject * create(const Layout &data, QObject *parent = 0);
-    QString name() const;
-    QString accountUserId() const;
-    int unread() const;
-    QueryTypeObject::TweetListType queryType() const;
-    QObject * query() const;
-    QVariantMap parameters() const;
+    enum Roles {
+        NameRole = Qt::UserRole + 1,
+        QueryTypeRole
+    };
+    explicit QueryTypeModel(QObject *parent = 0);
+    void classBegin() override final;
+    void componentComplete() override final;
+    int rowCount(const QModelIndex &index = QModelIndex()) const override final;
+    QVariant data(const QModelIndex &index, int role) const override final;
+    int count() const;
+public slots:
+    int getType(int index);
+    int getIndex(int type);
 signals:
-    void nameChanged();
-    void accountUserIdChanged();
-    void queryTypeChanged();
-    void unreadChanged();
-    void queryChanged();
-    void parametersChanged();
+    void countChanged();
 private:
-    explicit LayoutObject(const Layout &data, QObject *parent = 0);
-    void update(const Layout &other);
-    Layout m_data {};
-    QObjectPtr<TweetListQueryWrapperObject> m_query {};
-    QVariantMap m_parameters {};
-    friend class Model<Layout, LayoutObject>;
+    QHash<int, QByteArray> roleNames() const override final;
+    struct Data
+    {
+        QString name;
+        QueryTypeObject::TweetListType type;
+    };
+    std::vector<std::unique_ptr<Data>> m_items {};
 };
 
 }
 
-#endif // LAYOUTOBJECT_H
+#endif // QUERYTYPEMODEL_H

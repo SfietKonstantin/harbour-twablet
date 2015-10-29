@@ -125,7 +125,7 @@ Rectangle {
             width: view.cellWidth
             height: view.height
             source: "image://theme/icon-m-add"
-            onClicked: pageStack.push(Qt.resolvedUrl("AddColumnPage.qml"), {accountModel: accountModel})
+            onClicked: pageStack.push(Qt.resolvedUrl("AddColumnPage.qml"))
         }
 
         Rectangle {

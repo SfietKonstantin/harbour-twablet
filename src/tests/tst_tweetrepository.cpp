@@ -52,7 +52,7 @@ static std::ostream & operator<<(std::ostream &os, const TestRepositoryListener<
 
     os << "(status:" << data.status << ", insertion_type:" << data.insertionType
        << ", inserted_ids:" << insertedIds.str() << ", updated_id:"
-       << data.updatedId.toLocal8Bit().data() << ", index:" << data.index << ")";
+       << data.updatedId.toLocal8Bit().data() << ", index:" << data.index1 << ")";
     return os;
 }
 

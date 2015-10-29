@@ -80,11 +80,11 @@ public:
     {
         return m_errorMessage;
     }
-    DataRepositoryObject * repository() const override
+    QObject * repository() const override
     {
         return m_repository;
     }
-    void setRepository(DataRepositoryObject *repository) override
+    void setRepository(QObject *repository) override
     {
         if (m_repository != repository) {
             m_repository = repository;
@@ -103,6 +103,21 @@ public:
             updateInternalRepository();
             emit queryChanged();
         }
+    }
+public slots:
+    void startMove() override
+    {
+        m_localMove = true;
+    }
+    void move(int from, int to) override
+    {
+        if (m_localMove) {
+            performMove(from, to);
+        }
+    }
+    void endMove()
+    {
+        m_localMove = false;
     }
 protected:
     explicit Model(QObject *parent = 0)
@@ -158,6 +173,12 @@ private:
         emit countChanged();
         endRemoveRows();
     }
+    void doMove(int from, int to) override
+    {
+        if (!m_localMove) {
+            performMove(from, to);
+        }
+    }
     void doInvalidate() override
     {
         m_internalRepository = nullptr;
@@ -192,6 +213,9 @@ private:
         int oldSize = m_items.size();
         int newSize = newItems.size();
         int delta = newSize - oldSize;
+
+        qCDebug(mLogging) << "Refreshing data. Item delta:" << delta;
+
         if (delta < 0) {
             beginRemoveRows(QModelIndex(), newSize, oldSize - 1);
         } else if (delta > 0) {
@@ -253,11 +277,30 @@ private:
             refreshData();
         }
     }
+    void performMove(int from, int to)
+    {
+        if (from < 0 || static_cast<std::size_t>(from) >= m_items.size()
+            || to < 0 || static_cast<std::size_t>(to) > m_items.size()) {
+            return;
+        }
+
+        if (!beginMoveRows(QModelIndex(), from, from, QModelIndex(), to)) {
+            return;
+        }
+
+        int toIndex = (to < from) ? to : to - 1;
+
+        QObjectPtr<O> item = std::move(*(std::begin(m_items) + from));
+        m_items.erase(std::begin(m_items) + from);
+        m_items.insert(std::begin(m_items) + toIndex, std::move(item));
+        endMoveRows();
+    }
 
     bool m_complete {false};
+    bool m_localMove {false};
     Status m_status {Idle};
     QString m_errorMessage {};
-    DataRepositoryObject *m_repository {nullptr};
+    QObject *m_repository {nullptr};
     QObject *m_query {nullptr};
     QString m_internalAccountUserId {};
     Query m_internalQuery {};

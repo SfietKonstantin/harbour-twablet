@@ -178,22 +178,29 @@ void DataRepositoryObject::removeAccount(int index)
 void DataRepositoryObject::addLayout(const QString &name, int accountIndex, int queryType,
                                      const QVariantMap &parameters)
 {
-    QString userId {};
-    if (!addLayoutCheckAccount(accountIndex, userId)) {
+    QString accountUserId {};
+    if (!addLayoutCheckAccount(accountIndex, accountUserId)) {
         return;
     }
 
-    addLayout(name, userId, queryType, parameters);
+    addLayout(name, accountUserId, queryType, parameters);
 }
 
-void DataRepositoryObject::addLayout(const QString &name, AccountObject *account, int queryType,
-                                     const QVariantMap &parameters)
+void DataRepositoryObject::addLayout(const QString &name, const QString &accountUserId,
+                                     int queryType, const QVariantMap &parameters)
 {
-    if (account == nullptr) {
+    TweetListQuery query {
+        static_cast<TweetListQuery::Type>(queryType),
+        std::move(private_util::convertParameters(parameters))
+    };
+    if (!query.isValid()) {
         return;
     }
 
-    addLayout(name, account->userId(), queryType, parameters);
+    m_tweetRepositoryContainer.referenceQuery(account(accountUserId), query);
+    m_layouts.append(std::move(Layout(name, accountUserId, std::move(query))));
+    m_loadSaveManager.save(m_layouts);
+    refresh();
 }
 
 void DataRepositoryObject::addDefaultLayouts(int accountIndex, const QString &homeName,
@@ -206,25 +213,45 @@ void DataRepositoryObject::addDefaultLayouts(int accountIndex, const QString &ho
     }
 
     if (enableHomeTimeline) {
-        m_layouts.append(Layout(homeName, userId, TweetListQuery(TweetListQuery::Home, TweetListQuery::Parameters())));
-        referenceLastLayoutTweetList();
+        TweetListQuery query {TweetListQuery::Home, TweetListQuery::Parameters()};
+        m_tweetRepositoryContainer.referenceQuery(account(userId), query);
+        m_layouts.append(Layout{homeName, userId, std::move(query)});
     }
     if (enableMentionsTimeline) {
-        m_layouts.append(Layout(mentionsName, userId, TweetListQuery(TweetListQuery::Mentions, TweetListQuery::Parameters())));
-        referenceLastLayoutTweetList();
+        TweetListQuery query {TweetListQuery::Mentions, TweetListQuery::Parameters()};
+        m_tweetRepositoryContainer.referenceQuery(account(userId), query);
+        m_layouts.append(Layout{mentionsName, userId, std::move(query)});
     }
     m_loadSaveManager.save(m_layouts);
+    refresh();
 }
 
-void DataRepositoryObject::updateLayoutName(int index, const QString &name)
+void DataRepositoryObject::updateLayout(int index, const QString &name, int accountIndex,
+                                        int queryType, const QVariantMap &parameters)
 {
     if (index < 0 || index >= m_layouts.size()) {
         return;
     }
-    Layout layout {*(std::begin(m_layouts) + index)};
-    layout.setName(name);
+
+    QString accountUserId {};
+    if (!addLayoutCheckAccount(accountIndex, accountUserId)) {
+        return;
+    }
+
+    TweetListQuery query {
+        static_cast<TweetListQuery::Type>(queryType),
+        std::move(private_util::convertParameters(parameters))
+    };
+
+    const Layout &oldLayout {*(std::begin(m_layouts) + index)};
+    m_tweetRepositoryContainer.dereferenceQuery(account(oldLayout.accountUserId()), oldLayout.query());
+
+    Layout layout {name, accountUserId, std::move(query)};
+    m_tweetRepositoryContainer.referenceQuery(account(layout.accountUserId()), layout.query());
+
     m_layouts.update(index, std::move(layout));
     m_loadSaveManager.save(m_layouts);
+    refresh();
 }
 
 void DataRepositoryObject::updateLayoutUnread(int index, int unread)
@@ -244,6 +271,12 @@ void DataRepositoryObject::removeLayout(int index)
     }
 
     dereferenceLayoutTweetList(index);
+    m_loadSaveManager.save(m_layouts);
+}
+
+void DataRepositoryObject::moveLayout(int from, int to)
+{
+    m_layouts.move(from, to);
     m_loadSaveManager.save(m_layouts);
 }
 
@@ -342,23 +375,6 @@ void DataRepositoryObject::setTweetFavorited(const QString &tweetId, bool favori
     }
 }
 
-void DataRepositoryObject::addLayout(const QString &name, const QString &userId, int queryType,
-                                     const QVariantMap &parameters)
-{
-    TweetListQuery query {
-        static_cast<TweetListQuery::Type>(queryType),
-        std::move(private_util::convertParameters(parameters))
-    };
-    if (!query.isValid()) {
-        return;
-    }
-
-    m_layouts.append(std::move(Layout(name, userId, std::move(query))));
-    referenceLastLayoutTweetList();
-    m_loadSaveManager.save(m_layouts);
-    refresh();
-}
-
 bool DataRepositoryObject::addLayoutCheckAccount(int accountIndex, QString &userId)
 {
     if (accountIndex < 0 || accountIndex >= m_accounts.size()) {
@@ -367,12 +383,6 @@ bool DataRepositoryObject::addLayoutCheckAccount(int accountIndex, QString &user
     const Account &account = *(std::begin(m_accounts) + accountIndex);
     userId = account.userId();
     return true;
-}
-
-void DataRepositoryObject::referenceLastLayoutTweetList()
-{
-    const Layout &layout {*(std::end(m_layouts) - 1)};
-    m_tweetRepositoryContainer.referenceQuery(account(layout.accountUserId()), layout.query());
 }
 
 void DataRepositoryObject::dereferenceLayoutTweetList(int index)

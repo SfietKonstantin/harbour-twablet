@@ -70,6 +70,16 @@ AccountObject * AccountModel::get(const QString &userId) const
     return it == std::end(m_items) ? nullptr : it->get();
 }
 
+int AccountModel::getIndex(const QString &userId) const
+{
+    for (size_t i = 0; i < m_items.size(); ++i) {
+        if (m_items[i]->userId() == userId) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 QHash<int, QByteArray> AccountModel::roleNames() const
 {
     return {{NameRole, "name"}, {ScreenNameRole, "screenName"}, {AccountRole, "account"}};

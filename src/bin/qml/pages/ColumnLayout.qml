@@ -36,6 +36,7 @@ import harbour.twablet 1.0
 Item {
     id: container
     property string title
+    property SilicaListView flickable: view
     property alias query: twitterModel.query
     signal handleLink(string url)
     signal openTweet(string tweetId, string retweetId)
@@ -115,67 +116,18 @@ Item {
         header: Column {
             width: container.width
 
-            ListItem {
+            PageHeader {
                 id: header
                 anchors.left: parent.left; anchors.right: parent.right
-                onClicked: header.state = "visible"
-                contentHeight: pageHeader.height
-                enabled: !container.temporary
-
-                PageHeader {
-                    id: pageHeader
-                    anchors.left: headerRemove.right; anchors.right: parent.right
-                    title: container.title
-                    height: Theme.itemSizeLarge
-                    _titleItem.color: header.pressed || container.temporary ? Theme.highlightColor: Theme.primaryColor
-                }
+                title: container.title
+                height: Theme.itemSizeLarge
 
                 BusyIndicator {
-                    id: headerIndicator
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
-                    running: model.status === Model.Loading
+                    running: twitterModel.status === Model.Loading
                     size: BusyIndicatorSize.Small
                 }
-
-                IconButton {
-                    id: headerRemove
-                    anchors.left: headerIndicator.right; anchors.leftMargin: Theme.paddingMedium
-                    anchors.verticalCenter: parent.verticalCenter
-                    icon.source: "image://theme/icon-m-remove"
-                    enabled: !container.temporary
-                    opacity: 0
-                    onClicked: {
-                        headerTimer.stop()
-                        header.state = ""
-                        header.remorseAction(qsTr("Removing column"), function() {
-                            container.removed()
-                        })
-                    }
-
-                    Behavior on opacity { NumberAnimation { duration: 200 } }
-                }
-
-                Timer {
-                    id: headerTimer
-                    interval: 5000
-                    repeat: false
-                    onTriggered: header.state = ""
-                }
-
-                states: [
-                    State {
-                        name: "visible"
-                        PropertyChanges {
-                            target: headerRemove
-                            opacity: 1
-                        }
-                        PropertyChanges {
-                            target: headerTimer
-                            running: true
-                        }
-                    }
-                ]
             }
 
             StatusHeader {

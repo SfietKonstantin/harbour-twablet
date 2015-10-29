@@ -30,6 +30,7 @@
  */
 
 #include "layoutobject.h"
+#include "private/conversionutil.h"
 
 namespace qml
 {
@@ -37,6 +38,7 @@ namespace qml
 LayoutObject::LayoutObject(const Layout &data, QObject *parent)
     : QObject(parent), m_data{data}
     , m_query{new TweetListQueryWrapperObject(data.accountUserId(), data.query())}
+    , m_parameters{private_util::convertParametersBack(data.query().parameters())}
 {
 }
 
@@ -50,7 +52,7 @@ QString LayoutObject::name() const
     return m_data.name();
 }
 
-QString LayoutObject::userId() const
+QString LayoutObject::accountUserId() const
 {
     return m_data.accountUserId();
 }
@@ -70,6 +72,11 @@ QObject * LayoutObject::query() const
     return m_query.get();
 }
 
+QVariantMap LayoutObject::parameters() const
+{
+    return m_parameters;
+}
+
 void LayoutObject::update(const Layout &other)
 {
     if (m_data.name() != other.name()) {
@@ -77,9 +84,12 @@ void LayoutObject::update(const Layout &other)
         emit nameChanged();
     }
 
+    bool hasQueryChanged {false};
+
     if (m_data.accountUserId() != other.accountUserId()) {
         m_data.setAccountUserId(other.accountUserId());
-        emit userIdChanged();
+        hasQueryChanged = true;
+        emit accountUserIdChanged();
     }
 
     if (m_data.query() != other.query()) {
@@ -89,6 +99,17 @@ void LayoutObject::update(const Layout &other)
         if (m_data.query().type() != oldType) {
             emit queryTypeChanged();
         }
+        QVariantMap parameters = private_util::convertParametersBack(m_data.query().parameters());
+        if (m_parameters != parameters) {
+            m_parameters = parameters;
+            emit parametersChanged();
+        }
+        hasQueryChanged = true;
+    }
+
+    if (hasQueryChanged) {
+        m_query.reset(new TweetListQueryWrapperObject(m_data.accountUserId(), m_data.query()));
+        emit queryChanged();
     }
 
     if (m_data.unread() != other.unread()) {

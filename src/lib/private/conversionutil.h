@@ -39,6 +39,7 @@ namespace private_util
 {
 
 Query::Parameters convertParameters(const QVariantMap &parameters);
+QVariantMap convertParametersBack(const Query::Parameters &parameters);
 
 }
 

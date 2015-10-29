@@ -97,7 +97,6 @@ public:
             listener->doPrepend(data);
         }
     }
-
     void update(int index, T &&data)
     {
         if (index < 0 || static_cast<std::size_t>(index) >= m_data.size()) {
@@ -116,6 +115,26 @@ public:
         m_data.erase(std::begin(m_data) + index);
         for (IRepositoryListener<T> *listener : m_listeners) {
             listener->doRemove(index);
+        }
+    }
+    void move(int from, int to)
+    {
+        if (from < 0 || static_cast<std::size_t>(from) >= m_data.size()
+            || to < 0 || static_cast<std::size_t>(to) > m_data.size()) {
+            return;
+        }
+
+        if (to == from || to == from + 1) {
+            return;
+        }
+
+        int toIndex = (to < from) ? to : to - 1;
+
+        T data {*(std::begin(m_data) + from)};
+        m_data.erase(std::begin(m_data) + from);
+        m_data.insert(std::begin(m_data) + toIndex, data);
+        for (IRepositoryListener<T> *listener : m_listeners) {
+            listener->doMove(from, to);
         }
     }
     void start()

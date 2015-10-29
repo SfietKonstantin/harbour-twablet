@@ -149,7 +149,7 @@ Item {
             args.orientation = Orientation.Portrait
             args.allowedOrientations = Orientation.Portrait
             if (pushMode === Info.Replace) {
-                pageStack.pop()
+                pageStack.pop(mainPage)
             }
             return panelPageStack.push(page, args)
         } else {

@@ -41,7 +41,7 @@ Page {
     onStatusChanged: {
         if (container.status === PageStatus.Active) {
             if (accountModel.count === 0) {
-                pageStack.replace(Qt.resolvedUrl("AccountsPage.qml"), {initial: true})
+                pageStack.replace(Qt.resolvedUrl("SettingsPage.qml"), {initial: true})
             }
         }
     }
@@ -90,15 +90,13 @@ Page {
                 enabled: layoutModel.count > 0
                 onClicked: Repository.refresh()
             }
-
             MenuItem {
-                text: qsTr("Accounts")
-                onClicked: pageStack.push(Qt.resolvedUrl("AccountsPage.qml"))
+                text: qsTr("Search")
+                enabled: false
             }
-
             MenuItem {
-                text: qsTr("About")
-                onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"), {rightPanel: panel})
+                text: qsTr("Settings")
+                onClicked: pageStack.push(Qt.resolvedUrl("SettingsPage.qml"), {rightPanel: panel})
             }
         }
 
@@ -106,7 +104,7 @@ Page {
             anchors.centerIn: parent
             visible: layoutModel.count === 0
             text: qsTr("Add column")
-            onClicked: pageStack.push(Qt.resolvedUrl("AddColumnPage.qml"), {accountModel: accountModel})
+            onClicked: pageStack.push(Qt.resolvedUrl("AddColumnPage.qml"))
         }
 
         Item {
@@ -177,7 +175,7 @@ Page {
                     Button {
                         anchors.centerIn: parent
                         text: qsTr("Add column")
-                        onClicked: pageStack.push(Qt.resolvedUrl("AddColumnPage.qml"), {accountModel: accountModel})
+                        onClicked: pageStack.push(Qt.resolvedUrl("AddColumnPage.qml"))
                     }
                 }
 

@@ -83,7 +83,7 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/tweetmodel.cpp
     qml/usermodel.cpp
     qml/mediamodel.cpp
-    qml/querylistmodel.cpp
+    qml/querytypemodel.cpp
     qml/accountselectionmodel.cpp
     qml/iaccountrepositorycontainerobject.h
     qml/ilayoutcontainerobject.h

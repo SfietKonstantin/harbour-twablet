@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,47 +29,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef QUERYLISTMODEL_H
-#define QUERYLISTMODEL_H
+import QtQuick 2.0
+import Sailfish.Silica 1.0
 
-#include <memory>
-#include <QtCore/QAbstractListModel>
-#include <QtQml/QQmlParserStatus>
-#include "querytypeobject.h"
+BackgroundItem {
+    id: container
+    property alias text: text.text
+    height: Theme.itemSizeMedium
 
-namespace qml
-{
-
-class QueryListModel : public QAbstractListModel, public QQmlParserStatus
-{
-    Q_OBJECT
-    Q_INTERFACES(QQmlParserStatus)
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
-public:
-    enum Roles {
-        NameRole = Qt::UserRole + 1,
-        QueryTypeRole
-    };
-    explicit QueryListModel(QObject *parent = 0);
-    void classBegin() override;
-    void componentComplete() override;
-    int rowCount(const QModelIndex &index = QModelIndex()) const override final;
-    QVariant data(const QModelIndex &index, int role) const override final;
-    int count() const;
-public slots:
-    int getType(int index);
-signals:
-    void countChanged();
-private:
-    QHash<int, QByteArray> roleNames() const override final;
-    struct Data
-    {
-        QString name;
-        QueryTypeObject::TweetListType type;
-    };
-    std::vector<std::unique_ptr<Data>> m_data {};
-};
-
+    Label {
+        id: text
+        anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
+        anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
+        anchors.verticalCenter: parent.verticalCenter
+        truncationMode: TruncationMode.Fade
+        color: container.pressed ? Theme.highlightColor : Theme.primaryColor
+    }
 }
 
-#endif // QUERYLISTMODEL_H

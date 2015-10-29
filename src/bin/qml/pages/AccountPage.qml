@@ -35,16 +35,19 @@ import harbour.twablet 1.0
 
 Dialog {
     id: container
-    canAccept: nameField.text.length > 0
-    allowedOrientations: app.defaultAllowedOrientations
+    property SettingsPage parentPage: null
     property int index: -1
     property string userId
     property string screenName
     property string token
     property string tokenSecret
     property string initialName
+    readonly property bool editing: index != -1
+    canAccept: nameField.text.length > 0
+    allowedOrientations: app.defaultAllowedOrientations
+
     onAccepted: {
-        if (container.index == -1) {
+        if (!container.editing) {
             var index = Repository.addAccount(nameField.text, container.userId, container.screenName,
                                               container.token, container.tokenSecret)
             Repository.addDefaultLayouts(index, qsTr("Home"), homeTl.checked,
@@ -62,7 +65,7 @@ Dialog {
             anchors.left: parent.left; anchors.right: parent.right
             DialogHeader {
                 id: header
-                acceptText: qsTr("Add account")
+                acceptText: container.editing ? qsTr("Edit account") : qsTr("Add account")
             }
 
             Item {
@@ -94,15 +97,26 @@ Dialog {
             }
             TextSwitch {
                 id: homeTl
-                visible: container.index === -1
+                visible: !container.editing
                 text: qsTr("Add home timeline")
                 checked: true
             }
             TextSwitch {
                 id: mentionsTl
-                visible: container.index === -1
+                visible: !container.editing
                 text: qsTr("Add mentions timeline")
                 checked: true
+            }
+        }
+
+        PullDownMenu {
+            visible: container.editing
+            MenuItem {
+                text: qsTr("Remove")
+                onClicked: {
+                    container.parentPage.removeAccount(container.index)
+                    pageStack.pop()
+                }
             }
         }
     }

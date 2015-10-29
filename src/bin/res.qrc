@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>qml/harbour-twablet.qml</file>
-        <file>qml/pages/AccountsPage.qml</file>
         <file>qml/pages/AccountPage.qml</file>
         <file>qml/pages/AddColumnPage.qml</file>
         <file>qml/pages/AuthentificationPage.qml</file>
@@ -36,5 +35,9 @@
         <file>qml/pages/TweetHeader.qml</file>
         <file>qml/pages/TweetText.qml</file>
         <file>qml/pages/TweetFooter.qml</file>
+        <file>qml/pages/SettingsPage.qml</file>
+        <file>qml/pages/UserPageButton.qml</file>
+        <file>qml/pages/AccountDelegate.qml</file>
+        <file>qml/pages/LayoutItemDelegate.qml</file>
     </qresource>
 </RCC>

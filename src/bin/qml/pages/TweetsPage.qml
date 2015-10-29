@@ -61,6 +61,7 @@ Page {
         }
 
         PullDownMenu {
+            flickable: layout.flickable
             MenuItem {
                 text: qsTr("Add as column")
                 onClicked: Repository.addLayout(container.title, container.accountUserId,

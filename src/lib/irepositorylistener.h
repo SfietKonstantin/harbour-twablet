@@ -82,6 +82,12 @@ private:
      */
     virtual void doRemove(int index) = 0;
     /**
+     * @brief Notify that an item has moved
+     * @param from index of the item to move.
+     * @param to the item's new index.
+     */
+    virtual void doMove(int from, int to) = 0;
+    /**
      * @brief Notify that the listened object is now invalid
      *
      * When called on this method, the listener should stop

@@ -47,7 +47,7 @@
 #include "qml/accountselectionmodel.h"
 #include "qml/layoutmodel.h"
 #include "qml/querytypeobject.h"
-#include "qml/querylistmodel.h"
+#include "qml/querytypemodel.h"
 #include "qml/tweetmodel.h"
 #include "qml/descriptionformatter.h"
 #include "qml/tweetformatter.h"
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<qml::AccountSelectionModel>("harbour.twablet", 1, 0, "AccountSelectionModel");
     qmlRegisterType<qml::LayoutModel>("harbour.twablet", 1, 0, "LayoutModel");
     qmlRegisterType<qml::TweetModel>("harbour.twablet", 1, 0, "TweetModel");
-    qmlRegisterType<qml::QueryListModel>("harbour.twablet", 1, 0, "QueryListModel");
+    qmlRegisterType<qml::QueryTypeModel>("harbour.twablet", 1, 0, "QueryTypeModel");
     qmlRegisterType<qml::DescriptionFormatter>("harbour.twablet", 1, 0, "DescriptionFormatter");
     qmlRegisterType<qml::TweetFormatter>("harbour.twablet", 1, 0, "TweetFormatter");
     qmlRegisterType<qml::QuotedTweetFormatter>("harbour.twablet", 1, 0, "QuotedTweetFormatter");

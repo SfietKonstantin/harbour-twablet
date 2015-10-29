@@ -35,12 +35,12 @@ import Sailfish.Silica 1.0
 BackgroundItem {
     id: container
     property alias text: text.text
-    height: Theme.itemSizeMedium
+    height: Theme.itemSizeSmall
 
     Label {
         id: text
-        anchors.left: parent.left; anchors.leftMargin: Theme.paddingMedium
-        anchors.right: parent.right; anchors.rightMargin: Theme.paddingMedium
+        anchors.left: parent.left; anchors.leftMargin: Theme.horizontalPageMargin
+        anchors.right: parent.right; anchors.rightMargin: Theme.horizontalPageMargin
         anchors.verticalCenter: parent.verticalCenter
         truncationMode: TruncationMode.Fade
         color: container.pressed ? Theme.highlightColor : Theme.primaryColor

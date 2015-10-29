@@ -89,13 +89,15 @@ public slots:
     // Layouts
     void addLayout(const QString &name, int accountIndex, int queryType,
                    const QVariantMap &parameters);
-    void addLayout(const QString &name, AccountObject *account, int queryType,
+    void addLayout(const QString &name, const QString &accountUserId, int queryType,
                    const QVariantMap &parameters);
     void addDefaultLayouts(int accountIndex, const QString &homeName, bool enableHomeTimeline,
                            const QString &mentionsName, bool enableMentionsTimeline);
-    void updateLayoutName(int index, const QString &name);
+    void updateLayout(int index, const QString &name, int accountIndex, int queryType,
+                      const QVariantMap &parameters);
     void updateLayoutUnread(int index, int unread);
     void removeLayout(int index);
+    void moveLayout(int from, int to);
     void refresh();
     void refresh(QObject *query);
     void loadMore(QObject *query);
@@ -103,10 +105,7 @@ public slots:
     void setTweetRetweeted(const QString &tweetId);
     void setTweetFavorited(const QString &tweetId, bool favorited);
 private:
-    void addLayout(const QString &name, const QString &userId, int queryType,
-                   const QVariantMap &parameters);
     bool addLayoutCheckAccount(int accountIndex, QString &userId);
-    void referenceLastLayoutTweetList();
     void dereferenceLayoutTweetList(int index);
 
     QObjectPtr<QNetworkAccessManager> m_network {nullptr};

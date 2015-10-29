@@ -51,6 +51,7 @@ public:
     QVariant data(const QModelIndex &index, int role) const override final;
 public slots:
     qml::AccountObject * get(const QString &userId) const;
+    int getIndex(const QString &userId) const;
 private:
     QHash<int, QByteArray> roleNames() const override final;
 };

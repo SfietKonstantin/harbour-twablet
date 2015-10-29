@@ -35,6 +35,7 @@ import harbour.twablet 1.0
 
 Dialog {
     id: container
+    property bool initial: false
     canAccept: false
     allowedOrientations: app.defaultAllowedOrientations
     Component.onCompleted: state = "initial"
@@ -54,13 +55,19 @@ Dialog {
             error.text = errorMessage
         }
         onDone: {
-            pageStack.replace(Qt.resolvedUrl("AccountPage.qml"),
-                              {
-                                  userId: authentification.userId,
-                                  screenName: authentification.screenName,
-                                  token: authentification.token,
-                                  tokenSecret: authentification.tokenSecret
-                              })
+            var args = {
+                userId: authentification.userId,
+                screenName: authentification.screenName,
+                token: authentification.token,
+                tokenSecret: authentification.tokenSecret
+            }
+            if (container.initial) {
+                args.acceptDestination = Qt.resolvedUrl("MainPage.qml")
+                args.acceptDestinationAction = PageStackAction.Replace
+                args.acceptDestinationReplaceTarget = null
+            }
+
+            pageStack.replace(Qt.resolvedUrl("AccountPage.qml"), args)
         }
     }
 

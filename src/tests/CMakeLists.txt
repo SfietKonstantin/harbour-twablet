@@ -27,7 +27,9 @@ set(gmock_SRCS
 
 set(${PROJECT_NAME}_SRCS
     testrepositorylistener.h
+    testmodel.cpp
     tst_main.cpp
+    tst_model.cpp
     tst_account.cpp
     tst_layout.cpp
     tst_loadsavemanager.cpp

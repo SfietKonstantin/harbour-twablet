@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,52 +29,46 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef LAYOUTOBJECT_H
-#define LAYOUTOBJECT_H
+import QtQuick 2.0
+import Sailfish.Silica 1.0
+import harbour.twablet 1.0
 
-#include <QtCore/QObject>
-#include "layout.h"
-#include "model.h"
-#include "qobjectutils.h"
-#include "querytypeobject.h"
-#include "tweetlistquerywrapperobject.h"
+ListItem {
+    id: container
+    property int index
+    property alias name: name.text
+    property alias screenName: screenName.text
+    menu: contextMenu
+    contentHeight: Theme.itemSizeMedium
+    ListView.onRemove: animateRemoval(container)
+    signal removed()
 
-namespace qml
-{
+    Column {
+        spacing: Theme.paddingSmall
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left; anchors.leftMargin: Theme.horizontalPageMargin
+        anchors.right: parent.right; anchors.rightMargin: Theme.horizontalPageMargin
 
-class LayoutObject : public QObject
-{
-    Q_OBJECT
-    Q_PROPERTY(QString name READ name NOTIFY nameChanged)
-    Q_PROPERTY(QString accountUserId READ accountUserId NOTIFY accountUserIdChanged)
-    Q_PROPERTY(qml::QueryTypeObject::TweetListType queryType READ queryType NOTIFY queryTypeChanged)
-    Q_PROPERTY(QObject * query READ query NOTIFY queryChanged)
-    Q_PROPERTY(QVariantMap parameters READ parameters NOTIFY parametersChanged)
-public:
-    DISABLE_COPY_DISABLE_MOVE(LayoutObject);
-    static LayoutObject * create(const Layout &data, QObject *parent = 0);
-    QString name() const;
-    QString accountUserId() const;
-    int unread() const;
-    QueryTypeObject::TweetListType queryType() const;
-    QObject * query() const;
-    QVariantMap parameters() const;
-signals:
-    void nameChanged();
-    void accountUserIdChanged();
-    void queryTypeChanged();
-    void unreadChanged();
-    void queryChanged();
-    void parametersChanged();
-private:
-    explicit LayoutObject(const Layout &data, QObject *parent = 0);
-    void update(const Layout &other);
-    Layout m_data {};
-    QObjectPtr<TweetListQueryWrapperObject> m_query {};
-    QVariantMap m_parameters {};
-    friend class Model<Layout, LayoutObject>;
-};
+        Label {
+            id: name
+            anchors.left: parent.left; anchors.right: parent.right
+            color: container.pressed ? Theme.highlightColor : Theme.primaryColor
+        }
+        Label {
+            id: screenName
+            anchors.left: parent.left; anchors.right: parent.right
+            color: container.pressed ? Theme.secondaryHighlightColor : Theme.secondaryColor
+            font.pixelSize: Theme.fontSizeSmall
+        }
+    }
 
+    Component {
+        id: contextMenu
+        ContextMenu {
+            MenuItem {
+                text: qsTr("Remove")
+                onClicked: container.removed()
+            }
+        }
+    }
 }
-
-#endif // LAYOUTOBJECT_H

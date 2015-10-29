@@ -29,52 +29,74 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef LAYOUTOBJECT_H
-#define LAYOUTOBJECT_H
+#include "testmodel.h"
 
-#include <QtCore/QObject>
-#include "layout.h"
-#include "model.h"
-#include "qobjectutils.h"
-#include "querytypeobject.h"
-#include "tweetlistquerywrapperobject.h"
-
-namespace qml
+TestData::TestData(int value)
+    : m_value{value}
 {
-
-class LayoutObject : public QObject
-{
-    Q_OBJECT
-    Q_PROPERTY(QString name READ name NOTIFY nameChanged)
-    Q_PROPERTY(QString accountUserId READ accountUserId NOTIFY accountUserIdChanged)
-    Q_PROPERTY(qml::QueryTypeObject::TweetListType queryType READ queryType NOTIFY queryTypeChanged)
-    Q_PROPERTY(QObject * query READ query NOTIFY queryChanged)
-    Q_PROPERTY(QVariantMap parameters READ parameters NOTIFY parametersChanged)
-public:
-    DISABLE_COPY_DISABLE_MOVE(LayoutObject);
-    static LayoutObject * create(const Layout &data, QObject *parent = 0);
-    QString name() const;
-    QString accountUserId() const;
-    int unread() const;
-    QueryTypeObject::TweetListType queryType() const;
-    QObject * query() const;
-    QVariantMap parameters() const;
-signals:
-    void nameChanged();
-    void accountUserIdChanged();
-    void queryTypeChanged();
-    void unreadChanged();
-    void queryChanged();
-    void parametersChanged();
-private:
-    explicit LayoutObject(const Layout &data, QObject *parent = 0);
-    void update(const Layout &other);
-    Layout m_data {};
-    QObjectPtr<TweetListQueryWrapperObject> m_query {};
-    QVariantMap m_parameters {};
-    friend class Model<Layout, LayoutObject>;
-};
-
 }
 
-#endif // LAYOUTOBJECT_H
+int TestData::value() const
+{
+    return m_value;
+}
+
+TestDataObject::TestDataObject(const TestData &data, QObject *parent)
+    : QObject(parent), m_data{data}
+{
+}
+
+TestDataObject * TestDataObject::create(const TestData &data, QObject *parent)
+{
+    return new TestDataObject{data, parent};
+}
+
+int TestDataObject::value() const
+{
+    return m_data.value();
+}
+
+void TestDataObject::update(const TestData &data)
+{
+    Q_UNUSED(data)
+}
+
+TestRepositoryContainer::TestRepositoryContainer(QObject *parent)
+    : QObject(parent)
+{
+}
+
+TestRepository & TestRepositoryContainer::repository()
+{
+    return m_repository;
+}
+
+TestModel::TestModel(QObject *parent)
+    : Model<TestData, TestDataObject>(parent)
+{
+}
+
+QVariant TestModel::data(const QModelIndex &index, int role) const
+{
+    int row = index.row();
+    if (row < 0 || row >= rowCount()) {
+        return QVariant();
+    }
+    const QObjectPtr<TestDataObject> &data = m_items[row];
+    switch (role) {
+    case ValueRole:
+        return data->value();
+        break;
+    case ItemRole:
+        return QVariant::fromValue(data.get());
+        break;
+    default:
+        return QVariant();
+        break;
+    }
+}
+
+QHash<int, QByteArray> TestModel::roleNames() const
+{
+    return {{ValueRole, "value"}, {ItemRole, "item"}};
+}

@@ -168,19 +168,19 @@ Page {
 
             Row {
                 anchors.left: parent.left; anchors.right: parent.right
-                MiniButton {
+                UserPageButton {
                     width: parent.width / 3
                     text: queryItem.item ? qsTr("%n\ntweets", "", queryItem.item.statusesCount) : ""
                     onClicked: container.panel.openUserTimeline(container.userId, queryItem.item.screenName,
                                                                 container.accountUserId, false)
                 }
-                MiniButton {
+                UserPageButton {
                     width: parent.width / 3
                     text: queryItem.item ? qsTr("%n\nfollowing", "", queryItem.item.friendsCount) : ""
                     onClicked: container.panel.openFriends(container.userId, queryItem.item.screenName,
                                                            container.accountUserId, false)
                 }
-                MiniButton {
+                UserPageButton {
                     width: parent.width / 3
                     text: queryItem.item ? qsTr("%n\nfollowers", "", queryItem.item.followersCount) : ""
                     onClicked: container.panel.openFollowers(container.userId, queryItem.item.screenName,
@@ -202,23 +202,23 @@ Page {
                 }
             }
 
-            MiniButton {
+            UserPageButton {
                 visible: queryItem.item && queryItem.item.displayUrl !== ""
                 text: queryItem.item ? queryItem.item.displayUrl : ""
                 onClicked: Qt.openUrlExternally(queryItem.item.url)
             }
 
-            MiniButton {
+            UserPageButton {
                 text: queryItem.item ? qsTr("%n favourites", "", queryItem.item.favouritesCount) : ""
                 onClicked: container.panel.openFavorites(container.userId, queryItem.item.screenName,
                                                          container.accountUserId, false)
             }
 
-            MiniButton {
+            UserPageButton {
                 text: qsTr("Subscribed lists")
             }
 
-            MiniButton {
+            UserPageButton {
                 text: queryItem.item ? qsTr("Listed in %n lists", "", queryItem.item.listedCount) : ""
             }
         }

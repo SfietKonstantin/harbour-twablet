@@ -46,5 +46,14 @@ Query::Parameters convertParameters(const QVariantMap &parameters)
     return returned;
 }
 
+QVariantMap convertParametersBack(const Query::Parameters &parameters)
+{
+    QVariantMap returned {};
+    for (auto it = std::begin(parameters); it != std::end(parameters); ++it) {
+        returned.insert(QUrl::fromPercentEncoding(it->first), QUrl::fromPercentEncoding(it->second));
+    }
+    return returned;
+}
+
 }
 

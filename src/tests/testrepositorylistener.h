@@ -58,59 +58,65 @@ public:
             Prepend,
             Append,
             Update,
-            Remove
+            Remove,
+            Move
         };
         explicit Data() = default;
         explicit Data(Status status, InsertionType insertionType,
                       const std::vector<QString> &insertedIds, const QString &updatedId,
-                      int index)
+                      int index1, int index2)
             : status{status}, insertionType{insertionType}, insertedIds{insertedIds}
-            , updatedId{updatedId}, index{index}
+            , updatedId{updatedId}, index1{index1}, index2{index2}
         {
         }
         static Data createAppend(const std::vector<QString> &itemsIds)
         {
-            return Data(NoChangeStatus, Append, itemsIds, QString{}, -1);
+            return Data(NoChangeStatus, Append, itemsIds, QString{}, -1, -1);
         }
         static Data createPrepend(const std::vector<QString> &itemsIds)
         {
-            return Data(NoChangeStatus, Prepend, itemsIds, QString{}, -1);
+            return Data(NoChangeStatus, Prepend, itemsIds, QString{}, -1, -1);
         }
         static Data createUpdate(int index, const QString &itemId)
         {
-            return Data(NoChangeStatus, Update, std::vector<QString>{}, itemId, index);
+            return Data(NoChangeStatus, Update, std::vector<QString>{}, itemId, index, -1);
         }
         static Data createRemove(int index)
         {
-            return Data(NoChangeStatus, Prepend, std::vector<QString>{}, QString{}, index);
+            return Data(NoChangeStatus, Prepend, std::vector<QString>{}, QString{}, index, -1);
+        }
+        static Data createMove(int start, int end)
+        {
+            return Data(NoChangeStatus, Move, std::vector<QString>{}, QString{}, start, end);
         }
         static Data createInvalidate()
         {
-            return Data(Invalidated, NoChangeInsertionType, std::vector<QString>{}, QString{}, -1);
+            return Data(Invalidated, NoChangeInsertionType, std::vector<QString>{}, QString{}, -1, -1);
         }
         static Data createIdle()
         {
-            return Data(Idle, NoChangeInsertionType, std::vector<QString>{}, QString{}, -1);
+            return Data(Idle, NoChangeInsertionType, std::vector<QString>{}, QString{}, -1, -1);
         }
         static Data createLoading()
         {
-            return Data(Loading, NoChangeInsertionType, std::vector<QString>{}, QString{}, -1);
+            return Data(Loading, NoChangeInsertionType, std::vector<QString>{}, QString{}, -1, -1);
         }
         static Data createError()
         {
-            return Data(Error, NoChangeInsertionType, std::vector<QString>{}, QString{}, -1);
+            return Data(Error, NoChangeInsertionType, std::vector<QString>{}, QString{}, -1, -1);
         }
         bool operator==(const Data &other) const
         {
             return status == other.status && insertionType == other.insertionType
                    && insertedIds == other.insertedIds && updatedId == other.updatedId
-                   && index == other.index;
+                   && index1 == other.index1 && index2 == other.index2;
         }
         Status status {InvalidStatus};
         InsertionType insertionType {InvalidInsertionType};
         std::vector<QString> insertedIds{};
         QString updatedId {};
-        int index {-1};
+        int index1 {-1};
+        int index2 {-1};
     };
     std::vector<Data> data {};
 private:
@@ -141,6 +147,10 @@ private:
     void doRemove(int index) override
     {
         data.emplace_back(Data::createRemove(index));
+    }
+    void doMove(int start, int end) override
+    {
+        data.emplace_back(Data::createMove(start, end));
     }
     void doInvalidate() override
     {

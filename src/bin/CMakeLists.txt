@@ -37,8 +37,8 @@ set(${PROJECT_NAME}_SRCS
 set(${PROJECT_NAME}_Qml_SRCS
     qml/harbour-twablet.qml
     qml/pages/MainPage.qml
-    qml/pages/AccountsPage.qml
     qml/pages/AuthentificationPage.qml
+    qml/pages/AccountPage.qml
     qml/pages/ColumnLayout.qml
     qml/pages/AddColumnPage.qml
     qml/pages/Toolbar.qml
@@ -50,6 +50,7 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/pages/ToolbarButton.qml
     qml/pages/RightPanel.qml
     qml/pages/UserPage.qml
+    qml/pages/UserPageButton.qml
     qml/pages/MiniButton.qml
     qml/pages/UsersPage.qml
     qml/pages/TweetsPage.qml
@@ -61,6 +62,9 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/pages/TweetHeader.qml
     qml/pages/TweetText.qml
     qml/pages/TweetFooter.qml
+    qml/pages/SettingsPage.qml
+    qml/pages/AccountDelegate.qml
+    qml/pages/LayoutItemDelegate.qml
     qml/pages/LinkHandler.js
 )
 

@@ -47,7 +47,7 @@ class IModel : public QAbstractListModel, public QQmlParserStatus
     Q_PROPERTY(int count READ count NOTIFY countChanged)
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
-    Q_PROPERTY(qml::DataRepositoryObject * repository READ repository WRITE setRepository
+    Q_PROPERTY(QObject * repository READ repository WRITE setRepository
                NOTIFY repositoryChanged)
     Q_PROPERTY(QObject * query READ query WRITE setQuery NOTIFY queryChanged)
     Q_ENUMS(Status)
@@ -63,10 +63,33 @@ public:
     virtual int count() const = 0;
     virtual Status status() const = 0;
     virtual QString errorMessage() const = 0;
-    virtual DataRepositoryObject * repository() const = 0;
-    virtual void setRepository(DataRepositoryObject *repository) = 0;
+    virtual QObject * repository() const = 0;
+    virtual void setRepository(QObject *repository) = 0;
     virtual QObject * query() const = 0;
     virtual void setQuery(QObject *query) = 0;
+public slots:
+    /**
+     * @brief Start a local move for this model
+     *
+     * Starting a local move will enable the model to move
+     * it's items without impacting the repository. This
+     * is done for following user input.
+     *
+     * When in a local move mode, the model stop listening
+     * about the move message from the repository.
+     */
+    virtual void startMove() = 0;
+    /**
+     * @brief Locally move an item
+     *
+     * @param from index of the item to move.
+     * @param to the item's new index.
+     */
+    virtual void move(int from, int to) = 0;
+    /**
+     * @brief Stop the local move for this model
+     */
+    virtual void endMove() = 0;
 signals:
     void countChanged();
     void prependPre();

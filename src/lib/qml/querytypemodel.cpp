@@ -29,41 +29,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "querylistmodel.h"
+#include "querytypemodel.h"
 #include "querytypeobject.h"
 
 namespace qml
 {
 
-QueryListModel::QueryListModel(QObject *parent) :
+QueryTypeModel::QueryTypeModel(QObject *parent) :
     QAbstractListModel(parent)
 {
-    m_data.emplace_back(new Data {tr("Home"), QueryTypeObject::Home});
-    m_data.emplace_back(new Data {tr("Mentions"), QueryTypeObject::Mentions});
-    m_data.emplace_back(new Data {tr("Search"), QueryTypeObject::Search});
+    m_items.emplace_back(new Data {tr("Home"), QueryTypeObject::Home});
+    m_items.emplace_back(new Data {tr("Mentions"), QueryTypeObject::Mentions});
+    m_items.emplace_back(new Data {tr("Search"), QueryTypeObject::Search});
 }
 
-void QueryListModel::classBegin()
+void QueryTypeModel::classBegin()
 {
 }
 
-void QueryListModel::componentComplete()
+void QueryTypeModel::componentComplete()
 {
 }
 
-int QueryListModel::rowCount(const QModelIndex &index) const
+int QueryTypeModel::rowCount(const QModelIndex &index) const
 {
     Q_UNUSED(index)
-    return m_data.size();
+    return m_items.size();
 }
 
-QVariant QueryListModel::data(const QModelIndex &index, int role) const
+QVariant QueryTypeModel::data(const QModelIndex &index, int role) const
 {
     int row = index.row();
     if (row < 0 || row >= rowCount()) {
         return QVariant();
     }
-    const std::unique_ptr<Data> &data = m_data[row];
+    const std::unique_ptr<Data> &data = m_items[row];
     switch (role) {
     case NameRole:
         return data->name;
@@ -77,20 +77,30 @@ QVariant QueryListModel::data(const QModelIndex &index, int role) const
     }
 }
 
-int QueryListModel::count() const
+int QueryTypeModel::count() const
 {
     return rowCount();
 }
 
-int QueryListModel::getType(int index)
+int QueryTypeModel::getType(int index)
 {
     if (index < 0 || index >= rowCount()) {
         return QueryTypeObject::InvalidTweetList;
     }
-    return m_data[index]->type;
+    return m_items[index]->type;
 }
 
-QHash<int, QByteArray> QueryListModel::roleNames() const
+int QueryTypeModel::getIndex(int type)
+{
+    for (size_t i = 0; i < m_items.size(); ++i) {
+        if (m_items[i]->type == type) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+QHash<int, QByteArray> QueryTypeModel::roleNames() const
 {
     return {{NameRole, "name"}, {QueryTypeRole, "type"}};
 }
