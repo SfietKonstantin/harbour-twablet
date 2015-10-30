@@ -33,7 +33,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.twablet 1.0
 
-ListItem {
+SimpleListItem {
     id: container
     property Page page
     property int index
@@ -47,7 +47,7 @@ ListItem {
     drag.target: content.held ? content : undefined
     drag.axis: Drag.YAxis
     anchors.left: parent.left; anchors.right: parent.right
-    contentHeight: content.height
+    height: content.height
 
     Item {
         id: content
@@ -56,17 +56,16 @@ ListItem {
         height: Theme.itemSizeMedium
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
-        anchors {
-            onHorizontalCenterChanged: console.debug(horizontalCenter)
-            onVerticalCenterChanged: console.debug(verticalCenter)
-        }
-        onParentChanged: console.debug(parent)
-        onHeldChanged: console.debug(held)
-
         Drag.active: content.held
         Drag.source: container
         Drag.hotSpot.x: width / 2
         Drag.hotSpot.y: height / 2
+
+        Rectangle {
+            anchors.fill: parent
+            color: Theme.secondaryHighlightColor
+            visible: content.held
+        }
 
         Label {
             id: name
@@ -102,10 +101,6 @@ ListItem {
                 ScriptAction {
                     script: {
                         container.endMove()
-                        content.parent = container
-                        content.horizontalCenter = container.horizontalCenter
-                        content.verticalCenter = container.verticalCenter
-                        console.debug("End move")
                     }
                 }
             }

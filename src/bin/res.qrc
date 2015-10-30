@@ -39,5 +39,6 @@
         <file>qml/pages/UserPageButton.qml</file>
         <file>qml/pages/AccountDelegate.qml</file>
         <file>qml/pages/LayoutItemDelegate.qml</file>
+        <file>qml/pages/SimpleListItem.qml</file>
     </qresource>
 </RCC>

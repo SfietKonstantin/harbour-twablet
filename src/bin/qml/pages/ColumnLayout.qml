@@ -74,7 +74,7 @@ Item {
         id: refreshUnreadCountTimer
         interval: 250
         repeat: false
-        onTriggered: container.setUnread(view.indexAt(0, container.contentY + 5))
+        onTriggered: container.setUnread(view.indexAt(0, view.contentY + 5))
     }
 
     SilicaListView {
@@ -99,15 +99,15 @@ Item {
             onPrependPre: {
                 internal.isInit = (twitterModel.count === 0)
                 if (!internal.isInit) {
-                    var previousY = container.contentY
-                    container.positionViewAtIndex(1, ListView.Beginning)
-                    internal.refreshDelta = container.contentY - previousY
+                    var previousY = view.contentY
+                    view.positionViewAtIndex(1, ListView.Beginning)
+                    internal.refreshDelta = view.contentY - previousY
                 }
             }
             onPrependPost: {
                 if (!internal.isInit) {
-                    container.positionViewAtIndex(1 + insertedCount, ListView.Beginning)
-                    container.contentY -= internal.refreshDelta
+                    view.positionViewAtIndex(1 + insertedCount, ListView.Beginning)
+                    view.contentY -= internal.refreshDelta
                     internal.unread += insertedCount
                 }
             }
