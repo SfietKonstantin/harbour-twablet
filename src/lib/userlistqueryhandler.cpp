@@ -85,7 +85,7 @@ bool UserListQueryHandler::treatReply(RequestType requestType, const QByteArray 
     }
 
     if (!items.empty()) {
-        m_nextCursor = QString::number(root.value(QLatin1String("next_cursor")).toInt());
+        m_nextCursor = root.value(QLatin1String("next_cursor_str")).toString();
         placement = Append;
     }
     return true;
