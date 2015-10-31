@@ -241,6 +241,7 @@ MouseArea {
                     color: Theme.highlightColor
                     text: quotedTweetFormatter.text
                     wrapMode: Text.WordWrap
+                    textFormat: Text.StyledText
 
                     QuotedTweetFormatter {
                         id: quotedTweetFormatter

@@ -140,7 +140,7 @@ void EntitiesFormatter::doFormat(const QString &input, Entity::List &&entities, 
     // Use HTML escaped to provide correct formatting for styled Label
     QString escapedString {input};
     escapedString.replace(QLatin1String{"&lt;"}, QLatin1String{"<"});
-    escapedString.replace(QLatin1String{"&rt;"}, QLatin1String{">"});
+    escapedString.replace(QLatin1String{"&gt;"}, QLatin1String{">"});
     escapedString.replace(QLatin1String{"&amp;"}, QLatin1String{"&"});
     escapedString = escapedString.toHtmlEscaped();
 
