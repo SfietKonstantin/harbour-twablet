@@ -148,7 +148,7 @@ Page {
                         LH.handleLink(url, panel, model.layout.userId, Info.Clear)
                     }
                     onOpenTweet: {
-                        panel.openTweet(tweetId, retweetId, model.layout.userId, Info.Clear)
+                        panel.openTweet(tweetId, retweetId, model.layout.accountUserId, Info.Clear)
                     }
                     onUnreadChanged: {
                         Repository.updateLayoutUnread(model.index, unread)

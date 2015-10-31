@@ -34,8 +34,10 @@
 
 #include <QtCore/QDebug>
 #include "query.h"
+#include "containerkey.h"
 
 QDebug & operator<<(QDebug &debug, const Query::Parameters &parameters);
 QDebug & operator<<(QDebug &debug, const Query &query);
+QDebug & operator<<(QDebug &debug, const ContainerKey &containerKey);
 
 #endif // DEBUGHELPER_H

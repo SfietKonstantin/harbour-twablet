@@ -112,6 +112,10 @@ void TweetRepositoryContainer::refresh(const Account &account, const Query &quer
     auto it = m_mapping.find(ContainerKey{Account{account}, Query{query}});
     if (it != std::end(m_mapping)) {
         load(it->first, it->second, IListQueryHandler<Tweet>::Refresh);
+    } else {
+        qCWarning(logger) << "refresh: cannot perform load";
+        qCWarning(logger) << "  Account:" << account.userId();
+        qCWarning(logger) << "  Query:" << query;
     }
 }
 
@@ -120,6 +124,10 @@ void TweetRepositoryContainer::loadMore(const Account &account, const Query &que
     auto it = m_mapping.find(ContainerKey{Account{account}, Query{query}});
     if (it != std::end(m_mapping)) {
         load(it->first, it->second, IListQueryHandler<Tweet>::LoadMore);
+    } else {
+        qCWarning(logger) << "loadmore: cannot perform load";
+        qCWarning(logger) << "  Account:" << account.userId();
+        qCWarning(logger) << "  Query:" << query;
     }
 }
 
@@ -154,13 +162,15 @@ void TweetRepositoryContainer::load(const ContainerKey &key, Data &mappingData,
                                   IListQueryHandler<Tweet>::RequestType requestType)
 {
     if (mappingData.loading) {
+        qCDebug(logger) << "Already loading:" << key;
         return;
     }
 
+    qCDebug(logger) << "Load:" << key;
     qCDebug(logger) << "Refcount info:";
     for (const auto &it : m_mapping) {
         qCDebug(logger) << "  For query" << it.first.query() << "Refcount:" << it.second.refcount
-                     << "Observers:" << it.second.repository.listeners().size();
+                        << "Observers:" << it.second.repository.listeners().size();
     }
 
     mappingData.loading = true;

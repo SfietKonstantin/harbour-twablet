@@ -51,3 +51,11 @@ QDebug & operator<<(QDebug &debug, const Query &query)
     debug.nospace() << "(" << query.path() << " " << query.parameters() << ")";
     return debug;
 }
+
+QDebug &operator<<(QDebug &debug, const ContainerKey &containerKey)
+{
+    QDebugStateSaver saver(debug);
+    debug.nospace() << "(" << containerKey.account().userId() << " "
+                    << containerKey.query() << ")";
+    return debug;
+}
