@@ -135,10 +135,6 @@ Item {
     }
 
     function _open(page, args, pushMode) {
-        for (var key in args) {
-            console.debug(key, args[key])
-        }
-
         if (typeof(pushMode) === 'undefined') {
             pushMode = Info.Push
         }

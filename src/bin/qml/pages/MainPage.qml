@@ -145,7 +145,7 @@ Page {
                     title: model.name
                     query: model.layout.query
                     onHandleLink: {
-                        LH.handleLink(url, panel, model.layout.userId, Info.Clear)
+                        LH.handleLink(url, panel, model.layout.accountUserId, Info.Clear)
                     }
                     onOpenTweet: {
                         panel.openTweet(tweetId, retweetId, model.layout.accountUserId, Info.Clear)

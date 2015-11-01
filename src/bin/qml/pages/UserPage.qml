@@ -224,7 +224,7 @@ Page {
         }
 
         PullDownMenu {
-            visible: queryItem.status === QueryItem.Idle
+            visible: queryItem.status === QueryItem.Idle && container.userId !== container.accountUserId
             MenuItem {
                 text: queryItem.item ? (queryItem.item.following ? qsTr("Unfollow @%1").arg(queryItem.item.screenName)
                                                                  : qsTr("Follow @%1").arg(queryItem.item.screenName))
