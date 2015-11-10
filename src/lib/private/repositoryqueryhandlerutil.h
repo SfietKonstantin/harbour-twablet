@@ -29,49 +29,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef USERLISTQUERYWRAPPEROBJECT_H
-#define USERLISTQUERYWRAPPEROBJECT_H
+#ifndef REPOSITORYQUERYHANDLERUTIL_H
+#define REPOSITORYQUERYHANDLERUTIL_H
 
-#include <QtCore/QVariantMap>
-#include "iquerywrapperobject.h"
-#include "query.h"
-#include "querytypeobject.h"
+#include "irepositoryqueryhandler.h"
+#include "tweet.h"
 
-namespace qml
+class QJsonArray;
+
+namespace private_util
 {
 
-class UserListQueryWrapperObject : public QObject, public IQueryWrapperObject
-{
-    Q_OBJECT
-    Q_INTERFACES(qml::IQueryWrapperObject)
-    Q_PROPERTY(QString accountUserId READ accountUserId WRITE setAccountUserId
-               NOTIFY accountUserIdChanged)
-    Q_PROPERTY(qml::QueryTypeObject::UserListType type READ type WRITE setType NOTIFY typeChanged)
-    Q_PROPERTY(QVariantMap parameters READ parameters WRITE setParameters NOTIFY parametersChanged)
-public:
-    explicit UserListQueryWrapperObject(QObject *parent = 0);
-    QString accountUserId() const override;
-    void setAccountUserId(const QString &accountUserId);
-    Query query() const override;
-    void setQuery(UserListQuery &&query);
-    QueryTypeObject::UserListType type() const;
-    void setType(QueryTypeObject::UserListType type);
-    QVariantMap parameters() const;
-    void setParameters(const QVariantMap &parameters);
-    void accept(QueryWrapperVisitor &visitor) const override;
-signals:
-    void accountUserIdChanged();
-    void typeChanged();
-    void parametersChanged();
-private:
-    void updateQuery();
-    UserListQuery::Type convertedType() const;
-    QString m_accountUserId {};
-    UserListQuery m_query {};
-    QueryTypeObject::UserListType m_type {QueryTypeObject::InvalidUserList};
-    QVariantMap m_parameters {};
-};
+bool treatTweetReply(IRepositoryQueryHandler<Tweet>::RequestType requestType,
+                     const QJsonArray &data, std::vector<Tweet> &items,
+                     IRepositoryQueryHandler<Tweet>::Placement &placement,
+                     QString &sinceId, QString &maxId);
 
 }
 
-#endif // USERLISTQUERYWRAPPEROBJECT_H
+#endif // REPOSITORYQUERYHANDLERUTIL_H
+

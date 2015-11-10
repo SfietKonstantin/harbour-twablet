@@ -37,7 +37,7 @@ namespace qml
 
 LayoutObject::LayoutObject(const Layout &data, QObject *parent)
     : QObject(parent), m_data{data}
-    , m_query{new TweetListQueryWrapperObject(data.accountUserId(), data.query())}
+    , m_query{new TweetModelQueryWrapperObject(data.accountUserId(), data.query())}
     , m_parameters{private_util::convertParametersBack(data.query().parameters())}
 {
 }
@@ -62,9 +62,9 @@ int LayoutObject::unread() const
     return m_data.unread();
 }
 
-QueryTypeObject::TweetListType LayoutObject::queryType() const
+QueryTypeObject::TweetModelType LayoutObject::queryType() const
 {
-    return static_cast<QueryTypeObject::TweetListType>(m_data.query().type());
+    return static_cast<QueryTypeObject::TweetModelType>(m_data.query().type());
 }
 
 QObject * LayoutObject::query() const
@@ -93,7 +93,7 @@ void LayoutObject::update(const Layout &other)
     }
 
     if (m_data.query() != other.query()) {
-        TweetListQuery::Type oldType = m_data.query().type();
+        TweetRepositoryQuery::Type oldType = m_data.query().type();
         m_data.setQuery(other.query());
         m_query->setQuery(other.query());
         if (m_data.query().type() != oldType) {
@@ -108,7 +108,7 @@ void LayoutObject::update(const Layout &other)
     }
 
     if (hasQueryChanged) {
-        m_query.reset(new TweetListQueryWrapperObject(m_data.accountUserId(), m_data.query()));
+        m_query.reset(new TweetModelQueryWrapperObject(m_data.accountUserId(), m_data.query()));
         emit queryChanged();
     }
 

@@ -38,16 +38,16 @@ namespace qml
 TweetObject::TweetObject(const Tweet &data, QObject *parent)
     : QObject(parent), m_data{std::move(data)}
 {
-    m_user = UserObject::create(m_data.user(), this);
+    m_user.reset(UserObject::create(m_data.user(), this));
     if (m_data.retweetingUser().isValid()) {
-        m_retweetingUser = UserObject::create(m_data.retweetingUser(), this);
+        m_retweetingUser.reset(UserObject::create(m_data.retweetingUser(), this));
     }
     QRegularExpression urlParser {QLatin1String("<a[^>]*>([^<]*)</a>")};
     QRegularExpressionMatch match {urlParser.match(m_data.source())};
     m_sourceName = match.captured(1);
     m_media.reset(MediaModel::create(m_data.entities(), this));
     if (m_data.quotedStatus().isValid()) {
-        m_quotedStatus = QuotedTweetObject::create(m_data.quotedStatus(), this);
+        m_quotedStatus.reset(QuotedTweetObject::create(m_data.quotedStatus(), this));
     }
 }
 
@@ -73,12 +73,12 @@ QString TweetObject::text() const
 
 UserObject * TweetObject::user() const
 {
-    return m_user;
+    return m_user.get();
 }
 
 UserObject * TweetObject::retweetingUser() const
 {
-    return m_retweetingUser;
+    return m_retweetingUser.get();
 }
 
 QDateTime TweetObject::timestamp() const
@@ -128,7 +128,7 @@ MediaModel * TweetObject::media() const
 
 QuotedTweetObject * TweetObject::quotedStatus() const
 {
-    return m_quotedStatus;
+    return m_quotedStatus.get();
 }
 
 Tweet TweetObject::data() const

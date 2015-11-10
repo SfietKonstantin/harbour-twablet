@@ -109,7 +109,7 @@ Item {
                 id: postAccountSelectionModel
                 repository: Repository
                 Component.onCompleted: {
-                    postAccountSelectionModel.index = 0
+                    postAccountSelectionModel.currentIndex = 0
                 }
             }
 

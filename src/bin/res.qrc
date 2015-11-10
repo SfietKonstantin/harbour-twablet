@@ -40,5 +40,6 @@
         <file>qml/pages/AccountDelegate.qml</file>
         <file>qml/pages/LayoutItemDelegate.qml</file>
         <file>qml/pages/SimpleListItem.qml</file>
+        <file>qml/pages/ListPage.qml</file>
     </qresource>
 </RCC>

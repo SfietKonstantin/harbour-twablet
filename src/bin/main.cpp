@@ -53,10 +53,12 @@
 #include "qml/tweetformatter.h"
 #include "qml/quotedtweetformatter.h"
 #include "qml/usermodel.h"
+#include "qml/listmodel.h"
 #include "qml/tweetqueryitem.h"
 #include "qml/userqueryitem.h"
-#include "qml/tweetlistquerywrapperobject.h"
-#include "qml/userlistquerywrapperobject.h"
+#include "qml/tweetmodelquerywrapperobject.h"
+#include "qml/usermodelquerywrapperobject.h"
+#include "qml/listmodelqueryobject.h"
 #include "qml/statusupdatequerywrapperobject.h"
 #include "qml/tweetspecificquerywrapperobject.h"
 #include "qml/userspecificquerywrapperobject.h"
@@ -125,10 +127,12 @@ int main(int argc, char *argv[])
     qmlRegisterType<qml::TweetFormatter>("harbour.twablet", 1, 0, "TweetFormatter");
     qmlRegisterType<qml::QuotedTweetFormatter>("harbour.twablet", 1, 0, "QuotedTweetFormatter");
     qmlRegisterType<qml::UserModel>("harbour.twablet", 1, 0, "UserModel");
+    qmlRegisterType<qml::ListModel>("harbour.twablet", 1, 0, "ListModel");
     qmlRegisterType<qml::TweetQueryItem>("harbour.twablet", 1, 0, "TweetQueryItem");
     qmlRegisterType<qml::UserQueryItem>("harbour.twablet", 1, 0, "UserQueryItem");
-    qmlRegisterType<qml::TweetListQueryWrapperObject>("harbour.twablet", 1, 0, "TweetListQuery");
-    qmlRegisterType<qml::UserListQueryWrapperObject>("harbour.twablet", 1, 0, "UserListQuery");
+    qmlRegisterType<qml::TweetModelQueryWrapperObject>("harbour.twablet", 1, 0, "TweetModelQuery");
+    qmlRegisterType<qml::UserModelQueryWrapperObject>("harbour.twablet", 1, 0, "UserModelQuery");
+    qmlRegisterType<qml::ListModelQueryObject>("harbour.twablet", 1, 0, "ListModelQuery");
     qmlRegisterType<qml::StatusUpdateQueryWrapperObject>("harbour.twablet", 1, 0, "StatusUpdateQuery");
     qmlRegisterType<qml::TweetSpecificQueryWrapperObject>("harbour.twablet", 1, 0, "TweetQuery");
     qmlRegisterType<qml::UserSpecificQueryWrapperObject>("harbour.twablet", 1, 0, "UserQuery");

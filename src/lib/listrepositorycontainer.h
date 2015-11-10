@@ -29,24 +29,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef USERLISTQUERYHANDLER_H
-#define USERLISTQUERYHANDLER_H
+#ifndef LISTREPOSITORYCONTAINER_H
+#define LISTREPOSITORYCONTAINER_H
 
-#include "ilistqueryhandler.h"
-#include "user.h"
+#include <set>
+#include "containerkey.h"
+#include "globals.h"
+#include "irepositoryqueryhandler.h"
+#include "iqueryexecutor.h"
+#include "irepositorylistener.h"
+#include "listrepository.h"
 
-class UserListQueryHandler final : public IListQueryHandler<User>
+class Account;
+class List;
+class ListRepositoryContainer
 {
 public:
-    DISABLE_COPY_DISABLE_MOVE(UserListQueryHandler);
-    static IListQueryHandler<User>::Ptr create();
+    explicit ListRepositoryContainer(IQueryExecutor::ConstPtr queryExecutor);
+    DISABLE_COPY_DEFAULT_MOVE(ListRepositoryContainer);
+    ListRepository * repository(const Account &account, const Query &query);
+    void referenceQuery(const Account &account, const Query &query);
+    void dereferenceQuery(const Account &account, const Query &query);
+    void refresh(const Account &account, const Query &query);
+    void loadMore(const Account &account, const Query &query);
 private:
-    UserListQueryHandler();
-    Query::Parameters additionalParameters(RequestType requestType) const override;
-    bool treatReply(RequestType requestType, const QByteArray &data,
-                    std::vector<User> &items, QString &errorMessage,
-                    Placement &placement) override;
-    QString m_nextCursor {};
+    class Data
+    {
+    public:
+        explicit Data(IRepositoryQueryHandler<List>::Ptr &&inputHandler);
+        bool loading {false};
+        ListRepository repository {};
+        int refcount {0};
+        IRepositoryQueryHandler<List>::Ptr handler;
+    };
+    void load(const ContainerKey &key, Data &mappingData,
+              IRepositoryQueryHandler<List>::RequestType requestType);
+    Data * getMappingData(const ContainerKey &key);
+    IQueryExecutor::ConstPtr m_queryExecutor {nullptr};
+    std::map<ContainerKey, Data> m_mapping {};
 };
 
-#endif // USERLISTQUERYHANDLER_H
+#endif // LISTREPOSITORYCONTAINER_H

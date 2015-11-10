@@ -39,23 +39,26 @@
 #include "layoutrepository.h"
 #include "tweetrepositorycontainer.h"
 #include "userrepositorycontainer.h"
+#include "listrepositorycontainer.h"
 #include "iaccountrepositorycontainerobject.h"
 #include "ilayoutcontainerobject.h"
 #include "itweetrepositorycontainerobject.h"
 #include "iuserrepositorycontainerobject.h"
+#include "ilistrepositorycontainerobject.h"
 #include "iitemquerycontainerobject.h"
 
 namespace qml
 {
 
 class AccountObject;
-class TweetListQueryWrapperObject;
+class TweetModelQueryWrapperObject;
 class DataRepositoryObject
         : public QObject
         , public IAccountRepositoryContainerObject
         , public ILayoutContainerObject
         , public ITweetRepositoryContainerObject
         , public IUserRepositoryContainerObject
+        , public IListRepositoryContainerObject
         , public IItemQueryContainerObject
 {
     Q_OBJECT
@@ -64,6 +67,7 @@ class DataRepositoryObject
     Q_INTERFACES(qml::ILayoutContainerObject)
     Q_INTERFACES(qml::ITweetRepositoryContainerObject)
     Q_INTERFACES(qml::IUserRepositoryContainerObject)
+    Q_INTERFACES(qml::IListRepositoryContainerObject)
     Q_INTERFACES(qml::IItemQueryContainerObject)
 public:
     explicit DataRepositoryObject(QObject *parent = 0);
@@ -71,11 +75,14 @@ public:
     AccountRepository & accountRepository() override;
     LayoutRepository & layouts() override;
     TweetRepository * tweetRepository(const Account &account, const Query &query) override;
-    void referenceTweetListQuery(const Account &account, const Query &query) override;
-    void dereferenceTweetListQuery(const Account &account, const Query &query) override;
+    void referenceTweetRepositoryQuery(const Account &account, const Query &query) override;
+    void dereferenceTweetRepositoryQuery(const Account &account, const Query &query) override;
     UserRepository * userRepository(const Account &account, const Query &query) override;
-    void referenceUserListQuery(const Account &account, const Query &query) override;
-    void dereferenceUserListQuery(const Account &account, const Query &query) override;
+    void referenceUserRepositoryQuery(const Account &account, const Query &query) override;
+    void dereferenceUserRepositoryQuery(const Account &account, const Query &query) override;
+    ListRepository * listRepository(const Account &account, const Query &query) override;
+    void referenceListRepositoryQuery(const Account &account, const Query &query) override;
+    void dereferenceListRepositoryQuery(const Account &account, const Query &query) override;
     Account account(const QString &accountUserId) const override;
     ItemQueryContainer * itemQueryContainer() override;
 signals:
@@ -115,6 +122,7 @@ private:
     LayoutRepository m_layouts {};
     TweetRepositoryContainer m_tweetRepositoryContainer;
     UserRepositoryContainer m_userRepositoryContainer;
+    ListRepositoryContainer m_listRepositoryContainer;
     ItemQueryContainer m_itemQueryContainer;
 };
 

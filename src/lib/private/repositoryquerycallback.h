@@ -29,8 +29,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef LISTQUERYCALLBACK_H
-#define LISTQUERYCALLBACK_H
+#ifndef REPOSITORYQUERYCALLBACK_H
+#define REPOSITORYQUERYCALLBACK_H
 
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
@@ -38,19 +38,19 @@
 #include <QtCore/QLoggingCategory>
 #include <QtNetwork/QNetworkReply>
 #include "repository.h"
-#include "ilistqueryhandler.h"
+#include "irepositoryqueryhandler.h"
 
-static const QLoggingCategory lqcLogger {"list-query-callback"};
+static const QLoggingCategory rqcLogger {"repository-query-callback"};
 
 namespace private_util {
 
 template<class T>
-class ListQueryHandler
+class RepositoryQueryCallback
 {
 public:
-    explicit ListQueryHandler(typename IListQueryHandler<T>::RequestType requestType,
-                              IListQueryHandler<T> &handler, Repository<T> &repository,
-                              std::vector<T> &items, bool &loading)
+    explicit RepositoryQueryCallback(typename IRepositoryQueryHandler<T>::RequestType requestType,
+                                     IRepositoryQueryHandler<T> &handler, Repository<T> &repository,
+                                     std::vector<T> &items, bool &loading)
         : m_requestType(requestType), m_handler(handler), m_repository(repository)
         , m_items(items), m_loading(loading)
     {
@@ -75,11 +75,11 @@ public:
         LoadingLock loadingLock {m_loading};
 
         if (error != QNetworkReply::NoError) {
-            qCWarning(lqcLogger) << "Network error";
-            qCWarning(lqcLogger) << "  Error code:" << error;
-            qCWarning(lqcLogger) << "  Error message (Qt):" << errorMessage;
+            qCWarning(rqcLogger) << "Network error";
+            qCWarning(rqcLogger) << "  Error code:" << error;
+            qCWarning(rqcLogger) << "  Error message (Qt):" << errorMessage;
             const QByteArray &data {reply.readAll()};
-            qCWarning(lqcLogger) << "  Error message (Twitter):" << data;
+            qCWarning(rqcLogger) << "  Error message (Twitter):" << data;
 
             // Check if Twitter sent us an issue
             QJsonDocument document {QJsonDocument::fromJson(data)};
@@ -89,7 +89,7 @@ public:
                 if (array.count() == 1) {
                     const QJsonObject &firstError {array.first().toObject()};
                     if (firstError.value(QLatin1String("code")).toInt() == 88) {
-                        qCWarning(lqcLogger) << "  Parsed error: \"Rate limit exceeded\"";
+                        qCWarning(rqcLogger) << "  Parsed error: \"Rate limit exceeded\"";
                         m_repository.error(QObject::tr("Twitter rate limit exceeded. Please try again later."));
                         return;
                     }
@@ -101,30 +101,30 @@ public:
         }
 
         QString newErrorMessage {};
-        typename IListQueryHandler<T>::Placement placement {IListQueryHandler<T>::Discard};
+        typename IRepositoryQueryHandler<T>::Placement placement {IRepositoryQueryHandler<T>::Discard};
         bool returned = m_handler.treatReply(m_requestType, reply.readAll(), m_items, newErrorMessage, placement);
         if (!returned) {
-            qCWarning(lqcLogger) << "Parsing error: " << newErrorMessage;
+            qCWarning(rqcLogger) << "Parsing error: " << newErrorMessage;
             m_repository.error(QObject::tr("Internal error"));
             return;
         } else {
-            qCDebug(lqcLogger) << "Finished. New data count:" << m_items.size();
+            qCDebug(rqcLogger) << "Finished. New data count:" << m_items.size();
             switch (placement) {
-            case IListQueryHandler<T>::Append:
+            case IRepositoryQueryHandler<T>::Append:
                 m_repository.append(m_items);
                 break;
-            case IListQueryHandler<T>::Prepend:
+            case IRepositoryQueryHandler<T>::Prepend:
                 m_repository.prepend(m_items);
                 break;
-            case IListQueryHandler<T>::Discard:
+            case IRepositoryQueryHandler<T>::Discard:
                 break;
             }
             m_repository.finish();
         }
     }
 private:
-    typename IListQueryHandler<T>::RequestType m_requestType;
-    IListQueryHandler<T> &m_handler;
+    typename IRepositoryQueryHandler<T>::RequestType m_requestType;
+    IRepositoryQueryHandler<T> &m_handler;
     Repository<T> &m_repository;
     std::vector<T> &m_items;
     bool &m_loading;
@@ -132,5 +132,5 @@ private:
 
 }
 
-#endif // LISTQUERYCALLBACK_H
+#endif // REPOSITORYQUERYCALLBACK_H
 

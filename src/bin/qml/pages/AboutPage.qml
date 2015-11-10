@@ -111,7 +111,7 @@ Page {
                     id: accountSelectionModel
                     repository: Repository
                     Component.onCompleted: {
-                        accountSelectionModel.index = 0
+                        accountSelectionModel.currentIndex = 0
                     }
                 }
 

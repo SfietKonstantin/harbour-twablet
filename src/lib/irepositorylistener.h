@@ -42,72 +42,70 @@ class QString;
  * Repository and want to be notified when the Repository changes.
  *
  * This listener can be used to get notifications when some items are inserted,
- * removed, or updated. This is done via doAppend(), doPrepend(), doUpdate() and
- * doRemove().
+ * removed, or updated. This is done via onAppend(), onPrepend(), onUpdate() and
+ * onRemove().
  *
  * This interface also handle the status of the asynchronous loading operation
- * that takes places in the Repository. This is done via doStart(), doError() and
- * doFinished().
+ * that takes places in the Repository. This is done via onStart(), onError() and
+ * onFinished().
  */
 template<class T>
 class IRepositoryListener
 {
 public:
     virtual ~IRepositoryListener() {}
-private:
     /**
      * @brief Notify that a new item is appended
      * @param item item to be appended.
      */
-    virtual void doAppend(const T &item) = 0;
+    virtual void onAppend(const T &item) = 0;
     /**
      * @brief Notify that new items are appended
      * @param items items to be appended.
      */
-    virtual void doAppend(const std::vector<T> &items) = 0;
+    virtual void onAppend(const std::vector<T> &items) = 0;
     /**
      * @brief Notify that new items are prepended
      * @param items items to be prepended.
      */
-    virtual void doPrepend(const std::vector<T> &items) = 0;
+    virtual void onPrepend(const std::vector<T> &items) = 0;
     /**
      * @brief Notify that an item is updated
      * @param index index of the item that is updated.
      * @param item the new value of the item.
      */
-    virtual void doUpdate(int index, const T &item) = 0;
+    virtual void onUpdate(int index, const T &item) = 0;
     /**
      * @brief Notify that an item is removed
      * @param index index of the item that is removed.
      */
-    virtual void doRemove(int index) = 0;
+    virtual void onRemove(int index) = 0;
     /**
      * @brief Notify that an item has moved
      * @param from index of the item to move.
      * @param to the item's new index.
      */
-    virtual void doMove(int from, int to) = 0;
+    virtual void onMove(int from, int to) = 0;
     /**
      * @brief Notify that the listened object is now invalid
      *
      * When called on this method, the listener should stop
      * listening.
      */
-    virtual void doInvalidate() = 0;
+    virtual void onInvalidation() = 0;
     /**
      * @brief Notify that an asynchronous operation has started
      */
-    virtual void doStart() = 0;
+    virtual void onStart() = 0;
     /**
      * @brief Notify that an asynchronous operation has failed
      * @param error error message.
      */
-    virtual void doError(const QString &error) = 0;
+    virtual void onError(const QString &error) = 0;
     /**
      * @brief Notify that an asynchronous operation has finished
      */
-    virtual void doFinish() = 0;
-    template<class C> friend class Repository;
+    virtual void onFinish() = 0;
 };
 
 #endif // IREPOSITORYLISTENER_H

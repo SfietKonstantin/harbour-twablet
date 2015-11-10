@@ -29,18 +29,43 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef IITEMLISTENER_H
-#define IITEMLISTENER_H
+#ifndef LIST_H
+#define LIST_H
 
-template<class T>
-class IItemListener
+#include "user.h"
+
+class QJsonObject;
+class List
 {
 public:
-    virtual ~IItemListener() {}
-    virtual void onStart() = 0;
-    virtual void onError(const QString &error) = 0;
-    virtual void onFinish(T &&item) = 0;
+    explicit List() = default;
+    explicit List(const QJsonObject &json);
+    DEFAULT_COPY_DEFAULT_MOVE(List);
+    bool isValid() const;
+    QString id() const;
+    QString name() const;
+    QString slug() const;
+    QString fullName() const;
+    QString description() const;
+    User user() const;
+    QString mode() const;
+    bool isFollowing() const;
+    int memberCount() const;
+    int subscriberCount() const;
+    QString uri() const;
+private:
+    QString m_id {};
+    QString m_name {};
+    QString m_slug {};
+    QString m_fullName {};
+    QString m_description {};
+    User m_user {};
+    QString m_mode {};
+    bool m_following {false};
+    int m_memberCount {0};
+    int m_subscriberCount {0};
+    QString m_uri {};
+    QDateTime m_createdAt {};
 };
 
-#endif // IITEMLISTENER_H
-
+#endif // LIST_H

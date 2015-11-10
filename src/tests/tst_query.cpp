@@ -39,11 +39,11 @@ TEST(query, Invalid)
         EXPECT_FALSE(query.isValid());
     }
     {
-        TweetListQuery query {};
+        TweetRepositoryQuery query {};
         EXPECT_FALSE(query.isValid());
     }
     {
-        UserListQuery query {};
+        UserRepositoryQuery query {};
         EXPECT_FALSE(query.isValid());
     }
 }

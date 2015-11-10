@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,46 +29,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "tweetsearchqueryhandler.h"
-#include "private/repositoryqueryhandlerutil.h"
-#include <QtCore/QUrl>
-#include <QtCore/QJsonArray>
+#include "listrepositoryqueryhandler.h"
 #include <QtCore/QJsonDocument>
+#include <QtCore/QJsonArray>
+#include <QtCore/QUrl>
+#include "private/repositoryqueryhandlerutil.h"
 
-TweetSearchQueryHandler::TweetSearchQueryHandler()
+ListRepositoryQueryHandler::ListRepositoryQueryHandler()
 {
 }
 
-IRepositoryQueryHandler<Tweet>::Ptr TweetSearchQueryHandler::create()
+IRepositoryQueryHandler<List>::Ptr ListRepositoryQueryHandler::create()
 {
-    return Ptr(new TweetSearchQueryHandler());
+    return Ptr(new ListRepositoryQueryHandler());
 }
 
-Query::Parameters TweetSearchQueryHandler::additionalParameters(RequestType requestType) const
+Query::Parameters ListRepositoryQueryHandler::additionalParameters(RequestType requestType) const
 {
+    Q_UNUSED(requestType);
     Query::Parameters returned {};
 
     switch (requestType) {
     case Refresh:
-        if (!m_sinceId.isEmpty()) {
-            returned.emplace("since_id", QUrl::toPercentEncoding(m_sinceId));
-        }
+        Q_ASSERT_X(false, "ListRepositoryQueryHandler", "Refreshed is not implemented for List");
         break;
     case LoadMore:
-        if (!m_maxId.isEmpty()) {
-            returned.emplace("max_id", QUrl::toPercentEncoding(m_maxId));
+        if (!m_nextCursor.isEmpty()) {
+            returned.emplace("cursor", QUrl::toPercentEncoding(m_nextCursor));
         }
-        break;
-    default:
         break;
     }
     return returned;
 }
 
-bool TweetSearchQueryHandler::treatReply(RequestType requestType, const QByteArray &data,
-                                       std::vector<Tweet> &items, QString &errorMessage,
-                                       Placement &placement)
+bool ListRepositoryQueryHandler::treatReply(RequestType requestType, const QByteArray &data,
+                                            std::vector<List> &items, QString &errorMessage,
+                                            Placement &placement)
 {
+    Q_ASSERT_X(requestType == LoadMore, "ListRepositoryQueryHandler", "Refreshed is not implemented for List");
     QJsonParseError error {-1, QJsonParseError::NoError};
     QJsonDocument document {QJsonDocument::fromJson(data, &error)};
     if (error.error != QJsonParseError::NoError) {
@@ -78,7 +76,17 @@ bool TweetSearchQueryHandler::treatReply(RequestType requestType, const QByteArr
     }
 
     const QJsonObject &root (document.object());
-    const QJsonArray tweets (root.value(QLatin1String("statuses")).toArray());
-    return private_util::treatTweetReply(requestType, tweets, items, placement,
-                                         m_sinceId, m_maxId);
+    const QJsonArray &lists (root.value(QLatin1String("lists")).toArray());
+    items.reserve(lists.size());
+    for (const QJsonValue &list : lists) {
+        if (list.isObject()) {
+            items.emplace_back(list.toObject());
+        }
+    }
+
+    if (!items.empty()) {
+        m_nextCursor = root.value(QLatin1String("next_cursor_str")).toString();
+        placement = Append;
+    }
+    return true;
 }

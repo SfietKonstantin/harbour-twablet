@@ -29,48 +29,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "listqueryhandlerutil.h"
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
+#ifndef LISTREPOSITORY_H
+#define LISTREPOSITORY_H
 
-namespace private_util
-{
+#include "repository.h"
+#include "list.h"
 
-bool treatTweetReply(IListQueryHandler<Tweet>::RequestType requestType,
-                     const QJsonArray &data, std::vector<Tweet> &items,
-                     IListQueryHandler<Tweet>::Placement &placement,
-                     QString &sinceId, QString &maxId)
-{
-    items.reserve(data.size());
-    for (const QJsonValue &item : data) {
-        if (item.isObject()) {
-            items.emplace_back(item.toObject());
-        }
-    }
+using ListRepository = Repository<List>;
 
-    QString newSinceId = !items.empty() ? std::begin(items)->id() : QString();
-    quint64 newMaxId = items.empty() ? 0 : (std::end(items) - 1)->id().toULongLong();
-    QString newMaxIdStr = newMaxId > 0 ? QString::number(newMaxId - 1) : QString();
-    if (!items.empty()) {
-        switch (requestType) {
-        case IListQueryHandler<Tweet>::Refresh:
-            sinceId = std::move(newSinceId);
-            if (maxId.isEmpty()) {
-                maxId = std::move(newMaxIdStr);
-            }
-            placement = IListQueryHandler<Tweet>::Prepend;
-            break;
-        case IListQueryHandler<Tweet>::LoadMore:
-            if (sinceId.isEmpty()) {
-                sinceId = std::move(newSinceId);
-            }
-            maxId = std::move(newMaxIdStr);
-            placement = IListQueryHandler<Tweet>::Append;
-            break;
-        }
+#endif // LISTREPOSITORY_H
 
-    }
-    return true;
-}
-
-}

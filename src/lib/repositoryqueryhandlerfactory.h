@@ -29,54 +29,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "tweetlistqueryhandler.h"
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonDocument>
-#include <QtCore/QUrl>
-#include "private/listqueryhandlerutil.h"
+#ifndef REPOSITORYQUERYHANDLERFACTORY_H
+#define REPOSITORYQUERYHANDLERFACTORY_H
 
-TweetListQueryHandler::TweetListQueryHandler()
+#include "irepositoryqueryhandler.h"
+#include "tweet.h"
+#include "user.h"
+#include "list.h"
+
+class Query;
+class RepositoryQueryHandlerFactory
 {
-}
+public:
+    static IRepositoryQueryHandler<Tweet>::Ptr createTweet(const Query &query);
+    static IRepositoryQueryHandler<User>::Ptr createUser(const Query &query);
+    static IRepositoryQueryHandler<List>::Ptr createList(const Query &query);
+};
 
-IListQueryHandler<Tweet>::Ptr TweetListQueryHandler::create()
-{
-    return Ptr(new TweetListQueryHandler());
-}
-
-Query::Parameters TweetListQueryHandler::additionalParameters(RequestType requestType) const
-{
-    Query::Parameters returned {};
-
-    switch (requestType) {
-    case Refresh:
-        if (!m_sinceId.isEmpty()) {
-            returned.emplace("since_id", QUrl::toPercentEncoding(m_sinceId));
-        }
-        break;
-    case LoadMore:
-        if (!m_maxId.isEmpty()) {
-            returned.emplace("max_id", QUrl::toPercentEncoding(m_maxId));
-        }
-        break;
-    default:
-        break;
-    }
-    return returned;
-}
-
-bool TweetListQueryHandler::treatReply(RequestType requestType, const QByteArray &data,
-                                       std::vector<Tweet> &items, QString &errorMessage,
-                                       Placement &placement)
-{
-    QJsonParseError error {-1, QJsonParseError::NoError};
-    QJsonDocument document {QJsonDocument::fromJson(data, &error)};
-    if (error.error != QJsonParseError::NoError) {
-        errorMessage = error.errorString();
-        placement = Discard;
-        return false;
-    }
-
-    return private_util::treatTweetReply(requestType, document.array(), items, placement,
-                                         m_sinceId, m_maxId);
-}
+#endif // REPOSITORYQUERYHANDLERFACTORY_H

@@ -32,6 +32,7 @@ set(${PROJECT_NAME}_Core_SRCS
     urlentity.cpp
     usermentionentity.cpp
     hashtagentity.cpp
+    list.cpp
     query.cpp
     loadsavemanager.cpp
     repository.h
@@ -39,15 +40,18 @@ set(${PROJECT_NAME}_Core_SRCS
     layoutrepository.cpp
     tweetrepository.h
     userrepository.h
+    listrepository.h
     containerkey.cpp
     tweetrepositorycontainer.cpp
     userrepositorycontainer.cpp
+    listrepositorycontainer.cpp
     iqueryexecutor.h
-    ilistqueryhandler.h
-    listqueryhandlerfactory.cpp
-    tweetlistqueryhandler.cpp
+    irepositoryqueryhandler.h
+    repositoryqueryhandlerfactory.cpp
+    tweetrepositoryqueryhandler.cpp
     tweetsearchqueryhandler.cpp
-    userlistqueryhandler.cpp
+    userrepositoryqueryhandler.cpp
+    listrepositoryqueryhandler.cpp
     iitemqueryhandler.h
     itemqueryhandlerfactory.cpp
     iitemlistener.h
@@ -62,8 +66,8 @@ set(${PROJECT_NAME}_Private_SRCS
     private/twitterdatautil.cpp
     private/twitterqueryutil.cpp
     private/networkqueryexecutor.cpp
-    private/listquerycallback.h
-    private/listqueryhandlerutil.cpp
+    private/repositoryquerycallback.h
+    private/repositoryqueryhandlerutil.cpp
     private/conversionutil.cpp
     private/itemquerycallback.h
 )
@@ -75,6 +79,7 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/quotedtweetobject.cpp
     qml/userobject.cpp
     qml/mediaobject.cpp
+    qml/listobject.cpp
     qml/querytypeobject.cpp
     qml/imodel.h
     qml/model.h
@@ -82,6 +87,7 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/layoutmodel.cpp
     qml/tweetmodel.cpp
     qml/usermodel.cpp
+    qml/listmodel.cpp
     qml/mediamodel.cpp
     qml/querytypemodel.cpp
     qml/accountselectionmodel.cpp
@@ -89,6 +95,7 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/ilayoutcontainerobject.h
     qml/itweetrepositorycontainerobject.h
     qml/iuserrepositorycontainerobject.h
+    qml/ilistrepositorycontainerobject.h
     qml/iitemquerycontainerobject.h
     qml/twitterauthentification.cpp
     qml/datarepositoryobject.cpp
@@ -99,8 +106,9 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/quotedtweetformatter.cpp
     qml/iquerywrapperobject.h
     qml/querywrappervisitor.cpp
-    qml/tweetlistquerywrapperobject.cpp
-    qml/userlistquerywrapperobject.cpp
+    qml/tweetmodelquerywrapperobject.cpp
+    qml/usermodelquerywrapperobject.cpp
+    qml/listmodelqueryobject.cpp
     qml/iqueryitem.h
     qml/queryitem.h
     qml/queryitemfactory.h

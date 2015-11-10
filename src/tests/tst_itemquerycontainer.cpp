@@ -60,8 +60,8 @@ TEST_F(itemquerycontainer, Base)
             .Times(1).WillRepeatedly(Return(QByteArray("{}")));
 
     MockItemListener listener;
-    EXPECT_CALL(listener, doStart()).Times(1);
-    EXPECT_CALL(listener, doError(_)).Times(0);
+    EXPECT_CALL(listener, onStart()).Times(1);
+    EXPECT_CALL(listener, onError(_)).Times(0);
     EXPECT_CALL(listener, handleFinish(_)).Times(1);
 
     TweetItemQuery query {TweetItemQuery::Favorite, Query::Parameters{{"id", "0"}}};

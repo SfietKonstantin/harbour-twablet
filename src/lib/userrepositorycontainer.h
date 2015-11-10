@@ -38,7 +38,7 @@
 #include "globals.h"
 #include "query.h"
 #include "userrepository.h"
-#include "ilistqueryhandler.h"
+#include "irepositoryqueryhandler.h"
 #include "iqueryexecutor.h"
 
 class UserRepositoryContainer
@@ -54,14 +54,14 @@ public:
 private:
     struct Data
     {
-        explicit Data(IListQueryHandler<User>::Ptr &&inputHandler);
+        explicit Data(IRepositoryQueryHandler<User>::Ptr &&inputHandler);
         bool loading {false};
         UserRepository repository {};
         int refcount {0};
-        IListQueryHandler<User>::Ptr handler {};
+        IRepositoryQueryHandler<User>::Ptr handler {};
     };
     void load(const ContainerKey &key, Data &mappingData,
-              IListQueryHandler<User>::RequestType requestType);
+              IRepositoryQueryHandler<User>::RequestType requestType);
     Data * getMappingData(const ContainerKey &key);
     IQueryExecutor::ConstPtr m_queryExecutor {nullptr};
     std::map<ContainerKey, Data> m_mapping {};

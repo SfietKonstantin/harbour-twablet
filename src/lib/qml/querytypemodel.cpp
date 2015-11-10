@@ -85,7 +85,7 @@ int QueryTypeModel::count() const
 int QueryTypeModel::getType(int index)
 {
     if (index < 0 || index >= rowCount()) {
-        return QueryTypeObject::InvalidTweetList;
+        return QueryTypeObject::InvalidTweetModel;
     }
     return m_items[index]->type;
 }

@@ -119,7 +119,7 @@ bool ItemQueryContainer::doExecuteQuery(const Account &account, const Query &que
     data->listeners.insert(listener);
 
     for (IItemListener<T> *listener : data->listeners) {
-        listener->doStart();
+        listener->onStart();
     }
 
     if (data->loading) {

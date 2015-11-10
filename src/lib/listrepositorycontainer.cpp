@@ -29,24 +29,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "userrepositorycontainer.h"
-#include "private/debughelper.h"
+#include "listrepositorycontainer.h"
 #include "private/repositoryquerycallback.h"
-#include "private/twitterqueryutil.h"
 #include "repositoryqueryhandlerfactory.h"
-#include <QtCore/QLoggingCategory>
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
-#include <QtNetwork/QNetworkReply>
 
-UserRepositoryContainer::UserRepositoryContainer(IQueryExecutor::ConstPtr &&queryExecutor)
-    : m_queryExecutor(std::move(queryExecutor))
+ListRepositoryContainer::ListRepositoryContainer(IQueryExecutor::ConstPtr queryExecutor)
+    : m_queryExecutor{std::move(queryExecutor)}
 {
-    Q_ASSERT_X(m_queryExecutor, "UserCentralRepository", "NULL query executor");
+    Q_ASSERT_X(m_queryExecutor, "ListQueryContainer", "NULL query executor");
 }
 
-UserRepository * UserRepositoryContainer::repository(const Account &account, const Query &query)
+ListRepository * ListRepositoryContainer::repository(const Account &account, const Query &query)
 {
     auto it = m_mapping.find(ContainerKey{Account{account}, Query{query}});
     if (it == std::end(m_mapping)) {
@@ -55,7 +48,7 @@ UserRepository * UserRepositoryContainer::repository(const Account &account, con
     return &(it->second.repository);
 }
 
-void UserRepositoryContainer::referenceQuery(const Account &account, const Query &query)
+void ListRepositoryContainer::referenceQuery(const Account &account, const Query &query)
 {
     Data *data {getMappingData(ContainerKey{Account{account}, Query{query}})};
     if (data == nullptr) {
@@ -64,7 +57,7 @@ void UserRepositoryContainer::referenceQuery(const Account &account, const Query
     ++data->refcount;
 }
 
-void UserRepositoryContainer::dereferenceQuery(const Account &account, const Query &query)
+void ListRepositoryContainer::dereferenceQuery(const Account &account, const Query &query)
 {
     Data *data {getMappingData(ContainerKey{Account{account}, Query{query}})};
     if (data == nullptr) {
@@ -76,24 +69,24 @@ void UserRepositoryContainer::dereferenceQuery(const Account &account, const Que
     }
 }
 
-void UserRepositoryContainer::refresh(const Account &account, const Query &query)
+void ListRepositoryContainer::refresh(const Account &account, const Query &query)
 {
     auto it = m_mapping.find(ContainerKey{Account{account}, Query{query}});
     if (it != std::end(m_mapping)) {
-        load(it->first, it->second, IRepositoryQueryHandler<User>::Refresh);
+        load(it->first, it->second, IRepositoryQueryHandler<List>::Refresh);
     }
 }
 
-void UserRepositoryContainer::loadMore(const Account &account, const Query &query)
+void ListRepositoryContainer::loadMore(const Account &account, const Query &query)
 {
     auto it = m_mapping.find(ContainerKey{Account{account}, Query{query}});
     if (it != std::end(m_mapping)) {
-        load(it->first, it->second, IRepositoryQueryHandler<User>::LoadMore);
+        load(it->first, it->second, IRepositoryQueryHandler<List>::LoadMore);
     }
 }
 
-void UserRepositoryContainer::load(const ContainerKey &key, Data &mappingData,
-                                   IRepositoryQueryHandler<User>::RequestType requestType)
+void ListRepositoryContainer::load(const ContainerKey &key, ListRepositoryContainer::Data &mappingData,
+                                   IRepositoryQueryHandler<List>::RequestType requestType)
 {
     if (mappingData.loading) {
         return;
@@ -109,8 +102,8 @@ void UserRepositoryContainer::load(const ContainerKey &key, Data &mappingData,
     mappingData.repository.start();
 
     m_queryExecutor->execute(key.query().requestType(), path, parameters, key.account(), [this, &mappingData, requestType](QIODevice &reply, QNetworkReply::NetworkError error, const QString &errorMessage) {
-        std::vector<User> items {};
-        private_util::RepositoryQueryCallback<User> callback {
+        std::vector<List> items {};
+        private_util::RepositoryQueryCallback<List> callback {
             requestType,
             *mappingData.handler,
             mappingData.repository,
@@ -121,7 +114,7 @@ void UserRepositoryContainer::load(const ContainerKey &key, Data &mappingData,
     });
 }
 
-UserRepositoryContainer::Data * UserRepositoryContainer::getMappingData(const ContainerKey &key)
+ListRepositoryContainer::Data * ListRepositoryContainer::getMappingData(const ContainerKey &key)
 {
     auto it = m_mapping.find(key);
     if (it != std::end(m_mapping)) {
@@ -132,15 +125,14 @@ UserRepositoryContainer::Data * UserRepositoryContainer::getMappingData(const Co
         return nullptr;
     }
 
-    IRepositoryQueryHandler<User>::Ptr handler {RepositoryQueryHandlerFactory::createUser(key.query())};
+    IRepositoryQueryHandler<List>::Ptr handler {RepositoryQueryHandlerFactory::createList(key.query())};
     if (!handler) {
         return nullptr;
     }
     return &(m_mapping.emplace(key, Data{std::move(handler)}).first->second);
 }
 
-
-UserRepositoryContainer::Data::Data(IRepositoryQueryHandler<User>::Ptr &&inputHandler)
+ListRepositoryContainer::Data::Data(IRepositoryQueryHandler<List>::Ptr &&inputHandler)
     : handler{std::move(inputHandler)}
 {
 }

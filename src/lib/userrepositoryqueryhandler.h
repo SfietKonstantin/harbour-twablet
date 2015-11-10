@@ -29,18 +29,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef IITEMLISTENER_H
-#define IITEMLISTENER_H
+#ifndef USERREPOSITORYQUERYHANDLER_H
+#define USERREPOSITORYQUERYHANDLER_H
 
-template<class T>
-class IItemListener
+#include "irepositoryqueryhandler.h"
+#include "user.h"
+
+class UserRepositoryQueryHandler final : public IRepositoryQueryHandler<User>
 {
 public:
-    virtual ~IItemListener() {}
-    virtual void onStart() = 0;
-    virtual void onError(const QString &error) = 0;
-    virtual void onFinish(T &&item) = 0;
+    DISABLE_COPY_DISABLE_MOVE(UserRepositoryQueryHandler);
+    static IRepositoryQueryHandler<User>::Ptr create();
+private:
+    UserRepositoryQueryHandler();
+    Query::Parameters additionalParameters(RequestType requestType) const override;
+    bool treatReply(RequestType requestType, const QByteArray &data,
+                    std::vector<User> &items, QString &errorMessage,
+                    Placement &placement) override;
+    QString m_nextCursor {};
 };
 
-#endif // IITEMLISTENER_H
-
+#endif // USERREPOSITORYQUERYHANDLER_H

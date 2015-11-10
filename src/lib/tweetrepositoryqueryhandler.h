@@ -29,18 +29,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef IITEMLISTENER_H
-#define IITEMLISTENER_H
+#ifndef TWEETREPOSITORYQUERYHANDLER_H
+#define TWEETREPOSITORYQUERYHANDLER_H
 
-template<class T>
-class IItemListener
+#include "irepositoryqueryhandler.h"
+#include "tweet.h"
+
+class TweetRepositoryQueryHandler final : public IRepositoryQueryHandler<Tweet>
 {
 public:
-    virtual ~IItemListener() {}
-    virtual void onStart() = 0;
-    virtual void onError(const QString &error) = 0;
-    virtual void onFinish(T &&item) = 0;
+    DISABLE_COPY_DISABLE_MOVE(TweetRepositoryQueryHandler);
+    static IRepositoryQueryHandler<Tweet>::Ptr create();
+private:
+    TweetRepositoryQueryHandler();
+    Query::Parameters additionalParameters(RequestType requestType) const override;
+    bool treatReply(RequestType requestType, const QByteArray &data,
+                    std::vector<Tweet> &items, QString &errorMessage,
+                    Placement &placement) override;
+    QString m_sinceId {};
+    QString m_maxId {};
 };
 
-#endif // IITEMLISTENER_H
-
+#endif // TWEETREPOSITORYQUERYHANDLER_H

@@ -120,11 +120,11 @@ public:
     };
     std::vector<Data> data {};
 private:
-    void doAppend(const T &item) override
+    void onAppend(const T &item) override
     {
         data.emplace_back(Data::createAppend(std::vector<QString>{item.id()}));
     }
-    void doAppend(const std::vector<T> &items) override
+    void onAppend(const std::vector<T> &items) override
     {
         std::vector<QString> ids {};
         for (const T &item : items) {
@@ -132,7 +132,7 @@ private:
         }
         data.emplace_back(Data::createAppend(ids));
     }
-    void doPrepend(const std::vector<T> &items) override
+    void onPrepend(const std::vector<T> &items) override
     {
         std::vector<QString> ids {};
         for (const T &item : items) {
@@ -140,32 +140,32 @@ private:
         }
         data.emplace_back(Data::createPrepend(ids));
     }
-    void doUpdate(int index, const T &item) override
+    void onUpdate(int index, const T &item) override
     {
         data.emplace_back(Data::createUpdate(index, item.id()));
     }
-    void doRemove(int index) override
+    void onRemove(int index) override
     {
         data.emplace_back(Data::createRemove(index));
     }
-    void doMove(int start, int end) override
+    void onMove(int start, int end) override
     {
         data.emplace_back(Data::createMove(start, end));
     }
-    void doInvalidate() override
+    void onInvalidation() override
     {
         data.emplace_back(Data::createInvalidate());
     }
-    void doStart() override
+    void onStart() override
     {
         data.emplace_back(Data::createLoading());
     }
-    void doError(const QString &error) override
+    void onError(const QString &error) override
     {
         Q_UNUSED(error);
         data.emplace_back(Data::createError());
     }
-    void doFinish() override
+    void onFinish() override
     {
         data.emplace_back(Data::createIdle());
     }

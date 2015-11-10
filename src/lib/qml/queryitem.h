@@ -126,15 +126,15 @@ protected:
     }
     virtual void doItemChanged() = 0;
 private:
-    void doStart() override
+    void onStart() override
     {
         setStatusAndErrorMessage(Loading, QString());
     }
-    void doError(const QString &error) override
+    void onError(const QString &error) override
     {
         setStatusAndErrorMessage(Error, error);
     }
-    void doFinish(T &&item) override
+    void onFinish(T &&item) override
     {
         m_item = QueryItemFactory<T, O>::create(item, this);
         doItemChanged();

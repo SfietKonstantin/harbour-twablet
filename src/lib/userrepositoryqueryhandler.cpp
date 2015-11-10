@@ -29,29 +29,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "userlistqueryhandler.h"
+#include "userrepositoryqueryhandler.h"
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
 #include <QtCore/QUrl>
-#include "private/listqueryhandlerutil.h"
+#include "private/repositoryqueryhandlerutil.h"
 
-UserListQueryHandler::UserListQueryHandler()
+UserRepositoryQueryHandler::UserRepositoryQueryHandler()
 {
 }
 
-IListQueryHandler<User>::Ptr UserListQueryHandler::create()
+IRepositoryQueryHandler<User>::Ptr UserRepositoryQueryHandler::create()
 {
-    return Ptr(new UserListQueryHandler());
+    return Ptr(new UserRepositoryQueryHandler());
 }
 
-Query::Parameters UserListQueryHandler::additionalParameters(RequestType requestType) const
+Query::Parameters UserRepositoryQueryHandler::additionalParameters(RequestType requestType) const
 {
     Q_UNUSED(requestType);
     Query::Parameters returned {};
 
     switch (requestType) {
     case Refresh:
-        Q_ASSERT_X(false, "UserListQueryHandler", "Refreshed is not implemented for User");
+        Q_ASSERT_X(false, "UserRepositoryQueryHandler", "Refreshed is not implemented for User");
         break;
     case LoadMore:
         if (!m_nextCursor.isEmpty()) {
@@ -62,11 +62,11 @@ Query::Parameters UserListQueryHandler::additionalParameters(RequestType request
     return returned;
 }
 
-bool UserListQueryHandler::treatReply(RequestType requestType, const QByteArray &data,
-                                      std::vector<User> &items, QString &errorMessage,
-                                      Placement &placement)
+bool UserRepositoryQueryHandler::treatReply(RequestType requestType, const QByteArray &data,
+                                            std::vector<User> &items, QString &errorMessage,
+                                            Placement &placement)
 {
-    Q_ASSERT_X(requestType == LoadMore, "UserListQueryHandler", "Refreshed is not implemented for User");
+    Q_ASSERT_X(requestType == LoadMore, "UserRepositoryQueryHandler", "Refreshed is not implemented for User");
     QJsonParseError error {-1, QJsonParseError::NoError};
     QJsonDocument document {QJsonDocument::fromJson(data, &error)};
     if (error.error != QJsonParseError::NoError) {

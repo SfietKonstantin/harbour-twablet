@@ -29,23 +29,54 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef LISTQUERYHANDLERUTIL_H
-#define LISTQUERYHANDLERUTIL_H
+#include "tweetrepositoryqueryhandler.h"
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QUrl>
+#include "private/repositoryqueryhandlerutil.h"
 
-#include "ilistqueryhandler.h"
-#include "tweet.h"
-
-class QJsonArray;
-
-namespace private_util
+TweetRepositoryQueryHandler::TweetRepositoryQueryHandler()
 {
-
-bool treatTweetReply(IListQueryHandler<Tweet>::RequestType requestType,
-                     const QJsonArray &data, std::vector<Tweet> &items,
-                     IListQueryHandler<Tweet>::Placement &placement,
-                     QString &sinceId, QString &maxId);
-
 }
 
-#endif // LISTQUERYHANDLERUTIL_H
+IRepositoryQueryHandler<Tweet>::Ptr TweetRepositoryQueryHandler::create()
+{
+    return Ptr(new TweetRepositoryQueryHandler());
+}
 
+Query::Parameters TweetRepositoryQueryHandler::additionalParameters(RequestType requestType) const
+{
+    Query::Parameters returned {};
+
+    switch (requestType) {
+    case Refresh:
+        if (!m_sinceId.isEmpty()) {
+            returned.emplace("since_id", QUrl::toPercentEncoding(m_sinceId));
+        }
+        break;
+    case LoadMore:
+        if (!m_maxId.isEmpty()) {
+            returned.emplace("max_id", QUrl::toPercentEncoding(m_maxId));
+        }
+        break;
+    default:
+        break;
+    }
+    return returned;
+}
+
+bool TweetRepositoryQueryHandler::treatReply(RequestType requestType, const QByteArray &data,
+                                       std::vector<Tweet> &items, QString &errorMessage,
+                                       Placement &placement)
+{
+    QJsonParseError error {-1, QJsonParseError::NoError};
+    QJsonDocument document {QJsonDocument::fromJson(data, &error)};
+    if (error.error != QJsonParseError::NoError) {
+        errorMessage = error.errorString();
+        placement = Discard;
+        return false;
+    }
+
+    return private_util::treatTweetReply(requestType, document.array(), items, placement,
+                                         m_sinceId, m_maxId);
+}

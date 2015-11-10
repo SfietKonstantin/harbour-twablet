@@ -29,25 +29,55 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEETLISTQUERYHANDLER_H
-#define TWEETLISTQUERYHANDLER_H
+#ifndef LISTOBJECT_H
+#define LISTOBJECT_H
 
-#include "ilistqueryhandler.h"
-#include "tweet.h"
+#include <QtCore/QObject>
+#include "list.h"
+#include "userobject.h"
+#include "quotedtweetobject.h"
 
-class TweetListQueryHandler final : public IListQueryHandler<Tweet>
+namespace qml
 {
+
+class ListObject : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(bool valid READ isValid CONSTANT)
+    Q_PROPERTY(QString id READ id CONSTANT)
+    Q_PROPERTY(QString name READ name CONSTANT)
+    Q_PROPERTY(QString slug READ slug CONSTANT)
+    Q_PROPERTY(QString fullName READ fullName CONSTANT)
+    Q_PROPERTY(QString description READ description CONSTANT)
+    Q_PROPERTY(qml::UserObject * user READ user CONSTANT)
+    Q_PROPERTY(QString mode READ mode CONSTANT)
+    Q_PROPERTY(bool following READ isFollowing CONSTANT)
+    Q_PROPERTY(int memberCount READ memberCount CONSTANT)
+    Q_PROPERTY(int subscriberCount READ subscriberCount CONSTANT)
+    Q_PROPERTY(QString uri READ uri CONSTANT)
 public:
-    DISABLE_COPY_DISABLE_MOVE(TweetListQueryHandler);
-    static IListQueryHandler<Tweet>::Ptr create();
+    DISABLE_COPY_DISABLE_MOVE(ListObject);
+    static ListObject * create(const List &data, QObject *parent = 0);
+    bool isValid() const;
+    QString id() const;
+    QString name() const;
+    QString slug() const;
+    QString fullName() const;
+    QString description() const;
+    UserObject * user() const;
+    QString mode() const;
+    bool isFollowing() const;
+    int memberCount() const;
+    int subscriberCount() const;
+    QString uri() const;
+    List data() const;
+    void update(const List &other);
 private:
-    TweetListQueryHandler();
-    Query::Parameters additionalParameters(RequestType requestType) const override;
-    bool treatReply(RequestType requestType, const QByteArray &data,
-                    std::vector<Tweet> &items, QString &errorMessage,
-                    Placement &placement) override;
-    QString m_sinceId {};
-    QString m_maxId {};
+    explicit ListObject(const List &data, QObject *parent = 0);
+    List m_data {};
+    QObjectPtr<UserObject> m_user {nullptr};
 };
 
-#endif // TWEETLISTQUERYHANDLER_H
+}
+
+#endif // LISTOBJECT_H

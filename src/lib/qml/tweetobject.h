@@ -85,11 +85,11 @@ signals:
 private:
     explicit TweetObject(const Tweet &data, QObject *parent = 0);
     Tweet m_data {};
-    UserObject *m_user {nullptr};
-    UserObject *m_retweetingUser {nullptr};
+    QObjectPtr<UserObject> m_user {nullptr};
+    QObjectPtr<UserObject> m_retweetingUser {nullptr};
     QString m_sourceName {};
     QObjectPtr<MediaModel> m_media {nullptr};
-    QuotedTweetObject *m_quotedStatus {nullptr};
+    QObjectPtr<QuotedTweetObject> m_quotedStatus {nullptr};
 };
 
 }

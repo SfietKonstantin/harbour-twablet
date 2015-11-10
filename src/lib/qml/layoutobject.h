@@ -37,7 +37,7 @@
 #include "model.h"
 #include "qobjectutils.h"
 #include "querytypeobject.h"
-#include "tweetlistquerywrapperobject.h"
+#include "tweetmodelquerywrapperobject.h"
 
 namespace qml
 {
@@ -47,7 +47,7 @@ class LayoutObject : public QObject
     Q_OBJECT
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
     Q_PROPERTY(QString accountUserId READ accountUserId NOTIFY accountUserIdChanged)
-    Q_PROPERTY(qml::QueryTypeObject::TweetListType queryType READ queryType NOTIFY queryTypeChanged)
+    Q_PROPERTY(qml::QueryTypeObject::TweetModelType queryType READ queryType NOTIFY queryTypeChanged)
     Q_PROPERTY(QObject * query READ query NOTIFY queryChanged)
     Q_PROPERTY(QVariantMap parameters READ parameters NOTIFY parametersChanged)
 public:
@@ -56,9 +56,10 @@ public:
     QString name() const;
     QString accountUserId() const;
     int unread() const;
-    QueryTypeObject::TweetListType queryType() const;
+    QueryTypeObject::TweetModelType queryType() const;
     QObject * query() const;
     QVariantMap parameters() const;
+    void update(const Layout &other);
 signals:
     void nameChanged();
     void accountUserIdChanged();
@@ -68,11 +69,9 @@ signals:
     void parametersChanged();
 private:
     explicit LayoutObject(const Layout &data, QObject *parent = 0);
-    void update(const Layout &other);
     Layout m_data {};
-    QObjectPtr<TweetListQueryWrapperObject> m_query {};
+    QObjectPtr<TweetModelQueryWrapperObject> m_query {};
     QVariantMap m_parameters {};
-    friend class Model<Layout, LayoutObject>;
 };
 
 }

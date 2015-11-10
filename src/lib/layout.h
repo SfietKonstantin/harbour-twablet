@@ -58,7 +58,7 @@ public:
      * @param userId user id of the account.
      * @param query query.
      */
-    explicit Layout(const QString &name, const QString &accountUserId, TweetListQuery &&query);
+    explicit Layout(const QString &name, const QString &accountUserId, TweetRepositoryQuery &&query);
     DEFAULT_COPY_DEFAULT_MOVE(Layout);
     /**
      * @brief If the Layout instance is valid
@@ -93,12 +93,12 @@ public:
      * @brief Query to use
      * @return query to use.
      */
-    TweetListQuery query() const;
+    TweetRepositoryQuery query() const;
     /**
      * @brief Set the query to use
      * @param query query to use.
      */
-    void setQuery(TweetListQuery &&query);
+    void setQuery(TweetRepositoryQuery &&query);
     /**
      * @brief The number of unread entries
      * @return number of unread entries.
@@ -112,7 +112,7 @@ public:
 private:
     QString m_name {};
     QString m_accountUserId {};
-    TweetListQuery m_query {};
+    TweetRepositoryQuery m_query {};
     int m_unread {0};
 };
 

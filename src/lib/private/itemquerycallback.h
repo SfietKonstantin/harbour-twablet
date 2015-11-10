@@ -91,13 +91,13 @@ private:
     void doError(const QString &error)
     {
         for (IItemListener<T> *listener : m_listeners) {
-            listener->doError(error);
+            listener->onError(error);
         }
     }
     void doFinish(const T &item)
     {
         for (IItemListener<T> *listener : m_listeners) {
-            listener->doFinish(std::move(T(item)));
+            listener->onFinish(std::move(T(item)));
         }
     }
 };

@@ -40,19 +40,19 @@ namespace qml
 class AccountSelectionModel : public AccountModel
 {
     Q_OBJECT
-    Q_PROPERTY(int index READ index WRITE setIndex NOTIFY indexChanged)
+    Q_PROPERTY(int setCurrentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
     Q_PROPERTY(qml::AccountObject * selection READ selection NOTIFY selectionChanged)
 public:
     explicit AccountSelectionModel(QObject *parent = 0);
-    int index() const;
-    void setIndex(int index);
+    int currentIndex() const;
+    void setCurrentIndex(int currentIndex);
     AccountObject * selection() const;
 signals:
-    void indexChanged();
+    void currentIndexChanged();
     void selectionChanged();
 private:
     void setSelection(AccountObject *selection);
-    int m_index {-1};
+    int m_currentIndex {-1};
     AccountObject * m_selection {nullptr};
 };
 

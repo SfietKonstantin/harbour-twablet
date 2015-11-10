@@ -32,6 +32,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.twablet 1.0
+import harbour.twablet 1.0 as Twablet
 
 Page {
     id: container
@@ -47,10 +48,10 @@ Page {
 
     SilicaListView {
         anchors.fill: parent
-        model: UserModel {
-            id: userModel
+        model: Twablet.ListModel {
+            id: listModel
             repository: Repository
-            query: UserModelQuery {
+            query: ListModelQuery {
                 id: query
             }
         }
@@ -63,14 +64,14 @@ Page {
             id: delegate
             height: Theme.itemSizeMedium
             anchors.left: parent.left; anchors.right: parent.right
-            onClicked: container.panel.openUser(model.id, container.accountUserId, false)
+            // onClicked: container.panel.openUser(model.id, container.accountUserId, false)
 
             TwitterImage {
                 id: profilePicture
                 anchors.verticalCenter: parent.verticalCenter
                 width: Theme.itemSizeSmall
                 height: Theme.itemSizeSmall
-                source: Screen.sizeCategory === Screen.Large ? model.item.imageUrlLarge : model.item.imageUrl
+                source: Screen.sizeCategory === Screen.Large ? model.item.user.imageUrlLarge : model.item.user.imageUrl
             }
 
             Column {
@@ -90,7 +91,7 @@ Page {
                 Label {
                     anchors.left: parent.left; anchors.right: parent.right
                     truncationMode: TruncationMode.Elide
-                    text: "@" + model.item.screenName
+                    text: qsTr("By %1").arg(model.item.user.name)
                     font.pixelSize: Theme.fontSizeSmall
                     color: delegate.pressed ? Theme.secondaryHighlightColor : Theme.secondaryColor
                 }
@@ -98,13 +99,13 @@ Page {
         }
 
         footer: LoadMoreButton {
-            model: userModel
+            model: listModel
             onClicked: Repository.loadMore(query)
         }
 
         StatusPlaceholder {
-            model: userModel
-            errorMessage: (model.status === Model.Idle && model.count === 0) ? qsTr("No users") : ""
+            model: listModel
+            errorMessage: (model.status === Model.Idle && model.count === 0) ? qsTr("No lists") : ""
         }
 
         VerticalScrollDecorator {}

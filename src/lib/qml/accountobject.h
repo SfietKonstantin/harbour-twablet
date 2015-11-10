@@ -54,13 +54,12 @@ public:
     QByteArray token() const;
     QByteArray tokenSecret() const;
     const Account & data() const;
+    void update(const Account &other);
 signals:
     void nameChanged();
 private:
     explicit AccountObject(const Account &data, QObject *parent = 0);
-    void update(const Account &other);
     Account m_data {};
-    friend class Model<Account, AccountObject>;
 };
 
 }

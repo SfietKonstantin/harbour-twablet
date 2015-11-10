@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,18 +29,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef IITEMLISTENER_H
-#define IITEMLISTENER_H
+#ifndef LISTMODEL_H
+#define LISTMODEL_H
 
-template<class T>
-class IItemListener
+#include "listobject.h"
+#include "model.h"
+
+namespace qml
 {
+
+class ListModel : public Model<List, ListObject>
+{
+    Q_OBJECT
 public:
-    virtual ~IItemListener() {}
-    virtual void onStart() = 0;
-    virtual void onError(const QString &error) = 0;
-    virtual void onFinish(T &&item) = 0;
+    enum Roles {
+        IdRole = Qt::UserRole + 1,
+        ItemRole
+    };
+    explicit ListModel(QObject *parent = 0);
+    QVariant data(const QModelIndex &index, int role) const override final;
+private:
+    QHash<int, QByteArray> roleNames() const override final;
 };
 
-#endif // IITEMLISTENER_H
+}
 
+#endif // LISTMODEL_H

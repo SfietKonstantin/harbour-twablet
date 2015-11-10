@@ -46,6 +46,7 @@ DataRepositoryObject::DataRepositoryObject(QObject *parent)
     , m_network(new QNetworkAccessManager())
     , m_tweetRepositoryContainer(private_util::NetworkQueryExecutor::create(*m_network))
     , m_userRepositoryContainer(private_util::NetworkQueryExecutor::create(*m_network))
+    , m_listRepositoryContainer(private_util::NetworkQueryExecutor::create(*m_network))
     , m_itemQueryContainer(private_util::NetworkQueryExecutor::create(*m_network))
 {
     m_loadSaveManager.load(m_accounts);
@@ -78,12 +79,12 @@ TweetRepository * DataRepositoryObject::tweetRepository(const Account &account, 
     return m_tweetRepositoryContainer.repository(account, query);
 }
 
-void DataRepositoryObject::referenceTweetListQuery(const Account &account, const Query &query)
+void DataRepositoryObject::referenceTweetRepositoryQuery(const Account &account, const Query &query)
 {
     m_tweetRepositoryContainer.referenceQuery(account, query);
 }
 
-void DataRepositoryObject::dereferenceTweetListQuery(const Account &account, const Query &query)
+void DataRepositoryObject::dereferenceTweetRepositoryQuery(const Account &account, const Query &query)
 {
     m_tweetRepositoryContainer.dereferenceQuery(account, query);
 }
@@ -93,14 +94,29 @@ UserRepository * DataRepositoryObject::userRepository(const Account &account, co
     return m_userRepositoryContainer.repository(account, query);
 }
 
-void DataRepositoryObject::referenceUserListQuery(const Account &account, const Query &query)
+void DataRepositoryObject::referenceUserRepositoryQuery(const Account &account, const Query &query)
 {
     return m_userRepositoryContainer.referenceQuery(account, query);
 }
 
-void DataRepositoryObject::dereferenceUserListQuery(const Account &account, const Query &query)
+void DataRepositoryObject::dereferenceUserRepositoryQuery(const Account &account, const Query &query)
 {
     return m_userRepositoryContainer.dereferenceQuery(account, query);
+}
+
+ListRepository * DataRepositoryObject::listRepository(const Account &account, const Query &query)
+{
+    return m_listRepositoryContainer.repository(account, query);
+}
+
+void DataRepositoryObject::referenceListRepositoryQuery(const Account &account, const Query &query)
+{
+    return m_listRepositoryContainer.referenceQuery(account, query);
+}
+
+void DataRepositoryObject::dereferenceListRepositoryQuery(const Account &account, const Query &query)
+{
+    return m_listRepositoryContainer.dereferenceQuery(account, query);
 }
 
 Account DataRepositoryObject::account(const QString &accountUserId) const
@@ -189,8 +205,8 @@ void DataRepositoryObject::addLayout(const QString &name, int accountIndex, int 
 void DataRepositoryObject::addLayout(const QString &name, const QString &accountUserId,
                                      int queryType, const QVariantMap &parameters)
 {
-    TweetListQuery query {
-        static_cast<TweetListQuery::Type>(queryType),
+    TweetRepositoryQuery query {
+        static_cast<TweetRepositoryQuery::Type>(queryType),
         std::move(private_util::convertParameters(parameters))
     };
     if (!query.isValid()) {
@@ -213,12 +229,12 @@ void DataRepositoryObject::addDefaultLayouts(int accountIndex, const QString &ho
     }
 
     if (enableHomeTimeline) {
-        TweetListQuery query {TweetListQuery::Home, TweetListQuery::Parameters()};
+        TweetRepositoryQuery query {TweetRepositoryQuery::Home, TweetRepositoryQuery::Parameters()};
         m_tweetRepositoryContainer.referenceQuery(account(userId), query);
         m_layouts.append(Layout{homeName, userId, std::move(query)});
     }
     if (enableMentionsTimeline) {
-        TweetListQuery query {TweetListQuery::Mentions, TweetListQuery::Parameters()};
+        TweetRepositoryQuery query {TweetRepositoryQuery::Mentions, TweetRepositoryQuery::Parameters()};
         m_tweetRepositoryContainer.referenceQuery(account(userId), query);
         m_layouts.append(Layout{mentionsName, userId, std::move(query)});
     }
@@ -238,8 +254,8 @@ void DataRepositoryObject::updateLayout(int index, const QString &name, int acco
         return;
     }
 
-    TweetListQuery query {
-        static_cast<TweetListQuery::Type>(queryType),
+    TweetRepositoryQuery query {
+        static_cast<TweetRepositoryQuery::Type>(queryType),
         std::move(private_util::convertParameters(parameters))
     };
 
@@ -297,27 +313,40 @@ void DataRepositoryObject::refresh(QObject *query)
     public:
         explicit RefreshVisitor(DataRepositoryObject &parent,
                                 TweetRepositoryContainer &tweetRepositoryContainer,
-                                UserRepositoryContainer &userRepositoryContainer)
+                                UserRepositoryContainer &userRepositoryContainer,
+                                ListRepositoryContainer &listRepositoryContainer)
             : m_parent(parent), m_tweetRepositoryContainer(tweetRepositoryContainer)
             , m_userRepositoryContainer(userRepositoryContainer)
+            , m_listRepositoryContainer(listRepositoryContainer)
         {
         }
-        void visitTweetListQuery(const TweetListQueryWrapperObject &wrapperObject) override
+        void visitTweetModelQuery(const TweetModelQueryWrapperObject &wrapperObject) override
         {
             const Account &account {m_parent.account(wrapperObject.accountUserId())};
             m_tweetRepositoryContainer.refresh(account, wrapperObject.query());
         }
-        void visitUserListQuery(const UserListQueryWrapperObject &wrapperObject) override
+        void visitUserModelQuery(const UserModelQueryWrapperObject &wrapperObject) override
         {
             const Account &account {m_parent.account(wrapperObject.accountUserId())};
             m_userRepositoryContainer.refresh(account, wrapperObject.query());
+        }
+        void visitListModelQuery(const ListModelQueryObject &wrapperObject) override
+        {
+            const Account &account {m_parent.account(wrapperObject.accountUserId())};
+            m_listRepositoryContainer.refresh(account, wrapperObject.query());
         }
     private:
         DataRepositoryObject &m_parent;
         TweetRepositoryContainer &m_tweetRepositoryContainer;
         UserRepositoryContainer &m_userRepositoryContainer;
+        ListRepositoryContainer &m_listRepositoryContainer;
     };
-    RefreshVisitor visitor {*this, m_tweetRepositoryContainer, m_userRepositoryContainer};
+    RefreshVisitor visitor {
+        *this,
+        m_tweetRepositoryContainer,
+        m_userRepositoryContainer,
+        m_listRepositoryContainer
+    };
     queryWrapper->accept(visitor);
 }
 
@@ -333,27 +362,40 @@ void DataRepositoryObject::loadMore(QObject *query)
     public:
         explicit LoadMoreVisitor(DataRepositoryObject &parent,
                                  TweetRepositoryContainer &tweetRepositoryContainer,
-                                 UserRepositoryContainer &userRepositoryContainer)
+                                 UserRepositoryContainer &userRepositoryContainer,
+                                 ListRepositoryContainer &listRepositoryContainer)
             : m_parent(parent), m_tweetRepositoryContainer(tweetRepositoryContainer)
             , m_userRepositoryContainer(userRepositoryContainer)
+            , m_listRepositoryContainer(listRepositoryContainer)
         {
         }
-        void visitTweetListQuery(const TweetListQueryWrapperObject &wrapperObject) override
+        void visitTweetModelQuery(const TweetModelQueryWrapperObject &wrapperObject) override
         {
             const Account &account {m_parent.account(wrapperObject.accountUserId())};
             m_tweetRepositoryContainer.loadMore(account, wrapperObject.query());
         }
-        void visitUserListQuery(const UserListQueryWrapperObject &wrapperObject) override
+        void visitUserModelQuery(const UserModelQueryWrapperObject &wrapperObject) override
         {
             const Account &account {m_parent.account(wrapperObject.accountUserId())};
             m_userRepositoryContainer.loadMore(account, wrapperObject.query());
+        }
+        void visitListModelQuery(const ListModelQueryObject &wrapperObject) override
+        {
+            const Account &account {m_parent.account(wrapperObject.accountUserId())};
+            m_listRepositoryContainer.loadMore(account, wrapperObject.query());
         }
     private:
         DataRepositoryObject &m_parent;
         TweetRepositoryContainer &m_tweetRepositoryContainer;
         UserRepositoryContainer &m_userRepositoryContainer;
+        ListRepositoryContainer &m_listRepositoryContainer;
     };
-    LoadMoreVisitor visitor {*this, m_tweetRepositoryContainer, m_userRepositoryContainer};
+    LoadMoreVisitor visitor {
+        *this,
+        m_tweetRepositoryContainer,
+        m_userRepositoryContainer,
+        m_listRepositoryContainer
+    };
     queryWrapper->accept(visitor);
 }
 

@@ -29,18 +29,91 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef IITEMLISTENER_H
-#define IITEMLISTENER_H
+#include "listobject.h"
 
-template<class T>
-class IItemListener
+namespace qml
 {
-public:
-    virtual ~IItemListener() {}
-    virtual void onStart() = 0;
-    virtual void onError(const QString &error) = 0;
-    virtual void onFinish(T &&item) = 0;
-};
 
-#endif // IITEMLISTENER_H
+ListObject::ListObject(const List &data, QObject *parent)
+    : QObject(parent), m_data{data}
+{
+    m_user.reset(UserObject::create(m_data.user(), this));
+}
+
+ListObject * ListObject::create(const List &data, QObject *parent)
+{
+    return new ListObject(data, parent);
+}
+
+bool ListObject::isValid() const
+{
+    return m_data.isValid();
+}
+
+QString ListObject::id() const
+{
+    return m_data.id();
+}
+
+QString ListObject::name() const
+{
+    return m_data.name();
+}
+
+QString ListObject::slug() const
+{
+    return m_data.slug();
+}
+
+QString ListObject::fullName() const
+{
+    return m_data.fullName();
+}
+
+QString ListObject::description() const
+{
+    return m_data.description();
+}
+
+UserObject * ListObject::user() const
+{
+    return m_user.get();
+}
+
+QString ListObject::mode() const
+{
+    return m_data.mode();
+}
+
+bool ListObject::isFollowing() const
+{
+    return m_data.isFollowing();
+}
+
+int ListObject::memberCount() const
+{
+    return m_data.memberCount();
+}
+
+int ListObject::subscriberCount() const
+{
+    return m_data.subscriberCount();
+}
+
+QString ListObject::uri() const
+{
+    return m_data.uri();
+}
+
+List ListObject::data() const
+{
+    return m_data;
+}
+
+void ListObject::update(const List &other)
+{
+    Q_UNUSED(other)
+}
+
+}
 

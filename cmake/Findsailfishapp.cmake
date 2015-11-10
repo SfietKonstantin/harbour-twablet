@@ -24,6 +24,7 @@ find_library(SAILFISHAPP_LIBRARY NAMES sailfishapp libsailfishapp
 
 set(SAILFISHAPP_LIBRARIES ${SAILFISHAPP_LIBRARY})
 set(SAILFISHAPP_INCLUDE_DIRS ${SAILFISHAPP_INCLUDE_DIR})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -pie -rdynamic")
 
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set SAILFISHAPP_FOUND to TRUE

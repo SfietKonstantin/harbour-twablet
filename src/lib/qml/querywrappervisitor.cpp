@@ -38,12 +38,17 @@ QueryWrapperVisitor::~QueryWrapperVisitor()
 {
 }
 
-void QueryWrapperVisitor::visitTweetListQuery(const TweetListQueryWrapperObject &wrapperObject)
+void QueryWrapperVisitor::visitTweetModelQuery(const TweetModelQueryWrapperObject &wrapperObject)
 {
     Q_UNUSED(wrapperObject)
 }
 
-void QueryWrapperVisitor::visitUserListQuery(const UserListQueryWrapperObject &wrapperObject)
+void QueryWrapperVisitor::visitUserModelQuery(const UserModelQueryWrapperObject &wrapperObject)
+{
+    Q_UNUSED(wrapperObject)
+}
+
+void QueryWrapperVisitor::visitListModelQuery(const ListModelQueryObject &wrapperObject)
 {
     Q_UNUSED(wrapperObject)
 }

@@ -46,8 +46,8 @@ class ITweetRepositoryContainerObject
 public:
     virtual ~ITweetRepositoryContainerObject() {}
     virtual TweetRepository * tweetRepository(const Account &account, const Query &query) = 0;
-    virtual void referenceTweetListQuery(const Account &account, const Query &query) = 0;
-    virtual void dereferenceTweetListQuery(const Account &account, const Query &query) = 0;
+    virtual void referenceTweetRepositoryQuery(const Account &account, const Query &query) = 0;
+    virtual void dereferenceTweetRepositoryQuery(const Account &account, const Query &query) = 0;
 };
 
 }

@@ -29,19 +29,48 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef LISTQUERYHANDLERFACTORY_H
-#define LISTQUERYHANDLERFACTORY_H
+#include "repositoryqueryhandlerutil.h"
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
 
-#include "ilistqueryhandler.h"
-#include "tweet.h"
-#include "user.h"
-
-class Query;
-class ListQueryHandlerFactory
+namespace private_util
 {
-public:
-    static IListQueryHandler<Tweet>::Ptr createTweetList(const Query &query);
-    static IListQueryHandler<User>::Ptr createUserList(const Query &query);
-};
 
-#endif // LISTQUERYHANDLERFACTORY_H
+bool treatTweetReply(IRepositoryQueryHandler<Tweet>::RequestType requestType,
+                     const QJsonArray &data, std::vector<Tweet> &items,
+                     IRepositoryQueryHandler<Tweet>::Placement &placement,
+                     QString &sinceId, QString &maxId)
+{
+    items.reserve(data.size());
+    for (const QJsonValue &item : data) {
+        if (item.isObject()) {
+            items.emplace_back(item.toObject());
+        }
+    }
+
+    QString newSinceId = !items.empty() ? std::begin(items)->id() : QString();
+    quint64 newMaxId = items.empty() ? 0 : (std::end(items) - 1)->id().toULongLong();
+    QString newMaxIdStr = newMaxId > 0 ? QString::number(newMaxId - 1) : QString();
+    if (!items.empty()) {
+        switch (requestType) {
+        case IRepositoryQueryHandler<Tweet>::Refresh:
+            sinceId = std::move(newSinceId);
+            if (maxId.isEmpty()) {
+                maxId = std::move(newMaxIdStr);
+            }
+            placement = IRepositoryQueryHandler<Tweet>::Prepend;
+            break;
+        case IRepositoryQueryHandler<Tweet>::LoadMore:
+            if (sinceId.isEmpty()) {
+                sinceId = std::move(newSinceId);
+            }
+            maxId = std::move(newMaxIdStr);
+            placement = IRepositoryQueryHandler<Tweet>::Append;
+            break;
+        }
+
+    }
+    return true;
+}
+
+}

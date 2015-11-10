@@ -32,14 +32,14 @@
 #ifndef TWEETSEARCHQUERYHANDLER_H
 #define TWEETSEARCHQUERYHANDLER_H
 
-#include "ilistqueryhandler.h"
+#include "irepositoryqueryhandler.h"
 #include "tweet.h"
 
-class TweetSearchQueryHandler final : public IListQueryHandler<Tweet>
+class TweetSearchQueryHandler final : public IRepositoryQueryHandler<Tweet>
 {
 public:
     DISABLE_COPY_DISABLE_MOVE(TweetSearchQueryHandler);
-    static IListQueryHandler<Tweet>::Ptr create();
+    static IRepositoryQueryHandler<Tweet>::Ptr create();
 private:
     TweetSearchQueryHandler();
     Query::Parameters additionalParameters(RequestType requestType) const override;

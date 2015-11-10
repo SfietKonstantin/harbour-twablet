@@ -29,31 +29,43 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "listqueryhandlerfactory.h"
-#include "tweetlistqueryhandler.h"
+#include "repositoryqueryhandlerfactory.h"
+#include "tweetrepositoryqueryhandler.h"
 #include "tweetsearchqueryhandler.h"
-#include "userlistqueryhandler.h"
+#include "userrepositoryqueryhandler.h"
+#include "listrepositoryqueryhandler.h"
 
-IListQueryHandler<Tweet>::Ptr ListQueryHandlerFactory::createTweetList(const Query &query)
+IRepositoryQueryHandler<Tweet>::Ptr RepositoryQueryHandlerFactory::createTweet(const Query &query)
 {
-    if (query.path() == TweetListQuery::pathFromType(TweetListQuery::Home)
-        || query.path() == TweetListQuery::pathFromType(TweetListQuery::Mentions)
-        || query.path() == TweetListQuery::pathFromType(TweetListQuery::Favorites)
-        || query.path() == TweetListQuery::pathFromType(TweetListQuery::UserTimeline)) {
-        return TweetListQueryHandler::create();
-    } else if (query.path() == TweetListQuery::pathFromType(TweetListQuery::Search)) {
+    if (query.path() == TweetRepositoryQuery::pathFromType(TweetRepositoryQuery::Home)
+        || query.path() == TweetRepositoryQuery::pathFromType(TweetRepositoryQuery::Mentions)
+        || query.path() == TweetRepositoryQuery::pathFromType(TweetRepositoryQuery::Favorites)
+        || query.path() == TweetRepositoryQuery::pathFromType(TweetRepositoryQuery::UserTimeline)) {
+        return TweetRepositoryQueryHandler::create();
+    } else if (query.path() == TweetRepositoryQuery::pathFromType(TweetRepositoryQuery::Search)) {
         return TweetSearchQueryHandler::create();
     } else {
-        return IListQueryHandler<Tweet>::Ptr();
+        return IRepositoryQueryHandler<Tweet>::Ptr();
     }
 }
 
-IListQueryHandler<User>::Ptr ListQueryHandlerFactory::createUserList(const Query &query)
+IRepositoryQueryHandler<User>::Ptr RepositoryQueryHandlerFactory::createUser(const Query &query)
 {
-    if (query.path() == UserListQuery::pathFromType(UserListQuery::Friends)
-        || query.path() == UserListQuery::pathFromType(UserListQuery::Followers)) {
-        return UserListQueryHandler::create();
+    if (query.path() == UserRepositoryQuery::pathFromType(UserRepositoryQuery::Friends)
+        || query.path() == UserRepositoryQuery::pathFromType(UserRepositoryQuery::Followers)) {
+        return UserRepositoryQueryHandler::create();
     } else {
-        return IListQueryHandler<User>::Ptr();
+        return IRepositoryQueryHandler<User>::Ptr();
+    }
+}
+
+IRepositoryQueryHandler<List>::Ptr RepositoryQueryHandlerFactory::createList(const Query &query)
+{
+    if (query.path() == ListRepositoryQuery::pathFromType(ListRepositoryQuery::Subscriptions)
+        || query.path() == ListRepositoryQuery::pathFromType(ListRepositoryQuery::Ownerships)
+        || query.path() == ListRepositoryQuery::pathFromType(ListRepositoryQuery::Memberships)) {
+        return ListRepositoryQueryHandler::create();
+    } else {
+        return IRepositoryQueryHandler<List>::Ptr();
     }
 }

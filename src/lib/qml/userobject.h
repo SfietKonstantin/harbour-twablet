@@ -34,7 +34,6 @@
 
 #include <QtCore/QObject>
 #include "user.h"
-#include "model.h"
 
 namespace qml
 {
@@ -95,7 +94,6 @@ private:
     User m_data {};
     QString m_displayUrl {};
     QString m_url {};
-    friend class Model<User, UserObject>;
 };
 
 }

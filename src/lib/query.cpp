@@ -87,14 +87,14 @@ Query::Parameters Query::parameters() const
     return m_parameters;
 }
 
-TweetListQuery::TweetListQuery(Type type, Parameters &&additionalParameters)
+TweetRepositoryQuery::TweetRepositoryQuery(Type type, Parameters &&additionalParameters)
     : Query(Get, pathFromTypeWithCheck(type, additionalParameters)
             , makeParameters(type, additionalParameters))
     , m_type(type)
 {
 }
 
-QByteArray TweetListQuery::pathFromType(Type type)
+QByteArray TweetRepositoryQuery::pathFromType(Type type)
 {
     switch (type)
     {
@@ -114,18 +114,18 @@ QByteArray TweetListQuery::pathFromType(Type type)
         return QByteArray{"statuses/user_timeline.json"};
         break;
     default:
-        qCDebug(logger) << "Type" << type << "is not compatible with TweetListQuery";
+        qCDebug(logger) << "Type" << type << "is not compatible with TweetRepositoryQuery";
         return QByteArray{};
         break;
     }
 }
 
-TweetListQuery::Type TweetListQuery::type() const
+TweetRepositoryQuery::Type TweetRepositoryQuery::type() const
 {
     return m_type;
 }
 
-QByteArray TweetListQuery::pathFromTypeWithCheck(Type type, const Query::Parameters &additionalParameters)
+QByteArray TweetRepositoryQuery::pathFromTypeWithCheck(Type type, const Query::Parameters &additionalParameters)
 {
     bool ok {false};
     switch (type) {
@@ -157,14 +157,14 @@ QByteArray TweetListQuery::pathFromTypeWithCheck(Type type, const Query::Paramet
         }
         break;
     default:
-        qCDebug(logger) << "Type" << type << "is not compatible with TweetListQuery";
+        qCDebug(logger) << "Type" << type << "is not compatible with TweetRepositoryQuery";
         break;
     }
 
     return ok ? pathFromType(type) : QByteArray{};
 }
 
-Query::Parameters TweetListQuery::makeParameters(Type type, const Parameters &additionalParameters)
+Query::Parameters TweetRepositoryQuery::makeParameters(Type type, const Parameters &additionalParameters)
 {
     Parameters returned {};
     switch (type)
@@ -244,12 +244,12 @@ Query::Parameters TweetListQuery::makeParameters(Type type, const Parameters &ad
     return returned;
 }
 
-UserListQuery::UserListQuery(Type type, Query::Parameters &&additionalParameters)
+UserRepositoryQuery::UserRepositoryQuery(Type type, Query::Parameters &&additionalParameters)
     : Query(Get, std::move(pathFromType(type)), std::move(makeParameters(std::move(additionalParameters))))
 {
 }
 
-QByteArray UserListQuery::pathFromType(UserListQuery::Type type)
+QByteArray UserRepositoryQuery::pathFromType(UserRepositoryQuery::Type type)
 {
     switch (type)
     {
@@ -260,27 +260,27 @@ QByteArray UserListQuery::pathFromType(UserListQuery::Type type)
         return QByteArray{"followers/list.json"};
         break;
     default:
-        qCDebug(logger) << "Type" << type << "is not compatible with UserListQuery";
+        qCDebug(logger) << "Type" << type << "is not compatible with UserRepositoryQuery";
         return QByteArray{};
         break;
     }
 }
 
-QByteArray UserListQuery::pathFromTypeWithCheck(Type type, const Query::Parameters &additionalParameters)
+QByteArray UserRepositoryQuery::pathFromTypeWithCheck(Type type, const Query::Parameters &additionalParameters)
 {
     if (!private_util::hasValue(additionalParameters, QByteArray{"user_id"})) {
-        qCDebug(logger) << "UserListQuery based query must contain parameter user_id";
+        qCDebug(logger) << "UserRepositoryQuery based query must contain parameter user_id";
         return QByteArray{};
     }
 
     return  pathFromType(type);
 }
 
-Query::Parameters UserListQuery::makeParameters(const Query::Parameters &additionalParameters)
+Query::Parameters UserRepositoryQuery::makeParameters(const Query::Parameters &additionalParameters)
 {
     QByteArray userId = private_util::getValue(additionalParameters, QByteArray{"user_id"});
     if (userId.isEmpty()) {
-        qCDebug(logger) << "UserListQuery based query must contain parameter user_id";
+        qCDebug(logger) << "UserRepositoryQuery based query must contain parameter user_id";
         return Parameters{};
     }
 
@@ -293,7 +293,7 @@ Query::Parameters UserListQuery::makeParameters(const Query::Parameters &additio
 }
 
 TweetItemQuery::TweetItemQuery(Type type, Parameters &&additionalParameters)
-    : Query(requestTypeFromtype(type), std::move(pathFromTypeWithCheck(type, additionalParameters)),
+    : Query(requestTypeFromType(type), std::move(pathFromTypeWithCheck(type, additionalParameters)),
             makeParameters(type, additionalParameters))
 {
 }
@@ -323,7 +323,7 @@ QByteArray TweetItemQuery::pathFromType(Type type)
     }
 }
 
-Query::RequestType TweetItemQuery::requestTypeFromtype(TweetItemQuery::Type type)
+Query::RequestType TweetItemQuery::requestTypeFromType(TweetItemQuery::Type type)
 {
     return type == Invalid || type == Show ? Get : Post;
 }
@@ -415,7 +415,7 @@ Query::Parameters TweetItemQuery::makeParameters(Type type, const Query::Paramet
 }
 
 UserItemQuery::UserItemQuery(UserItemQuery::Type type, Query::Parameters &&additionalParameters)
-    : Query(requestTypeFromtype(type), std::move(pathFromTypeWithCheck(type, additionalParameters)),
+    : Query(requestTypeFromType(type), std::move(pathFromTypeWithCheck(type, additionalParameters)),
             makeParameters(type, additionalParameters))
 {
 }
@@ -439,13 +439,12 @@ QByteArray UserItemQuery::pathFromType(Type type)
     }
 }
 
-Query::RequestType UserItemQuery::requestTypeFromtype(UserItemQuery::Type type)
+Query::RequestType UserItemQuery::requestTypeFromType(UserItemQuery::Type type)
 {
     return type == Show || type == Invalid ? Get : Post;
 }
 
-QByteArray UserItemQuery::pathFromTypeWithCheck(UserItemQuery::Type type,
-                                                const Query::Parameters &additionalParameters)
+QByteArray UserItemQuery::pathFromTypeWithCheck(Type type, const Query::Parameters &additionalParameters)
 {
     bool ok {false};
     switch (type) {
@@ -515,4 +514,53 @@ Query::Parameters UserItemQuery::makeParameters(UserItemQuery::Type type,
         break;
     }
     return returned;
+}
+
+ListRepositoryQuery::ListRepositoryQuery(Type type, Query::Parameters &&additionalParameters)
+    : Query(Get, std::move(pathFromTypeWithCheck(type, additionalParameters)),
+            makeParameters(additionalParameters))
+{
+}
+
+QByteArray ListRepositoryQuery::pathFromType(Type type)
+{
+    switch (type) {
+    case Subscriptions:
+        return QByteArray{"lists/subscriptions.json"};
+        break;
+    case Ownerships:
+        return QByteArray{"lists/ownerships.json"};
+        break;
+    case Memberships:
+        return QByteArray{"lists/memberships.json"};
+        break;
+    default:
+        qCDebug(logger) << "Type" << type << "is not compatible with ListRepositoryQuery";
+        return QByteArray{};
+        break;
+    }
+}
+
+QByteArray ListRepositoryQuery::pathFromTypeWithCheck(Type type, const Query::Parameters &additionalParameters)
+{
+    if (!private_util::hasValue(additionalParameters, QByteArray{"user_id"})) {
+        qCDebug(logger) << "ListRepositoryQuery based query must contain parameter user_id";
+        return QByteArray{};
+    }
+
+    return  pathFromType(type);
+}
+
+Query::Parameters ListRepositoryQuery::makeParameters(const Query::Parameters &additionalParameters)
+{
+    QByteArray userId = private_util::getValue(additionalParameters, QByteArray{"user_id"});
+    if (userId.isEmpty()) {
+        qCDebug(logger) << "ListRepositoryQuery based query must contain parameter user_id";
+        return Parameters{};
+    }
+
+    return Parameters{
+        {"count", QByteArray::number(200)},
+        {"user_id", userId}
+    };
 }

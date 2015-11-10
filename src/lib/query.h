@@ -54,8 +54,8 @@
  * the validity of the path or the parameters. Specialized subclasses can be used
  * to create queries for tweets, users or other requests.
  *
- * @see TweetListQuery
- * @see UserListQuery
+ * @see TweetRepositoryQuery
+ * @see UserRepositoryQuery
  */
 class Query
 {
@@ -124,7 +124,7 @@ private:
  * of tweets. It performs checks, and uses a list of predefined
  * types to determine the list of tweets to query.
  */
-class TweetListQuery: public Query
+class TweetRepositoryQuery: public Query
 {
 public:
     /**
@@ -157,7 +157,7 @@ public:
          */
         UserTimeline = 5
     };
-    explicit TweetListQuery() = default;
+    explicit TweetRepositoryQuery() = default;
     /**
      * @brief Constructor
      *
@@ -170,8 +170,8 @@ public:
      * @param type type of query to create.
      * @param additionalParameters additional parameters.
      */
-    explicit TweetListQuery(Type type, Parameters &&additionalParameters);
-    DEFAULT_COPY_DEFAULT_MOVE(TweetListQuery);
+    explicit TweetRepositoryQuery(Type type, Parameters &&additionalParameters);
+    DEFAULT_COPY_DEFAULT_MOVE(TweetRepositoryQuery);
     /**
      * @brief Path from type
      * @param type type of the query.
@@ -189,7 +189,7 @@ private:
     Type m_type {Invalid};
 };
 
-class UserListQuery: public Query
+class UserRepositoryQuery: public Query
 {
 public:
     enum Type
@@ -198,9 +198,28 @@ public:
         Friends,
         Followers
     };
-    explicit UserListQuery() = default;
-    explicit UserListQuery(Type type, Parameters &&additionalParameters);
-    DEFAULT_COPY_DEFAULT_MOVE(UserListQuery);
+    explicit UserRepositoryQuery() = default;
+    explicit UserRepositoryQuery(Type type, Parameters &&additionalParameters);
+    DEFAULT_COPY_DEFAULT_MOVE(UserRepositoryQuery);
+    static QByteArray pathFromType(Type type);
+private:
+    static QByteArray pathFromTypeWithCheck(Type type, const Parameters &additionalParameters);
+    static Parameters makeParameters(const Parameters &additionalParameters);
+};
+
+class ListRepositoryQuery: public Query
+{
+public:
+    enum Type
+    {
+        Invalid = 0,
+        Subscriptions,
+        Ownerships,
+        Memberships
+    };
+    explicit ListRepositoryQuery() = default;
+    explicit ListRepositoryQuery(Type type, Parameters &&additionalParameters);
+    DEFAULT_COPY_DEFAULT_MOVE(ListRepositoryQuery);
     static QByteArray pathFromType(Type type);
 private:
     static QByteArray pathFromTypeWithCheck(Type type, const Parameters &additionalParameters);
@@ -224,7 +243,7 @@ public:
     DEFAULT_COPY_DEFAULT_MOVE(TweetItemQuery);
     static QByteArray pathFromType(Type type);
 private:
-    static RequestType requestTypeFromtype(Type type);
+    static RequestType requestTypeFromType(Type type);
     static QByteArray pathFromTypeWithCheck(Type type, const Parameters &additionalParameters);
     static Parameters makeParameters(Type type, const Parameters &additionalParameters);
 };
@@ -244,7 +263,7 @@ public:
     DEFAULT_COPY_DEFAULT_MOVE(UserItemQuery);
     static QByteArray pathFromType(Type type);
 private:
-    static RequestType requestTypeFromtype(Type type);
+    static RequestType requestTypeFromType(Type type);
     static QByteArray pathFromTypeWithCheck(Type type, const Parameters &additionalParameters);
     static Parameters makeParameters(Type type, const Parameters &additionalParameters);
 };

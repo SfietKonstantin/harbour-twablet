@@ -29,31 +29,31 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "tweetlistquerywrapperobject.h"
+#include "tweetmodelquerywrapperobject.h"
 #include "private/conversionutil.h"
 #include "querywrappervisitor.h"
 
 namespace qml
 {
 
-TweetListQueryWrapperObject::TweetListQueryWrapperObject(QObject *parent)
+TweetModelQueryWrapperObject::TweetModelQueryWrapperObject(QObject *parent)
     : QObject(parent)
 {
 }
 
-TweetListQueryWrapperObject::TweetListQueryWrapperObject(const QString accountUserId,
-                                                         const TweetListQuery &query,
+TweetModelQueryWrapperObject::TweetModelQueryWrapperObject(const QString accountUserId,
+                                                         const TweetRepositoryQuery &query,
                                                          QObject *parent)
     : QObject(parent), m_accountUserId(accountUserId), m_query(query)
 {
 }
 
-QString TweetListQueryWrapperObject::accountUserId() const
+QString TweetModelQueryWrapperObject::accountUserId() const
 {
     return m_accountUserId;
 }
 
-void TweetListQueryWrapperObject::setAccountUserId(const QString &accountUserId)
+void TweetModelQueryWrapperObject::setAccountUserId(const QString &accountUserId)
 {
     if (m_accountUserId != accountUserId) {
         m_accountUserId = accountUserId;
@@ -62,22 +62,22 @@ void TweetListQueryWrapperObject::setAccountUserId(const QString &accountUserId)
 }
 
 
-Query TweetListQueryWrapperObject::query() const
+Query TweetModelQueryWrapperObject::query() const
 {
     return m_query;
 }
 
-void TweetListQueryWrapperObject::setQuery(TweetListQuery &&query)
+void TweetModelQueryWrapperObject::setQuery(TweetRepositoryQuery &&query)
 {
     m_query = std::move(query);
 }
 
-QueryTypeObject::TweetListType TweetListQueryWrapperObject::type() const
+QueryTypeObject::TweetModelType TweetModelQueryWrapperObject::type() const
 {
     return m_type;
 }
 
-void TweetListQueryWrapperObject::setType(QueryTypeObject::TweetListType type)
+void TweetModelQueryWrapperObject::setType(QueryTypeObject::TweetModelType type)
 {
     if (m_type != type) {
         m_type = type;
@@ -86,12 +86,12 @@ void TweetListQueryWrapperObject::setType(QueryTypeObject::TweetListType type)
     }
 }
 
-QVariantMap TweetListQueryWrapperObject::parameters() const
+QVariantMap TweetModelQueryWrapperObject::parameters() const
 {
     return m_parameters;
 }
 
-void TweetListQueryWrapperObject::setParameters(const QVariantMap &parameters)
+void TweetModelQueryWrapperObject::setParameters(const QVariantMap &parameters)
 {
     if (m_parameters != parameters) {
         m_parameters = parameters;
@@ -100,21 +100,21 @@ void TweetListQueryWrapperObject::setParameters(const QVariantMap &parameters)
     }
 }
 
-void TweetListQueryWrapperObject::accept(QueryWrapperVisitor &visitor) const
+void TweetModelQueryWrapperObject::accept(QueryWrapperVisitor &visitor) const
 {
-    visitor.visitTweetListQuery(*this);
+    visitor.visitTweetModelQuery(*this);
 }
 
-void TweetListQueryWrapperObject::updateQuery()
+void TweetModelQueryWrapperObject::updateQuery()
 {
-    if (convertedType() != TweetListQuery::Invalid) {
-        setQuery(TweetListQuery(convertedType(), private_util::convertParameters(m_parameters)));
+    if (convertedType() != TweetRepositoryQuery::Invalid) {
+        setQuery(TweetRepositoryQuery(convertedType(), private_util::convertParameters(m_parameters)));
     }
 }
 
-TweetListQuery::Type TweetListQueryWrapperObject::convertedType() const
+TweetRepositoryQuery::Type TweetModelQueryWrapperObject::convertedType() const
 {
-    return static_cast<TweetListQuery::Type>(m_type);
+    return static_cast<TweetRepositoryQuery::Type>(m_type);
 }
 
 }

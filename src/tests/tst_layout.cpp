@@ -41,13 +41,13 @@ TEST(layout, Layout)
         {"exclude_replies", "true"},
         {"include_rts", "false"}
     };
-    TweetListQuery query {TweetListQuery::UserTimeline, std::move(parameters)};
+    TweetRepositoryQuery query {TweetRepositoryQuery::UserTimeline, std::move(parameters)};
     EXPECT_TRUE(query.isValid());
 
     Layout layout {
         QLatin1String("Layout name"),
         QLatin1String("userId"),
-        std::move(TweetListQuery(query)) // Copy query
+        std::move(TweetRepositoryQuery(query)) // Copy query
     };
 
     EXPECT_TRUE(layout.isValid());
@@ -71,8 +71,8 @@ TEST(layout, Layout)
     Query::Parameters newParameters {
         {"user_id", "123"}
     };
-    TweetListQuery newQuery {TweetListQuery::Favorites, std::move(newParameters)};
-    movedLayout.setQuery(std::move(TweetListQuery(newQuery))); // Copy query
+    TweetRepositoryQuery newQuery {TweetRepositoryQuery::Favorites, std::move(newParameters)};
+    movedLayout.setQuery(std::move(TweetRepositoryQuery(newQuery))); // Copy query
     EXPECT_EQ(movedLayout.query(), newQuery);
     movedLayout.setUnread(123);
     EXPECT_EQ(movedLayout.unread(), 123);
@@ -82,7 +82,7 @@ TEST(layout, LayoutRepository)
 {
     LayoutRepository repository {};
     for (int i = 0; i < 4; ++i) {
-        TweetListQuery query {TweetListQuery::Home, Query::Parameters()};
+        TweetRepositoryQuery query {TweetRepositoryQuery::Home, Query::Parameters()};
         repository.append(Layout(QString::number(i + 1), QString(), std::move(query)));
     }
     EXPECT_EQ((std::begin(repository) + 0)->name(), QString::number(1));
@@ -108,7 +108,7 @@ TEST(layout, LayoutModel)
     LayoutRepository &repository (repositoryObject.layouts());
 
     for (int i = 0; i < 3; ++i) {
-        TweetListQuery query {TweetListQuery::Home, std::move(Query::Parameters())};
+        TweetRepositoryQuery query {TweetRepositoryQuery::Home, std::move(Query::Parameters())};
         repository.append(Layout(QString::number(i + 1), QString(), std::move(query)));
     }
 
@@ -123,7 +123,7 @@ TEST(layout, LayoutModel)
     EXPECT_EQ(getObject(model, 2)->name(), QString::number(3));
 
     {
-        TweetListQuery query {TweetListQuery::Home, std::move(Query::Parameters())};
+        TweetRepositoryQuery query {TweetRepositoryQuery::Home, std::move(Query::Parameters())};
         repository.append(Layout(QString::number(4), QString(), std::move(query)));
     }
 

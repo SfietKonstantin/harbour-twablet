@@ -126,14 +126,14 @@ protected:
     }
     std::deque<QObjectPtr<O>> m_items {};
 private:
-    void doAppend(const T &item) override
+    void onAppend(const T &item) override
     {
         beginInsertRows(QModelIndex(), rowCount(), rowCount());
         m_items.emplace_back(O::create(item, this));
         emit countChanged();
         endInsertRows();
     }
-    void doAppend(const std::vector<T> &items) override
+    void onAppend(const std::vector<T> &items) override
     {
         beginInsertRows(QModelIndex(), rowCount(), rowCount() + items.size() - 1);
         for (const T &entry : items) {
@@ -142,7 +142,7 @@ private:
         emit countChanged();
         endInsertRows();
     }
-    void doPrepend(const std::vector<T> &items) override
+    void onPrepend(const std::vector<T> &items) override
     {
         emit prependPre();
         beginInsertRows(QModelIndex(), 0, items.size() - 1);
@@ -153,7 +153,7 @@ private:
         endInsertRows();
         emit prependPost(items.size());
     }
-    void doUpdate(int index, const T &item) override
+    void onUpdate(int index, const T &item) override
     {
         if (index < 0 || index >= rowCount()) {
             return;
@@ -162,7 +162,7 @@ private:
         emit dataChanged(this->index(index), this->index(index));
     }
 
-    void doRemove(int index) override
+    void onRemove(int index) override
     {
         if (index < 0 || index >= rowCount()) {
             return;
@@ -173,27 +173,27 @@ private:
         emit countChanged();
         endRemoveRows();
     }
-    void doMove(int from, int to) override
+    void onMove(int from, int to) override
     {
         if (!m_localMove) {
             performMove(from, to);
         }
     }
-    void doInvalidate() override
+    void onInvalidation() override
     {
         m_internalRepository = nullptr;
     }
-    void doStart() override
+    void onStart() override
     {
         setStatusAndErrorMessage(Loading, QString());
     }
 
-    void doError(const QString &error) override
+    void onError(const QString &error) override
     {
         setStatusAndErrorMessage(Error, error);
     }
 
-    void doFinish() override
+    void onFinish() override
     {
         setStatusAndErrorMessage(Idle, QString());
     }

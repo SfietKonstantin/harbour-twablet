@@ -124,6 +124,30 @@ Item {
         page.load()
     }
 
+    function openSubscribedLists(userId, screenName, accountUserId, pushMode) {
+        var parameters = {user_id: userId}
+        var params = {
+            title: qsTr("%1's subscribed lists").arg(screenName),
+            type: QueryType.Subscriptions,
+            parameters: parameters,
+            accountUserId: accountUserId,
+            panel: container
+        }
+        _open(Qt.resolvedUrl("ListPage.qml"), params, pushMode)
+    }
+
+    function openListedLists(userId, screenName, accountUserId, pushMode) {
+        var parameters = {user_id: userId}
+        var params = {
+            title: qsTr("%1 listed in").arg(screenName),
+            type: QueryType.Memberships,
+            parameters: parameters,
+            accountUserId: accountUserId,
+            panel: container
+        }
+        _open(Qt.resolvedUrl("ListPage.qml"), params, pushMode)
+    }
+
     function openImageBrowser(tweet, accountUserId) {
         var params = {
             tweet: tweet,

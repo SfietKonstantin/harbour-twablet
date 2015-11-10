@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,36 +29,31 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef ILISTQUERYHANDLER_H
-#define ILISTQUERYHANDLER_H
+#ifndef ILISTREPOSITORYCONTAINEROBJECT_H
+#define ILISTREPOSITORYCONTAINEROBJECT_H
 
-#include <memory>
-#include <vector>
-#include <QtCore/QString>
-#include "query.h"
+#include <QtCore/QtPlugin>
+#include "listrepository.h"
 
-template<class T>
-class IListQueryHandler
+class Account;
+class Layout;
+class Query;
+namespace qml
+{
+
+class IListRepositoryContainerObject
 {
 public:
-    enum RequestType
-    {
-        Refresh,
-        LoadMore
-    };
-    enum Placement
-    {
-        Discard,
-        Append,
-        Prepend,
-    };
-    using Ptr = std::unique_ptr<IListQueryHandler<T>>;
-    virtual ~IListQueryHandler() {}
-    virtual Query::Parameters additionalParameters(RequestType requestType) const = 0;
-    virtual bool treatReply(RequestType requestType, const QByteArray &data,
-                            std::vector<T> &items, QString &errorMessage,
-                            Placement &placement) = 0;
+    virtual ~IListRepositoryContainerObject() {}
+    virtual ListRepository * listRepository(const Account &account, const Query &query) = 0;
+    virtual void referenceListRepositoryQuery(const Account &account, const Query &query) = 0;
+    virtual void dereferenceListRepositoryQuery(const Account &account, const Query &query) = 0;
 };
 
-#endif // ILISTQUERYHANDLER_H
+}
+
+Q_DECLARE_INTERFACE(qml::IListRepositoryContainerObject,
+                    "harbour.twablet.IListRepositoryContainerObject")
+
+#endif // ILISTREPOSITORYCONTAINEROBJECT_H
 

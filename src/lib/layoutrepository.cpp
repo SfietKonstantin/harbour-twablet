@@ -59,8 +59,8 @@ void LayoutRepository::load(const QJsonObject &json)
             parameters.emplace(QUrl::toPercentEncoding(key), QUrl::toPercentEncoding(value));
         }
 
-        if (!userId.isEmpty() && queryType != TweetListQuery::Invalid) {
-            TweetListQuery query {static_cast<TweetListQuery::Type>(queryType), std::move(parameters)};
+        if (!userId.isEmpty() && queryType != TweetRepositoryQuery::Invalid) {
+            TweetRepositoryQuery query {static_cast<TweetRepositoryQuery::Type>(queryType), std::move(parameters)};
             data.emplace_back(name, userId, std::move(query));
         }
     }

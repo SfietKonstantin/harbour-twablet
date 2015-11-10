@@ -31,9 +31,9 @@
 
 #include "tweetrepositorycontainer.h"
 #include "private/debughelper.h"
-#include "private/listquerycallback.h"
+#include "private/repositoryquerycallback.h"
 #include "private/twitterqueryutil.h"
-#include "listqueryhandlerfactory.h"
+#include "repositoryqueryhandlerfactory.h"
 #include <QtCore/QLoggingCategory>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
@@ -103,7 +103,7 @@ std::set<Query> TweetRepositoryContainer::referencedQueries(const Account &accou
 void TweetRepositoryContainer::refresh()
 {
     for (auto it = std::begin(m_mapping); it != std::end(m_mapping); ++it) {
-        load(it->first, it->second, IListQueryHandler<Tweet>::Refresh);
+        load(it->first, it->second, IRepositoryQueryHandler<Tweet>::Refresh);
     }
 }
 
@@ -111,7 +111,7 @@ void TweetRepositoryContainer::refresh(const Account &account, const Query &quer
 {
     auto it = m_mapping.find(ContainerKey{Account{account}, Query{query}});
     if (it != std::end(m_mapping)) {
-        load(it->first, it->second, IListQueryHandler<Tweet>::Refresh);
+        load(it->first, it->second, IRepositoryQueryHandler<Tweet>::Refresh);
     } else {
         qCWarning(logger) << "refresh: cannot perform load";
         qCWarning(logger) << "  Account:" << account.userId();
@@ -123,7 +123,7 @@ void TweetRepositoryContainer::loadMore(const Account &account, const Query &que
 {
     auto it = m_mapping.find(ContainerKey{Account{account}, Query{query}});
     if (it != std::end(m_mapping)) {
-        load(it->first, it->second, IListQueryHandler<Tweet>::LoadMore);
+        load(it->first, it->second, IRepositoryQueryHandler<Tweet>::LoadMore);
     } else {
         qCWarning(logger) << "loadmore: cannot perform load";
         qCWarning(logger) << "  Account:" << account.userId();
@@ -159,7 +159,7 @@ void TweetRepositoryContainer::updateTweet(const Tweet &tweet)
 }
 
 void TweetRepositoryContainer::load(const ContainerKey &key, Data &mappingData,
-                                  IListQueryHandler<Tweet>::RequestType requestType)
+                                  IRepositoryQueryHandler<Tweet>::RequestType requestType)
 {
     if (mappingData.loading) {
         qCDebug(logger) << "Already loading:" << key;
@@ -185,7 +185,7 @@ void TweetRepositoryContainer::load(const ContainerKey &key, Data &mappingData,
 
     m_queryExecutor->execute(key.query().requestType(), path, parameters, key.account(), [this, &mappingData, requestType](QIODevice &reply, QNetworkReply::NetworkError error, const QString &errorMessage) {
         std::vector<Tweet> items {};
-        private_util::ListQueryHandler<Tweet> callback {
+        private_util::RepositoryQueryCallback<Tweet> callback {
             requestType,
             *mappingData.handler,
             mappingData.repository,
@@ -211,14 +211,14 @@ TweetRepositoryContainer::Data * TweetRepositoryContainer::getMappingData(const 
         return nullptr;
     }
 
-    IListQueryHandler<Tweet>::Ptr handler {ListQueryHandlerFactory::createTweetList(key.query())};
+    IRepositoryQueryHandler<Tweet>::Ptr handler {RepositoryQueryHandlerFactory::createTweet(key.query())};
     if (!handler) {
         return nullptr;
     }
     return &(m_mapping.emplace(key, Data{std::move(handler)}).first->second);
 }
 
-TweetRepositoryContainer::Data::Data(IListQueryHandler<Tweet>::Ptr &&inputHandler)
+TweetRepositoryContainer::Data::Data(IRepositoryQueryHandler<Tweet>::Ptr &&inputHandler)
     : handler(std::move(inputHandler))
 {
 }

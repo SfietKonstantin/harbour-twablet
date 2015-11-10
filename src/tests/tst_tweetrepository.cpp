@@ -75,35 +75,35 @@ protected:
 TEST_F(tweetrepository, SupportedTypes)
 {
     {
-        const TweetListQuery query {TweetListQuery::Home, Query::Parameters()};
+        const TweetRepositoryQuery query {TweetRepositoryQuery::Home, Query::Parameters()};
         repository->referenceQuery(account, query);
         const std::set<Query> queries (repository->referencedQueries(account));
         EXPECT_EQ(queries.size(), 1);
         EXPECT_TRUE(queries.find(query) != std::end(queries));
     }
     {
-        const TweetListQuery query {TweetListQuery::Mentions, Query::Parameters()};
+        const TweetRepositoryQuery query {TweetRepositoryQuery::Mentions, Query::Parameters()};
         repository->referenceQuery(account, query);
         const std::set<Query> queries (repository->referencedQueries(account));
         EXPECT_EQ(queries.size(), 2);
         EXPECT_TRUE(queries.find(query) != std::end(queries));
     }
     {
-        const TweetListQuery query {TweetListQuery::Search, Query::Parameters{{"q", "test"}}};
+        const TweetRepositoryQuery query {TweetRepositoryQuery::Search, Query::Parameters{{"q", "test"}}};
         repository->referenceQuery(account, query);
         const std::set<Query> queries (repository->referencedQueries(account));
         EXPECT_EQ(queries.size(), 3);
         EXPECT_TRUE(queries.find(query) != std::end(queries));
     }
     {
-        const TweetListQuery query {TweetListQuery::Favorites, Query::Parameters{{"user_id", "123"}}};
+        const TweetRepositoryQuery query {TweetRepositoryQuery::Favorites, Query::Parameters{{"user_id", "123"}}};
         repository->referenceQuery(account, query);
         const std::set<Query> queries (repository->referencedQueries(account));
         EXPECT_EQ(queries.size(), 4);
         EXPECT_TRUE(queries.find(query) != std::end(queries));
     }
     {
-        const TweetListQuery query {TweetListQuery::UserTimeline, Query::Parameters{{"user_id", "123"}}};
+        const TweetRepositoryQuery query {TweetRepositoryQuery::UserTimeline, Query::Parameters{{"user_id", "123"}}};
         repository->referenceQuery(account, query);
         const std::set<Query> queries (repository->referencedQueries(account));
         EXPECT_EQ(queries.size(), 5);
@@ -114,14 +114,14 @@ TEST_F(tweetrepository, SupportedTypes)
 TEST_F(tweetrepository, UnsupportedTypes)
 {
     {
-        const UserListQuery query {UserListQuery::Friends, Query::Parameters{{"user_id", "123"}}};
+        const UserRepositoryQuery query {UserRepositoryQuery::Friends, Query::Parameters{{"user_id", "123"}}};
         repository->referenceQuery(account, query);
         const std::set<Query> queries (repository->referencedQueries(account));
         EXPECT_EQ(queries.size(), 0);
         EXPECT_TRUE(queries.find(query) == std::end(queries));
     }
     {
-        const UserListQuery query {UserListQuery::Followers, Query::Parameters{{"user_id", "123"}}};
+        const UserRepositoryQuery query {UserRepositoryQuery::Followers, Query::Parameters{{"user_id", "123"}}};
         repository->referenceQuery(account, query);
         const std::set<Query> queries (repository->referencedQueries(account));
         EXPECT_EQ(queries.size(), 0);
@@ -139,14 +139,14 @@ TEST_F(tweetrepository, RefDeref)
             .Times(1).WillRepeatedly(Return(QByteArray()));
 
     {
-        TweetListQuery query {TweetListQuery::Home, Query::Parameters()};
+        TweetRepositoryQuery query {TweetRepositoryQuery::Home, Query::Parameters()};
         repository->referenceQuery(account, query);
         const std::set<Query> queries (repository->referencedQueries(account));
         EXPECT_EQ(queries.size(), 1);
         EXPECT_TRUE(queries.find(query) != std::end(queries));
     }
     {
-        TweetListQuery query {TweetListQuery::Mentions, Query::Parameters()};
+        TweetRepositoryQuery query {TweetRepositoryQuery::Mentions, Query::Parameters()};
         repository->referenceQuery(account, query);
         const std::set<Query> queries (repository->referencedQueries(account));
         EXPECT_EQ(queries.size(), 2);
@@ -156,7 +156,7 @@ TEST_F(tweetrepository, RefDeref)
     repository->refresh();
 
     {
-        TweetListQuery query {TweetListQuery::Mentions, Query::Parameters()};
+        TweetRepositoryQuery query {TweetRepositoryQuery::Mentions, Query::Parameters()};
         repository->dereferenceQuery(account, query);
         const std::set<Query> queries (repository->referencedQueries(account));
         EXPECT_EQ(queries.size(), 1);
@@ -252,7 +252,7 @@ TEST_F(tweetrepository, ErrorManagement)
             .WillOnce(Return(QByteArray("{")))
             .WillOnce(Return(QByteArray(QJsonDocument(twitterReply).toJson())));
 
-    TweetListQuery query {TweetListQuery::Home, Query::Parameters()};
+    TweetRepositoryQuery query {TweetRepositoryQuery::Home, Query::Parameters()};
     repository->referenceQuery(account, query);
     const std::set<Query> queries (repository->referencedQueries(account));
     EXPECT_EQ(queries.size(), 1);

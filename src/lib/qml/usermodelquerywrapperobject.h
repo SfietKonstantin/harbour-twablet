@@ -29,18 +29,49 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef IITEMLISTENER_H
-#define IITEMLISTENER_H
+#ifndef USERMODELQUERYWRAPPEROBJECT_H
+#define USERMODELQUERYWRAPPEROBJECT_H
 
-template<class T>
-class IItemListener
+#include <QtCore/QVariantMap>
+#include "iquerywrapperobject.h"
+#include "query.h"
+#include "querytypeobject.h"
+
+namespace qml
 {
+
+class UserModelQueryWrapperObject : public QObject, public IQueryWrapperObject
+{
+    Q_OBJECT
+    Q_INTERFACES(qml::IQueryWrapperObject)
+    Q_PROPERTY(QString accountUserId READ accountUserId WRITE setAccountUserId
+               NOTIFY accountUserIdChanged)
+    Q_PROPERTY(qml::QueryTypeObject::UserModelType type READ type WRITE setType NOTIFY typeChanged)
+    Q_PROPERTY(QVariantMap parameters READ parameters WRITE setParameters NOTIFY parametersChanged)
 public:
-    virtual ~IItemListener() {}
-    virtual void onStart() = 0;
-    virtual void onError(const QString &error) = 0;
-    virtual void onFinish(T &&item) = 0;
+    explicit UserModelQueryWrapperObject(QObject *parent = 0);
+    QString accountUserId() const override;
+    void setAccountUserId(const QString &accountUserId);
+    Query query() const override;
+    void setQuery(UserRepositoryQuery &&query);
+    QueryTypeObject::UserModelType type() const;
+    void setType(QueryTypeObject::UserModelType type);
+    QVariantMap parameters() const;
+    void setParameters(const QVariantMap &parameters);
+    void accept(QueryWrapperVisitor &visitor) const override;
+signals:
+    void accountUserIdChanged();
+    void typeChanged();
+    void parametersChanged();
+private:
+    void updateQuery();
+    UserRepositoryQuery::Type convertedType() const;
+    QString m_accountUserId {};
+    UserRepositoryQuery m_query {};
+    QueryTypeObject::UserModelType m_type {QueryTypeObject::InvalidUserModel};
+    QVariantMap m_parameters {};
 };
 
-#endif // IITEMLISTENER_H
+}
 
+#endif // USERMODELQUERYWRAPPEROBJECT_H

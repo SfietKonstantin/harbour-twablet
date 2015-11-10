@@ -48,7 +48,7 @@ Page {
 
     ColumnLayout {
         id: layout
-        query: TweetListQuery {
+        query: TweetModelQuery {
             id: query
         }
         anchors.fill: parent

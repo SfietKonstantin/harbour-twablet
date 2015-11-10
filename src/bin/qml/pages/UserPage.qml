@@ -216,10 +216,14 @@ Page {
 
             UserPageButton {
                 text: qsTr("Subscribed lists")
+                onClicked: container.panel.openSubscribedLists(container.userId, queryItem.item.screenName,
+                                                               container.accountUserId, false)
             }
 
             UserPageButton {
                 text: queryItem.item ? qsTr("Listed in %n lists", "", queryItem.item.listedCount) : ""
+                onClicked: container.panel.openListedLists(container.userId, queryItem.item.screenName,
+                                                           container.accountUserId, false)
             }
         }
 

@@ -39,10 +39,10 @@
 class MockItemListener: public IItemListener<Tweet>
 {
 public:
-    MOCK_METHOD0(doStart, void());
-    MOCK_METHOD1(doError, void(const QString &));
+    MOCK_METHOD0(onStart, void());
+    MOCK_METHOD1(onError, void(const QString &));
     MOCK_METHOD1(handleFinish, void(const Tweet &));
-    void doFinish(Tweet &&item)
+    void onFinish(Tweet &&item)
     {
         handleFinish(std::move(item));
     }

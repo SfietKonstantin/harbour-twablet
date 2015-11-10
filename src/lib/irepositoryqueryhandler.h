@@ -29,18 +29,36 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef IITEMLISTENER_H
-#define IITEMLISTENER_H
+#ifndef ILISTQUERYHANDLER_H
+#define ILISTQUERYHANDLER_H
+
+#include <memory>
+#include <vector>
+#include <QtCore/QString>
+#include "query.h"
 
 template<class T>
-class IItemListener
+class IRepositoryQueryHandler
 {
 public:
-    virtual ~IItemListener() {}
-    virtual void onStart() = 0;
-    virtual void onError(const QString &error) = 0;
-    virtual void onFinish(T &&item) = 0;
+    enum RequestType
+    {
+        Refresh,
+        LoadMore
+    };
+    enum Placement
+    {
+        Discard,
+        Append,
+        Prepend,
+    };
+    using Ptr = std::unique_ptr<IRepositoryQueryHandler<T>>;
+    virtual ~IRepositoryQueryHandler() {}
+    virtual Query::Parameters additionalParameters(RequestType requestType) const = 0;
+    virtual bool treatReply(RequestType requestType, const QByteArray &data,
+                            std::vector<T> &items, QString &errorMessage,
+                            Placement &placement) = 0;
 };
 
-#endif // IITEMLISTENER_H
+#endif // ILISTQUERYHANDLER_H
 

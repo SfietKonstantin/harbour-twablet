@@ -40,13 +40,16 @@
 #include "ilayoutcontainerobject.h"
 #include "itweetrepositorycontainerobject.h"
 #include "iuserrepositorycontainerobject.h"
-#include "tweetlistquerywrapperobject.h"
-#include "userlistquerywrapperobject.h"
+#include "ilistrepositorycontainerobject.h"
+#include "tweetmodelquerywrapperobject.h"
+#include "usermodelquerywrapperobject.h"
+#include "listmodelqueryobject.h"
 
 class Account;
 class Layout;
 class Tweet;
 class User;
+class List;
 
 namespace qml
 {
@@ -126,7 +129,7 @@ template<> class DataRepositoryObjectMap<Tweet>
 public:
     static void getQueryInfo(QObject *queryWrapper, QString &accountUserId, Query &query)
     {
-        TweetListQueryWrapperObject *queryObject = qobject_cast<TweetListQueryWrapperObject *>(queryWrapper);
+        TweetModelQueryWrapperObject *queryObject = qobject_cast<TweetModelQueryWrapperObject *>(queryWrapper);
         if (queryObject == nullptr) {
             accountUserId.clear();
             query = Query{};
@@ -145,7 +148,7 @@ public:
         }
 
         const Account &account {accountContainer->account(accountUserId)};
-        tweetContainer->referenceTweetListQuery(account, query);
+        tweetContainer->referenceTweetRepositoryQuery(account, query);
         return tweetContainer->tweetRepository(account, query);
     }
     static void addListener(Repository<Tweet> &repository, IRepositoryListener<Tweet> &listener,
@@ -164,7 +167,7 @@ public:
 
         if (accountContainer != nullptr && tweetContainer != nullptr && query.isValid()) {
             const Account &account {accountContainer->account(accountUserId)};
-            tweetContainer->dereferenceTweetListQuery(account, query);
+            tweetContainer->dereferenceTweetRepositoryQuery(account, query);
         }
 
         repository.removeListener(listener);
@@ -176,7 +179,7 @@ template<> class DataRepositoryObjectMap<User>
 public:
     static void getQueryInfo(QObject *queryWrapper, QString &accountUserId, Query &query)
     {
-        UserListQueryWrapperObject *queryObject = qobject_cast<UserListQueryWrapperObject *>(queryWrapper);
+        UserModelQueryWrapperObject *queryObject = qobject_cast<UserModelQueryWrapperObject *>(queryWrapper);
         if (queryObject == nullptr) {
             accountUserId.clear();
             query = Query{};
@@ -188,15 +191,15 @@ public:
     static Repository<User> * get(QObject &object, const QString &accountUserId, const Query &query)
     {
         IAccountRepositoryContainerObject *accountContainer = qobject_cast<IAccountRepositoryContainerObject *>(&object);
-        IUserRepositoryContainerObject *userContainer = qobject_cast<IUserRepositoryContainerObject *>(&object);
+        IUserRepositoryContainerObject *listContainer = qobject_cast<IUserRepositoryContainerObject *>(&object);
 
-        if (accountContainer == nullptr || userContainer == nullptr || !query.isValid()) {
+        if (accountContainer == nullptr || listContainer == nullptr || !query.isValid()) {
             return nullptr;
         }
 
         const Account &account {accountContainer->account(accountUserId)};
-        userContainer->referenceUserListQuery(account, query);
-        return userContainer->userRepository(account, query);
+        listContainer->referenceUserRepositoryQuery(account, query);
+        return listContainer->userRepository(account, query);
     }
     static void addListener(Repository<User> &repository, IRepositoryListener<User> &listener,
                             QObject *object, const QString &accountUserId, const Query &query)
@@ -214,7 +217,57 @@ public:
 
         if (accountContainer != nullptr && userContainer != nullptr && query.isValid()) {
             const Account &account {accountContainer->account(accountUserId)};
-            userContainer->dereferenceUserListQuery(account, query);
+            userContainer->dereferenceUserRepositoryQuery(account, query);
+        }
+
+        repository.removeListener(listener);
+    }
+};
+
+template<> class DataRepositoryObjectMap<List>
+{
+public:
+    static void getQueryInfo(QObject *queryWrapper, QString &accountUserId, Query &query)
+    {
+        ListModelQueryObject *queryObject = qobject_cast<ListModelQueryObject *>(queryWrapper);
+        if (queryObject == nullptr) {
+            accountUserId.clear();
+            query = Query{};
+        } else {
+            accountUserId = queryObject->accountUserId();
+            query = queryObject->query();
+        }
+    }
+    static Repository<List> * get(QObject &object, const QString &accountUserId, const Query &query)
+    {
+        IAccountRepositoryContainerObject *accountContainer = qobject_cast<IAccountRepositoryContainerObject *>(&object);
+        IListRepositoryContainerObject *listContainer = qobject_cast<IListRepositoryContainerObject *>(&object);
+
+        if (accountContainer == nullptr || listContainer == nullptr || !query.isValid()) {
+            return nullptr;
+        }
+
+        const Account &account {accountContainer->account(accountUserId)};
+        listContainer->referenceListRepositoryQuery(account, query);
+        return listContainer->listRepository(account, query);
+    }
+    static void addListener(Repository<List> &repository, IRepositoryListener<List> &listener,
+                            QObject *object, const QString &accountUserId, const Query &query)
+    {
+        Q_UNUSED(object)
+        Q_UNUSED(accountUserId)
+        Q_UNUSED(query)
+        repository.addListener(listener);
+    }
+    static void removeListener(Repository<List> &repository, IRepositoryListener<List> &listener,
+                               QObject *object, const QString &accountUserId, const Query &query)
+    {
+        IAccountRepositoryContainerObject *accountContainer = qobject_cast<IAccountRepositoryContainerObject *>(object);
+        IListRepositoryContainerObject *listContainer = qobject_cast<IListRepositoryContainerObject *>(object);
+
+        if (accountContainer != nullptr && listContainer != nullptr && query.isValid()) {
+            const Account &account {accountContainer->account(accountUserId)};
+            listContainer->dereferenceListRepositoryQuery(account, query);
         }
 
         repository.removeListener(listener);

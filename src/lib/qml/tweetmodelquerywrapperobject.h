@@ -29,48 +29,51 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef QUERYTYPEMODEL_H
-#define QUERYTYPEMODEL_H
+#ifndef TWEETMODELQUERYWRAPPEROBJECT_H
+#define TWEETMODELQUERYWRAPPEROBJECT_H
 
-#include <memory>
-#include <QtCore/QAbstractListModel>
-#include <QtQml/QQmlParserStatus>
+#include <QtCore/QVariantMap>
+#include "iquerywrapperobject.h"
+#include "query.h"
 #include "querytypeobject.h"
 
 namespace qml
 {
 
-class QueryTypeModel : public QAbstractListModel, public QQmlParserStatus
+class TweetModelQueryWrapperObject : public QObject, public IQueryWrapperObject
 {
     Q_OBJECT
-    Q_INTERFACES(QQmlParserStatus)
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    Q_INTERFACES(qml::IQueryWrapperObject)
+    Q_PROPERTY(QString accountUserId READ accountUserId WRITE setAccountUserId
+               NOTIFY accountUserIdChanged)
+    Q_PROPERTY(qml::QueryTypeObject::TweetModelType type READ type WRITE setType NOTIFY typeChanged)
+    Q_PROPERTY(QVariantMap parameters READ parameters WRITE setParameters NOTIFY parametersChanged)
 public:
-    enum Roles {
-        NameRole = Qt::UserRole + 1,
-        QueryTypeRole
-    };
-    explicit QueryTypeModel(QObject *parent = 0);
-    void classBegin() override final;
-    void componentComplete() override final;
-    int rowCount(const QModelIndex &index = QModelIndex()) const override final;
-    QVariant data(const QModelIndex &index, int role) const override final;
-    int count() const;
-public slots:
-    int getType(int index);
-    int getIndex(int type);
+    explicit TweetModelQueryWrapperObject(QObject *parent = 0);
+    explicit TweetModelQueryWrapperObject(const QString accountUserId, const TweetRepositoryQuery &query,
+                                         QObject *parent = 0);
+    QString accountUserId() const override;
+    void setAccountUserId(const QString &accountUserId);
+    Query query() const override;
+    void setQuery(TweetRepositoryQuery &&query);
+    QueryTypeObject::TweetModelType type() const;
+    void setType(QueryTypeObject::TweetModelType type);
+    QVariantMap parameters() const;
+    void setParameters(const QVariantMap &parameters);
+    void accept(QueryWrapperVisitor &visitor) const override;
 signals:
-    void countChanged();
+    void accountUserIdChanged();
+    void typeChanged();
+    void parametersChanged();
 private:
-    QHash<int, QByteArray> roleNames() const override final;
-    struct Data
-    {
-        QString name;
-        QueryTypeObject::TweetModelType type;
-    };
-    std::vector<std::unique_ptr<Data>> m_items {};
+    void updateQuery();
+    TweetRepositoryQuery::Type convertedType() const;
+    QString m_accountUserId {};
+    TweetRepositoryQuery m_query {};
+    QueryTypeObject::TweetModelType m_type {QueryTypeObject::InvalidTweetModel};
+    QVariantMap m_parameters {};
 };
 
 }
 
-#endif // QUERYTYPEMODEL_H
+#endif // TWEETMODELQUERYWRAPPEROBJECT_H

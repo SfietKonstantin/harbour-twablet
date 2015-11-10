@@ -29,24 +29,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "userlistquerywrapperobject.h"
+#include "listmodelqueryobject.h"
 #include "private/conversionutil.h"
 #include "querywrappervisitor.h"
 
 namespace qml
 {
 
-UserListQueryWrapperObject::UserListQueryWrapperObject(QObject *parent)
+ListModelQueryObject::ListModelQueryObject(QObject *parent)
     : QObject(parent)
 {
 }
 
-QString UserListQueryWrapperObject::accountUserId() const
+QString ListModelQueryObject::accountUserId() const
 {
     return m_accountUserId;
 }
 
-void UserListQueryWrapperObject::setAccountUserId(const QString &accountUserId)
+void ListModelQueryObject::setAccountUserId(const QString &accountUserId)
 {
     if (m_accountUserId != accountUserId) {
         m_accountUserId = accountUserId;
@@ -55,22 +55,22 @@ void UserListQueryWrapperObject::setAccountUserId(const QString &accountUserId)
 }
 
 
-Query UserListQueryWrapperObject::query() const
+Query ListModelQueryObject::query() const
 {
     return m_query;
 }
 
-void UserListQueryWrapperObject::setQuery(UserListQuery &&query)
+void ListModelQueryObject::setQuery(ListRepositoryQuery &&query)
 {
     m_query = std::move(query);
 }
 
-QueryTypeObject::UserListType UserListQueryWrapperObject::type() const
+QueryTypeObject::ListModelType ListModelQueryObject::type() const
 {
     return m_type;
 }
 
-void UserListQueryWrapperObject::setType(QueryTypeObject::UserListType type)
+void ListModelQueryObject::setType(QueryTypeObject::ListModelType type)
 {
     if (m_type != type) {
         m_type = type;
@@ -79,12 +79,12 @@ void UserListQueryWrapperObject::setType(QueryTypeObject::UserListType type)
     }
 }
 
-QVariantMap UserListQueryWrapperObject::parameters() const
+QVariantMap ListModelQueryObject::parameters() const
 {
     return m_parameters;
 }
 
-void UserListQueryWrapperObject::setParameters(const QVariantMap &parameters)
+void ListModelQueryObject::setParameters(const QVariantMap &parameters)
 {
     if (m_parameters != parameters) {
         m_parameters = parameters;
@@ -93,21 +93,21 @@ void UserListQueryWrapperObject::setParameters(const QVariantMap &parameters)
     }
 }
 
-void UserListQueryWrapperObject::accept(QueryWrapperVisitor &visitor) const
+void ListModelQueryObject::accept(QueryWrapperVisitor &visitor) const
 {
-    visitor.visitUserListQuery(*this);
+    visitor.visitListModelQuery(*this);
 }
 
-void UserListQueryWrapperObject::updateQuery()
+void ListModelQueryObject::updateQuery()
 {
-    if (convertedType() != UserListQuery::Invalid) {
-        setQuery(UserListQuery(convertedType(), private_util::convertParameters(m_parameters)));
+    if (convertedType() != ListRepositoryQuery::Invalid) {
+        setQuery(ListRepositoryQuery(convertedType(), private_util::convertParameters(m_parameters)));
     }
 }
 
-UserListQuery::Type UserListQueryWrapperObject::convertedType() const
+ListRepositoryQuery::Type ListModelQueryObject::convertedType() const
 {
-    return static_cast<UserListQuery::Type>(m_type);
+    return static_cast<ListRepositoryQuery::Type>(m_type);
 }
 
 }

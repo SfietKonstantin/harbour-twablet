@@ -38,7 +38,7 @@
 #include "globals.h"
 #include "query.h"
 #include "tweetrepository.h"
-#include "ilistqueryhandler.h"
+#include "irepositoryqueryhandler.h"
 #include "iqueryexecutor.h"
 
 class TweetRepositoryContainer
@@ -58,14 +58,14 @@ public:
 private:
     struct Data
     {
-        explicit Data(IListQueryHandler<Tweet>::Ptr &&inputHandler);
+        explicit Data(IRepositoryQueryHandler<Tweet>::Ptr &&inputHandler);
         bool loading {false};
         TweetRepository repository {};
         int refcount {0};
-        IListQueryHandler<Tweet>::Ptr handler {};
+        IRepositoryQueryHandler<Tweet>::Ptr handler {};
     };
     void load(const ContainerKey &key, Data &mappingData,
-              IListQueryHandler<Tweet>::RequestType requestType);
+              IRepositoryQueryHandler<Tweet>::RequestType requestType);
     Data * getMappingData(const ContainerKey &key);
     IQueryExecutor::ConstPtr m_queryExecutor {nullptr};
     std::map<QString, Tweet> m_data {};

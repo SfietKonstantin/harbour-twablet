@@ -51,7 +51,7 @@ public:
     ~Repository()
     {
         for (IRepositoryListener<T> *listener : m_listeners) {
-            listener->doInvalidate();
+            listener->onInvalidation();
             removeListener(*listener);
         }
     }
@@ -75,7 +75,7 @@ public:
     {
         m_data.emplace_back(data);
         for (IRepositoryListener<T> *listener : m_listeners) {
-            listener->doAppend(*(std::end(m_data) - 1));
+            listener->onAppend(*(std::end(m_data) - 1));
         }
         return *(std::end(m_data) - 1);
     }
@@ -85,7 +85,7 @@ public:
             m_data.emplace_back(entry);
         }
         for (IRepositoryListener<T> *listener : m_listeners) {
-            listener->doAppend(data);
+            listener->onAppend(data);
         }
     }
     void prepend(const std::vector<T> &data)
@@ -94,7 +94,7 @@ public:
             m_data.emplace_front(*it);
         }
         for (IRepositoryListener<T> *listener : m_listeners) {
-            listener->doPrepend(data);
+            listener->onPrepend(data);
         }
     }
     void update(int index, T &&data)
@@ -104,7 +104,7 @@ public:
         }
         m_data[index] = std::move(data);
         for (IRepositoryListener<T> *listener : m_listeners) {
-            listener->doUpdate(index, *(std::begin(m_data) + index));
+            listener->onUpdate(index, *(std::begin(m_data) + index));
         }
     }
     void remove(int index)
@@ -114,7 +114,7 @@ public:
         }
         m_data.erase(std::begin(m_data) + index);
         for (IRepositoryListener<T> *listener : m_listeners) {
-            listener->doRemove(index);
+            listener->onRemove(index);
         }
     }
     void move(int from, int to)
@@ -134,14 +134,14 @@ public:
         m_data.erase(std::begin(m_data) + from);
         m_data.insert(std::begin(m_data) + toIndex, data);
         for (IRepositoryListener<T> *listener : m_listeners) {
-            listener->doMove(from, to);
+            listener->onMove(from, to);
         }
     }
     void start()
     {
         m_status = Loading;
         for (IRepositoryListener<T> *listener : m_listeners) {
-            listener->doStart();
+            listener->onStart();
         }
     }
     void error(const QString &error)
@@ -149,14 +149,14 @@ public:
         m_status = Error;
         m_lastError = error;
         for (IRepositoryListener<T> *listener : m_listeners) {
-            listener->doError(error);
+            listener->onError(error);
         }
     }
     void finish()
     {
         m_status = Idle;
         for (IRepositoryListener<T> *listener : m_listeners) {
-            listener->doFinish();
+            listener->onFinish();
         }
     }
     void addListener(IRepositoryListener<T> &listener)
@@ -166,10 +166,10 @@ public:
         case Idle:
             break;
         case Loading:
-            listener.doStart();
+            listener.onStart();
             break;
         case Error:
-            listener.doError(m_lastError);
+            listener.onError(m_lastError);
             break;
         }
     }

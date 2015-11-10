@@ -39,19 +39,19 @@ AccountSelectionModel::AccountSelectionModel(QObject *parent)
 {
 }
 
-int AccountSelectionModel::index() const
+int AccountSelectionModel::currentIndex() const
 {
-    return m_index;
+    return m_currentIndex;
 }
 
-void AccountSelectionModel::setIndex(int index)
+void AccountSelectionModel::setCurrentIndex(int currentIndex)
 {
-    if (m_index != index) {
-        m_index = index;
-        emit indexChanged();
+    if (m_currentIndex != currentIndex) {
+        m_currentIndex = currentIndex;
+        emit currentIndexChanged();
 
-        if (m_index >= 0 && m_index < rowCount()) {
-            setSelection(m_items.at(m_index).get());
+        if (m_currentIndex >= 0 && m_currentIndex < rowCount()) {
+            setSelection(m_items.at(m_currentIndex).get());
         } else {
             setSelection(nullptr);
         }

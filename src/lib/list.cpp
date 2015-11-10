@@ -29,54 +29,83 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#include "layout.h"
+#include "list.h"
+#include <QtCore/QJsonObject>
+#include "private/timeutil.h"
 
-Layout::Layout(const QString &name, const QString &userId, TweetRepositoryQuery &&query)
-    : m_name{name}, m_accountUserId{userId}, m_query{std::move(query)}
+
+List::List(const QJsonObject &json)
 {
+    m_id = std::move(json.value(QLatin1String("id_str")).toString());
+    m_name = std::move(json.value(QLatin1String("name")).toString());
+    m_slug = std::move(json.value(QLatin1String("slut")).toString());
+    m_fullName = std::move(json.value(QLatin1String("full_name")).toString());
+    m_description = std::move(json.value(QLatin1String("description")).toString());
+    m_user = std::move(User(json.value(QLatin1String("user")).toObject()));
+    m_mode = std::move(json.value(QLatin1String("mode")).toString());
+    m_following = json.value(QLatin1String("following")).toBool();
+    m_memberCount = json.value(QLatin1String("member_count")).toInt();
+    m_subscriberCount = json.value(QLatin1String("subscriber_count")).toInt();
+    m_uri = std::move(json.value(QLatin1String("uri")).toString());
+    m_createdAt = std::move(private_util::fromUtc(json.value(QLatin1String("created_at")).toString()));
 }
 
-bool Layout::isValid() const
+bool List::isValid() const
 {
-    return (!m_name.isEmpty() && !m_accountUserId.isEmpty() && m_query.isValid());
+    return !m_id.isEmpty();
 }
 
-QString Layout::name() const
+QString List::id() const
+{
+    return m_id;
+}
+
+QString List::name() const
 {
     return m_name;
 }
 
-void Layout::setName(const QString &name)
+QString List::slug() const
 {
-    m_name = name;
+    return m_slug;
 }
 
-QString Layout::accountUserId() const
+QString List::fullName() const
 {
-    return m_accountUserId;
+    return m_fullName;
 }
 
-void Layout::setAccountUserId(const QString &userId)
+QString List::description() const
 {
-    m_accountUserId = userId;
+    return m_description;
 }
 
-TweetRepositoryQuery Layout::query() const
+User List::user() const
 {
-    return m_query;
+    return m_user;
 }
 
-void Layout::setQuery(TweetRepositoryQuery &&query)
+QString List::mode() const
 {
-    m_query = std::move(query);
+    return m_mode;
 }
 
-int Layout::unread() const
+bool List::isFollowing() const
 {
-    return m_unread;
+    return m_following;
 }
 
-void Layout::setUnread(int unread)
+int List::memberCount() const
 {
-    m_unread = unread;
+    return m_memberCount;
+}
+
+int List::subscriberCount() const
+{
+    return m_subscriberCount;
+}
+
+QString List::uri() const
+{
+    return m_uri;
 }

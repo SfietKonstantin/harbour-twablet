@@ -41,25 +41,33 @@ namespace qml
 class QueryTypeObject : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(TweetListType)
-    Q_ENUMS(UserListType)
+    Q_ENUMS(TweetModelType)
+    Q_ENUMS(UserModelType)
+    Q_ENUMS(ListModelType)
     Q_ENUMS(TweetItemType)
     Q_ENUMS(UserItemType)
 public:
-    enum TweetListType
+    enum TweetModelType
     {
-        InvalidTweetList = TweetListQuery::Invalid,
-        Home = TweetListQuery::Home,
-        Mentions = TweetListQuery::Mentions,
-        Search = TweetListQuery::Search,
-        Favorites = TweetListQuery::Favorites,
-        UserTimeline = TweetListQuery::UserTimeline,
+        InvalidTweetModel = TweetRepositoryQuery::Invalid,
+        Home = TweetRepositoryQuery::Home,
+        Mentions = TweetRepositoryQuery::Mentions,
+        Search = TweetRepositoryQuery::Search,
+        Favorites = TweetRepositoryQuery::Favorites,
+        UserTimeline = TweetRepositoryQuery::UserTimeline,
     };
-    enum UserListType
+    enum UserModelType
     {
-        InvalidUserList = UserListQuery::Invalid,
-        Friends = UserListQuery::Friends,
-        Followers = UserListQuery::Followers
+        InvalidUserModel = UserRepositoryQuery::Invalid,
+        Friends = UserRepositoryQuery::Friends,
+        Followers = UserRepositoryQuery::Followers
+    };
+    enum ListModelType
+    {
+        InvalidListModel = ListRepositoryQuery::Invalid,
+        Subscriptions = ListRepositoryQuery::Subscriptions,
+        Ownerships = ListRepositoryQuery::Ownerships,
+        Memberships = ListRepositoryQuery::Memberships
     };
     enum TweetItemType
     {

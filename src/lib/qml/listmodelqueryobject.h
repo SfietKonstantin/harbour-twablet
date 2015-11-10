@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2015 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,8 +29,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef TWEETLISTQUERYWRAPPEROBJECT_H
-#define TWEETLISTQUERYWRAPPEROBJECT_H
+#ifndef LISTMODELQUERYOBJECT_H
+#define LISTMODELQUERYOBJECT_H
 
 #include <QtCore/QVariantMap>
 #include "iquerywrapperobject.h"
@@ -40,24 +40,22 @@
 namespace qml
 {
 
-class TweetListQueryWrapperObject : public QObject, public IQueryWrapperObject
+class ListModelQueryObject : public QObject, public IQueryWrapperObject
 {
     Q_OBJECT
     Q_INTERFACES(qml::IQueryWrapperObject)
     Q_PROPERTY(QString accountUserId READ accountUserId WRITE setAccountUserId
                NOTIFY accountUserIdChanged)
-    Q_PROPERTY(qml::QueryTypeObject::TweetListType type READ type WRITE setType NOTIFY typeChanged)
+    Q_PROPERTY(qml::QueryTypeObject::ListModelType type READ type WRITE setType NOTIFY typeChanged)
     Q_PROPERTY(QVariantMap parameters READ parameters WRITE setParameters NOTIFY parametersChanged)
 public:
-    explicit TweetListQueryWrapperObject(QObject *parent = 0);
-    explicit TweetListQueryWrapperObject(const QString accountUserId, const TweetListQuery &query,
-                                         QObject *parent = 0);
+    explicit ListModelQueryObject(QObject *parent = 0);
     QString accountUserId() const override;
     void setAccountUserId(const QString &accountUserId);
     Query query() const override;
-    void setQuery(TweetListQuery &&query);
-    QueryTypeObject::TweetListType type() const;
-    void setType(QueryTypeObject::TweetListType type);
+    void setQuery(ListRepositoryQuery &&query);
+    QueryTypeObject::ListModelType type() const;
+    void setType(QueryTypeObject::ListModelType type);
     QVariantMap parameters() const;
     void setParameters(const QVariantMap &parameters);
     void accept(QueryWrapperVisitor &visitor) const override;
@@ -67,13 +65,14 @@ signals:
     void parametersChanged();
 private:
     void updateQuery();
-    TweetListQuery::Type convertedType() const;
+    ListRepositoryQuery::Type convertedType() const;
     QString m_accountUserId {};
-    TweetListQuery m_query {};
-    QueryTypeObject::TweetListType m_type {QueryTypeObject::InvalidTweetList};
+    ListRepositoryQuery m_query {};
+    QueryTypeObject::ListModelType m_type {QueryTypeObject::InvalidListModel};
     QVariantMap m_parameters {};
+
 };
 
 }
 
-#endif // TWEETLISTQUERYWRAPPEROBJECT_H
+#endif // LISTMODELQUERYOBJECT_H

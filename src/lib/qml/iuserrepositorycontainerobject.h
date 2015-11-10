@@ -46,8 +46,8 @@ class IUserRepositoryContainerObject
 public:
     virtual ~IUserRepositoryContainerObject() {}
     virtual UserRepository * userRepository(const Account &account, const Query &query) = 0;
-    virtual void referenceUserListQuery(const Account &account, const Query &query) = 0;
-    virtual void dereferenceUserListQuery(const Account &account, const Query &query) = 0;
+    virtual void referenceUserRepositoryQuery(const Account &account, const Query &query) = 0;
+    virtual void dereferenceUserRepositoryQuery(const Account &account, const Query &query) = 0;
 };
 
 }

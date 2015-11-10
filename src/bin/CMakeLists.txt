@@ -55,6 +55,7 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/pages/SimpleListItem.qml
     qml/pages/UsersPage.qml
     qml/pages/TweetsPage.qml
+    qml/pages/ListPage.qml
     qml/pages/TweetPage.qml
     qml/pages/StatusUpdater.qml
     qml/pages/ProgressIconButton.qml

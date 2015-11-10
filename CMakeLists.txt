@@ -7,7 +7,6 @@ option(ENABLE_DESKTOP_BUILD "Enable build on desktop" OFF)
 
 # Configuration
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -pie -rdynamic")
 
 if(ENABLE_TESTS)
     if(CMAKE_BUILD_TYPE MATCHES Debug)
