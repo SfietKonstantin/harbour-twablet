@@ -42,15 +42,15 @@ Page {
     property RightPanel panel
 
     Component.onCompleted: {
-        Repository.loadMore(query)
+        Twablet.Repository.loadMore(query)
     }
 
     SilicaListView {
         anchors.fill: parent
         model: Twablet.ListModel {
             id: listModel
-            repository: Repository
-            query: ListModelQuery {
+            repository: Twablet.Repository
+            query: Twablet.ListModelQuery {
                 id: query
             }
         }
@@ -99,7 +99,7 @@ Page {
 
         footer: LoadMoreButton {
             model: listModel
-            onClicked: Repository.loadMore(query)
+            onClicked: Twablet.Repository.loadMore(query)
         }
 
         StatusPlaceholder {
