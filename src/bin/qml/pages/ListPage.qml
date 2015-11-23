@@ -31,7 +31,6 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import harbour.twablet 1.0
 import harbour.twablet 1.0 as Twablet
 
 Page {

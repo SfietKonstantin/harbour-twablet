@@ -31,7 +31,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import harbour.twablet 1.0
+import harbour.twablet 1.0 as Twablet
 
 Dialog {
     id: container
@@ -56,9 +56,9 @@ Dialog {
             args.result_type = resultTypeModel.get(resultTypeCombo.currentIndex).value
         }
         if (!container.editing) {
-            Repository.addLayout(nameField.text, accountIndex, queryType, args)
+            Twablet.Repository.addLayout(nameField.text, accountIndex, queryType, args)
         } else {
-            Repository.updateLayout(container.index, nameField.text, accountIndex, queryType, args)
+            Twablet.Repository.updateLayout(container.index, nameField.text, accountIndex, queryType, args)
         }
     }
 
@@ -90,9 +90,9 @@ Dialog {
                 label: qsTr("Account")
                 menu: ContextMenu {
                     Repeater {
-                        model: AccountModel {
+                        model: Twablet.AccountModel {
                             id: accountModel
-                            repository: Repository
+                            repository: Twablet.Repository
                             Component.onCompleted: {
                                 if (container.editing) {
                                     accountCombo.currentIndex = accountModel.getIndex(container.initialAccountUserId)
@@ -112,7 +112,7 @@ Dialog {
                 label: qsTr("Column type")
                 menu: ContextMenu {
                     Repeater {
-                        model: QueryTypeModel {
+                        model: Twablet.QueryTypeModel {
                             id: queryTypeModel
                             Component.onCompleted: {
                                 if (container.editing) {
@@ -129,7 +129,7 @@ Dialog {
 
             TextField {
                 id: searchQuery
-                property bool isSearch: (queryTypeModel.getType(queryCombo.currentIndex) === QueryType.Search)
+                property bool isSearch: (queryTypeModel.getType(queryCombo.currentIndex) === Twablet.QueryType.Search)
                 property bool isSearchOk: (isSearch && searchQuery.text.length > 0 || !isSearch)
                 anchors.left: parent.left; anchors.right: parent.right
                 visible: isSearch
@@ -137,7 +137,7 @@ Dialog {
                 label: qsTr("Search query")
 
                 Component.onCompleted: {
-                    if (container.editing && container.initialType == QueryType.Search) {
+                    if (container.editing && container.initialType == Twablet.QueryType.Search) {
                         searchQuery.text = container.initialParameters.q
                     }
                 }
@@ -147,31 +147,33 @@ Dialog {
                 id: resultTypeCombo
                 visible: searchQuery.isSearch
                 label: qsTr("Search result type")
+
+                ListModel {
+                    id: resultTypeModel
+                    ListElement {
+                        text: QT_TR_NOOP("Recent")
+                        value: "recent"
+                    }
+                    ListElement {
+                        text: QT_TR_NOOP("Popular")
+                        value: "popular"
+                    }
+                    ListElement {
+                        text: QT_TR_NOOP("Mixed")
+                        value: "mixed"
+                    }
+                }
+
                 menu: ContextMenu {
                     Repeater {
-                        model: ListModel {
-                            id: resultTypeModel
-                            ListElement {
-                                text: QT_TR_NOOP("Recent")
-                                value: "recent"
-                            }
-                            ListElement {
-                                text: QT_TR_NOOP("Popular")
-                                value: "popular"
-                            }
-                            ListElement {
-                                text: QT_TR_NOOP("Mixed")
-                                value: "mixed"
-                            }
-                        }
-
+                        model: resultTypeModel
                         delegate: MenuItem {
                             text: qsTr(model.text)
                         }
                     }
                 }
                 Component.onCompleted: {
-                    if (container.editing && container.initialType == QueryType.Search) {
+                    if (container.editing && container.initialType == Twablet.QueryType.Search) {
                         var resultType = container.initialParameters.result_type
                         if (resultType === "recent") {
                             resultTypeCombo.currentIndex = 0
