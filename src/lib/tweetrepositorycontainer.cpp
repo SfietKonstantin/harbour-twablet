@@ -30,6 +30,7 @@
  */
 
 #include "tweetrepositorycontainer.h"
+#include "private/accountutil.h"
 #include "private/debughelper.h"
 #include "private/repositoryquerycallback.h"
 #include "private/twitterqueryutil.h"
@@ -207,7 +208,7 @@ TweetRepositoryContainer::Data * TweetRepositoryContainer::getMappingData(const 
         return &(it->second);
     }
 
-    if (!key.account().isValid()) {
+    if (!private_util::isAccountValid(key.account())) {
         return nullptr;
     }
 

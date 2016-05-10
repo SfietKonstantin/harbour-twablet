@@ -33,9 +33,9 @@
 #define IUSERREPOSITORYCONTAINEROBJECT_H
 
 #include <QtCore/QtPlugin>
+#include "account.fwd.h"
 #include "userrepository.h"
 
-class Account;
 class Layout;
 class Query;
 namespace qml

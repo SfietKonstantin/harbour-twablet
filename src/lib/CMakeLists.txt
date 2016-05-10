@@ -21,7 +21,8 @@ set(${PROJECT_NAME}_Core_SRCS
     qobjectutils.h
     irepositorylistener.h
     iloadsave.h
-    account.cpp
+    account.fwd.h
+    account.h
     layout.cpp
     tweet.cpp
     quotedtweet.cpp
@@ -63,6 +64,7 @@ set(${PROJECT_NAME}_Core_SRCS
 set(${PROJECT_NAME}_Private_SRCS
     private/maputil.h
     private/debughelper.cpp
+    private/accountutil.cpp
     private/twitterdatautil.cpp
     private/twitterqueryutil.cpp
     private/networkqueryexecutor.cpp
@@ -121,14 +123,26 @@ set(${PROJECT_NAME}_Qml_SRCS
     qml/userspecificquerywrapperobject.cpp
 )
 
+microgen_bean(${PROJECT_NAME}_Generated_SRCS
+    generated/account.yaml
+)
+
 add_library(${PROJECT_NAME} STATIC
     ${${PROJECT_NAME}_Core_SRCS}
     ${${PROJECT_NAME}_Private_SRCS}
     ${${PROJECT_NAME}_Qml_SRCS}
+    ${${PROJECT_NAME}_Generated_SRCS}
+)
+target_link_libraries(${PROJECT_NAME}
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Network
+    microcore
 )
 
 qt5_use_modules(${PROJECT_NAME} Core Network Qml)
 
-set(${PROJECT_NAME}_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}
-    CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE
+target_include_directories(${PROJECT_NAME} PUBLIC
+    ${PROJECT_SOURCE_DIR}
+    ${PROJECT_BINARY_DIR}
 )

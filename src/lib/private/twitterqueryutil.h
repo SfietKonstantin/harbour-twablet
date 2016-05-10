@@ -34,10 +34,10 @@
 
 #include <map>
 #include <QtNetwork/QNetworkRequest>
+#include "account.fwd.h"
 
 class QNetworkAccessManager;
 class QNetworkReply;
-class Account;
 
 namespace private_util
 {

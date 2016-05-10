@@ -30,6 +30,7 @@
  */
 
 #include "listrepositorycontainer.h"
+#include "private/accountutil.h"
 #include "private/repositoryquerycallback.h"
 #include "repositoryqueryhandlerfactory.h"
 
@@ -121,7 +122,7 @@ ListRepositoryContainer::Data * ListRepositoryContainer::getMappingData(const Co
         return &(it->second);
     }
 
-    if (!key.account().isValid()) {
+    if (!private_util::isAccountValid(key.account())) {
         return nullptr;
     }
 

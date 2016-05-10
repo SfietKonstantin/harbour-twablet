@@ -33,9 +33,9 @@
 #define ITWEETREPOSITORYCONTAINEROBJECT_H
 
 #include <QtCore/QtPlugin>
+#include "account.fwd.h"
 #include "tweetrepository.h"
 
-class Account;
 class Layout;
 class Query;
 namespace qml

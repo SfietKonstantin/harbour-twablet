@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2016 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,47 +29,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
+#include "accountutil.h"
 #include "account.h"
 
-Account::Account(const QString &name, const QString &userId, const QString &screenName,
-                 const QByteArray &token, const QByteArray &tokenSecret)
-    : m_name{name}, m_userId{userId}, m_screenName{screenName}
-    , m_token{token}, m_tokenSecret{tokenSecret}
+namespace private_util
 {
+
+bool isAccountValid(const Account &account)
+{
+    return (!account.name().isEmpty()
+            && !account.userId().isEmpty()
+            && !account.screenName().isEmpty()
+            && !account.token().isEmpty()
+            && !account.tokenSecret().isEmpty());
 }
 
-bool Account::isValid() const
-{
-    return (!m_name.isEmpty() && !m_userId.isEmpty() && !m_screenName.isEmpty()
-            && !m_token.isEmpty() && !m_tokenSecret.isEmpty());
-}
-
-QString Account::name() const
-{
-    return m_name;
-}
-
-void Account::setName(const QString &name)
-{
-    m_name = name;
-}
-
-QString Account::userId() const
-{
-    return m_userId;
-}
-
-QString Account::screenName() const
-{
-    return m_screenName;
-}
-
-QByteArray Account::token() const
-{
-    return m_token;
-}
-
-QByteArray Account::tokenSecret() const
-{
-    return m_tokenSecret;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Lucien XU <sfietkonstantin@free.fr>
+ * Copyright (C) 2016 Lucien XU <sfietkonstantin@free.fr>
  *
  * You may use this file under the terms of the BSD license as follows:
  *
@@ -29,25 +29,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
  */
 
-#ifndef IQUERYEXECUTOR_H
-#define IQUERYEXECUTOR_H
+#ifndef ACCOUNTUTIL_H
+#define ACCOUNTUTIL_H
 
-#include <memory>
-#include <functional>
-#include <QtNetwork/QNetworkReply>
 #include "account.fwd.h"
-#include "query.h"
 
-class IQueryExecutor
+namespace private_util
 {
-public:
-    using ConstPtr = std::unique_ptr<const IQueryExecutor>;
-    using Callback_t = std::function<void (QIODevice &reply, QNetworkReply::NetworkError error, const QString &errorMessage)>;
-    virtual ~IQueryExecutor() {}
-    virtual void execute(Query::RequestType type, const QByteArray &path,
-                         const std::map<QByteArray, QByteArray> &parameters,
-                         const Account &account, const Callback_t &callback) const = 0;
-};
 
-#endif // ILISTQUERYEXECUTOR_H
+bool isAccountValid(const Account &account);
 
+}
+
+#endif // ACCOUNTUTIL_H

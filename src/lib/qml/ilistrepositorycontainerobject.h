@@ -33,9 +33,9 @@
 #define ILISTREPOSITORYCONTAINEROBJECT_H
 
 #include <QtCore/QtPlugin>
+#include "account.fwd.h"
 #include "listrepository.h"
 
-class Account;
 class Layout;
 class Query;
 namespace qml

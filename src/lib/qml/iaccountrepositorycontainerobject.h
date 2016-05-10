@@ -33,8 +33,8 @@
 #define IACCOUNTREPOSITORYCONTAINEROBJECT_H
 
 #include <QtCore/QtPlugin>
+#include "account.fwd.h"
 
-class Account;
 class AccountRepository;
 namespace qml
 {

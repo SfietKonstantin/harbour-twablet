@@ -1,0 +1,3 @@
+[submodule "src/3rdparty/microcore"]
+	path = src/3rdparty/microcore
+	url = https://github.com/SfietKonstantin/microcore.git

@@ -138,7 +138,8 @@ int DataRepositoryObject::addAccount(const QString &name, const QString &userId,
                                      const QString &token, const QString &tokenSecret)
 {
     bool oldHasAccounts = hasAccounts();
-    Account &addedAccount (m_accounts.append(Account(name, userId, screenName, token.toLocal8Bit(),
+    Account &addedAccount (m_accounts.append(Account(QString(name), QString(userId),
+                                                     QString(screenName), token.toLocal8Bit(),
                                                      tokenSecret.toLocal8Bit())));
     m_accountsMapping.emplace(addedAccount.userId(), addedAccount);
     m_loadSaveManager.save(m_accounts);
@@ -156,7 +157,7 @@ void DataRepositoryObject::updateAccountName(int index, const QString &name)
         return;
     }
     Account account {*(std::begin(m_accounts) + index)};
-    account.setName(name);
+    account.setName(QString(name));
     m_accounts.update(index, std::move(account));
     m_loadSaveManager.save(m_accounts);
 }

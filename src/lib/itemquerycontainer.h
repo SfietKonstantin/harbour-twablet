@@ -34,6 +34,7 @@
 
 #include <map>
 #include <set>
+#include "account.fwd.h"
 #include "containerkey.h"
 #include "globals.h"
 #include "iitemqueryhandler.h"
@@ -41,7 +42,6 @@
 #include "iitemlistener.h"
 #include "query.h"
 
-class Account;
 class User;
 class Tweet;
 class ItemQueryContainer

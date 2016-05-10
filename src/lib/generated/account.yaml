@@ -1,0 +1,22 @@
+module: twablet
+name: Account
+properties:
+    - name: name
+      type: QString
+      access: rw
+
+    - name: userId
+      type: QString
+      access: c
+      
+    - name: screenName
+      type: QString
+      access: c
+      
+    - name: token
+      type: QByteArray
+      access: c
+      
+    - name: tokenSecret
+      type: QByteArray
+      access: c

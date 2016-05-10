@@ -87,12 +87,9 @@ add_executable(${PROJECT_NAME}
     ${${PROJECT_NAME}_Data_SRCS}
 )
 target_link_libraries(${PROJECT_NAME}
-    Qt5::Core
-    Qt5::Gui
-    Qt5::Network
+    twablet
     Qt5::Quick
     ${SAILFISHAPP_LIBRARIES}
-    twablet
 )
 qt5_use_modules(${PROJECT_NAME} Core Gui Network Quick)
 

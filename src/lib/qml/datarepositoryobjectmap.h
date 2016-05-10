@@ -34,6 +34,7 @@
 
 #include <QtCore/QtGlobal>
 
+#include "account.fwd.h"
 #include "repository.h"
 #include "datarepositoryobject.h"
 #include "iaccountrepositorycontainerobject.h"
@@ -45,7 +46,6 @@
 #include "usermodelquerywrapperobject.h"
 #include "listmodelqueryobject.h"
 
-class Account;
 class Layout;
 class Tweet;
 class User;

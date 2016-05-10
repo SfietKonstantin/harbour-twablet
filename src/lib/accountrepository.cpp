@@ -40,13 +40,14 @@ void AccountRepository::load(const QJsonObject &json)
     List data;
     for (const QJsonValue &accountValue : accountsArray) {
         const QJsonObject &account {accountValue.toObject()};
-        const QString &name {account.value(QLatin1String("name")).toString()};
-        const QString &userId {account.value(QLatin1String("userId")).toString()};
-        const QString &screenName {account.value(QLatin1String("screenName")).toString()};
-        const QByteArray &token {account.value(QLatin1String("token")).toString().toLocal8Bit()};
-        const QByteArray &tokenSecret {account.value(QLatin1String("tokenSecret")).toString().toLocal8Bit()};
+        QString name {account.value(QLatin1String("name")).toString()};
+        QString userId {account.value(QLatin1String("userId")).toString()};
+        QString screenName {account.value(QLatin1String("screenName")).toString()};
+        QByteArray token {account.value(QLatin1String("token")).toString().toLocal8Bit()};
+        QByteArray tokenSecret {account.value(QLatin1String("tokenSecret")).toString().toLocal8Bit()};
         if (!name.isEmpty() && !userId.isEmpty()) {
-            data.emplace_back(name, userId, screenName, token, tokenSecret);
+            data.emplace_back(std::move(name), std::move(userId), std::move(screenName),
+                              std::move(token), std::move(tokenSecret));
         }
     }
     m_data = std::move(data);

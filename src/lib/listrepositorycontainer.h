@@ -33,6 +33,7 @@
 #define LISTREPOSITORYCONTAINER_H
 
 #include <set>
+#include "account.fwd.h"
 #include "containerkey.h"
 #include "globals.h"
 #include "irepositoryqueryhandler.h"
@@ -40,7 +41,6 @@
 #include "irepositorylistener.h"
 #include "listrepository.h"
 
-class Account;
 class List;
 class ListRepositoryContainer
 {
